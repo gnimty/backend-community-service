@@ -5,14 +5,18 @@ import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
 import com.gnimty.communityapiserver.domain.chat.service.ChatService;
 import com.gnimty.communityapiserver.domain.member.service.MemberService;
+import com.gnimty.communityapiserver.global.auth.WebSocketSessionManager;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.socket.messaging.SessionConnectedEvent;
+import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 
 @RestController
@@ -23,7 +27,7 @@ public class ChatController {
 	private final ChatService chatService;
 	private final MemberService memberService;
 	private final SimpMessagingTemplate template;
-
+	private final WebSocketSessionManager webSocketSessionManager;
 	// 채팅의 모든 조회
 	@SubscribeMapping("/init_chat")
 	public List<ChatRoomInfo> getTotalChatRoomsAndChatsAndOtherUserInfo() {
@@ -74,5 +78,17 @@ public class ChatController {
 		template.convertAndSend("/sub/chatRoom/" + chatRoomNo, message);
 	}
 
-	// 구독 취소 (유저 차단) 어떻게 구현?
+	@EventListener
+	public void onClientDisconnect(SessionDisconnectEvent event) {
+		Long memberId = webSocketSessionManager.disConnectSession(event.getSessionId());
+		// 유저 상태 '오프라인'으로 변경
+	}
+
+	@EventListener
+	public void onClientConnect(SessionConnectedEvent event) {
+		String simpSessionId = String.valueOf(event.getMessage().getHeaders().get("simpSessionId"));
+		Long memberId = webSocketSessionManager.getMemberId(simpSessionId);
+		// 유저 상태 '온라인'으로 변경
+	}
+
 }

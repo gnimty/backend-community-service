@@ -32,14 +32,16 @@ public class StompConfiguration implements WebSocketMessageBrokerConfigurer {
 		registry
 			.setErrorHandler(stompExceptionHandler)
 			.addEndpoint("/chat")
-//            .addInterceptors((HandshakeInterceptor) stompHandler)
+			//.addInterceptors((HandshakeInterceptor) stompHandler)
+
 			.setAllowedOriginPatterns("*");
 
 		// SockJS 사용 시
 		registry
 			.setErrorHandler(stompExceptionHandler)
 			.addEndpoint("/chat")
-//            .addInterceptors()
+			//.addInterceptors((HandshakeInterceptor) stompHandler)
+
 			.setAllowedOriginPatterns("*")
 			.withSockJS();
 	}
@@ -48,4 +50,6 @@ public class StompConfiguration implements WebSocketMessageBrokerConfigurer {
 	public void configureClientInboundChannel(ChannelRegistration registration) {
 		registration.interceptors(stompHandler);
 	}
+
+
 }
