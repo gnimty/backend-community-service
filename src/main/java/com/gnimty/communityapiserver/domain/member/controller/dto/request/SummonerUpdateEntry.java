@@ -1,0 +1,31 @@
+package com.gnimty.communityapiserver.domain.member.controller.dto.request;
+
+import com.gnimty.communityapiserver.global.constant.Lane;
+import com.gnimty.communityapiserver.global.constant.Tier;
+import com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage;
+import java.util.List;
+import javax.validation.constraints.NotNull;
+import lombok.Getter;
+
+@Getter
+public class SummonerUpdateEntry {
+
+	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+	private String summonerName;
+	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+	private String puuid;
+	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+	private Tier tier;
+	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+	private Integer division;
+	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+	private Long lp;
+	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+	private Long mmr;
+	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+	private List<Lane> mostLanes;
+	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+	private List<Long> mostChampionIds;
+	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+	private Long iconId;
+}

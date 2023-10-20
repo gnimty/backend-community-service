@@ -1,0 +1,60 @@
+version: '3'
+services:
+  community-web-dev:
+    image: kariskan/gnimty-community-server:latest
+    container_name: community-server
+    depends_on:
+      - community-mongo-dev
+      - community-mysql-dev
+      - community-redis-dev
+    ports:
+      - "18080:8080"
+    environment:
+      - TZ=Asia/Seoul
+    env_file:
+      - .env
+      - db.env
+    volumes:
+      - ./dev-logs:/app/logs/community
+    restart: always
+
+  community-mysql-dev:
+    image: mysql:8.0
+    container_name: gnimty-community-mysql-main
+    ports:
+      - "13306:3306"
+    env_file:
+      - db.env
+    environment:
+      TZ: Asia/Seoul
+    volumes:
+      - ./dev-data:/var/lib/mysql
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    restart: always
+
+  community-mongo-dev:
+    image: mongo:6.0.4
+    container_name: gnimty-community-mongo-main
+    volumes:
+      - ./dev-mongo-data:/data/db
+    ports:
+      - "37017:27017"
+    env_file:
+      - db.env
+    restart: always
+
+  community-redis-dev:
+    image: redis:latest
+    container_name: gnimty-community-redis-main
+    ports:
+      - "16379:6379"
+    volumes:
+      - ./dev-redis:/data
+      - ./dev-redis-conf:/usr/local/conf/redis.conf
+    labels:
+      - "name=redis"
+      - "mode=standalone"
+    restart: on-failure
+    command: redis-server /usr/local/conf/redis.conf
