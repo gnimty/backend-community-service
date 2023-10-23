@@ -8,4 +8,5 @@ import lombok.Getter;
 public class ChampionCommentsLikeServiceRequest {
 
 	private Boolean likeOrNot;
+	private Boolean cancel;
 }
