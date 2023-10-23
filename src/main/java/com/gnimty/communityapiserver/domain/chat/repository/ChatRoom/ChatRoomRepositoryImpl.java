@@ -11,14 +11,12 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
 @RequiredArgsConstructor
 public class ChatRoomRepositoryImpl implements ChatRoomRepositoryCustom {
-
 	@Autowired
 	private final MongoTemplate mongoTemplate;
 
@@ -44,25 +42,17 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepositoryCustom {
 		ChatRoom chatRoom = mongoTemplate.findOne(query, ChatRoom.class);
 		return Optional.ofNullable(chatRoom);
 	}
-
 	@Override
-	public ChatRoom save(User user1, User user2) {
+	public ChatRoom save(User user1, User user2, Long chatRoomNo) {
 		// 0. participant가 둘다 속해 있는 chatRoom이 없는지 확인
 		Optional<ChatRoom> bothJoined = findByUsers(user1, user2);
 
-		if (bothJoined.isPresent()) {
+		if (bothJoined.isPresent()){
 			throw new BaseException(ErrorCode.CHATROOM_ALREADY_EXISTS);
 		}
 
 		// 1. unique한 chatRoomNo를 찾기 -> chatRoomNo 최댓값 + 1
-		Long chatRoomNo = 0L;
-
-		Query query = new Query().with(Sort.by(Sort.Order.desc("chatRoomNo"))).limit(1);
-		ChatRoom target = mongoTemplate.findOne(query, ChatRoom.class);
-
-		if (target != null) {
-			chatRoomNo = target.getChatRoomNo() + 1;
-		}
+		// 변경 : 이미 Sequence generator를 통해서 chatRoomNo 가져옴
 
 		// 2. chatRoom에 User Set
 		List<ChatRoom.Participant> participants = new ArrayList<>();
@@ -76,9 +66,8 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepositoryCustom {
 	}
 
 	@Override
-	public void updateExitDate(User user) {
+	public void updateExitDate(Long chatRoomNo, User me){
 
 	}
-
 
 }
