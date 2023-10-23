@@ -2,6 +2,7 @@ package com.gnimty.communityapiserver.domain.chat.controller;
 
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatRoomInfo;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
+import com.gnimty.communityapiserver.domain.chat.entity.Status;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
 import com.gnimty.communityapiserver.domain.chat.service.ChatService;
 import com.gnimty.communityapiserver.domain.member.service.MemberService;
@@ -63,6 +64,7 @@ public class ChatController {
 	// 메세지 전송
 	@MessageMapping("/chatRoom/{chatRoomNo}")
 	public void sendMessage(@DestinationVariable("chatRoomNo") Long chatRoomNo, String message) {
+		chatService.saveChat(chatRoomNo, message);
 		template.convertAndSend("/sub/chatRoom/" + chatRoomNo, message);
 	}
 
@@ -80,15 +82,15 @@ public class ChatController {
 
 	@EventListener
 	public void onClientDisconnect(SessionDisconnectEvent event) {
-		Long memberId = webSocketSessionManager.disConnectSession(event.getSessionId());
-		// 유저 상태 '오프라인'으로 변경
+		Long userId = webSocketSessionManager.disConnectSession(event.getSessionId());
+		chatService.updateStatus(userId, Status.OFFLINE);
 	}
 
 	@EventListener
 	public void onClientConnect(SessionConnectedEvent event) {
 		String simpSessionId = String.valueOf(event.getMessage().getHeaders().get("simpSessionId"));
-		Long memberId = webSocketSessionManager.getMemberId(simpSessionId);
-		// 유저 상태 '온라인'으로 변경
+		Long userId = webSocketSessionManager.getMemberId(simpSessionId);
+		chatService.updateStatus(userId, Status.ONLINE);
 	}
 
 }
