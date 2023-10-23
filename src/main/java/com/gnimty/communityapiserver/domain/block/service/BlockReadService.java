@@ -2,6 +2,7 @@ package com.gnimty.communityapiserver.domain.block.service;
 
 import com.gnimty.communityapiserver.domain.block.controller.dto.response.BlockEntry;
 import com.gnimty.communityapiserver.domain.block.entity.Block;
+import com.gnimty.communityapiserver.domain.block.repository.BlockQueryRepository;
 import com.gnimty.communityapiserver.domain.block.repository.BlockRepository;
 import com.gnimty.communityapiserver.domain.block.service.dto.response.BlockReadServiceResponse;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class BlockReadService {
 
 	private final BlockRepository blockRepository;
+	private final BlockQueryRepository blockQueryRepository;
 
 	public BlockReadServiceResponse readBlocks() {
 		Member member = MemberThreadLocal.get();
@@ -31,7 +33,7 @@ public class BlockReadService {
 	}
 
 	public Boolean existsByBlockerAndBlocked(Member blocker, Member blocked) {
-		return blockRepository.existsByBlockerAndBlocked(blocker, blocked);
+		return blockQueryRepository.existsByBlockerAndBlocked(blocker, blocked);
 	}
 
 	public Block findById(Long id) {
