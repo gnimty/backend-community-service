@@ -168,7 +168,7 @@ public class RiotAccountQueryRepository {
 	}
 
 	private BooleanBuilder timeMatch(List<Schedule> schedules, Boolean timeMatch) {
-		if (!timeMatch) {
+		if (timeMatch == null || !timeMatch) {
 			return null;
 		}
 		BooleanBuilder builder = new BooleanBuilder();
