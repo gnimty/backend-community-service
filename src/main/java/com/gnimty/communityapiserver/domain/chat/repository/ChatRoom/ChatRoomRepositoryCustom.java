@@ -14,7 +14,9 @@ public interface ChatRoomRepositoryCustom {
 
 //    Optional<ChatRoom> findByConds(User user1, User user2, Long chaRoomNo);
 
-	ChatRoom save(User user1, User user2);
+	ChatRoom save(User user1, User user2, Long chatRoomNo);
 
-	void updateExitDate(User user);
+	void updateExitDate(Long chatRoomNo, User me);
+
+	void updateBlock(Long chatRoomNo, User me);
 }
