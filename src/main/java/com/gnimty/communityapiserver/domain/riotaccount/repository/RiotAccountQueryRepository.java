@@ -37,6 +37,22 @@ public class RiotAccountQueryRepository {
 
 	private final JPAQueryFactory queryFactory;
 
+	public Boolean existsByPuuid(String puuid) {
+		return queryFactory
+			.selectOne()
+			.from(riotAccount)
+			.where(riotAccount.puuid.eq(puuid))
+			.fetchFirst() != null;
+	}
+
+	public Boolean existsByMember(Member member) {
+		return queryFactory
+			.selectOne()
+			.from(riotAccount)
+			.where(riotAccount.member.id.eq(member.getId()))
+			.fetchFirst() != null;
+	}
+
 	public Slice<RecommendedSummonersEntry> findSummonersByConditions(
 		Pageable pageable,
 		RecommendedSummonersServiceRequest request,
@@ -111,14 +127,6 @@ public class RiotAccountQueryRepository {
 			.orderBy(Expressions.numberTemplate(Double.class, "function('rand')").asc())
 			.limit(5)
 			.fetch();
-	}
-
-	private Boolean existsByMember(Member member) {
-		return queryFactory
-			.selectOne()
-			.from(riotAccount)
-			.where(riotAccount.member.id.eq(member.getId()))
-			.fetchFirst() != null;
 	}
 
 	private List<RecommendedSummonersEntry> notLinkedSummonersQuery(

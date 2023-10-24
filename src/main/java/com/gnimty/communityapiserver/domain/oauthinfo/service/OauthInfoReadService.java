@@ -2,6 +2,7 @@ package com.gnimty.communityapiserver.domain.oauthinfo.service;
 
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.domain.oauthinfo.entity.OauthInfo;
+import com.gnimty.communityapiserver.domain.oauthinfo.repository.OauthInfoQueryRepository;
 import com.gnimty.communityapiserver.domain.oauthinfo.repository.OauthInfoRepository;
 import com.gnimty.communityapiserver.global.constant.Provider;
 import com.gnimty.communityapiserver.global.exception.BaseException;
@@ -17,9 +18,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class OauthInfoReadService {
 
 	private final OauthInfoRepository oauthInfoRepository;
+	private final OauthInfoQueryRepository oauthInfoQueryRepository;
 
 	public void throwIfExistsByEmailAndProvider(String email, Provider provider) {
-		if (oauthInfoRepository.existsByEmailAndProvider(email, provider)) {
+		if (oauthInfoQueryRepository.existsByEmailAndProvider(email, provider)) {
 			throw new BaseException(ErrorCode.ALREADY_LINKED_OAUTH);
 		}
 	}
@@ -29,7 +31,7 @@ public class OauthInfoReadService {
 	}
 
 	public Boolean existsByMemberAndProvider(Member member, Provider provider) {
-		return oauthInfoRepository.existsByMemberAndProvider(member, provider);
+		return oauthInfoQueryRepository.existsByMemberAndProvider(member, provider);
 	}
 
 	public OauthInfo findByMemberAndProvider(Member member, Provider provider) {
