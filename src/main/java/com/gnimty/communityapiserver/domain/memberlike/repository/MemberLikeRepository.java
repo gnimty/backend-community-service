@@ -14,8 +14,6 @@ public interface MemberLikeRepository extends JpaRepository<MemberLike, Long> {
 	Optional<MemberLike> findBySourceMemberAndTargetMember(Member sourceMember,
 		Member targetMember);
 
-	Boolean existsBySourceMemberAndTargetMember(Member sourceMember, Member targetMember);
-
 	List<MemberLike> findBySourceMember(Member sourceMember);
 
 	@Query("delete from MemberLike ml where ml.sourceMember.id = :id or ml.targetMember.id = :id")

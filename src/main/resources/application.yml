@@ -64,7 +64,7 @@ spring:
     properties:
       hibernate:
         hbm2ddl:
-          auto: update
+          auto: create-drop
   data:
     mongodb:
       database: ${MONGO_DATABASE}

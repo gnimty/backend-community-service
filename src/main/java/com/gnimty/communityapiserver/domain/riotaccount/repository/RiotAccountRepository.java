@@ -11,10 +11,6 @@ import org.springframework.data.repository.query.Param;
 
 public interface RiotAccountRepository extends JpaRepository<RiotAccount, Long> {
 
-	Boolean existsByPuuid(String puuid);
-
-	Boolean existsByMember(Member member);
-
 	List<RiotAccount> findByMember(Member member);
 
 	Optional<RiotAccount> findByMemberAndIsMain(Member member, Boolean isMain);
