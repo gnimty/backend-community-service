@@ -1,11 +1,11 @@
 package com.gnimty.communityapiserver.domain.chat.service.dto;
 
 import java.util.Date;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
-@AllArgsConstructor
+@Builder
 public class ChatDto {
     private Long senderId;
     private String message;
