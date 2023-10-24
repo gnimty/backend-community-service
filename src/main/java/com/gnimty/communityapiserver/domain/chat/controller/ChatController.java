@@ -2,11 +2,11 @@ package com.gnimty.communityapiserver.domain.chat.controller;
 
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatRoomInfo;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
-import com.gnimty.communityapiserver.domain.chat.entity.Status;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
 import com.gnimty.communityapiserver.domain.chat.service.ChatService;
 import com.gnimty.communityapiserver.domain.member.service.MemberService;
 import com.gnimty.communityapiserver.global.auth.WebSocketSessionManager;
+import com.gnimty.communityapiserver.global.constant.Status;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

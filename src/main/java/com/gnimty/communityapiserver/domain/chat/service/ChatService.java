@@ -74,7 +74,7 @@ public class ChatService {
 			).toList();
 
 		for (ChatRoom chatRoom : chatRooms) {
-			List<Object> chatList = getChatList(me, chatRoom.getChatRoomNo());
+			//List<Object> chatList = getChatList(me, chatRoom.getChatRoomNo());
 			// 윤희님 작업 끝나면 DTO에 추가 예정
 		}
 
@@ -195,7 +195,6 @@ public class ChatService {
 	// 두명 다 나간 상황일 때만 호출
 	public void flushAllChats(Long chatRoomNo) {
 		chatRepository.deleteByChatRoomNo(chatRoomNo);
-		chatRoomRepository.deleteByChatRoomNo(chatRoomNo);
 	}
 
 	// TODO janguni: 채팅방에 있는 모든 채팅의 readCount update
