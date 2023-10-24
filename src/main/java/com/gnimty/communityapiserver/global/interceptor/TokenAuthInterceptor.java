@@ -28,12 +28,12 @@ public class TokenAuthInterceptor implements HandlerInterceptor {
 			&& request.getMethod().equals(HttpMethod.PATCH.toString())) {
 			return true;
 		}
-		if (request.getServletPath().contains("champions")
-			&& request.getMethod().equals(HttpMethod.GET.toString())) {
-			return true;
-		}
 		Optional<String> tokenByHeader = jwtProvider.resolveToken(request);
 		if (tokenByHeader.isEmpty()) {
+			if (request.getServletPath().contains("champions")
+				&& request.getMethod().equals(HttpMethod.GET.toString())) {
+				return true;
+			}
 			if (request.getServletPath().equals("/summoners/main")
 				&& request.getMethod().equals(HttpMethod.GET.toString())) {
 				return true;

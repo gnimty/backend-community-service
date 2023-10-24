@@ -24,4 +24,5 @@ public class ChampionCommentsEntry {
 	private Boolean blocked;
 	private Long memberId;
 	private String summonerName;
+	private Boolean like;
 }

@@ -11,9 +11,13 @@ public class ChampionCommentsLikeRequest {
 	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
 	private Boolean likeOrNot;
 
+	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+	private Boolean cancel;
+
 	public ChampionCommentsLikeServiceRequest toServiceRequest() {
 		return ChampionCommentsLikeServiceRequest.builder()
 			.likeOrNot(likeOrNot)
+			.cancel(cancel)
 			.build();
 	}
 }
