@@ -26,13 +26,13 @@ public class RiotAccountReadService {
 	private final RiotAccountQueryRepository riotAccountQueryRepository;
 
 	public void throwIfExistsByPuuid(String puuid) {
-		if (riotAccountRepository.existsByPuuid(puuid)) {
+		if (riotAccountQueryRepository.existsByPuuid(puuid)) {
 			throw new BaseException(ErrorCode.ALREADY_LINKED_SUMMONER);
 		}
 	}
 
 	public Boolean existsByMemberId(Member member) {
-		return riotAccountRepository.existsByMember(member);
+		return riotAccountQueryRepository.existsByMember(member);
 	}
 
 	public List<RiotAccount> findByMember(Member member) {

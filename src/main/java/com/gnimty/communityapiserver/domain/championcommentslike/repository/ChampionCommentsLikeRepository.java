@@ -1,6 +1,5 @@
 package com.gnimty.communityapiserver.domain.championcommentslike.repository;
 
-import com.gnimty.communityapiserver.domain.championcomments.entity.ChampionComments;
 import com.gnimty.communityapiserver.domain.championcommentslike.entity.ChampionCommentsLike;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import java.util.Optional;

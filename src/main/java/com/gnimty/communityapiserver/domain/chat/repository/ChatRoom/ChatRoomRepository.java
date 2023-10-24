@@ -11,5 +11,5 @@ public interface ChatRoomRepository extends MongoRepository<ChatRoom, String>,
 
 	ChatRoom findFirstByOrderByChatRoomNoDesc();
 
-	void deleteByChatRoomNo();
+	void deleteByChatRoomNo(Long chatRoomNo);
 }

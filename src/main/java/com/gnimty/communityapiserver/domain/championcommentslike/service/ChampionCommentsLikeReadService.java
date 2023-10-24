@@ -2,7 +2,7 @@ package com.gnimty.communityapiserver.domain.championcommentslike.service;
 
 import com.gnimty.communityapiserver.domain.championcomments.entity.ChampionComments;
 import com.gnimty.communityapiserver.domain.championcommentslike.entity.ChampionCommentsLike;
-import com.gnimty.communityapiserver.domain.championcommentslike.repository.ChampionCommentsLikeRepository;
+import com.gnimty.communityapiserver.domain.championcommentslike.repository.ChampionCommentsLikeQueryRepository;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
@@ -15,13 +15,13 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ChampionCommentsLikeReadService {
 
-	private final ChampionCommentsLikeRepository championCommentsLikeRepository;
+	private final ChampionCommentsLikeQueryRepository championCommentsLikeQueryRepository;
 
 	public Boolean existsByMemberAndChampionComments(
 		Member member,
 		ChampionComments championComments
 	) {
-		return championCommentsLikeRepository.existsByMemberAndChampionComments(
+		return championCommentsLikeQueryRepository.existsByMemberAndChampionComments(
 			member, championComments);
 	}
 
