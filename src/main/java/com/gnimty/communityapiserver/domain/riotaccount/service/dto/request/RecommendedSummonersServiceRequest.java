@@ -21,6 +21,10 @@ public class RecommendedSummonersServiceRequest {
 	private Boolean duoable;
 	private Boolean timeMatch;
 	private SortBy sortBy;
-	private Long cursorId;
+	private Long lastSummonerId;
+	private String lastSummonerName;
+	private Tier lastSummonerTier;
+	private Integer lastSummonerDivision;
+	private Long lastSummonerUpCount;
 	private Integer pageSize;
 }

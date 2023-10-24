@@ -24,8 +24,11 @@ public class RecommendedSummonersRequest {
 	private List<Lane> lanes;
 	private SortBy sortBy;
 	private Boolean timeMatch;
-	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
-	private Long cursorId;
+	private Long lastSummonerId;
+	private String lastSummonerName;
+	private Tier lastSummonerTier;
+	private Integer lastSummonerDivision;
+	private Long lastSummonerUpCount;
 	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
 	private Integer pageSize;
 
@@ -39,7 +42,11 @@ public class RecommendedSummonersRequest {
 			.lanes(lanes)
 			.sortBy(sortBy)
 			.timeMatch(timeMatch)
-			.cursorId(cursorId)
+			.lastSummonerId(lastSummonerId)
+			.lastSummonerName(lastSummonerName)
+			.lastSummonerTier(lastSummonerTier)
+			.lastSummonerDivision(lastSummonerDivision)
+			.lastSummonerUpCount(lastSummonerUpCount)
 			.pageSize(pageSize)
 			.build();
 	}
