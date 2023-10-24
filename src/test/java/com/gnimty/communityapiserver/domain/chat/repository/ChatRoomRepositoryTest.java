@@ -1,15 +1,15 @@
 package com.gnimty.communityapiserver.domain.chat.repository;
 
-import com.gnimty.communityapiserver.domain.chat.entity.Blocked;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
-import com.gnimty.communityapiserver.domain.chat.entity.Status;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
 import com.gnimty.communityapiserver.domain.chat.repository.Chat.ChatRepository;
 import com.gnimty.communityapiserver.domain.chat.repository.ChatRoom.ChatRoomRepository;
 import com.gnimty.communityapiserver.domain.chat.repository.User.UserRepository;
+import com.gnimty.communityapiserver.domain.chat.service.SeqGeneratorService;
+import com.gnimty.communityapiserver.global.constant.Status;
+import com.gnimty.communityapiserver.global.constant.Tier;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +18,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.context.ActiveProfiles;
 
 @Slf4j
@@ -31,11 +33,16 @@ public class ChatRoomRepositoryTest {
 	private UserRepository userRepository;
 	@Autowired
 	private ChatRoomRepository chatRoomRepository;
+	@Autowired
+	private SeqGeneratorService seqGeneratorService;
+	@Autowired
+	private MongoTemplate mongoTemplate;
 
 	void clear() {
-		chatRoomRepository.deleteAll();
-		userRepository.deleteAll();
-		chatRepository.deleteAll();
+		mongoTemplate.remove(new Query(), "chatRoom");
+		mongoTemplate.remove(new Query(), "user");
+		mongoTemplate.remove(new Query(), "chat");
+		mongoTemplate.remove(new Query(), "auto_sequence");
 	}
 
 	void 채팅방_여러개_만들기() {
@@ -45,24 +52,20 @@ public class ChatRoomRepositoryTest {
 //
 		for (Integer i = 0; i < 20; i++) {
 			users.add(userRepository.save(
-				new User(null, i.longValue(), 3L, "diamond", 3,
+				new User(null, i.longValue(), 3L, Tier.DIAMOND, 3,
 					"so1omon", Status.ONLINE)));
 		}
 
 		for (Integer i = 1; i < 10; i++) {
-			List<ChatRoom.Participant> participants = new ArrayList<>();
-			participants.add(new ChatRoom.Participant(users.get(0), null, Blocked.UNBLOCK));
-			participants.add(new ChatRoom.Participant(users.get(i), null, Blocked.UNBLOCK));
 			chatRooms.add(chatRoomRepository.save(
-				new ChatRoom(null, i.longValue(), participants, new Date(), new Date())));
+				users.get(0),
+				users.get(i),seqGeneratorService.generateSequence(ChatRoom.SEQUENCE_NAME)));
 		}
 
 		for (Integer i = 11; i < 20; i++) {
-			List<ChatRoom.Participant> participants = new ArrayList<>();
-			participants.add(new ChatRoom.Participant(users.get(10), null, Blocked.UNBLOCK));
-			participants.add(new ChatRoom.Participant(users.get(i), null, Blocked.UNBLOCK));
 			chatRooms.add(chatRoomRepository.save(
-				new ChatRoom(null, i.longValue(), participants, new Date(), new Date())));
+				users.get(10),
+				users.get(i),seqGeneratorService.generateSequence(ChatRoom.SEQUENCE_NAME)));
 		}
 	}
 
@@ -75,13 +78,13 @@ public class ChatRoomRepositoryTest {
 	@Test
 	void 유저두명_생성해서_chatRoom에_넣기_테스트() {
 		User user1 = userRepository.save(
-			new User(null, 130L, 3L, "diamond", 3,
+			new User(null, 130L, 3L, Tier.DIAMOND, 3,
 				"so1omon", Status.ONLINE));
 		User user2 = userRepository.save(
-			new User(null, 131L, 4L, "emerald", 3,
+			new User(null, 131L, 4L, Tier.DIAMOND, 3,
 				"solmin23", Status.ONLINE));
 
-		ChatRoom save = chatRoomRepository.save(user1, user2);
+		ChatRoom save = chatRoomRepository.save(user1, user2, seqGeneratorService.generateSequence(ChatRoom.SEQUENCE_NAME) );
 		System.out.println("save = " + save);
 	}
 
@@ -117,7 +120,7 @@ public class ChatRoomRepositoryTest {
 		User user1 = all.get(0);
 		User user2 = all.get(1);
 
-		Assertions.assertThrows(BaseException.class, () -> chatRoomRepository.save(user1, user2));
+		Assertions.assertThrows(BaseException.class, () -> chatRoomRepository.save(user1, user2, seqGeneratorService.generateSequence(ChatRoom.SEQUENCE_NAME)));
 	}
 
 //	@AfterEach
