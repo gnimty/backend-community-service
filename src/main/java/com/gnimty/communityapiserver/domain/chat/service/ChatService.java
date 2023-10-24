@@ -1,5 +1,6 @@
 package com.gnimty.communityapiserver.domain.chat.service;
 
+import com.gnimty.communityapiserver.domain.block.entity.Block;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatRoomInfo;
 import com.gnimty.communityapiserver.domain.chat.entity.Blocked;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
@@ -131,6 +132,17 @@ public class ChatService {
 		}else{
 			return userRepository.save(User.toUser(riotAccount));
 		}
+	}
+
+	// 차단
+	public void updateStatus(User me, User other, Blocked status){
+		// 1. 나와 상대가 속해 있는 채팅방을 찾기
+		ChatRoom chatRoom = chatRoomRepository.findByUsers(me, other).orElseThrow(()-> new BaseException(ErrorCode.NOT_FOUND_CHAT_ROOM));
+
+		// 2. 해당 채팅방의 participant 정보 수정 후 save
+		extractParticipant(me, chatRoom.getParticipants(), true).setStatus(status);
+
+		chatRoomRepository.save(chatRoom);
 	}
 
 	// TODO janguni : 유저가 차단했는지 확인

@@ -70,4 +70,8 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepositoryCustom {
 
 	}
 
+	@Override
+	public void updateBlock(Long chatRoomNo, User me){
+
+	}
 }

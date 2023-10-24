@@ -17,4 +17,6 @@ public interface ChatRoomRepositoryCustom {
 	ChatRoom save(User user1, User user2, Long chatRoomNo);
 
 	void updateExitDate(Long chatRoomNo, User me);
+
+	void updateBlock(Long chatRoomNo, User me);
 }
