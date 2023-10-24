@@ -175,7 +175,7 @@ public class ChatService {
 		List<Participant> participants = findChatRoom.getParticipants();
 
 		for (Participant participant : participants) {
-			if (participant.getUser().getId() == senderId) {
+			if (participant.getUser().getId().equals(senderId)) {
 				return participant.getExitDate();
 			}
 		}
