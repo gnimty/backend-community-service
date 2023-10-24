@@ -165,7 +165,14 @@ public class ChatService {
 		List<ChatDto> chatDtos = new ArrayList<>();
 		for (Chat c : totalChats) {
 			if (c.getSendDate().before(exitDate)) break;
-			chatDtos.add(new ChatDto(c.getSenderId(), c.getMessage(), c.getSendDate(),c.getReadCnt()));
+
+			chatDtos.add(
+				ChatDto.builder()
+					.senderId(c.getSenderId())
+					.sendDate(c.getSendDate())
+					.message(c.getMessage())
+					.readCount(c.getReadCnt())
+					.build());
 		}
 		return chatDtos;
 	}
