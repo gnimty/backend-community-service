@@ -1,9 +1,10 @@
 package com.gnimty.communityapiserver.domain.chat.controller;
 
-import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatRoomInfo;
+import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatRoomDto;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
 import com.gnimty.communityapiserver.domain.chat.service.ChatService;
+import com.gnimty.communityapiserver.domain.chat.service.dto.UserWithBlockDto;
 import com.gnimty.communityapiserver.domain.member.service.MemberService;
 import com.gnimty.communityapiserver.global.auth.WebSocketSessionManager;
 import com.gnimty.communityapiserver.global.constant.Status;
@@ -31,11 +32,11 @@ public class ChatController {
 	private final WebSocketSessionManager webSocketSessionManager;
 	// 채팅의 모든 조회
 	@SubscribeMapping("/init_chat")
-	public List<ChatRoomInfo> getTotalChatRoomsAndChatsAndOtherUserInfo() {
+	public List<ChatRoomDto> getTotalChatRoomsAndChatsAndOtherUserInfo() {
 
-		List<ChatRoomInfo> chatRoomInfos = chatService.getChatRoomsJoined(null);
+		List<ChatRoomDto> chatRoomDtos = chatService.getChatRoomsJoined(null);
 
-		return chatRoomInfos;
+		return chatRoomDtos;
 	}
 
 	// 채팅방 구독 유도
@@ -46,8 +47,10 @@ public class ChatController {
 		User me = null; // 내 정보 가져올 수 있으면 가져와서 여기에 넣기
 		User other = chatService.getUser(otherUserId);
 
-		// 여기서 MemberService 호출해서 유저가 나를 차단했는지 정보를 가져오기
-		ChatRoom chatRoom = chatService.getOrCreateChatRoom(me, other);
+		// TODO janguni: 여기서 MemberService 호출해서 유저가 나를 차단했는지 정보를 가져오기
+		ChatRoom chatRoom = chatService.getOrCreateChatRoom(
+			new UserWithBlockDto(me, null),
+			new UserWithBlockDto(other, null));
 
 		// getchatRoomNo를 호출하기 X
 		// chatRoom을 먼저 생성 또는 조회 후 그 정보를 그대로 보내주거나 DTO로 변환해서 보내주는 게 좋아 보임
@@ -71,7 +74,7 @@ public class ChatController {
 	// 채팅방 나가기
 	@SubscribeMapping("/chatRoom/exit/{chatRoomNo}")
 	public void exitChatRoom(@DestinationVariable("chatRoomNo") Long chatRoomNo) {
-		chatService.exitChatRoom(null, chatRoomNo);
+		chatService.exitChatRoom(null, chatService.getChatRoom(chatRoomNo));
 	}
 
 	// chatRoomNo을 통한 sendStatus 필요
@@ -82,15 +85,16 @@ public class ChatController {
 
 	@EventListener
 	public void onClientDisconnect(SessionDisconnectEvent event) {
-		Long userId = webSocketSessionManager.disConnectSession(event.getSessionId());
-		chatService.updateStatus(userId, Status.OFFLINE);
+		Long userId = webSocketSessionManager.removeSession(event.getSessionId());
+
+		chatService.updateConnStatus(userId, Status.OFFLINE);
 	}
 
 	@EventListener
 	public void onClientConnect(SessionConnectedEvent event) {
 		String simpSessionId = String.valueOf(event.getMessage().getHeaders().get("simpSessionId"));
 		Long userId = webSocketSessionManager.getMemberId(simpSessionId);
-		chatService.updateStatus(userId, Status.ONLINE);
+		chatService.updateConnStatus(userId, Status.ONLINE);
 	}
 
 }

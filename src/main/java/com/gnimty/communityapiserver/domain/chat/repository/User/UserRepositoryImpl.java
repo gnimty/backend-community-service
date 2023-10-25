@@ -5,8 +5,5 @@ import com.gnimty.communityapiserver.global.constant.Status;
 
 public class UserRepositoryImpl implements UserRepositoryCustom{
 
-	@Override
-	public void updateStatus(User me, Status status) {
 
-	}
 }
