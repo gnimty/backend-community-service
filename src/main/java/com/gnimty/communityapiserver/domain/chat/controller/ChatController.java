@@ -93,8 +93,9 @@ public class ChatController {
 
 	@EventListener
 	public void onClientDisconnect(SessionDisconnectEvent event) {
-		webSocketSessionManager.disConnectSession(event.getSessionId());
-		User user = getUserBySessionId(event.getSessionId());
+		webSocketSessionManager.deleteSession(event.getSessionId());
+		User user = getUserBySessionId(
+			event.getSessionId());
 		chatService.updateStatus(user, Status.OFFLINE);
 	}
 
@@ -105,8 +106,9 @@ public class ChatController {
 		chatService.updateStatus(user, Status.ONLINE);
 	}
 
-	private User getUserBySessionId(String simpSessionId) {
-		return webSocketSessionManager.getUser(simpSessionId);
+	private User getUserBySessionId(String sessionId) {
+		Long memberId = webSocketSessionManager.getMemberId(sessionId);
+		User user = chatService.getUser(memberId);
+		return user;
 	}
-
 }

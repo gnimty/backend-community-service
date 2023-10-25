@@ -10,22 +10,19 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class WebSocketSessionManager {
 
-    private static Map<String, User> sessionStore = new ConcurrentHashMap<>();
+    private static Map<String, Long> sessionStore = new ConcurrentHashMap<>();
 
-    public void addSession(String sessionId, User user) {
-        sessionStore.put(sessionId, user);
+    public void addSession(String sessionId, Long memberId) {
+        sessionStore.put(sessionId, memberId);
     }
 
-    public User disConnectSession(String sessionId) {
-        deleteSession(sessionId);
-        return getUser(sessionId);
+    public void deleteSession(String sessionId) {
+        sessionStore.remove(sessionId);
     }
 
-    public User getUser(String sessionId)  {
+    public Long getMemberId(String sessionId)  {
         return sessionStore.get(sessionId);
     }
 
-    private void deleteSession(String sessionId) {
-        sessionStore.remove(sessionId);
-    }
+
 }
