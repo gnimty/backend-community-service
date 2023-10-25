@@ -63,15 +63,14 @@ spring:
     properties:
       hibernate:
         hbm2ddl:
-          auto: update
+          auto: create-drop
 
   data:
     mongodb:
-      database: ${MONGO_DATABASE}
-      host: ${MONGO_HOST}
-      port: ${MONGO_PORT}
-      timeZone: Asia/Seoul
-      auto-index-creation: true
+      uri: mongodb://localhost:27017/community?retryWrites=false
+      authentication-database: admin
+      username: ${MONGODB_LOCAL_USERNAME}
+      password: ${MONGODB_LOCAL_PASSWORD}
 
 logging:
   level:
