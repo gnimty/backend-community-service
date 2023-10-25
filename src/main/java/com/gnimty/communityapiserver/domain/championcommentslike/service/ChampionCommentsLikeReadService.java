@@ -17,8 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class ChampionCommentsLikeReadService {
 
 	private final ChampionCommentsLikeQueryRepository championCommentsLikeQueryRepository;
-
 	private final ChampionCommentsLikeRepository championCommentsLikeRepository;
+
 	public Boolean existsByMemberAndChampionComments(
 		Member member,
 		ChampionComments championComments

@@ -201,6 +201,7 @@ public class ChatService {
 	// TODO janguni: 채팅방에 있는 모든 채팅의 readCount update
 	// 채팅 readCount update 필요
 	public void checkChatsInChatRoom(User me, Long chatRoomId) {
+		// update All chats by chatRoomId
 		List<Chat> totalChats = chatRepository.findByChatRoomNo(chatRoomId);
 		for (Chat c : totalChats) {
 			//if (c.getReadCnt() == 1) chatRepository.updateReadCountById(c.getId(), 0);
