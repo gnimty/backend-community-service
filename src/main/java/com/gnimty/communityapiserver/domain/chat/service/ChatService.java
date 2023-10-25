@@ -13,6 +13,7 @@ import com.gnimty.communityapiserver.domain.chat.repository.User.UserRepository;
 import com.gnimty.communityapiserver.domain.chat.service.dto.ChatDto;
 import com.gnimty.communityapiserver.domain.member.repository.MemberRepository;
 import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
+import com.gnimty.communityapiserver.global.auth.WebSocketSessionManager;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
@@ -35,6 +36,7 @@ public class ChatService {
 	private final UserRepository userRepository;
 	private final MemberRepository memberRepository;
 	private final SeqGeneratorService generator;
+	private final WebSocketSessionManager sessionManager;
 
     /*
     TODO 리스트
@@ -167,11 +169,10 @@ public class ChatService {
 	// TODO janguni: 채팅방별 채팅 목록 불러오기 (exitDate < sendDate)
 	// cf) chatRoomId -> chatRoomNo로 통일해주세요! Object Id와 혼동이 올 수 있으실 것 같습니다. 필드도 구분되어있어용
 	public List<ChatDto> getChatList(User me, Long chatRoomNo) {
-		Long senderId = 1L;
 
 		// TODO: 시간 순서대로 오는건지 확인
-		List<Chat> totalChats = chatRepository.findBySenderIdAndChatRoomNo(senderId, chatRoomNo);
-		Date exitDate = getExitDateChatRoom(chatRoomNo, senderId);
+		List<Chat> totalChats = chatRepository.findBySenderIdAndChatRoomNo(me.getId(), chatRoomNo);
+		Date exitDate = getExitDateChatRoom(chatRoomNo, me.getId());
 
 		return getChatDtoAfterExitDate(totalChats, exitDate);
 	}
@@ -179,14 +180,14 @@ public class ChatService {
 
 	// TODO janguni: 채팅 저장
 	// chat 생성시 id 전략 필요
-	public void saveChat(Long chatRoomNo, String message) {
+	public void saveChat(User user, Long chatRoomNo, String message) {
 		//Long senderId = 1L;
 		//Chat chat = new Chat("id", chatRoomNo, 1L, (String) message, new Date(), 1);
 		//chatRepository.save(chat);
 	}
 
 	// TODO janguni: 접속정보 변동내역 전송
-	public Object updateStatus(Long userId, Status status) {
+	public Object updateStatus(User user, Status status) {
 		// userRepository.updateStatus()
 		return null;
 	}
@@ -235,7 +236,7 @@ public class ChatService {
 		return chatDtos;
 	}
 
-	private Date getExitDateChatRoom(Long chatRoomNo, Long senderId) {
+	private Date getExitDateChatRoom(Long chatRoomNo, String senderId) {
 		ChatRoom findChatRoom = chatRoomRepository.findByChatRoomNo(chatRoomNo).get();
 		List<Participant> participants = findChatRoom.getParticipants();
 
