@@ -40,7 +40,7 @@ public class ChatRoom {
 		@DBRef
 		private User user;
 		private Date exitDate;
-		private Blocked status;
+		private Blocked blockedStatus;
 	}
 
 	private Date lastModifiedDate;

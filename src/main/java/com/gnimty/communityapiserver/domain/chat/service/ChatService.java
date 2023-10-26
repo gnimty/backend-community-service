@@ -71,7 +71,7 @@ public class ChatService {
 
 		List<ChatRoom> chatRooms = chatRoomRepository.findByUser(me)
 			.stream().filter(chatRoom ->
-				extractParticipant(me, chatRoom.getParticipants(), true).getStatus()
+				extractParticipant(me, chatRoom.getParticipants(), true).getBlockedStatus()
 					== Blocked.UNBLOCK
 			).toList();
 
@@ -141,12 +141,12 @@ public class ChatService {
 	}
 
 	// 차단
-	public void updateStatus(User me, User other, Blocked status){
+	public void updateStatus(User me, User other, Blocked blockedStatus){
 		// 1. 나와 상대가 속해 있는 채팅방을 찾기
 		ChatRoom chatRoom = chatRoomRepository.findByUsers(me, other).orElseThrow(()-> new BaseException(ErrorCode.NOT_FOUND_CHAT_ROOM));
 
 		// 2. 해당 채팅방의 participant 정보 수정 후 save
-		extractParticipant(me, chatRoom.getParticipants(), true).setStatus(status);
+		extractParticipant(me, chatRoom.getParticipants(), true).setBlockedStatus(blockedStatus);
 
 		chatRoomRepository.save(chatRoom);
 	}
@@ -158,7 +158,7 @@ public class ChatService {
 		List<Participant> participants = chatRoom.getParticipants();
 		for (Participant participant : participants) {
 			if (participant.getUser().getId() == other.getId()) {
-				if ( participant.getStatus() == Blocked.BLOCK) return true;
+				if ( participant.getBlockedStatus() == Blocked.BLOCK) return true;
 				else return false;
 			}
 		}
@@ -167,7 +167,6 @@ public class ChatService {
 	}
 
 	// TODO janguni: 채팅방별 채팅 목록 불러오기 (exitDate < sendDate)
-	// cf) chatRoomId -> chatRoomNo로 통일해주세요! Object Id와 혼동이 올 수 있으실 것 같습니다. 필드도 구분되어있어용
 	public List<ChatDto> getChatList(User me, Long chatRoomNo) {
 
 		// TODO: 시간 순서대로 오는건지 확인
@@ -187,7 +186,7 @@ public class ChatService {
 	}
 
 	// TODO janguni: 접속정보 변동내역 전송
-	public Object updateStatus(User user, Status status) {
+	public Object updateStatus(User user, Status connectStatus) {
 		// userRepository.updateStatus()
 		return null;
 	}
