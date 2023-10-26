@@ -11,8 +11,6 @@ import static com.gnimty.communityapiserver.global.exception.ErrorCode.TOKEN_EXP
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.TOKEN_INVALID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gnimty.communityapiserver.domain.chat.entity.User;
-import com.gnimty.communityapiserver.domain.chat.service.ChatService;
 import com.gnimty.communityapiserver.domain.member.controller.dto.response.AuthToken;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.domain.member.service.MemberReadService;
@@ -46,16 +44,10 @@ public class JwtProvider {
 	private String secret;
 	private final MemberReadService memberReadService;
 	private final StringRedisTemplate redisTemplate;
-	private final ChatService chatService;
 
 	public Member findMemberByToken(String token) {
 		return memberReadService.findById(getIdByToken(token));
 	}
-
-	public User findUserByToken(String token) {
-		return chatService.getUser(getIdByToken(token));
-	}
-
 
 	public String generateToken(Long id, Long expiration, String subject) {
 		Date issueDate = new Date();

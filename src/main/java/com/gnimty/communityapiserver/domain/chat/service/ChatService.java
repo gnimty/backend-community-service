@@ -36,7 +36,6 @@ public class ChatService {
 	private final UserRepository userRepository;
 	private final MemberRepository memberRepository;
 	private final SeqGeneratorService generator;
-	private final WebSocketSessionManager sessionManager;
 
     /*
     TODO 리스트
@@ -188,7 +187,7 @@ public class ChatService {
 
 	// TODO janguni: 접속정보 변동내역 전송
 	public Object updateStatus(User user, Status status) {
-		// userRepository.updateStatus()
+		userRepository.updateStatus(user, status);
 		return null;
 	}
 

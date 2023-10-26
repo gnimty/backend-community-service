@@ -1,6 +1,5 @@
 package com.gnimty.communityapiserver.global.auth;
 
-import com.gnimty.communityapiserver.domain.chat.entity.User;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
@@ -10,22 +9,24 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class WebSocketSessionManager {
 
-    private static Map<String, User> sessionStore = new ConcurrentHashMap<>();
+    private static Map<String, Long> sessionStore = new ConcurrentHashMap<>();
 
-    public void addSession(String sessionId, User user) {
-        sessionStore.put(sessionId, user);
+    public void addSession(String sessionId, Long memberId) {
+        sessionStore.put(sessionId, memberId);
     }
 
-    public User disConnectSession(String sessionId) {
-        deleteSession(sessionId);
-        return getUser(sessionId);
+    public void deleteSession(String sessionId) {
+        sessionStore.remove(sessionId);
     }
 
-    public User getUser(String sessionId)  {
+    public Long getMemberId(String sessionId)  {
         return sessionStore.get(sessionId);
     }
 
-    private void deleteSession(String sessionId) {
-        sessionStore.remove(sessionId);
+    public int getSessionCountByMemberId(Long memberId) {
+        return (int) sessionStore.values().stream()
+            .filter(memberId::equals)
+            .count();
     }
+
 }
