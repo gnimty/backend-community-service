@@ -1,6 +1,5 @@
 package com.gnimty.communityapiserver.global.auth;
 
-import com.gnimty.communityapiserver.domain.chat.entity.User;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
@@ -29,11 +28,5 @@ public class WebSocketSessionManager {
             .filter(memberId::equals)
             .count();
     }
-
-
-    public boolean hasMemberId(Long memberId) {
-        return sessionStore.containsValue(memberId);
-    }
-
 
 }
