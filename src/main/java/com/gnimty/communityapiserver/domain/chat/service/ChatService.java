@@ -168,11 +168,16 @@ public class ChatService {
 
 
 	// TODO janguni: 채팅 저장
-	// chat 생성시 id 전략 필요
 	public void saveChat(User user, Long chatRoomNo, String message) {
-		//Long senderId = 1L;
-		//Chat chat = new Chat("id", chatRoomNo, 1L, (String) message, new Date(), 1);
-		//chatRepository.save(chat);
+		Chat chat = Chat.builder()
+			.senderId(user.getActualUserId())
+			.chatRoomNo(chatRoomNo)
+			.message(message)
+			.sendDate(new Date())
+			.readCnt(1)
+			.build();
+
+		chatRepository.save(chat);
 	}
 
 	// TODO janguni: 접속정보 변동내역 전송
