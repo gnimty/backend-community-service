@@ -1,6 +1,5 @@
 package com.gnimty.communityapiserver.domain.chat.service;
 
-import com.gnimty.communityapiserver.domain.block.entity.Block;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatRoomInfo;
 import com.gnimty.communityapiserver.domain.chat.entity.Blocked;
 import com.gnimty.communityapiserver.domain.chat.entity.Chat;
@@ -20,7 +19,6 @@ import com.gnimty.communityapiserver.global.exception.ErrorCode;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -140,8 +138,8 @@ public class ChatService {
 		}
 	}
 
-	// 차단
-	public void updateStatus(User me, User other, Blocked blockedStatus){
+	// 차단 시 chatRoom의 Participant 차단상태 변경
+	public void updateBlockedStatus(User me, User other, Blocked blockedStatus){
 		// 1. 나와 상대가 속해 있는 채팅방을 찾기
 		ChatRoom chatRoom = chatRoomRepository.findByUsers(me, other).orElseThrow(()-> new BaseException(ErrorCode.NOT_FOUND_CHAT_ROOM));
 
@@ -152,18 +150,10 @@ public class ChatService {
 	}
 
 	// TODO janguni : 유저가 차단했는지 확인
-	// 유저가 차단 시 memberController 또는 memberService 안에서 업데이트 할 것
-	// chatRoom entity 안에 정보가 이미 있기 떄문에, 서비스 레이어로 굳이 분리하지 않아도 되긴 함
-	public boolean isBlock(ChatRoom chatRoom, User other) {
+	public boolean isBlockParticipant(ChatRoom chatRoom, User other) {
 		List<Participant> participants = chatRoom.getParticipants();
-		for (Participant participant : participants) {
-			if (participant.getUser().getId() == other.getId()) {
-				if ( participant.getBlockedStatus() == Blocked.BLOCK) return true;
-				else return false;
-			}
-		}
-
-        throw new BaseException(ErrorCode.NOT_FOUND_CHAT_USER);
+		Participant participant = extractParticipant(other, participants, true);
+		return participant.getBlockedStatus().equals(Blocked.BLOCK);
 	}
 
 	// TODO janguni: 채팅방별 채팅 목록 불러오기 (exitDate < sendDate)
@@ -205,17 +195,6 @@ public class ChatService {
 		for (Chat c : totalChats) {
 			//if (c.getReadCnt() == 1) chatRepository.updateReadCountById(c.getId(), 0);
 		}
-	}
-
-	// 채팅 참여자 상태 update 필요
-	public void changeParticipantStatus(Long blockingUserId, Long blockedUserId) {
-		//User blockingUser;
-		//User blockedUser;
-		//<ChatRoom> findChatRoom = chatRoomRepository.findByUsers(me, other);
-
-		//if (findChatRoom.isPresent()) {
-			// 채팅방 참여자의 상태값 바꾸기
-		//}
 	}
 
 
