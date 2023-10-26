@@ -19,6 +19,7 @@ import com.gnimty.communityapiserver.global.exception.ErrorCode;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -192,14 +193,28 @@ public class ChatService {
 		chatRepository.deleteByChatRoomNo(chatRoomNo);
 	}
 
-	// TODO janguni: 채팅방에 있는 모든 채팅의 readCount update
-	// 채팅 readCount update 필요
-	public void checkChatsInChatRoom(User me, Long chatRoomId) {
-		// update All chats by chatRoomId
-		List<Chat> totalChats = chatRepository.findByChatRoomNo(chatRoomId);
-		for (Chat c : totalChats) {
-			//if (c.getReadCnt() == 1) chatRepository.updateReadCountById(c.getId(), 0);
-		}
+	// TODO janguni: 채팅방에 있는 상대방이 보낸 채팅의 readCount update
+	public void checkChatsInChatRoom(User me, Long chatRoomNo) {
+		ChatRoom chatRoom = getChatRoom(chatRoomNo).orElseThrow(
+			() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_ROOM,
+				String.format(ErrorCode.NOT_FOUND_CHAT_ROOM.getMessage(), chatRoomNo)));
+
+		Long otherActualUserId = getOther(me, chatRoom).getActualUserId();
+
+		List<Chat> totalChats = chatRepository.findByChatRoomNo(chatRoomNo);
+		totalChats.stream()
+			.filter(chat -> (chat.getReadCnt() == 1 && chat.getSenderId().equals(otherActualUserId)))
+			.forEach(chat -> {
+				chat.setReadCnt(0);
+				chatRepository.save(chat);
+			});
+	}
+
+	private User getOther(User me, ChatRoom chatRoom) {
+		List<Participant> participants = chatRoom.getParticipants();
+		Participant participant = extractParticipant(me, participants, false);
+		User other = participant.getUser();
+		return other;
 	}
 
 
