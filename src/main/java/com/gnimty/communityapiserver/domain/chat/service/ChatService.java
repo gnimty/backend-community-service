@@ -36,7 +36,6 @@ public class ChatService {
 	private final UserRepository userRepository;
 	private final MemberRepository memberRepository;
 	private final SeqGeneratorService generator;
-	private final WebSocketSessionManager sessionManager;
 
     /*
     TODO 리스트
