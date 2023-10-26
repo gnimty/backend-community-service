@@ -13,6 +13,7 @@ import com.gnimty.communityapiserver.domain.chat.repository.User.UserRepository;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatDto;
 import com.gnimty.communityapiserver.domain.chat.service.dto.UserWithBlockDto;
 import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
+import com.gnimty.communityapiserver.global.auth.WebSocketSessionManager;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
@@ -170,102 +171,103 @@ public class ChatService {
         }
 
         throw new BaseException(ErrorCode.NOT_FOUND_CHAT_USER);
-    }
+	}
 
-    // TODO janguni: 채팅방별 채팅 목록 불러오기 (exitDate < sendDate)
-    // cf) chatRoomId -> chatRoomNo로 통일해주세요! Object Id와 혼동이 올 수 있으실 것 같습니다. 필드도 구분되어있어용
-    public List<ChatDto> getChatList(User me, Long chatRoomNo) {
-        Long senderId = 1L;
+	// TODO janguni: 채팅방별 채팅 목록 불러오기 (exitDate < sendDate)
+	// cf) chatRoomId -> chatRoomNo로 통일해주세요! Object Id와 혼동이 올 수 있으실 것 같습니다. 필드도 구분되어있어용
+	public List<ChatDto> getChatList(User me, Long chatRoomNo) {
 
-        // TODO: 시간 순서대로 오는건지 확인
-        List<Chat> totalChats = chatRepository.findBySenderIdAndChatRoomNo(senderId, chatRoomNo);
-        Date exitDate = getExitDateChatRoom(chatRoomNo, senderId);
+		// TODO: 시간 순서대로 오는건지 확인
+		List<Chat> totalChats = chatRepository.findBySenderIdAndChatRoomNo(me.getId(), chatRoomNo);
+		Date exitDate = getExitDateChatRoom(chatRoomNo, me.getId());
 
-        return getChatDtoAfterExitDate(totalChats, exitDate);
-    }
-
-
-    // TODO janguni: 채팅 저장
-    // chat 생성시 id 전략 필요
-    public void saveChat(Long chatRoomNo, String message) {
-        //Long senderId = 1L;
-        //Chat chat = new Chat("id", chatRoomNo, 1L, (String) message, new Date(), 1);
-        //chatRepository.save(chat);
-    }
-
-    // TODO janguni: 접속정보 변동내역 전송
-    public Object updateConnStatus(Long userId, Status status) {
-        // userRepository.updateStatus()
-        return null;
-    }
-
-    // TODO januni: 채팅방의 모든 채팅내역 Flush
-    // 두명 다 나간 상황일 때만 호출
-    public void flushAllChats(Long chatRoomNo) {
-        chatRepository.deleteByChatRoomNo(chatRoomNo);
-    }
-
-    // TODO janguni: 채팅방에 있는 모든 채팅의 readCount update
-    // 채팅 readCount update 필요
-    public void checkChatsInChatRoom(User me, Long chatRoomId) {
-        // update All chats by chatRoomId
-        List<Chat> totalChats = chatRepository.findByChatRoomNo(chatRoomId);
-        for (Chat c : totalChats) {
-            //if (c.getReadCnt() == 1) chatRepository.updateReadCountById(c.getId(), 0);
-        }
-    }
-
-    // 채팅 참여자 상태 update 필요
-    public void changeParticipantStatus(Long blockingUserId, Long blockedUserId) {
-        //User blockingUser;
-        //User blockedUser;
-        //<ChatRoom> findChatRoom = chatRoomRepository.findByUsers(me, other);
-
-        //if (findChatRoom.isPresent()) {
-        // 채팅방 참여자의 상태값 바꾸기
-        //}
-    }
+		return getChatDtoAfterExitDate(totalChats, exitDate);
+	}
 
 
-    private static List<ChatDto> getChatDtoAfterExitDate(List<Chat> totalChats, Date exitDate) {
-        List<ChatDto> chatDtos = new ArrayList<>();
-        for (Chat c : totalChats) {
-            if (c.getSendDate().before(exitDate)) {
-                break;
-            }
+	// TODO janguni: 채팅 저장
+	// chat 생성시 id 전략 필요
+	public void saveChat(User user, Long chatRoomNo, String message) {
+		//Long senderId = 1L;
+		//Chat chat = new Chat("id", chatRoomNo, 1L, (String) message, new Date(), 1);
+		//chatRepository.save(chat);
+	}
 
-            chatDtos.add(new ChatDto(c));
-        }
-        return chatDtos;
-    }
+	// TODO janguni: 접속정보 변동내역 전송
+	public Object updateStatus(User user, Status status) {
+		userRepository.updateStatus(user, status);
+		return null;
+	}
 
-    private Date getExitDateChatRoom(Long chatRoomNo, Long senderId) {
-        ChatRoom findChatRoom = chatRoomRepository.findByChatRoomNo(chatRoomNo).get();
-        List<Participant> participants = findChatRoom.getParticipants();
+	// TODO januni: 채팅방의 모든 채팅내역 Flush
+	// 두명 다 나간 상황일 때만 호출
+	public void flushAllChats(Long chatRoomNo) {
+		chatRepository.deleteByChatRoomNo(chatRoomNo);
+	}
 
-        for (Participant participant : participants) {
-            if (participant.getUser().getId().equals(senderId)) {
-                return participant.getExitDate();
-            }
-        }
+	// TODO janguni: 채팅방에 있는 모든 채팅의 readCount update
+	// 채팅 readCount update 필요
+	public void checkChatsInChatRoom(User me, Long chatRoomId) {
+		// update All chats by chatRoomId
+		List<Chat> totalChats = chatRepository.findByChatRoomNo(chatRoomId);
+		for (Chat c : totalChats) {
+			//if (c.getReadCnt() == 1) chatRepository.updateReadCountById(c.getId(), 0);
+		}
+	}
 
-        throw new BaseException(ErrorCode.NOT_FOUND_CHAT_USER);
+	// 채팅 참여자 상태 update 필요
+	public void changeParticipantStatus(Long blockingUserId, Long blockedUserId) {
+		//User blockingUser;
+		//User blockedUser;
+		//<ChatRoom> findChatRoom = chatRoomRepository.findByUsers(me, other);
 
-    }
+		//if (findChatRoom.isPresent()) {
+			// 채팅방 참여자의 상태값 바꾸기
+		//}
+	}
 
 
-    /**
-     * isMe==true이면 Participant List에서 내 Participant 정보를 추출 isMe==false이면 other user에 해당하는
-     * Participant 정보를 추출
-     *
-     * @param me           자신의 유저정보
-     * @param participants 추출할 대상이 되는 Participant
-     * @param isMe         자신의 유저정보를 가져올 것인지 여부
-     * @return Participant
-     */
-    public Participant extractParticipant(User me, List<Participant> participants, Boolean isMe) {
-        return participants.get(0).getUser().equals(me) ^ isMe ?
-            participants.get(1) : participants.get(0);
-    }
+	private static List<ChatDto> getChatDtoAfterExitDate(List<Chat> totalChats, Date exitDate) {
+		List<ChatDto> chatDtos = new ArrayList<>();
+		for (Chat c : totalChats) {
+			if (c.getSendDate().before(exitDate)) break;
+
+			chatDtos.add(
+				ChatDto.builder()
+					.senderId(c.getSenderId())
+					.sendDate(c.getSendDate())
+					.message(c.getMessage())
+					.readCount(c.getReadCnt())
+					.build());
+		}
+		return chatDtos;
+	}
+
+	private Date getExitDateChatRoom(Long chatRoomNo, String senderId) {
+		ChatRoom findChatRoom = chatRoomRepository.findByChatRoomNo(chatRoomNo).get();
+		List<Participant> participants = findChatRoom.getParticipants();
+
+		for (Participant participant : participants) {
+			if (participant.getUser().getId().equals(senderId)) {
+				return participant.getExitDate();
+			}
+		}
+
+		throw new BaseException(ErrorCode.NOT_FOUND_CHAT_USER);
+
+	}
+
+
+	/**isMe==true이면 Participant List에서 내 Participant 정보를 추출
+	 * isMe==false이면 other user에 해당하는 Participant 정보를 추출
+	 * @param me 자신의 유저정보
+	 * @param participants 추출할 대상이 되는 Participant
+	 * @param isMe 자신의 유저정보를 가져올 것인지 여부
+	 * @return Participant
+	 */
+	public Participant extractParticipant(User me, List<Participant> participants, Boolean isMe) {
+		return participants.get(0).getUser().equals(me) ^ isMe ?
+			participants.get(1) : participants.get(0);
+	}
 
 }

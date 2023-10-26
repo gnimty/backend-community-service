@@ -18,14 +18,19 @@ public class WebSocketSessionManager {
         sessionStore.put(sessionId, memberId);
     }
 
-    public Long removeSession(String sessionId) {
-        Long memberId = getMemberId(sessionId);
+
+    public void deleteSession(String sessionId) {
         sessionStore.remove(sessionId);
-        return memberId;
     }
 
     public Long getMemberId(String sessionId)  {
         return sessionStore.get(sessionId);
+    }
+
+    public int getSessionCountByMemberId(Long memberId) {
+        return (int) sessionStore.values().stream()
+            .filter(memberId::equals)
+            .count();
     }
 
 }
