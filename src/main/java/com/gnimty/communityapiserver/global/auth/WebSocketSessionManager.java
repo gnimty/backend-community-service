@@ -24,5 +24,16 @@ public class WebSocketSessionManager {
         return sessionStore.get(sessionId);
     }
 
+    public int getSessionCountByMemberId(Long memberId) {
+        return (int) sessionStore.values().stream()
+            .filter(memberId::equals)
+            .count();
+    }
+
+
+    public boolean hasMemberId(Long memberId) {
+        return sessionStore.containsValue(memberId);
+    }
+
 
 }

@@ -93,22 +93,29 @@ public class ChatController {
 
 	@EventListener
 	public void onClientDisconnect(SessionDisconnectEvent event) {
+		User user = getUserBySessionId(event.getSessionId());
+		if (!isMultipleUser(user.getActualUserId()))
+			chatService.updateStatus(user, Status.OFFLINE);
 		webSocketSessionManager.deleteSession(event.getSessionId());
-		User user = getUserBySessionId(
-			event.getSessionId());
-		chatService.updateStatus(user, Status.OFFLINE);
 	}
 
 	@EventListener
 	public void onClientConnect(SessionConnectedEvent event) {
-		String simpSessionId = String.valueOf(event.getMessage().getHeaders().get("simpSessionId"));
-		User user = getUserBySessionId(simpSessionId);
-		chatService.updateStatus(user, Status.ONLINE);
+		String sessionId = String.valueOf(event.getMessage().getHeaders().get("simpSessionId"));
+		User user = getUserBySessionId(sessionId);
+		if (!isMultipleUser(user.getActualUserId())) {
+			chatService.updateStatus(user, Status.ONLINE);
+
+		}
 	}
 
 	private User getUserBySessionId(String sessionId) {
 		Long memberId = webSocketSessionManager.getMemberId(sessionId);
 		User user = chatService.getUser(memberId);
 		return user;
+	}
+
+	private boolean isMultipleUser(long memberId) {
+		return webSocketSessionManager.getSessionCountByMemberId(memberId) > 1;
 	}
 }

@@ -188,7 +188,7 @@ public class ChatService {
 
 	// TODO janguni: 접속정보 변동내역 전송
 	public Object updateStatus(User user, Status status) {
-		// userRepository.updateStatus()
+		userRepository.updateStatus(user, status);
 		return null;
 	}
 
