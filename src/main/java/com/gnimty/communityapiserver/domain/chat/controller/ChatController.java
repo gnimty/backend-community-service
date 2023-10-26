@@ -1,9 +1,10 @@
 package com.gnimty.communityapiserver.domain.chat.controller;
 
-import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatRoomInfo;
+import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatRoomDto;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
 import com.gnimty.communityapiserver.domain.chat.service.ChatService;
+import com.gnimty.communityapiserver.domain.chat.service.dto.UserWithBlockDto;
 import com.gnimty.communityapiserver.domain.member.service.MemberService;
 import com.gnimty.communityapiserver.global.auth.WebSocketSessionManager;
 import com.gnimty.communityapiserver.global.constant.Status;
@@ -38,7 +39,7 @@ public class ChatController {
 		User user = getUserBySessionId(sessionId);
 		List<ChatRoomInfo> chatRoomInfos = chatService.getChatRoomsJoined(user);
 
-		return chatRoomInfos;
+		return chatRoomDtos;
 	}
 
 	// 채팅방 구독 유도
@@ -50,8 +51,10 @@ public class ChatController {
 		User me = getUserBySessionId(sessionId); // 내 정보 가져올 수 있으면 가져와서 여기에 넣기
 		User other = chatService.getUser(otherUserId);
 
-		// 여기서 MemberService 호출해서 유저가 나를 차단했는지 정보를 가져오기
-		ChatRoom chatRoom = chatService.getOrCreateChatRoom(me, other);
+		// TODO janguni: 여기서 MemberService 호출해서 유저가 나를 차단했는지 정보를 가져오기
+		ChatRoom chatRoom = chatService.getOrCreateChatRoom(
+			new UserWithBlockDto(me, null),
+			new UserWithBlockDto(other, null));
 
 		// getchatRoomNo를 호출하기 X
 		// chatRoom을 먼저 생성 또는 조회 후 그 정보를 그대로 보내주거나 DTO로 변환해서 보내주는 게 좋아 보임
@@ -77,6 +80,7 @@ public class ChatController {
 
 	// 채팅방 나가기
 	@SubscribeMapping("/chatRoom/exit/{chatRoomNo}")
+
 	public void exitChatRoom(@DestinationVariable("chatRoomNo") Long chatRoomNo,
 							 @Header("simpSessionId") String sessionId) {
 		User user = getUserBySessionId(sessionId);
