@@ -155,26 +155,14 @@ public class ChatService {
     }
 
 
-    // TODO janguni : 유저가 차단했는지 확인
-    // 유저가 차단 시 memberController 또는 memberService 안에서 업데이트 할 것
-    // chatRoom entity 안에 정보가 이미 있기 떄문에, 서비스 레이어로 굳이 분리하지 않아도 되긴 함
-    public boolean isBlock(ChatRoom chatRoom, User other) {
-        List<Participant> participants = chatRoom.getParticipants();
-        for (Participant participant : participants) {
-            if (participant.getUser().getId() == other.getId()) {
-                if (participant.getStatus() == Blocked.BLOCK) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        }
-
-        throw new BaseException(ErrorCode.NOT_FOUND_CHAT_USER);
+   // TODO janguni : 유저가 차단했는지 확인
+	public boolean isBlockParticipant(ChatRoom chatRoom, User other) {
+		List<Participant> participants = chatRoom.getParticipants();
+		Participant participant = extractParticipant(other, participants, true);
+		return participant.getBlockedStatus().equals(Blocked.BLOCK);
 	}
 
 	// TODO janguni: 채팅방별 채팅 목록 불러오기 (exitDate < sendDate)
-	// cf) chatRoomId -> chatRoomNo로 통일해주세요! Object Id와 혼동이 올 수 있으실 것 같습니다. 필드도 구분되어있어용
 	public List<ChatDto> getChatList(User me, Long chatRoomNo) {
 
 		// TODO: 시간 순서대로 오는건지 확인
@@ -186,16 +174,21 @@ public class ChatService {
 
 
 	// TODO janguni: 채팅 저장
-	// chat 생성시 id 전략 필요
 	public void saveChat(User user, Long chatRoomNo, String message) {
-		//Long senderId = 1L;
-		//Chat chat = new Chat("id", chatRoomNo, 1L, (String) message, new Date(), 1);
-		//chatRepository.save(chat);
+		Chat chat = Chat.builder()
+			.senderId(user.getActualUserId())
+			.chatRoomNo(chatRoomNo)
+			.message(message)
+			.sendDate(new Date())
+			.readCnt(1)
+			.build();
+
+		chatRepository.save(chat);
 	}
 
 	// TODO janguni: 접속정보 변동내역 전송
-	public Object updateStatus(User user, Status status) {
-		userRepository.updateStatus(user, status);
+	public Object updateStatus(User user, Status connectStatus) {
+		userRepository.updateStatus(user, connectStatus);
 		return null;
 	}
 
@@ -205,25 +198,28 @@ public class ChatService {
 		chatRepository.deleteByChatRoomNo(chatRoomNo);
 	}
 
-	// TODO janguni: 채팅방에 있는 모든 채팅의 readCount update
-	// 채팅 readCount update 필요
-	public void checkChatsInChatRoom(User me, Long chatRoomId) {
-		// update All chats by chatRoomId
-		List<Chat> totalChats = chatRepository.findByChatRoomNo(chatRoomId);
-		for (Chat c : totalChats) {
-			//if (c.getReadCnt() == 1) chatRepository.updateReadCountById(c.getId(), 0);
-		}
+	// TODO janguni: 채팅방에 있는 상대방이 보낸 채팅의 readCount update
+	public void checkChatsInChatRoom(User me, Long chatRoomNo) {
+		ChatRoom chatRoom = getChatRoom(chatRoomNo).orElseThrow(
+			() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_ROOM,
+				String.format(ErrorCode.NOT_FOUND_CHAT_ROOM.getMessage(), chatRoomNo)));
+
+		Long otherActualUserId = getOther(me, chatRoom).getActualUserId();
+
+		List<Chat> totalChats = chatRepository.findByChatRoomNo(chatRoomNo);
+		totalChats.stream()
+			.filter(chat -> (chat.getReadCnt() == 1 && chat.getSenderId().equals(otherActualUserId)))
+			.forEach(chat -> {
+				chat.setReadCnt(0);
+				chatRepository.save(chat);
+			});
 	}
 
-	// 채팅 참여자 상태 update 필요
-	public void changeParticipantStatus(Long blockingUserId, Long blockedUserId) {
-		//User blockingUser;
-		//User blockedUser;
-		//<ChatRoom> findChatRoom = chatRoomRepository.findByUsers(me, other);
-
-		//if (findChatRoom.isPresent()) {
-			// 채팅방 참여자의 상태값 바꾸기
-		//}
+	private User getOther(User me, ChatRoom chatRoom) {
+		List<Participant> participants = chatRoom.getParticipants();
+		Participant participant = extractParticipant(me, participants, false);
+		User other = participant.getUser();
+		return other;
 	}
 
 
