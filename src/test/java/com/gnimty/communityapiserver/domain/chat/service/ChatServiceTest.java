@@ -130,4 +130,32 @@ class ChatServiceTest {
 
     }
 
+
+    @Test
+    void isBlockParticipant_테스트() {
+        // given
+
+        // 유저 2명 저장
+        User user1 = new User(null, 100L, 100L, Tier.BRONZE, 1, "uni", Status.OFFLINE);
+        User user2 = new User(null, 101L, 101L, Tier.DIAMOND, 1, "joo", Status.ONLINE);
+        userRepository.save(user1);
+        userRepository.save(user2);
+
+        // 채팅방 저장 (user2가 user1을 차단)
+        UserWithBlockDto userWithBlockDto1 = new UserWithBlockDto(user1, Blocked.UNBLOCK);
+        UserWithBlockDto userWithBlockDto2 = new UserWithBlockDto(user2, Blocked.BLOCK);
+        ChatRoom chatRoom = chatRoomRepository.save(userWithBlockDto1, userWithBlockDto2,
+            seqGeneratorService.generateSequence(ChatRoom.SEQUENCE_NAME));
+
+
+        // when
+        boolean result1 = chatService.isBlockParticipant(chatRoom, user1);
+        boolean result2 = chatService.isBlockParticipant(chatRoom, user2);
+
+
+        // then
+        Assertions.assertFalse(result1);
+        Assertions.assertTrue(result2);
+    }
+
 }

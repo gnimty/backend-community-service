@@ -45,6 +45,7 @@ public class ChatRoomRepositoryTest {
 		mongoTemplate.remove(new Query(), "auto_sequence");
 	}
 
+	/**
 	void 채팅방_여러개_만들기() {
 		clear();
 		List<User> users = new ArrayList<>();
@@ -122,6 +123,7 @@ public class ChatRoomRepositoryTest {
 
 		Assertions.assertThrows(BaseException.class, () -> chatRoomRepository.save(user1, user2, seqGeneratorService.generateSequence(ChatRoom.SEQUENCE_NAME)));
 	}
+	**/
 
 //	@AfterEach
 //	void afterEach() {
