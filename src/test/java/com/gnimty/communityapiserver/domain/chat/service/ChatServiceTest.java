@@ -1,9 +1,12 @@
 package com.gnimty.communityapiserver.domain.chat.service;
 
 
+import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatDto;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatRoomDto;
 import com.gnimty.communityapiserver.domain.chat.entity.Blocked;
+import com.gnimty.communityapiserver.domain.chat.entity.Chat;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
+import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom.Participant;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
 import com.gnimty.communityapiserver.domain.chat.repository.Chat.ChatRepository;
 import com.gnimty.communityapiserver.domain.chat.repository.ChatRoom.ChatRoomRepository;
@@ -12,6 +15,7 @@ import com.gnimty.communityapiserver.domain.chat.service.dto.UserWithBlockDto;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.constant.Tier;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
@@ -25,7 +29,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @Slf4j
 @SpringBootTest
-@ActiveProfiles("test")
+//@ActiveProfiles("test")
 class ChatServiceTest {
 
     @Autowired
@@ -156,6 +160,70 @@ class ChatServiceTest {
         // then
         Assertions.assertFalse(result1);
         Assertions.assertTrue(result2);
+    }
+
+    @Test
+    void getChatList_테스트() {
+        // given
+        // 유저 2명 저장
+        User user1 = new User(null, 100L, 100L, Tier.BRONZE, 1, "uni", Status.OFFLINE);
+        User user2 = new User(null, 101L, 101L, Tier.DIAMOND, 1, "joo", Status.ONLINE);
+        userRepository.save(user1);
+        userRepository.save(user2);
+
+        // 채팅방 저장
+        UserWithBlockDto userWithBlockDto1 = new UserWithBlockDto(user1, Blocked.UNBLOCK);
+        UserWithBlockDto userWithBlockDto2 = new UserWithBlockDto(user2, Blocked.UNBLOCK);
+        ChatRoom chatRoom = chatRoomRepository.save(userWithBlockDto1, userWithBlockDto2,
+            seqGeneratorService.generateSequence(ChatRoom.SEQUENCE_NAME));
+
+        // when
+        for (int i = 0; i < 5; i++) {
+            Chat chat = Chat.builder()
+                .chatRoomNo(chatRoom.getChatRoomNo())
+                .readCnt(1)
+                .senderId(user1.getActualUserId())
+                .sendDate(new Date())
+                .message("hi").build();
+            chatRepository.save(chat);
+        }
+
+        for (int i = 0; i < 5; i++) {
+            Chat chat = Chat.builder()
+                .chatRoomNo(chatRoom.getChatRoomNo())
+                .readCnt(1)
+                .senderId(user2.getActualUserId())
+                .sendDate(new Date())
+                .message("hi").build();
+            chatRepository.save(chat);
+        }
+
+        // user2가 나감
+        List<Participant> participants = new ArrayList<>();
+        Participant participant1 = chatRoom.getParticipants().get(1); // user1
+        participant1.setExitDate(new Date());
+        Participant participant0 = chatRoom.getParticipants().get(0); // user2
+        participants.add(participant1);
+        participants.add(participant0);
+
+        chatRoom.setParticipants(participants);
+        chatRoomRepository.save(chatRoom);
+
+        for (int i = 0; i < 5; i++) {
+            Chat chat = Chat.builder()
+                .chatRoomNo(chatRoom.getChatRoomNo())
+                .readCnt(1)
+                .senderId(user1.getActualUserId())
+                .sendDate(new Date())
+                .message("hi").build();
+            chatRepository.save(chat);
+        }
+
+        // then
+        List<ChatDto> chatList1 = chatService.getChatList(user2, chatRoom.getChatRoomNo());
+        Assertions.assertEquals(5, chatList1.size());
+        List<ChatDto> chatList2 = chatService.getChatList(user1, chatRoom.getChatRoomNo());
+        Assertions.assertEquals(15, chatList2.size());
     }
 
 }

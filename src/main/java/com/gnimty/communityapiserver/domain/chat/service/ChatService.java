@@ -17,9 +17,12 @@ import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -161,11 +164,12 @@ public class ChatService {
 		return participant.getBlockedStatus().equals(Blocked.BLOCK);
 	}
 
+
 	// TODO janguni: 채팅방별 채팅 목록 불러오기 (exitDate < sendDate)
 	public List<ChatDto> getChatList(User me, Long chatRoomNo) {
 
 		// TODO: 시간 순서대로 오는건지 확인
-		List<Chat> totalChats = chatRepository.findBySenderIdAndChatRoomNo(me.getId(), chatRoomNo);
+		List<Chat> totalChats = chatRepository.findByChatRoomNo(chatRoomNo);
 		Date exitDate = getExitDateChatRoom(chatRoomNo, me.getId());
 
 		return getChatDtoAfterExitDate(totalChats, exitDate);
@@ -222,17 +226,12 @@ public class ChatService {
 
 
 	private static List<ChatDto> getChatDtoAfterExitDate(List<Chat> totalChats, Date exitDate) {
-		List<ChatDto> chatDtos = new ArrayList<>();
-		for (Chat c : totalChats) {
-			if (c.getSendDate().before(exitDate)) break;
-
-			chatDtos.add(
-				ChatDto.builder()
-					.chat(c)
-					.build());
-		}
-		return chatDtos;
+		return totalChats.stream()
+			.filter(c -> exitDate == null || c.getSendDate().after(exitDate))
+			.map(ChatDto::new)
+			.collect(Collectors.toList());
 	}
+
 
 	private Date getExitDateChatRoom(Long chatRoomNo, String senderId) {
 		ChatRoom findChatRoom = chatRoomRepository.findByChatRoomNo(chatRoomNo).get();

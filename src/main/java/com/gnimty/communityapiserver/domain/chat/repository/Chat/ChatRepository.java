@@ -12,7 +12,7 @@ public interface ChatRepository extends MongoRepository<Chat, String>, ChatRepos
 
 	List<Chat> findByChatRoomNo(Long chatRoomNo);
 
-	List<Chat> findBySenderIdAndChatRoomNo(String senderId, Long chatRoomNo);
+	List<Chat> findBySenderIdAndChatRoomNo(Long senderId, Long chatRoomNo);
 
 	//void updateReadCountById(Long id, Integer readCount);
 
