@@ -1,6 +1,5 @@
 package com.gnimty.communityapiserver.domain.chat.controller;
 
-import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatRoomDto;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
 import com.gnimty.communityapiserver.domain.chat.service.ChatService;
@@ -96,7 +95,7 @@ public class ChatController {
 	public void onClientDisconnect(SessionDisconnectEvent event) {
 		User user = getUserBySessionId(event.getSessionId());
 		if (!isMultipleUser(user.getActualUserId()))
-			chatService.updateStatus(user, Status.OFFLINE);
+			chatService.updateConnStatus(user, Status.OFFLINE);
 		webSocketSessionManager.deleteSession(event.getSessionId());
 	}
 
@@ -105,7 +104,7 @@ public class ChatController {
 		String sessionId = String.valueOf(event.getMessage().getHeaders().get("simpSessionId"));
 		User user = getUserBySessionId(sessionId);
 		if (!isMultipleUser(user.getActualUserId())) {
-			chatService.updateStatus(user, Status.ONLINE);
+			chatService.updateConnStatus(user, Status.ONLINE);
 
 		}
 	}
