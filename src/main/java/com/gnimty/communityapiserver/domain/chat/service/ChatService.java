@@ -13,7 +13,6 @@ import com.gnimty.communityapiserver.domain.chat.repository.User.UserRepository;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatDto;
 import com.gnimty.communityapiserver.domain.chat.service.dto.UserWithBlockDto;
 import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
-import com.gnimty.communityapiserver.global.auth.WebSocketSessionManager;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
@@ -68,7 +67,7 @@ public class ChatService {
 
         List<ChatRoom> chatRooms = chatRoomRepository.findByUser(me)
             .stream().filter(chatRoom ->
-                extractParticipant(me, chatRoom.getParticipants(), true).getStatus()
+                extractParticipant(me, chatRoom.getParticipants(), true).getBlockedStatus()
                     == Blocked.UNBLOCK
             ).toList();
 
@@ -141,7 +140,7 @@ public class ChatService {
                 .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_ROOM));
 
             // 2. 해당 채팅방의 participant 정보 수정 후 save
-            extractParticipant(me, chatRoom.getParticipants(), true).setStatus(status);
+            extractParticipant(me, chatRoom.getParticipants(), true).setBlockedStatus(status);
 
             chatRoomRepository.save(chatRoom);
 
@@ -187,8 +186,9 @@ public class ChatService {
 	}
 
 	// TODO janguni: 접속정보 변동내역 전송
-	public Object updateStatus(User user, Status connectStatus) {
-		userRepository.updateStatus(user, connectStatus);
+	public Object updateConnStatus(User user, Status connectStatus) {
+		user.setStatus(connectStatus);
+		userRepository.save(user);
 		return null;
 	}
 
@@ -200,9 +200,7 @@ public class ChatService {
 
 	// TODO janguni: 채팅방에 있는 상대방이 보낸 채팅의 readCount update
 	public void checkChatsInChatRoom(User me, Long chatRoomNo) {
-		ChatRoom chatRoom = getChatRoom(chatRoomNo).orElseThrow(
-			() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_ROOM,
-				String.format(ErrorCode.NOT_FOUND_CHAT_ROOM.getMessage(), chatRoomNo)));
+		ChatRoom chatRoom = getChatRoom(chatRoomNo);
 
 		Long otherActualUserId = getOther(me, chatRoom).getActualUserId();
 
@@ -230,10 +228,7 @@ public class ChatService {
 
 			chatDtos.add(
 				ChatDto.builder()
-					.senderId(c.getSenderId())
-					.sendDate(c.getSendDate())
-					.message(c.getMessage())
-					.readCount(c.getReadCnt())
+					.chat(c)
 					.build());
 		}
 		return chatDtos;

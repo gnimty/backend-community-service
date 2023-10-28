@@ -34,11 +34,10 @@ public class ChatController {
 
 	// 채팅의 모든 조회
 	@SubscribeMapping("/init_chat")
-	public List<ChatRoomInfo> getTotalChatRoomsAndChatsAndOtherUserInfo(@Header("simpSessionId") String sessionId) {
+	public List<ChatRoomDto> getTotalChatRoomsAndChatsAndOtherUserInfo(@Header("simpSessionId") String sessionId) {
 		User user = getUserBySessionId(sessionId);
-		List<ChatRoomInfo> chatRoomInfos = chatService.getChatRoomsJoined(user);
 
-		return chatRoomDtos;
+		return chatService.getChatRoomsJoined(user);
 	}
 
 	// 채팅방 구독 유도
@@ -81,7 +80,7 @@ public class ChatController {
 	public void exitChatRoom(@DestinationVariable("chatRoomNo") Long chatRoomNo,
 							 @Header("simpSessionId") String sessionId) {
 		User user = getUserBySessionId(sessionId);
-		chatService.exitChatRoom(user, chatRoomNo);
+		chatService.exitChatRoom(user, chatService.getChatRoom(chatRoomNo));
 	}
 
 	// chatRoomNo을 통한 sendStatus 필요
@@ -96,7 +95,7 @@ public class ChatController {
 	public void onClientDisconnect(SessionDisconnectEvent event) {
 		User user = getUserBySessionId(event.getSessionId());
 		if (!isMultipleUser(user.getActualUserId()))
-			chatService.updateStatus(user, Status.OFFLINE);
+			chatService.updateConnStatus(user, Status.OFFLINE);
 		webSocketSessionManager.deleteSession(event.getSessionId());
 	}
 
@@ -105,7 +104,7 @@ public class ChatController {
 		String sessionId = String.valueOf(event.getMessage().getHeaders().get("simpSessionId"));
 		User user = getUserBySessionId(sessionId);
 		if (!isMultipleUser(user.getActualUserId())) {
-			chatService.updateStatus(user, Status.ONLINE);
+			chatService.updateConnStatus(user, Status.ONLINE);
 
 		}
 	}
