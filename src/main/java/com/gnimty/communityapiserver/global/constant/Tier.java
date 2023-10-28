@@ -4,25 +4,29 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
 import java.util.stream.Stream;
+import lombok.Getter;
 
+@Getter
 public enum Tier {
 
-	CHALLENGER("challenger"),
-	GRANDMASTER("grandmaster"),
-	MASTER("master"),
-	DIAMOND("diamond"),
-	EMERALD("emerald"),
-	PLATINUM("platinum"),
-	GOLD("gold"),
-	SILVER("silver"),
-	BRONZE("bronze"),
-	IRON("iron"),
-	NULL("null");
+	CHALLENGER("challenger", 10),
+	GRANDMASTER("grandmaster", 9),
+	MASTER("master", 8),
+	DIAMOND("diamond", 7),
+	EMERALD("emerald", 6),
+	PLATINUM("platinum", 5),
+	GOLD("gold", 4),
+	SILVER("silver", 3),
+	BRONZE("bronze", 2),
+	IRON("iron", 1),
+	NULL("null", 0);
 
 	private final String tier;
+	private final Integer order;
 
-	Tier(String tier) {
+	Tier(String tier, Integer order) {
 		this.tier = tier;
+		this.order = order;
 	}
 
 	@JsonCreator(mode = JsonCreator.Mode.DELEGATING)

@@ -1,6 +1,7 @@
 package com.gnimty.communityapiserver.domain.riotaccount.service;
 
 import com.gnimty.communityapiserver.domain.member.entity.Member;
+import com.gnimty.communityapiserver.domain.riotaccount.controller.dto.request.CursorEntry;
 import com.gnimty.communityapiserver.domain.riotaccount.controller.dto.response.RecommendedSummonersEntry;
 import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
 import com.gnimty.communityapiserver.domain.riotaccount.repository.RiotAccountQueryRepository;
@@ -9,6 +10,7 @@ import com.gnimty.communityapiserver.domain.riotaccount.service.dto.request.Reco
 import com.gnimty.communityapiserver.domain.riotaccount.service.dto.response.RecommendedSummonersServiceResponse;
 import com.gnimty.communityapiserver.domain.schedule.entity.Schedule;
 import com.gnimty.communityapiserver.global.constant.GameMode;
+import com.gnimty.communityapiserver.global.constant.Tier;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
 import java.util.List;
@@ -64,10 +66,26 @@ public class RiotAccountReadService {
 		List<Schedule> schedules
 	) {
 		List<RecommendedSummonersEntry> content = riotAccountQueryRepository.findSummonersByConditions(
-				Pageable.ofSize(request.getPageSize()), request, mainRiotAccount, schedules)
+				Pageable.ofSize(request.getPageSize()), request, mainRiotAccount, schedules,
+				buildCursorEntry(request))
 			.getContent();
 		return RecommendedSummonersServiceResponse.builder()
 			.recommendedSummoners(content)
+			.build();
+	}
+
+	private CursorEntry buildCursorEntry(RecommendedSummonersServiceRequest request) {
+		return CursorEntry.builder()
+			.lastSummonerName(
+				request.getLastSummonerName() == null ? "a" : request.getLastSummonerName())
+			.lastSummonerId(
+				request.getLastSummonerId() == null ? 0L : request.getLastSummonerId())
+			.lastSummonerTier(
+				request.getLastSummonerTier() == null ? Tier.NULL : request.getLastSummonerTier())
+			.lastSummonerDivision(
+				request.getLastSummonerDivision() == null ? 0 : request.getLastSummonerDivision())
+			.lastSummonerUpCount(
+				request.getLastSummonerUpCount() == null ? 0L : request.getLastSummonerUpCount())
 			.build();
 	}
 
