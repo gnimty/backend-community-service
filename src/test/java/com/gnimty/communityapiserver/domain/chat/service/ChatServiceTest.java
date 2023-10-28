@@ -1,17 +1,18 @@
 package com.gnimty.communityapiserver.domain.chat.service;
 
 
-import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatRoomInfo;
+import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatRoomDto;
+import com.gnimty.communityapiserver.domain.chat.entity.Blocked;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
 import com.gnimty.communityapiserver.domain.chat.repository.Chat.ChatRepository;
 import com.gnimty.communityapiserver.domain.chat.repository.ChatRoom.ChatRoomRepository;
 import com.gnimty.communityapiserver.domain.chat.repository.User.UserRepository;
+import com.gnimty.communityapiserver.domain.chat.service.dto.UserWithBlockDto;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.constant.Tier;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -61,14 +62,16 @@ class ChatServiceTest {
 
         for (Integer i = 1; i < 10; i++) {
             chatRooms.add(chatRoomRepository.save(
-                users.get(0),
-                users.get(i), seqGeneratorService.generateSequence(ChatRoom.SEQUENCE_NAME)));
+                new UserWithBlockDto(users.get(0),Blocked.UNBLOCK),
+                new UserWithBlockDto(users.get(i),Blocked.UNBLOCK),
+                seqGeneratorService.generateSequence(ChatRoom.SEQUENCE_NAME)));
         }
 
         for (Integer i = 11; i < 20; i++) {
             chatRooms.add(chatRoomRepository.save(
-                users.get(10),
-                users.get(i), seqGeneratorService.generateSequence(ChatRoom.SEQUENCE_NAME)));
+                new UserWithBlockDto(users.get(10),Blocked.UNBLOCK),
+                new UserWithBlockDto(users.get(i),Blocked.UNBLOCK),
+                seqGeneratorService.generateSequence(ChatRoom.SEQUENCE_NAME)));
         }
     }
 
@@ -91,11 +94,11 @@ class ChatServiceTest {
     @Test
     void getChatRoomsJoined_테스트() {
         User me = userRepository.findByActualUserId(10L).get();
-        List<ChatRoomInfo> chatRoomsJoined = chatService.getChatRoomsJoined(me);
+        List<ChatRoomDto> chatRoomsJoined = chatService.getChatRoomsJoined(me);
 
-        for (ChatRoomInfo chatRoomInfo : chatRoomsJoined) {
+        for (ChatRoomDto chatRoomDto : chatRoomsJoined) {
             System.out.printf("chatRoomId = %d, otherUserId = %d\n",
-                chatRoomInfo.getChatRoomId(), chatRoomInfo.getOtherUserId());
+                chatRoomDto.getChatRoomNo(), chatRoomDto.getOtherUser().getUserId());
         }
 
         Assertions.assertEquals(9, chatRoomsJoined.size());
@@ -107,12 +110,17 @@ class ChatServiceTest {
 
         List<ChatRoom> chatRooms = chatRoomRepository.findByUser(all.get(0));
         // 이미 존재하는 유저 쌍(0, 1번 유저)은 호출 시 기존 chatRoom인 첫 번째 chatRoom과 같음
-        ChatRoom chatRoom = chatService.getOrCreateChatRoom(all.get(0), all.get(1));
+        ChatRoom chatRoom = chatService.getOrCreateChatRoom(
+            new UserWithBlockDto(all.get(0),Blocked.UNBLOCK),
+            new UserWithBlockDto(all.get(1),Blocked.UNBLOCK)
+        );
 
         Assertions.assertEquals(chatRooms.get(0).getId(), chatRoom.getId());
         // 새로운 유저 쌍 생성
 
-        ChatRoom chatRoom2= chatService.getOrCreateChatRoom(all.get(1), all.get(2));
+        ChatRoom chatRoom2= chatService.getOrCreateChatRoom(
+            new UserWithBlockDto(all.get(1),Blocked.UNBLOCK),
+            new UserWithBlockDto(all.get(2),Blocked.UNBLOCK));
 
         Assertions.assertEquals(19, chatRoom2.getChatRoomNo());
     }

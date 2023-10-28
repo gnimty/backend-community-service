@@ -3,6 +3,7 @@ package com.gnimty.communityapiserver.domain.chat.repository.ChatRoom;
 import com.gnimty.communityapiserver.domain.chat.entity.Blocked;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
+import com.gnimty.communityapiserver.domain.chat.service.dto.UserWithBlockDto;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
 import java.util.ArrayList;
@@ -43,9 +44,9 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepositoryCustom {
 		return Optional.ofNullable(chatRoom);
 	}
 	@Override
-	public ChatRoom save(User user1, User user2, Long chatRoomNo) {
+	public ChatRoom save(UserWithBlockDto user1, UserWithBlockDto user2, Long chatRoomNo) {
 		// 0. participant가 둘다 속해 있는 chatRoom이 없는지 확인
-		Optional<ChatRoom> bothJoined = findByUsers(user1, user2);
+		Optional<ChatRoom> bothJoined = findByUsers(user1.getUser(), user2.getUser());
 
 		if (bothJoined.isPresent()){
 			throw new BaseException(ErrorCode.CHATROOM_ALREADY_EXISTS);
@@ -56,8 +57,8 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepositoryCustom {
 
 		// 2. chatRoom에 User Set
 		List<ChatRoom.Participant> participants = new ArrayList<>();
-		participants.add(new ChatRoom.Participant(user1, null, Blocked.UNBLOCK));
-		participants.add(new ChatRoom.Participant(user2, null, Blocked.UNBLOCK));
+		participants.add(new ChatRoom.Participant(user1.getUser(), null, user1.getStatus()));
+		participants.add(new ChatRoom.Participant(user2.getUser(), null, user2.getStatus()));
 
 		ChatRoom chatRoom = new ChatRoom(null, chatRoomNo, participants, new Date(), new Date());
 
