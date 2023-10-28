@@ -1,5 +1,6 @@
 package com.gnimty.communityapiserver.domain.chat.controller;
 
+import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatRoomDto;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
 import com.gnimty.communityapiserver.domain.chat.service.ChatService;
@@ -33,11 +34,10 @@ public class ChatController {
 
 	// 채팅의 모든 조회
 	@SubscribeMapping("/init_chat")
-	public List<ChatRoomInfo> getTotalChatRoomsAndChatsAndOtherUserInfo(@Header("simpSessionId") String sessionId) {
+	public List<ChatRoomDto> getTotalChatRoomsAndChatsAndOtherUserInfo(@Header("simpSessionId") String sessionId) {
 		User user = getUserBySessionId(sessionId);
-		List<ChatRoomInfo> chatRoomInfos = chatService.getChatRoomsJoined(user);
 
-		return chatRoomDtos;
+		return chatService.getChatRoomsJoined(user);
 	}
 
 	// 채팅방 구독 유도
@@ -80,7 +80,7 @@ public class ChatController {
 	public void exitChatRoom(@DestinationVariable("chatRoomNo") Long chatRoomNo,
 							 @Header("simpSessionId") String sessionId) {
 		User user = getUserBySessionId(sessionId);
-		chatService.exitChatRoom(user, chatRoomNo);
+		chatService.exitChatRoom(user, chatService.getChatRoom(chatRoomNo));
 	}
 
 	// chatRoomNo을 통한 sendStatus 필요
