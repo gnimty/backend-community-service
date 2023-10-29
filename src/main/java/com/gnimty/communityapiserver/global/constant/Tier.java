@@ -9,24 +9,24 @@ import lombok.Getter;
 @Getter
 public enum Tier {
 
-	CHALLENGER("challenger", 10),
-	GRANDMASTER("grandmaster", 9),
-	MASTER("master", 8),
-	DIAMOND("diamond", 7),
-	EMERALD("emerald", 6),
-	PLATINUM("platinum", 5),
-	GOLD("gold", 4),
-	SILVER("silver", 3),
-	BRONZE("bronze", 2),
-	IRON("iron", 1),
-	NULL("null", 0);
+	CHALLENGER("challenger", 9),
+	GRANDMASTER("grandmaster", 8),
+	MASTER("master", 7),
+	DIAMOND("diamond", 6),
+	EMERALD("emerald", 5),
+	PLATINUM("platinum", 4),
+	GOLD("gold", 3),
+	SILVER("silver", 2),
+	BRONZE("bronze", 1),
+	IRON("iron", 0),
+	NULL("null", -1);
 
 	private final String tier;
-	private final Integer order;
+	private final Integer weight;
 
-	Tier(String tier, Integer order) {
+	Tier(String tier, Integer weight) {
 		this.tier = tier;
-		this.order = order;
+		this.weight = weight;
 	}
 
 	@JsonCreator(mode = JsonCreator.Mode.DELEGATING)
