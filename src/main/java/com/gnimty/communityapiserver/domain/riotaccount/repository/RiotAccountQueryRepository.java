@@ -7,7 +7,6 @@ import static com.gnimty.communityapiserver.domain.riotaccount.entity.QRiotAccou
 import static com.gnimty.communityapiserver.domain.schedule.entity.QSchedule.schedule;
 
 import com.gnimty.communityapiserver.domain.member.entity.Member;
-import com.gnimty.communityapiserver.domain.riotaccount.controller.dto.request.CursorEntry;
 import com.gnimty.communityapiserver.domain.riotaccount.controller.dto.response.RecommendedSummonersEntry;
 import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
 import com.gnimty.communityapiserver.domain.riotaccount.service.dto.request.RecommendedSummonersServiceRequest;
@@ -23,9 +22,7 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.QBean;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
@@ -45,12 +42,10 @@ public class RiotAccountQueryRepository {
 		Pageable pageable,
 		RecommendedSummonersServiceRequest request,
 		RiotAccount mainRiotAccount,
-		List<Schedule> schedules,
-		CursorEntry cursor
+		List<Schedule> schedules
 	) {
 		Member me = MemberThreadLocal.get();
-		NumberExpression<Integer> tierOrder = getTierOrder();
-		OrderSpecifier<?>[] orderSpecifier = createOrderSpecifier(request.getSortBy(), tierOrder);
+		OrderSpecifier<?>[] orderSpecifier = createOrderSpecifier(request.getSortBy());
 
 		JPAQuery<RecommendedSummonersEntry> query = queryFactory.select(
 				getProjectionBean())
@@ -60,16 +55,16 @@ public class RiotAccountQueryRepository {
 			.join(introduction).on(introduction.member.eq(member))
 			.join(schedule).on(schedule.member.eq(member))
 			.where(
-				cursorGt(request.getSortBy(), cursor, tierOrder)
+				cursorGt(request)
 					.and(isMainRiotAccount())
-					.and(excludeMasterGoe(tierOrder))
+					.and(excludeMasterGoe())
 					.and(gameModeEq(request.getGameMode()))
-					.and(tierGoe(request.getTier(), tierOrder))
+					.and(tierGoe(request.getLastSummonerMmr()))
 					.and(memberStatusEq(request.getStatus()))
 					.and(laneEq(request.getLanes()))
 					.and(frequentChampionIdEq(request.getPreferChampionIds()))
 					.and(duoable(mainRiotAccount.getQueue(), mainRiotAccount.getDivision(),
-						request.getDuoable(), tierOrder))
+						request.getDuoable()))
 					.and(timeMatch(schedules, request.getTimeMatch()))
 					.and(riotAccount.member.id.ne(me.getId())))
 			.orderBy(orderSpecifier)
@@ -105,7 +100,7 @@ public class RiotAccountQueryRepository {
 			.where(riotAccount.member.id.eq(me.getId()))
 			.fetchFirst();
 		return query
-			.where(duoable(account.getQueue(), account.getDivision(), true, getTierOrder()))
+			.where(duoable(account.getQueue(), account.getDivision(), true))
 			.orderBy(Expressions.numberTemplate(Double.class, "function('rand')").asc())
 			.limit(5)
 			.fetch();
@@ -176,68 +171,48 @@ public class RiotAccountQueryRepository {
 		return builder;
 	}
 
-	private BooleanExpression excludeMasterGoe(NumberExpression<Integer> tierOrder) {
-		return tierOrder.lt(Tier.MASTER.getOrder());
+	private BooleanExpression excludeMasterGoe() {
+		return riotAccount.mmr.lt(getMmrByTier(Tier.MASTER));
 	}
 
 	private BooleanExpression duoable(
 		Tier tier,
 		Integer division,
-		Boolean duoable,
-		NumberExpression<?> tierOrder
+		Boolean duoable
 	) {
 		if (duoable == null || !duoable) {
 			return null;
 		}
 		if (tier.equals(Tier.IRON) || tier.equals(Tier.BRONZE)) {
-			return tierOrder.loe(Tier.SILVER.getOrder());
+			return riotAccount.mmr.lt(getMmrByTier(Tier.GOLD));
 		}
 		if (tier.equals(Tier.SILVER)) {
-			return tierOrder.loe(Tier.GOLD.getOrder());
+			return riotAccount.mmr.lt(getMmrByTier(Tier.PLATINUM));
 		}
 		if (tier.equals(Tier.GOLD)) {
-			return tierOrder.loe(Tier.PLATINUM.getOrder())
-				.and(tierOrder.goe(Tier.SILVER.getOrder()));
+			return riotAccount.mmr.goe(getMmrByTier(Tier.SILVER))
+				.and(riotAccount.mmr.lt(getMmrByTier(Tier.EMERALD)));
 		}
 		if (tier.equals(Tier.PLATINUM)) {
-			return tierOrder.loe(Tier.EMERALD.getOrder())
-				.and(tierOrder.goe(Tier.GOLD.getOrder()));
+			return riotAccount.mmr.goe(getMmrByTier(Tier.GOLD))
+				.and(riotAccount.mmr.lt(getMmrByTier(Tier.DIAMOND)));
 		}
 		if (tier.equals(Tier.EMERALD)) {
-			BooleanExpression be = tierOrder.goe(Tier.PLATINUM.getOrder());
+			BooleanExpression be = riotAccount.mmr.goe(getMmrByTier(Tier.PLATINUM));
 			if (division > 2) {
-				return be.and(tierOrder.loe(Tier.EMERALD.getOrder()));
+				return be.and(riotAccount.mmr.lt(getMmrByTier(Tier.DIAMOND)));
 			}
 			if (division == 2) {
 				return be
-					.and(tierOrder.loe(Tier.EMERALD.getOrder())
-						.or(riotAccount.queue.eq(Tier.DIAMOND)
-							.and(riotAccount.division.eq(4))));
+					.and(riotAccount.mmr.lt(getMmrByTierAndDivision(Tier.DIAMOND, 3)));
 			}
 			return be
-				.and(tierOrder.loe(Tier.EMERALD.getOrder())
-					.or(riotAccount.queue.eq(Tier.DIAMOND)
-						.and(riotAccount.division.goe(3))));
+				.and(riotAccount.mmr.lt(getMmrByTierAndDivision(Tier.DIAMOND, 2)));
 		}
 
 		// tier = DIAMOND
-		if (division == 1) {
-			return riotAccount.queue.eq(Tier.DIAMOND)
-				.and(riotAccount.division.loe(3));
-		}
-		if (division == 2) {
-			return riotAccount.queue.eq(Tier.DIAMOND);
-		}
-		if (division == 3) {
-			return riotAccount.queue.eq(Tier.DIAMOND)
-				.or(riotAccount.queue.eq(Tier.EMERALD).and(riotAccount.division.eq(1)));
-		}
-
-		// 다이아 4
-		return riotAccount.queue.eq(Tier.EMERALD)
-			.and(riotAccount.division.loe(2)) // 에메랄드 1, 2와 가능하고
-			.or(riotAccount.queue.eq(Tier.DIAMOND)
-				.and(riotAccount.division.goe(2))); // 다이아 2, 3, 4와 가능
+		return riotAccount.mmr.goe(
+			getMmrByTierAndDivision(Tier.DIAMOND, 3) - (division - 1) * 100L);
 	}
 
 	private BooleanExpression gameModeEq(GameMode gameMode) {
@@ -263,11 +238,11 @@ public class RiotAccountQueryRepository {
 				.or(riotAccount.frequentChampionId3.in(preferChampionIds)));
 	}
 
-	private BooleanExpression tierGoe(Tier tier, NumberExpression<Integer> tierOrder) {
-		if (tier == null) {
+	private BooleanExpression tierGoe(Long mmr) {
+		if (mmr == null) {
 			return null;
 		}
-		return tierOrder.goe(tier.getOrder());
+		return riotAccount.mmr.goe(mmr);
 	}
 
 	private BooleanExpression laneEq(List<Lane> lanes) {
@@ -278,50 +253,29 @@ public class RiotAccountQueryRepository {
 			.or(riotAccount.frequentLane2.in(lanes));
 	}
 
-	private NumberExpression<Integer> getTierOrder() {
-		return new CaseBuilder()
-			.when(riotAccount.queue.eq(Tier.CHALLENGER)).then(Tier.CHALLENGER.getOrder())
-			.when(riotAccount.queue.eq(Tier.GRANDMASTER)).then(Tier.GRANDMASTER.getOrder())
-			.when(riotAccount.queue.eq(Tier.MASTER)).then(Tier.MASTER.getOrder())
-			.when(riotAccount.queue.eq(Tier.DIAMOND)).then(Tier.DIAMOND.getOrder())
-			.when(riotAccount.queue.eq(Tier.EMERALD)).then(Tier.EMERALD.getOrder())
-			.when(riotAccount.queue.eq(Tier.PLATINUM)).then(Tier.PLATINUM.getOrder())
-			.when(riotAccount.queue.eq(Tier.GOLD)).then(Tier.GOLD.getOrder())
-			.when(riotAccount.queue.eq(Tier.SILVER)).then(Tier.SILVER.getOrder())
-			.when(riotAccount.queue.eq(Tier.BRONZE)).then(Tier.BRONZE.getOrder())
-			.when(riotAccount.queue.eq(Tier.IRON)).then(Tier.IRON.getOrder())
-			.otherwise(0);
-	}
-
-	private BooleanExpression cursorGt(
-		SortBy sortBy,
-		CursorEntry cursor,
-		NumberExpression<Integer> tierOrder
-	) {
+	private BooleanExpression cursorGt(RecommendedSummonersServiceRequest request) {
+		SortBy sortBy = request.getSortBy();
 		if (sortBy == null) {
-			return riotAccount.id.gt(cursor.getLastSummonerId());
+			return riotAccount.id.gt(request.getLastSummonerId());
 		}
 		if (sortBy.equals(SortBy.ATOZ)) {
-			return riotAccount.summonerName.lower().goe(cursor.getLastSummonerName().toLowerCase())
-				.and(riotAccount.summonerName.lower().gt(cursor.getLastSummonerName().toLowerCase())
-					.or(riotAccount.id.gt(cursor.getLastSummonerId())));
+			return riotAccount.summonerName.lower().goe(request.getLastSummonerName().toLowerCase())
+				.and(
+					riotAccount.summonerName.lower().gt(request.getLastSummonerName().toLowerCase())
+						.or(riotAccount.id.gt(request.getLastSummonerId())));
 		} else if (sortBy.equals(SortBy.TIER)) {
-			return tierOrder.goe(cursor.getLastSummonerTier().getOrder())
-				.and(tierOrder.gt(cursor.getLastSummonerTier().getOrder())
-					.or(riotAccount.division.goe(cursor.getLastSummonerDivision())
-						.and(riotAccount.division.gt(cursor.getLastSummonerDivision())
-							.or(riotAccount.id.gt(cursor.getLastSummonerId())))));
+			return riotAccount.mmr.goe(request.getLastSummonerMmr())
+				.and(riotAccount.mmr.gt(request.getLastSummonerMmr())
+					.or(riotAccount.id.gt(request.getLastSummonerId())));
 		}
-		return member.upCount.goe(cursor.getLastSummonerUpCount())
-			.and(member.upCount.gt(cursor.getLastSummonerUpCount())
-				.or(riotAccount.id.gt(cursor.getLastSummonerId())));
+		return member.upCount.goe(request.getLastSummonerUpCount())
+			.and(member.upCount.gt(request.getLastSummonerUpCount())
+				.or(riotAccount.id.gt(request.getLastSummonerId())));
 	}
 
-	private OrderSpecifier<?>[] createOrderSpecifier(SortBy sortBy,
-		NumberExpression<Integer> tierOrder) {
+	private OrderSpecifier<?>[] createOrderSpecifier(SortBy sortBy) {
 		OrderSpecifier<String> summonerNameAsc = riotAccount.summonerName.toLowerCase().asc();
-		OrderSpecifier<Integer> tierOrderDesc = tierOrder.desc();
-		OrderSpecifier<Integer> divisionAsc = riotAccount.division.asc();
+		OrderSpecifier<Long> mmrDesc = riotAccount.mmr.desc();
 		OrderSpecifier<Long> upCountDesc = member.upCount.desc();
 		OrderSpecifier<Long> idAsc = riotAccount.id.asc();
 
@@ -331,9 +285,34 @@ public class RiotAccountQueryRepository {
 		if (sortBy.equals(SortBy.ATOZ)) {
 			return new OrderSpecifier[]{summonerNameAsc, idAsc};
 		} else if (sortBy.equals(SortBy.TIER)) {
-			return new OrderSpecifier[]{tierOrderDesc, divisionAsc, idAsc};
+			return new OrderSpecifier[]{mmrDesc, idAsc};
 		} else {
 			return new OrderSpecifier[]{upCountDesc, idAsc};
 		}
+	}
+
+	/**
+	 * 			IV		III		II		I
+	 * 아이언		LP+0	LP+100	LP+200	LP+300
+	 * 브론즈		LP+400	LP+500	LP+600	LP+700
+	 * 실버		LP+800	LP+900	LP+1000	LP+1100
+	 * 골드		LP+1200	LP+1300	LP+1400	LP+1500
+	 * 플레티넘	LP+1600	LP+1700	LP+1800	LP+1900
+	 * 에메랄드	LP+2000	LP+2100	LP+2200	LP+2300
+	 * 다이아몬드	LP+2400	LP+2500	LP+2600	LP+2700
+	 * 마스터 /그랜드마스터 / 챌린저	LP+2800
+	 */
+	private Long getMmrByTierAndDivision(Tier tier, Integer division) {
+		if (tier.getWeight() >= Tier.MASTER.getWeight()) {
+			return 2800L;
+		}
+		return tier.getWeight() * 400 + (4 - division) * 100L;
+	}
+
+	private Long getMmrByTier(Tier tier) {
+		if (tier.getWeight() >= Tier.MASTER.getWeight()) {
+			return 2800L;
+		}
+		return tier.getWeight() * 400L;
 	}
 }
