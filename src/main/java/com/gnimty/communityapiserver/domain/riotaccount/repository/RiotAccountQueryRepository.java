@@ -7,7 +7,6 @@ import static com.gnimty.communityapiserver.domain.riotaccount.entity.QRiotAccou
 import static com.gnimty.communityapiserver.domain.schedule.entity.QSchedule.schedule;
 
 import com.gnimty.communityapiserver.domain.member.entity.Member;
-import com.gnimty.communityapiserver.domain.riotaccount.controller.dto.request.CursorEntry;
 import com.gnimty.communityapiserver.domain.riotaccount.controller.dto.response.RecommendedSummonersEntry;
 import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
 import com.gnimty.communityapiserver.domain.riotaccount.service.dto.request.RecommendedSummonersServiceRequest;
@@ -23,9 +22,7 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.QBean;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
@@ -61,8 +58,7 @@ public class RiotAccountQueryRepository {
 		Pageable pageable,
 		RecommendedSummonersServiceRequest request,
 		RiotAccount mainRiotAccount,
-		List<Schedule> schedules,
-		CursorEntry cursor
+		List<Schedule> schedules
 	) {
 		Member me = MemberThreadLocal.get();
 		OrderSpecifier<?>[] orderSpecifier = createOrderSpecifier(request.getSortBy());
@@ -77,14 +73,14 @@ public class RiotAccountQueryRepository {
 			.where(
 				cursorGt(request)
 					.and(isMainRiotAccount())
-					.and(excludeMasterGoe(tierOrder))
+					.and(excludeMasterGoe())
 					.and(gameModeEq(request.getGameMode()))
 					.and(tierGoe(request.getLastSummonerMmr()))
 					.and(memberStatusEq(request.getStatus()))
 					.and(laneEq(request.getLanes()))
 					.and(frequentChampionIdEq(request.getPreferChampionIds()))
 					.and(duoable(mainRiotAccount.getQueue(), mainRiotAccount.getDivision(),
-						request.getDuoable(), tierOrder))
+						request.getDuoable()))
 					.and(timeMatch(schedules, request.getTimeMatch()))
 					.and(riotAccount.member.id.ne(me.getId())))
 			.orderBy(orderSpecifier)
@@ -120,7 +116,7 @@ public class RiotAccountQueryRepository {
 			.where(riotAccount.member.id.eq(me.getId()))
 			.fetchFirst();
 		return query
-			.where(duoable(account.getQueue(), account.getDivision(), true, getTierOrder()))
+			.where(duoable(account.getQueue(), account.getDivision(), true))
 			.orderBy(Expressions.numberTemplate(Double.class, "function('rand')").asc())
 			.limit(5)
 			.fetch();
