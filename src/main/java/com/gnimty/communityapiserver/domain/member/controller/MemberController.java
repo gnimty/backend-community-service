@@ -24,8 +24,10 @@ import com.gnimty.communityapiserver.domain.member.controller.dto.request.Passwo
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.PreferGameModeUpdateRequest;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.StatusUpdateRequest;
 import com.gnimty.communityapiserver.domain.member.controller.dto.response.MyProfileResponse;
+import com.gnimty.communityapiserver.domain.member.service.MemberReadService;
 import com.gnimty.communityapiserver.domain.member.service.MemberService;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.MyProfileServiceResponse;
+import com.gnimty.communityapiserver.domain.member.service.dto.response.OtherProfileServiceResponse;
 import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
 import com.gnimty.communityapiserver.global.constant.Provider;
 import com.gnimty.communityapiserver.global.response.CommonResponse;
@@ -47,6 +49,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class MemberController {
 
 	private final MemberService memberService;
+	private final MemberReadService memberReadService;
 
 	@PostMapping("/{member_id}/rso")
 	public CommonResponse<Void> summonerAccountLink(
@@ -152,5 +155,12 @@ public class MemberController {
 	public CommonResponse<Void> withdrawal() {
 		memberService.withdrawal();
 		return CommonResponse.success(SUCCESS_WITHDRAWAL, OK);
+	}
+
+	@GetMapping("/{member_id}")
+	public CommonResponse<OtherProfileServiceResponse> getOtherProfile(
+		@PathVariable("member_id") Long memberId
+	) {
+		return CommonResponse.success(memberReadService.findOtherById(memberId));
 	}
 }
