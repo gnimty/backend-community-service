@@ -29,7 +29,6 @@ public class RecommendedSummonersRequest {
 	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
 	private SortBy sortBy;
 	private Boolean timeMatch;
-
 	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
 	private Long lastSummonerId;
 	private String lastSummonerName;

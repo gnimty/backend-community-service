@@ -1,5 +1,6 @@
 package com.gnimty.communityapiserver.global.auth;
 
+import com.gnimty.communityapiserver.domain.member.service.MemberService;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
