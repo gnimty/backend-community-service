@@ -30,7 +30,30 @@ public class ChampionCommentsLikeService {
 	) {
 		Member member = MemberThreadLocal.get();
 		ChampionComments championComments = championCommentsReadService.findById(commentsId);
-		checkValidation(championId, member, championComments);
+		checkValidation(championId, championComments);
+
+		if (!request.getCancel()) {
+			championCommentsLike(request, member, championComments);
+		} else {
+			cancelChampionCommentsLike(member, championComments);
+		}
+	}
+
+	private void cancelChampionCommentsLike(Member member, ChampionComments championComments) {
+		ChampionCommentsLike championCommentsLike = championCommentsLikeReadService
+			.findByMemberAndChampionComments(member, championComments);
+		championCommentsLikeRepository.delete(championCommentsLike);
+	}
+
+	private void championCommentsLike(
+		ChampionCommentsLikeServiceRequest request,
+		Member member,
+		ChampionComments championComments
+	) {
+		if (championCommentsLikeReadService.existsByMemberAndChampionComments(member,
+			championComments)) {
+			throw new BaseException(ErrorCode.ALREADY_CHAMPION_COMMENTS_LIKE);
+		}
 		championCommentsLikeRepository.save(
 			createChampionCommentsLike(request, member, championComments));
 		updateReactionCount(request.getLikeOrNot(), championComments);
@@ -56,14 +79,9 @@ public class ChampionCommentsLikeService {
 			.build();
 	}
 
-	private void checkValidation(Long championId, Member member,
-		ChampionComments championComments) {
+	private void checkValidation(Long championId, ChampionComments championComments) {
 		if (!Objects.equals(championComments.getChampionId(), championId)) {
 			throw new BaseException(ErrorCode.COMMENTS_ID_AND_CHAMPION_ID_INVALID);
-		}
-		if (championCommentsLikeReadService.existsByMemberAndChampionComments(
-			member, championComments)) {
-			throw new BaseException(ErrorCode.ALREADY_CHAMPION_COMMENTS_LIKE);
 		}
 	}
 }

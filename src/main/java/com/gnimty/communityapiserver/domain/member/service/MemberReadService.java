@@ -1,6 +1,7 @@
 package com.gnimty.communityapiserver.domain.member.service;
 
 import com.gnimty.communityapiserver.domain.member.entity.Member;
+import com.gnimty.communityapiserver.domain.member.repository.MemberQueryRepository;
 import com.gnimty.communityapiserver.domain.member.repository.MemberRepository;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
@@ -14,9 +15,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberReadService {
 
 	private final MemberRepository memberRepository;
+	private final MemberQueryRepository memberQueryRepository;
 
 	public void throwIfExistByEmail(String email) {
-		if (memberRepository.existsByEmail(email)) {
+		if (memberQueryRepository.existsByEmail(email)) {
 			throw new BaseException(ErrorCode.ALREADY_REGISTERED_EMAIL);
 		}
 	}
@@ -32,6 +34,6 @@ public class MemberReadService {
 	}
 
 	public Boolean existsById(Long id) {
-		return memberRepository.existsById(id);
+		return memberQueryRepository.existsById(id);
 	}
 }

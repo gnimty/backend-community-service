@@ -10,7 +10,11 @@ public interface ChatRepository extends MongoRepository<Chat, String>, ChatRepos
 	// 채팅방 번호와 내 정보로 채팅치기
 	Chat save(Chat chat);
 
-	List<Chat> findBySenderIdAndChatRoomNo(Long senderId, Long chatRoomNo);
+	List<Chat> findByChatRoomNo(Long chatRoomNo);
+
+	List<Chat> findBySenderIdAndChatRoomNo(String senderId, Long chatRoomNo);
+
+	//void updateReadCountById(Long id, Integer readCount);
 
 	void deleteByChatRoomNo(Long chatRoomNo);
 }
