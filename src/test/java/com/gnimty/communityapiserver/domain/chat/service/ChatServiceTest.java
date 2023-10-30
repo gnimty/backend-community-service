@@ -1,6 +1,10 @@
 package com.gnimty.communityapiserver.domain.chat.service;
 
 
+import static java.lang.Thread.sleep;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatDto;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatRoomDto;
 import com.gnimty.communityapiserver.domain.chat.entity.Blocked;
@@ -106,7 +110,7 @@ class ChatServiceTest {
                 chatRoomDto.getChatRoomNo(), chatRoomDto.getOtherUser().getUserId());
         }
 
-        Assertions.assertEquals(9, chatRoomsJoined.size());
+        assertEquals(9, chatRoomsJoined.size());
     }
 
     @Test
@@ -120,14 +124,14 @@ class ChatServiceTest {
             new UserWithBlockDto(all.get(1),Blocked.UNBLOCK)
         );
 
-        Assertions.assertEquals(chatRooms.get(0).getId(), chatRoom.getId());
+        assertEquals(chatRooms.get(0).getId(), chatRoom.getId());
         // 새로운 유저 쌍 생성
 
         ChatRoom chatRoom2= chatService.getOrCreateChatRoom(
             new UserWithBlockDto(all.get(1),Blocked.UNBLOCK),
             new UserWithBlockDto(all.get(2),Blocked.UNBLOCK));
 
-        Assertions.assertEquals(19, chatRoom2.getChatRoomNo());
+        assertEquals(19, chatRoom2.getChatRoomNo());
     }
 
     @Test
@@ -157,7 +161,24 @@ class ChatServiceTest {
     }
 
     @Test
-    void
+    void saveChat_테스트() throws InterruptedException {
+
+        // given
+        User user = userRepository.findByActualUserId(0L).get();
+        ChatRoom chatRoom = chatRoomRepository.findByChatRoomNo(1L).get();
+        Date originLastModifiedDate = chatRoom.getLastModifiedDate();
+        String message = "안녕하세요";
+
+        // when
+        sleep(3000);
+        chatService.saveChat(user, chatRoom.getChatRoomNo(), message);
+
+        // then
+        List<Chat> chats = chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo());
+        ChatRoom updatedChatRoom = chatRoomRepository.findByChatRoomNo(chatRoom.getChatRoomNo()).get();
+        assertEquals(1, chats.size());
+        assertNotEquals(originLastModifiedDate, updatedChatRoom.getLastModifiedDate());
+    }
 
     @NotNull
     private ChatRoom block(User user1, User user2) {
@@ -213,9 +234,9 @@ class ChatServiceTest {
 
         // then
         List<ChatDto> chatList1 = chatService.getChatList(user2, chatRoom.getChatRoomNo());
-        Assertions.assertEquals(3, chatList1.size());
+        assertEquals(3, chatList1.size());
         List<ChatDto> chatList2 = chatService.getChatList(user1, chatRoom.getChatRoomNo());
-        Assertions.assertEquals(5, chatList2.size());
+        assertEquals(5, chatList2.size());
     }
 
 
