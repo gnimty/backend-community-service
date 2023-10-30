@@ -180,6 +180,19 @@ class ChatServiceTest {
         assertNotEquals(originLastModifiedDate, updatedChatRoom.getLastModifiedDate());
     }
 
+    @Test
+    void updateConnStatus_테스트() {
+        // given
+        User user = userRepository.findByActualUserId(0L).get();
+
+        // when
+        chatService.updateConnStatus(user, Status.AWAY);
+
+        // then
+        User updatedUser = userRepository.findByActualUserId(0L).get();
+        assertEquals(updatedUser.getStatus(), Status.AWAY);
+    }
+
     @NotNull
     private ChatRoom block(User user1, User user2) {
         ChatRoom chatRoom = chatRoomRepository.findByUsers(user1, user2).get();
