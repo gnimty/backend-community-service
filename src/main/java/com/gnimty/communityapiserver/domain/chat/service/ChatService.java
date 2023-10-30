@@ -217,11 +217,11 @@ public class ChatService {
 			});
 	}
 
-	public void sendToClientWhoSubscribedUserId(String userId, Object message){
+	public void sendChatRoomToUserSubscribers(String userId, Object message){
 		template.convertAndSend("/sub/user/" + userId, message);
 	}
 
-	public void sendToClientWhoSubscribedChatRoomId(Long chatRoomId, Object message){
+	public void sendChatToChatRoomSubscribers(Long chatRoomId, Object message){
 		template.convertAndSend("/sub/chatRoom/" + chatRoomId, message);
 	}
 

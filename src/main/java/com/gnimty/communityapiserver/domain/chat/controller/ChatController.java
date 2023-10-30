@@ -16,7 +16,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.socket.messaging.SessionConnectedEvent;
@@ -30,7 +29,6 @@ public class ChatController {
 
 	private final ChatService chatService;
 	private final MemberService memberService;
-	private final SimpMessagingTemplate template;
 	private final WebSocketSessionManager webSocketSessionManager;
 
 	// 채팅의 모든 조회
@@ -57,11 +55,11 @@ public class ChatController {
 
 		// getchatRoomNo를 호출하기 X
 		// chatRoom을 먼저 생성 또는 조회 후 그 정보를 그대로 보내주거나 DTO로 변환해서 보내주는 게 좋아 보임
-		template.convertAndSend("/sub/user/" + me.getId(), chatRoom.getChatRoomNo());
+		chatService.sendChatRoomToUserSubscribers(me.getId(), chatRoom.getChatRoomNo());
 
 		if (!chatService.isBlockParticipant(chatRoom, other)) //
 		{
-			template.convertAndSend("/sub/user/" + other.getId(), chatRoom.getChatRoomNo());
+			chatService.sendChatRoomToUserSubscribers(other.getId(), chatRoom.getChatRoomNo());
 		}
 	}
 
@@ -72,7 +70,7 @@ public class ChatController {
 							String message) {
 		User user = getUserBySessionId(sessionId);
 		chatService.saveChat(user, chatRoomNo, message);
-		template.convertAndSend("/sub/chatRoom/" + chatRoomNo, message);
+		chatService.sendChatToChatRoomSubscribers(chatRoomNo, message);
 	}
 
 	// 채팅방 나가기
@@ -89,7 +87,7 @@ public class ChatController {
 	public void sendStatus(@DestinationVariable("chatRoomNo") Long chatRoomNo,
 		  				   @Header("simpSessionId") String sessionId,
 		                   String message) {
-		template.convertAndSend("/sub/chatRoom/" + chatRoomNo, message);
+		chatService.sendChatToChatRoomSubscribers(chatRoomNo, message);
 	}
 
 	@EventListener
