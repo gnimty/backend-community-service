@@ -133,6 +133,25 @@ public class ChatService {
         }
     }
 
+	// TODO so1omon : 특정 유저와 채팅을 나눈 member id list 넘기기
+	public List<Long> getChattedMemberIds(Long id){
+
+		// 0. 유저 정보 검색
+		User me = userRepository.findByActualUserId(id)
+			.orElseThrow(()-> new BaseException(ErrorCode.NOT_FOUND_CHAT_USER));
+
+		// 1. 내 정보로 chatRoom 리스트 검색
+		List<ChatRoom> chatRooms = chatRoomRepository.findByUser(me);
+
+		// 2. chatRoom에 속해 있는 모든 other participants 정보 검색하여 Id 추출
+		List<Long> memberIds = chatRooms.stream().map(chatRoom ->
+			 getOther(me, chatRoom).getActualUserId()).toList();
+
+		// 3. return
+		return memberIds;
+	}
+
+
     // 차단
     public void updateBlockStatus(User me, User other, Blocked status) {
         // 1. 나와 상대가 속해 있는 채팅방을 찾기 (수정예정)
