@@ -85,11 +85,12 @@ public class ChatService {
     // 양쪽 다 채팅방을 나간 상황이면, 모든 채팅 기록 삭제
     public void exitChatRoom(User me, ChatRoom chatRoom) {
         Long chatRoomNo = chatRoom.getChatRoomNo();
-        Participant participant = extractParticipant(me, chatRoom.getParticipants(), false);
+        Participant other = extractParticipant(me, chatRoom.getParticipants(), false);
+		Participant mine = extractParticipant(me, chatRoom.getParticipants(), false);
 
         // chatRoom lastModifiedDate, 상대방의 exitDate 비교
-        if (participant.getExitDate() == null
-            || chatRoom.getLastModifiedDate().getTime() < participant.getExitDate().getTime()) {
+        if (other.getExitDate() != null
+            && chatRoom.getLastModifiedDate().before(other.getExitDate())) {
             // (상대방이 채팅방 나간 상황) lastModifiedDate가 상대의 exitDate 이전일 때 : flush
             //      -> flushAllChats() + chatRoomRepository.deleteByChatRoomNo()
             flushAllChats(chatRoomNo);
@@ -97,7 +98,7 @@ public class ChatService {
         } else {
             // (상대방이 채팅방 나가지 않은 상황) lastModifiedDate가 상대의 exitDate 이후일 때 : exitDate update
             //      -> chatRoomRepository.updateExitDate(me);
-            participant.setExitDate(new Date());
+            mine.setExitDate(new Date());
             chatRoomRepository.save(chatRoom);
         }
     }
