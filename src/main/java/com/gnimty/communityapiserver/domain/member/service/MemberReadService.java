@@ -3,6 +3,9 @@ package com.gnimty.communityapiserver.domain.member.service;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.domain.member.repository.MemberQueryRepository;
 import com.gnimty.communityapiserver.domain.member.repository.MemberRepository;
+import com.gnimty.communityapiserver.domain.member.service.dto.response.OtherProfileServiceResponse;
+import com.gnimty.communityapiserver.domain.riotaccount.repository.RiotAccountQueryRepository;
+import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +19,7 @@ public class MemberReadService {
 
 	private final MemberRepository memberRepository;
 	private final MemberQueryRepository memberQueryRepository;
+	private final RiotAccountQueryRepository riotAccountQueryRepository;
 
 	public void throwIfExistByEmail(String email) {
 		if (memberQueryRepository.existsByEmail(email)) {
@@ -35,5 +39,13 @@ public class MemberReadService {
 
 	public Boolean existsById(Long id) {
 		return memberQueryRepository.existsById(id);
+	}
+
+	public OtherProfileServiceResponse findOtherById(Long id) {
+		Member member = MemberThreadLocal.get();
+		if (!riotAccountQueryRepository.existsByMember(member)) {
+			throw new BaseException(ErrorCode.NOT_LINKED_RSO);
+		}
+		return memberQueryRepository.findOtherById(id);
 	}
 }
