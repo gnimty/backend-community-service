@@ -6,6 +6,7 @@ import com.gnimty.communityapiserver.domain.chat.entity.User;
 import com.gnimty.communityapiserver.domain.chat.service.ChatService;
 import com.gnimty.communityapiserver.domain.chat.service.dto.UserWithBlockDto;
 import com.gnimty.communityapiserver.domain.member.service.MemberService;
+import com.gnimty.communityapiserver.domain.member.service.dto.request.StatusUpdateServiceRequest;
 import com.gnimty.communityapiserver.global.auth.WebSocketSessionManager;
 import com.gnimty.communityapiserver.global.constant.Status;
 import java.util.List;
@@ -94,8 +95,10 @@ public class ChatController {
 	@EventListener
 	public void onClientDisconnect(SessionDisconnectEvent event) {
 		User user = getUserBySessionId(event.getSessionId());
-		if (!isMultipleUser(user.getActualUserId()))
+		if (!isMultipleUser(user.getActualUserId())) {
 			chatService.updateConnStatus(user, Status.OFFLINE);
+			memberService.updateStatus(user.getActualUserId(), StatusUpdateServiceRequest.builder().status(Status.OFFLINE).build());
+		}
 		webSocketSessionManager.deleteSession(event.getSessionId());
 	}
 
@@ -105,7 +108,7 @@ public class ChatController {
 		User user = getUserBySessionId(sessionId);
 		if (!isMultipleUser(user.getActualUserId())) {
 			chatService.updateConnStatus(user, Status.ONLINE);
-
+			memberService.updateStatus(user.getActualUserId(), StatusUpdateServiceRequest.builder().status(Status.ONLINE).build());
 		}
 	}
 
