@@ -112,6 +112,8 @@ public class ChatController {
 		}
 	}
 
+
+
 	private User getUserBySessionId(String sessionId) {
 		Long memberId = webSocketSessionManager.getMemberId(sessionId);
 		User user = chatService.getUser(memberId);

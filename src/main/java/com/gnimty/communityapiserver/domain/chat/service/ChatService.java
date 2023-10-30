@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -33,6 +34,7 @@ public class ChatService {
     private final ChatRepository chatRepository;
     private final UserRepository userRepository;
     private final SeqGeneratorService generator;
+	private final SimpMessagingTemplate template;
 
     /*
     TODO 리스트
@@ -213,6 +215,14 @@ public class ChatService {
 				chat.setReadCnt(0);
 				chatRepository.save(chat);
 			});
+	}
+
+	public void sendToClientWhoSubscribedUserId(String userId, Object message){
+		template.convertAndSend("/sub/user/" + userId, message);
+	}
+
+	public void sendToClientWhoSubscribedChatRoomId(Long chatRoomId, Object message){
+		template.convertAndSend("/sub/chatRoom/" + chatRoomId, message);
 	}
 
 	private User getOther(User me, ChatRoom chatRoom) {
