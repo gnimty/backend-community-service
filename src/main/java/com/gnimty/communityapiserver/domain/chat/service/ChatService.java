@@ -133,10 +133,12 @@ public class ChatService {
     }
 
     // 차단
-    public void updateBlockStatus(User me, User other, Blocked status) {
+    public void updateBlockStatus(Long meActualId, Long otherActualId, Blocked status) {
         // 1. 나와 상대가 속해 있는 채팅방을 찾기 (수정예정)
         try{
-            ChatRoom chatRoom = chatRoomRepository.findByUsers(me, other)
+			User me = getUser(meActualId);
+			User other = getUser(otherActualId);
+			ChatRoom chatRoom = chatRoomRepository.findByUsers(me, other)
                 .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_ROOM));
 
             // 2. 해당 채팅방의 participant 정보 수정 후 save
