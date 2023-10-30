@@ -23,8 +23,7 @@ public class RecommendedSummonersServiceRequest {
 	private SortBy sortBy;
 	private Long lastSummonerId;
 	private String lastSummonerName;
-	private Tier lastSummonerTier;
-	private Integer lastSummonerDivision;
+	private Long lastSummonerMmr;
 	private Long lastSummonerUpCount;
 	private Integer pageSize;
 }
