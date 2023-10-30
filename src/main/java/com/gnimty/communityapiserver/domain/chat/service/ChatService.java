@@ -230,11 +230,11 @@ public class ChatService {
 	}
 
 
-	private static List<ChatDto> getChatDtoAfterExitDate(List<Chat> totalChats, Date exitDate) {
+	private List<ChatDto> getChatDtoAfterExitDate(List<Chat> totalChats, Date exitDate) {
 		return totalChats.stream()
-			.filter(c -> exitDate == null || c.getSendDate().after(exitDate))
+			.filter(chat -> exitDate == null || chat.getSendDate().after(exitDate))
 			.map(ChatDto::new)
-			.collect(Collectors.toList());
+			.toList();
 	}
 
 

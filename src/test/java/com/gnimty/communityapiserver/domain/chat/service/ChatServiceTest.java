@@ -2,9 +2,7 @@ package com.gnimty.communityapiserver.domain.chat.service;
 
 
 import static java.lang.Thread.sleep;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-
+import static org.assertj.core.api.Assertions.*;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatDto;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatRoomDto;
 import com.gnimty.communityapiserver.domain.chat.entity.Blocked;
@@ -22,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,8 +105,7 @@ class ChatServiceTest {
             System.out.printf("chatRoomId = %d, otherUserId = %d\n",
                 chatRoomDto.getChatRoomNo(), chatRoomDto.getOtherUser().getUserId());
         }
-
-        assertEquals(9, chatRoomsJoined.size());
+        assertThat(chatRoomsJoined.size()).isEqualTo(9);
     }
 
     @Test
@@ -122,15 +118,13 @@ class ChatServiceTest {
             new UserWithBlockDto(all.get(0),Blocked.UNBLOCK),
             new UserWithBlockDto(all.get(1),Blocked.UNBLOCK)
         );
-
-        assertEquals(chatRooms.get(0).getId(), chatRoom.getId());
+        assertThat(chatRooms.get(0).getId()).isEqualTo(chatRoom.getId());
         // 새로운 유저 쌍 생성
 
         ChatRoom chatRoom2= chatService.getOrCreateChatRoom(
             new UserWithBlockDto(all.get(1),Blocked.UNBLOCK),
             new UserWithBlockDto(all.get(2),Blocked.UNBLOCK));
-
-        assertEquals(19, chatRoom2.getChatRoomNo());
+        assertThat(chatRoom2.getChatRoomNo()).isEqualTo(19);
     }
 
     @Test
@@ -154,9 +148,10 @@ class ChatServiceTest {
         boolean result1 = chatService.isBlockParticipant(chatRoom, user1);
         boolean result2 = chatService.isBlockParticipant(chatRoom, user2);
 
+
         // then
-        Assertions.assertTrue(result1);
-        Assertions.assertFalse(result2);
+        assertThat(result1).isTrue();
+        assertThat(result2).isFalse();
     }
 
     @Test
@@ -175,8 +170,8 @@ class ChatServiceTest {
         // then
         List<Chat> chats = chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo());
         ChatRoom updatedChatRoom = chatRoomRepository.findByChatRoomNo(chatRoom.getChatRoomNo()).get();
-        assertEquals(1, chats.size());
-        assertNotEquals(originLastModifiedDate, updatedChatRoom.getLastModifiedDate());
+        assertThat(chats.size()).isEqualTo(1);
+        assertThat(originLastModifiedDate).isBefore(updatedChatRoom.getLastModifiedDate());
     }
 
     @Test
@@ -189,7 +184,7 @@ class ChatServiceTest {
 
         // then
         User updatedUser = userRepository.findByActualUserId(0L).get();
-        assertEquals(updatedUser.getStatus(), Status.AWAY);
+        assertThat(updatedUser.getStatus()).isEqualTo(Status.AWAY);
     }
 
     @Test
@@ -225,9 +220,9 @@ class ChatServiceTest {
         List<Chat> chats = chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo());
         for (Chat chat : chats) {
             if (chat.getSenderId().equals(user1.getActualUserId())) {
-                assertEquals(chat.getReadCnt(), 0);
+                assertThat(chat.getReadCnt()).isEqualTo(0);
             } else {
-                assertEquals(chat.getReadCnt(), 1);
+                assertThat(chat.getReadCnt()).isEqualTo(1);
             }
         }
     }
@@ -286,9 +281,9 @@ class ChatServiceTest {
 
         // then
         List<ChatDto> chatList1 = chatService.getChatList(user2, chatRoom.getChatRoomNo());
-        assertEquals(3, chatList1.size());
+        assertThat(chatList1.size()).isEqualTo(3);
         List<ChatDto> chatList2 = chatService.getChatList(user1, chatRoom.getChatRoomNo());
-        assertEquals(5, chatList2.size());
+        assertThat(chatList2.size()).isEqualTo(5);
     }
 
 

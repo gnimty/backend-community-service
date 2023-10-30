@@ -1,5 +1,7 @@
 package com.gnimty.communityapiserver.domain.chat.repository;
 
+import static org.assertj.core.api.Assertions.*;
+
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
 import com.gnimty.communityapiserver.domain.chat.repository.Chat.ChatRepository;
@@ -13,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Assertions;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,8 +101,7 @@ public class ChatRoomRepositoryTest {
 		for (ChatRoom result : results) {
 			System.out.println("result = " + result);
 		}
-
-		Assertions.assertEquals(results.size(), 9);
+		assertThat(results.size()).isEqualTo(9);
 	}
 
 	@Test
@@ -112,7 +113,7 @@ public class ChatRoomRepositoryTest {
 
 		Optional<ChatRoom> expected = chatRoomRepository.findByChatRoomNo(1L);
 
-		Assertions.assertEquals(result.get().getId(), expected.get().getId());
+		assertThat(result.get().getId()).isEqualTo(expected.get().getId());
 	}
 
 	@Test
@@ -121,7 +122,8 @@ public class ChatRoomRepositoryTest {
 		User user1 = all.get(0);
 		User user2 = all.get(1);
 
-		Assertions.assertThrows(BaseException.class, () -> chatRoomRepository.save(user1, user2, seqGeneratorService.generateSequence(ChatRoom.SEQUENCE_NAME)));
+		assertThatThrownBy(() -> chatRoomRepository.save(user1, user2, seqGeneratorService.generateSequence(ChatRoom.SEQUENCE_NAME)))
+			.isInstanceOf(BaseException.class);
 	}
 
 
