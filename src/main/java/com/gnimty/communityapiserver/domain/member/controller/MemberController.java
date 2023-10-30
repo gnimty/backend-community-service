@@ -24,6 +24,7 @@ import com.gnimty.communityapiserver.domain.member.controller.dto.request.Passwo
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.PreferGameModeUpdateRequest;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.StatusUpdateRequest;
 import com.gnimty.communityapiserver.domain.member.controller.dto.response.MyProfileResponse;
+import com.gnimty.communityapiserver.domain.member.controller.dto.response.OtherProfileResponse;
 import com.gnimty.communityapiserver.domain.member.service.MemberReadService;
 import com.gnimty.communityapiserver.domain.member.service.MemberService;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.MyProfileServiceResponse;
@@ -158,9 +159,10 @@ public class MemberController {
 	}
 
 	@GetMapping("/{member_id}")
-	public CommonResponse<OtherProfileServiceResponse> getOtherProfile(
+	public CommonResponse<OtherProfileResponse> getOtherProfile(
 		@PathVariable("member_id") Long memberId
 	) {
-		return CommonResponse.success(memberReadService.findOtherById(memberId));
+		OtherProfileServiceResponse response = memberReadService.findOtherById(memberId);
+		return CommonResponse.success(OtherProfileResponse.from(response));
 	}
 }
