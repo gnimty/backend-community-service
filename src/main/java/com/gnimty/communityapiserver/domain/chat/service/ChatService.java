@@ -178,14 +178,19 @@ public class ChatService {
 
 	// TODO janguni: 채팅 저장
 	public void saveChat(User user, Long chatRoomNo, String message) {
+		Date now = new Date();
+
 		Chat chat = Chat.builder()
 			.senderId(user.getActualUserId())
 			.chatRoomNo(chatRoomNo)
 			.message(message)
-			.sendDate(new Date())
+			.sendDate(now)
 			.readCnt(1)
 			.build();
+		ChatRoom chatRoom = getChatRoom(chatRoomNo);
 
+		chatRoom.setLastModifiedDate(now);
+		chatRoomRepository.save(chatRoom);
 		chatRepository.save(chat);
 	}
 

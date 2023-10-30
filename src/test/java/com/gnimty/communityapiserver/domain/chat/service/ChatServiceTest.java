@@ -157,11 +157,7 @@ class ChatServiceTest {
     }
 
     @Test
-    void test111() {
-
-
-
-    }
+    void
 
     @NotNull
     private ChatRoom block(User user1, User user2) {
