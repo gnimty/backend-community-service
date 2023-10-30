@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,7 +33,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @Slf4j
 @SpringBootTest
-//@ActiveProfiles("test")
+@ActiveProfiles("test")
 class ChatServiceTest {
 
     @Autowired
@@ -193,7 +192,47 @@ class ChatServiceTest {
         assertEquals(updatedUser.getStatus(), Status.AWAY);
     }
 
-    @NotNull
+    @Test
+    void checkChatsInChatRoom_테스트() {
+        // given
+        //      유저 2명
+        User user1 = userRepository.findByActualUserId(0L).get();
+        User user2 = userRepository.findByActualUserId(1L).get();
+
+        //      채팅방
+        ChatRoom chatRoom = chatRoomRepository.findByUsers(user1, user2).get();
+
+        //      user2가 읽지 않은 채팅 5개
+        for (int i = 0; i < 5; i++) {
+            Chat chat = new Chat(chatRoom.getChatRoomNo(), user1.getActualUserId(), "hi",
+                new Date(), 1);
+            chatRepository.save(chat);
+        }
+
+        //      user1가 읽지 않은 채팅 5개
+        for (int i = 0; i < 5; i++) {
+            Chat chat = new Chat(chatRoom.getChatRoomNo(), user2.getActualUserId(), "hello",
+                new Date(), 1);
+            chatRepository.save(chat);
+        }
+
+
+        // when
+        chatService.checkChatsInChatRoom(user2, chatRoom.getChatRoomNo()); // user2가 채팅방 읽음
+
+
+        // then
+        List<Chat> chats = chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo());
+        for (Chat chat : chats) {
+            if (chat.getSenderId().equals(user1.getActualUserId())) {
+                assertEquals(chat.getReadCnt(), 0);
+            } else {
+                assertEquals(chat.getReadCnt(), 1);
+            }
+        }
+    }
+
+
     private ChatRoom block(User user1, User user2) {
         ChatRoom chatRoom = chatRoomRepository.findByUsers(user1, user2).get();
         List<Participant> originParticipants = chatRoom.getParticipants();
