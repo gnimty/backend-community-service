@@ -53,7 +53,7 @@ public class ChatService {
 
     // TODO solomon: 채팅방 생성 또는 조회
     // 이미 차단정보 확인된 상황
-    public ChatRoomDto getOrCreateChatRoom(UserWithBlockDto me, UserWithBlockDto other) {
+    public ChatRoomDto getOrCreateChatRoomDto(UserWithBlockDto me, UserWithBlockDto other) {
         Optional<ChatRoom> nullableChatRoom = chatRoomRepository.findByUsers(me.getUser(), other.getUser());
 		ChatRoom chatRoom = nullableChatRoom.orElseGet(() ->
 			chatRoomRepository.save(me, other, generator.generateSequence(ChatRoom.SEQUENCE_NAME))

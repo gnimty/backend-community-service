@@ -47,7 +47,7 @@ public class ChatRoomRepositoryTest {
 		mongoTemplate.remove(new Query(), "auto_sequence");
 	}
 
-/**
+
 	void 채팅방_여러개_만들기() {
 		clear();
 		List<User> users = new ArrayList<>();
@@ -126,7 +126,7 @@ public class ChatRoomRepositoryTest {
 			.isInstanceOf(BaseException.class);
 	}
 
-**/
+
 //	@AfterEach
 //	void afterEach() {
 //		chatRoomRepository.deleteAll();

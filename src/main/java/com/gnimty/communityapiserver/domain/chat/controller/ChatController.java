@@ -55,10 +55,9 @@ public class ChatController {
 		Boolean isMeBlock = blockReadService.existsByBlockerIdAndBlockedId(me.getActualUserId(), other.getActualUserId());
 		Boolean isOtherBlock = blockReadService.existsByBlockerIdAndBlockedId(other.getActualUserId(), me.getActualUserId());
 
-		ChatRoomDto chatRoomDto = chatService.getOrCreateChatRoom(
+		ChatRoomDto chatRoomDto = chatService.getOrCreateChatRoomDto(
 			new UserWithBlockDto(me, isMeBlock.equals(true) ? Blocked.BLOCK : Blocked.UNBLOCK),
-			new UserWithBlockDto(other,
-				isOtherBlock.equals(true) ? Blocked.BLOCK : Blocked.UNBLOCK)
+			new UserWithBlockDto(other, isOtherBlock.equals(true) ? Blocked.BLOCK : Blocked.UNBLOCK)
 		);
 
 		// getchatRoomNo를 호출하기 X
