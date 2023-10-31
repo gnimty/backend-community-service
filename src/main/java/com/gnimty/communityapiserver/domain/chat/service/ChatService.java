@@ -1,6 +1,7 @@
 package com.gnimty.communityapiserver.domain.chat.service;
 
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatRoomDto;
+import com.gnimty.communityapiserver.domain.chat.controller.dto.MessageResponse;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.UserDto;
 import com.gnimty.communityapiserver.domain.chat.entity.Blocked;
 import com.gnimty.communityapiserver.domain.chat.entity.Chat;
@@ -13,6 +14,7 @@ import com.gnimty.communityapiserver.domain.chat.repository.User.UserRepository;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatDto;
 import com.gnimty.communityapiserver.domain.chat.service.dto.UserWithBlockDto;
 import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
+import com.gnimty.communityapiserver.global.constant.MessageType;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
@@ -55,15 +57,20 @@ public class ChatService {
 
     // TODO solomon: 채팅방 생성 또는 조회
     // 이미 차단정보 확인된 상황
-    public ChatRoom getOrCreateChatRoom(UserWithBlockDto me, UserWithBlockDto other) {
-        Optional<ChatRoom> chatRoom = chatRoomRepository.findByUsers(me.getUser(), other.getUser());
-
-        if (chatRoom.isPresent()) {
-            return chatRoom.get();
+    public ChatRoomDto getOrCreateChatRoom(UserWithBlockDto me, UserWithBlockDto other) {
+        Optional<ChatRoom> nullableChatRoom = chatRoomRepository.findByUsers(me.getUser(), other.getUser());
+		ChatRoom chatRoom;
+        if (nullableChatRoom.isPresent()) {
+			chatRoom = nullableChatRoom.get();
         } else {
-            return chatRoomRepository.save(me, other,
-                generator.generateSequence(ChatRoom.SEQUENCE_NAME));
-        }
+			chatRoom = chatRoomRepository.save(me, other,
+				generator.generateSequence(ChatRoom.SEQUENCE_NAME));
+		}
+
+		return ChatRoomDto.builder()
+			.chatRoom(chatRoom)
+			.other(new UserDto(other.getUser()))
+			.build();
     }
 
     // TODO solomon: 채팅방 목록 불러오기
@@ -226,12 +233,12 @@ public class ChatService {
 			});
 	}
 
-	public void sendChatRoomToUserSubscribers(String userId, Object message){
-		template.convertAndSend("/sub/user/" + userId, message);
+	public void sendChatRoomToUserSubscribers(String userId, MessageResponse response){
+		template.convertAndSend("/sub/user/" + userId, response);
 	}
 
-	public void sendChatToChatRoomSubscribers(Long chatRoomId, Object message){
-		template.convertAndSend("/sub/chatRoom/" + chatRoomId, message);
+	public void sendChatToChatRoomSubscribers(Long chatRoomId, MessageResponse response){
+		template.convertAndSend("/sub/chatRoom/" + chatRoomId, response);
 	}
 
 	private User getOther(User me, ChatRoom chatRoom) {

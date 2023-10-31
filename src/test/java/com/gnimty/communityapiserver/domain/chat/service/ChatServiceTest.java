@@ -114,17 +114,17 @@ class ChatServiceTest {
 
         List<ChatRoom> chatRooms = chatRoomRepository.findByUser(all.get(0));
         // 이미 존재하는 유저 쌍(0, 1번 유저)은 호출 시 기존 chatRoom인 첫 번째 chatRoom과 같음
-        ChatRoom chatRoom = chatService.getOrCreateChatRoom(
-            new UserWithBlockDto(all.get(0),Blocked.UNBLOCK),
-            new UserWithBlockDto(all.get(1),Blocked.UNBLOCK)
+        ChatRoomDto chatRoomDto1 = chatService.getOrCreateChatRoom(
+            new UserWithBlockDto(all.get(0), Blocked.UNBLOCK),
+            new UserWithBlockDto(all.get(1), Blocked.UNBLOCK)
         );
-        assertThat(chatRooms.get(0).getId()).isEqualTo(chatRoom.getId());
+        assertThat(chatRooms.get(0).getChatRoomNo()).isEqualTo(chatRoomDto1.getChatRoomNo());
         // 새로운 유저 쌍 생성
 
-        ChatRoom chatRoom2= chatService.getOrCreateChatRoom(
-            new UserWithBlockDto(all.get(1),Blocked.UNBLOCK),
-            new UserWithBlockDto(all.get(2),Blocked.UNBLOCK));
-        assertThat(chatRoom2.getChatRoomNo()).isEqualTo(19);
+        ChatRoomDto chatRoomDto2 = chatService.getOrCreateChatRoom(
+            new UserWithBlockDto(all.get(1), Blocked.UNBLOCK),
+            new UserWithBlockDto(all.get(2), Blocked.UNBLOCK));
+        assertThat(chatRoomDto2.getChatRoomNo()).isEqualTo(19);
     }
 
     @Test
