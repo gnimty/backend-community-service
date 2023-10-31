@@ -1,8 +1,19 @@
 package com.gnimty.communityapiserver.domain.member.repository;
 
-import static com.gnimty.communityapiserver.domain.member.entity.QMember.*;
+import static com.gnimty.communityapiserver.domain.introduction.entity.QIntroduction.introduction;
+import static com.gnimty.communityapiserver.domain.member.entity.QMember.member;
+import static com.gnimty.communityapiserver.domain.prefergamemode.entity.QPreferGameMode.preferGameMode;
+import static com.gnimty.communityapiserver.domain.schedule.entity.QSchedule.schedule;
 
+import com.gnimty.communityapiserver.domain.introduction.entity.Introduction;
+import com.gnimty.communityapiserver.domain.member.service.dto.response.OtherProfileServiceResponse;
+import com.gnimty.communityapiserver.domain.member.service.dto.response.PreferGameModeEntry;
+import com.gnimty.communityapiserver.domain.prefergamemode.entity.PreferGameMode;
+import com.gnimty.communityapiserver.domain.schedule.controller.dto.request.ScheduleEntry;
+import com.gnimty.communityapiserver.domain.schedule.entity.Schedule;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -26,5 +37,37 @@ public class MemberQueryRepository {
 			.from(member)
 			.where(member.id.eq(id))
 			.fetchFirst() != null;
+	}
+
+	public OtherProfileServiceResponse findOtherById(Long id) {
+		List<Schedule> schedules = queryFactory
+			.selectFrom(schedule)
+			.join(schedule.member, member).on(schedule.member.id.eq(member.id))
+			.where(schedule.member.id.eq(id))
+			.fetch();
+		Introduction mainIntroduction = queryFactory
+			.selectFrom(introduction)
+			.join(introduction.member)
+			.where(introduction.member.id.eq(id), isMainIntroduction())
+			.fetchFirst();
+		List<PreferGameMode> preferGameModes = queryFactory
+			.selectFrom(preferGameMode)
+			.join(preferGameMode.member)
+			.where(preferGameMode.member.id.eq(id))
+			.fetch();
+
+		return OtherProfileServiceResponse.builder()
+			.schedules(schedules.stream()
+				.map(ScheduleEntry::from)
+				.toList())
+			.mainIntroduction(mainIntroduction.getContent())
+			.preferGameModes(preferGameModes.stream()
+				.map(PreferGameModeEntry::from)
+				.toList())
+			.build();
+	}
+
+	private BooleanExpression isMainIntroduction() {
+		return introduction.isMain.eq(true);
 	}
 }

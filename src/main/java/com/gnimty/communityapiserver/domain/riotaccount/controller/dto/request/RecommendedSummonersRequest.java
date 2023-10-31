@@ -7,6 +7,7 @@ import com.gnimty.communityapiserver.global.constant.SortBy;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.constant.Tier;
 import com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage;
+import com.gnimty.communityapiserver.global.validation.annotation.ValidateCursor;
 import java.util.List;
 import javax.validation.constraints.NotNull;
 import lombok.Builder;
@@ -14,6 +15,8 @@ import lombok.Getter;
 
 @Getter
 @Builder
+@ValidateCursor(sortBy = "sortBy", lastSummonerName = "lastSummonerName",
+	lastSummonerMmr = "lastSummonerMmr", lastSummonerUpCount = "lastSummonerUpCount")
 public class RecommendedSummonersRequest {
 
 	private GameMode gameMode;
@@ -22,12 +25,14 @@ public class RecommendedSummonersRequest {
 	private Boolean duoable;
 	private Tier tier;
 	private List<Lane> lanes;
+
+	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
 	private SortBy sortBy;
 	private Boolean timeMatch;
+	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
 	private Long lastSummonerId;
 	private String lastSummonerName;
-	private Tier lastSummonerTier;
-	private Integer lastSummonerDivision;
+	private Long lastSummonerMmr;
 	private Long lastSummonerUpCount;
 	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
 	private Integer pageSize;
@@ -44,8 +49,7 @@ public class RecommendedSummonersRequest {
 			.timeMatch(timeMatch)
 			.lastSummonerId(lastSummonerId)
 			.lastSummonerName(lastSummonerName)
-			.lastSummonerTier(lastSummonerTier)
-			.lastSummonerDivision(lastSummonerDivision)
+			.lastSummonerMmr(lastSummonerMmr)
 			.lastSummonerUpCount(lastSummonerUpCount)
 			.pageSize(pageSize)
 			.build();
