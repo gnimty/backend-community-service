@@ -1,6 +1,8 @@
 package com.gnimty.communityapiserver.domain.chat.repository;
 
 
+import static org.assertj.core.api.Assertions.*;
+
 import com.gnimty.communityapiserver.domain.chat.entity.User;
 import com.gnimty.communityapiserver.domain.chat.repository.Chat.ChatRepository;
 import com.gnimty.communityapiserver.domain.chat.repository.ChatRoom.ChatRoomRepository;
@@ -9,7 +11,7 @@ import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.constant.Tier;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Assertions;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -66,9 +68,8 @@ public class UserRepositoryTest {
 			"so1omon", Status.ONLINE);
 		User user2 = new User(null, 1L, 3L, Tier.DIAMOND, 3,
 			"so1omon", Status.ONLINE);
-
-		Assertions.assertThrows(DuplicateKeyException.class,
-			() -> userRepository.saveAll(List.of(user1, user2)));
+		assertThatThrownBy(() -> userRepository.saveAll(List.of(user1, user2)))
+				.isInstanceOf(DuplicateKeyException.class);
 	}
 
 //	@AfterEach

@@ -76,7 +76,6 @@ public class ChatController {
 
 	// 채팅방 나가기
 	@SubscribeMapping("/chatRoom/exit/{chatRoomNo}")
-
 	public void exitChatRoom(@DestinationVariable("chatRoomNo") Long chatRoomNo,
 							 @Header("simpSessionId") String sessionId) {
 		User user = getUserBySessionId(sessionId);

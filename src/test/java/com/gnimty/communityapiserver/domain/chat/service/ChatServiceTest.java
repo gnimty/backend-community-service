@@ -1,9 +1,14 @@
 package com.gnimty.communityapiserver.domain.chat.service;
 
 
+import static java.lang.Thread.sleep;
+import static org.assertj.core.api.Assertions.*;
+import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatDto;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatRoomDto;
 import com.gnimty.communityapiserver.domain.chat.entity.Blocked;
+import com.gnimty.communityapiserver.domain.chat.entity.Chat;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
+import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom.Participant;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
 import com.gnimty.communityapiserver.domain.chat.repository.Chat.ChatRepository;
 import com.gnimty.communityapiserver.domain.chat.repository.ChatRoom.ChatRoomRepository;
@@ -12,9 +17,9 @@ import com.gnimty.communityapiserver.domain.chat.service.dto.UserWithBlockDto;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.constant.Tier;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,8 +105,7 @@ class ChatServiceTest {
             System.out.printf("chatRoomId = %d, otherUserId = %d\n",
                 chatRoomDto.getChatRoomNo(), chatRoomDto.getOtherUser().getUserId());
         }
-
-        Assertions.assertEquals(9, chatRoomsJoined.size());
+        assertThat(chatRoomsJoined.size()).isEqualTo(9);
     }
 
     @Test
@@ -114,20 +118,185 @@ class ChatServiceTest {
             new UserWithBlockDto(all.get(0),Blocked.UNBLOCK),
             new UserWithBlockDto(all.get(1),Blocked.UNBLOCK)
         );
-
-        Assertions.assertEquals(chatRooms.get(0).getId(), chatRoom.getId());
+        assertThat(chatRooms.get(0).getId()).isEqualTo(chatRoom.getId());
         // 새로운 유저 쌍 생성
 
         ChatRoom chatRoom2= chatService.getOrCreateChatRoom(
             new UserWithBlockDto(all.get(1),Blocked.UNBLOCK),
             new UserWithBlockDto(all.get(2),Blocked.UNBLOCK));
-
-        Assertions.assertEquals(19, chatRoom2.getChatRoomNo());
+        assertThat(chatRoom2.getChatRoomNo()).isEqualTo(19);
     }
 
     @Test
     void exitChatRoom_테스트() {
 
+    }
+
+
+    @Test
+    void isBlockParticipant_테스트() {
+        // given
+        //      유저 2명
+        User user1 = userRepository.findByActualUserId(0L).get();
+        User user2 = userRepository.findByActualUserId(1L).get();
+
+        //      user1이 user2를 차단
+        ChatRoom chatRoom = block(user1, user2);
+
+
+        // when
+        boolean result1 = chatService.isBlockParticipant(chatRoom, user1);
+        boolean result2 = chatService.isBlockParticipant(chatRoom, user2);
+
+
+        // then
+        assertThat(result1).isTrue();
+        assertThat(result2).isFalse();
+    }
+
+    @Test
+    void saveChat_테스트() throws InterruptedException {
+
+        // given
+        User user = userRepository.findByActualUserId(0L).get();
+        ChatRoom chatRoom = chatRoomRepository.findByChatRoomNo(1L).get();
+        Date originLastModifiedDate = chatRoom.getLastModifiedDate();
+        String message = "안녕하세요";
+
+        // when
+        sleep(3000);
+        chatService.saveChat(user, chatRoom.getChatRoomNo(), message);
+
+        // then
+        List<Chat> chats = chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo());
+        ChatRoom updatedChatRoom = chatRoomRepository.findByChatRoomNo(chatRoom.getChatRoomNo()).get();
+        assertThat(chats.size()).isEqualTo(1);
+        assertThat(originLastModifiedDate).isBefore(updatedChatRoom.getLastModifiedDate());
+    }
+
+    @Test
+    void updateConnStatus_테스트() {
+        // given
+        User user = userRepository.findByActualUserId(0L).get();
+
+        // when
+        chatService.updateConnStatus(user, Status.AWAY);
+
+        // then
+        User updatedUser = userRepository.findByActualUserId(0L).get();
+        assertThat(updatedUser.getStatus()).isEqualTo(Status.AWAY);
+    }
+
+    @Test
+    void checkChatsInChatRoom_테스트() {
+        // given
+        //      유저 2명
+        User user1 = userRepository.findByActualUserId(0L).get();
+        User user2 = userRepository.findByActualUserId(1L).get();
+
+        //      채팅방
+        ChatRoom chatRoom = chatRoomRepository.findByUsers(user1, user2).get();
+
+        //      user2가 읽지 않은 채팅 5개
+        for (int i = 0; i < 5; i++) {
+            Chat chat = new Chat(chatRoom.getChatRoomNo(), user1.getActualUserId(), "hi",
+                new Date(), 1);
+            chatRepository.save(chat);
+        }
+
+        //      user1가 읽지 않은 채팅 5개
+        for (int i = 0; i < 5; i++) {
+            Chat chat = new Chat(chatRoom.getChatRoomNo(), user2.getActualUserId(), "hello",
+                new Date(), 1);
+            chatRepository.save(chat);
+        }
+
+
+        // when
+        chatService.checkChatsInChatRoom(user2, chatRoom.getChatRoomNo()); // user2가 채팅방 읽음
+
+
+        // then
+        List<Chat> chats = chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo());
+        for (Chat chat : chats) {
+            if (chat.getSenderId().equals(user1.getActualUserId())) {
+                assertThat(chat.getReadCnt()).isEqualTo(0);
+            } else {
+                assertThat(chat.getReadCnt()).isEqualTo(1);
+            }
+        }
+    }
+
+
+    private ChatRoom block(User user1, User user2) {
+        ChatRoom chatRoom = chatRoomRepository.findByUsers(user1, user2).get();
+        List<Participant> originParticipants = chatRoom.getParticipants();
+
+        List<Participant> updateParticipants = new ArrayList<>();
+        Participant participant1 = originParticipants.get(0); // user1
+        Participant participant2 = originParticipants.get(1); // user2
+
+        participant1.setBlockedStatus(Blocked.BLOCK); // 차단
+
+        updateParticipants.add(participant1);
+        updateParticipants.add(participant2);
+        chatRoom.setParticipants(updateParticipants);
+        chatRoomRepository.save(chatRoom);
+        return chatRoom;
+    }
+
+    @Test
+    void getChatList_테스트() {
+        // given
+        //      유저 2명
+        User user1 = userRepository.findByActualUserId(0L).get();
+        User user2 = userRepository.findByActualUserId(1L).get();
+
+        //      채팅방
+        ChatRoom chatRoom = chatRoomRepository.findByUsers(user1, user2).get();
+
+        // when
+        //      2번 채팅 -> user2가 나감 -> 3번 채팅(user1)
+        for (int i = 0; i < 2; i++) {
+            Chat chat = Chat.builder()
+                .chatRoomNo(chatRoom.getChatRoomNo())
+                .readCnt(1)
+                .senderId(user1.getActualUserId())
+                .sendDate(new Date())
+                .message("hi").build();
+            chatRepository.save(chat);
+        }
+
+        quitRoom(chatRoom);
+
+        for (int i = 0; i < 3; i++) {
+            Chat chat = Chat.builder()
+                .chatRoomNo(chatRoom.getChatRoomNo())
+                .readCnt(1)
+                .senderId(user1.getActualUserId())
+                .sendDate(new Date())
+                .message("hi").build();
+            chatRepository.save(chat);
+        }
+
+        // then
+        List<ChatDto> chatList1 = chatService.getChatList(user2, chatRoom.getChatRoomNo());
+        assertThat(chatList1.size()).isEqualTo(3);
+        List<ChatDto> chatList2 = chatService.getChatList(user1, chatRoom.getChatRoomNo());
+        assertThat(chatList2.size()).isEqualTo(5);
+    }
+
+
+    private void quitRoom(ChatRoom chatRoom) {
+        List<Participant> participants = new ArrayList<>();
+        Participant participant1 = chatRoom.getParticipants().get(0); // user1
+        Participant participant2 = chatRoom.getParticipants().get(1); // user2
+        // 채팅방 exitDate update
+        participant2.setExitDate(new Date());
+        participants.add(participant1);
+        participants.add(participant2);
+        chatRoom.setParticipants(participants);
+        chatRoomRepository.save(chatRoom);
     }
 
 }
