@@ -130,9 +130,11 @@ public class ChatService {
 		User user = userRepository.save(User.toUser(riotAccount));
 
 		List<ChatRoom> chatRooms = chatRoomRepository.findByUser(user);
-		MessageResponse response = new MessageResponse(MessageType.USERINFO, new UserDto(user));
-
-		chatRooms.forEach(chatRoom -> sendToChatRoomSubscribers(chatRoom.getChatRoomNo(), response));
+		if (!chatRooms.isEmpty()) {
+			MessageResponse response = new MessageResponse(MessageType.USERINFO, new UserDto(user));
+			chatRooms.forEach(
+				chatRoom -> sendToChatRoomSubscribers(chatRoom.getChatRoomNo(), response));
+		}
     }
 
     // 차단
