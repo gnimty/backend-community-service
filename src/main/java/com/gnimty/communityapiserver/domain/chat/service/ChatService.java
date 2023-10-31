@@ -25,6 +25,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -36,6 +37,7 @@ public class ChatService {
     private final ChatRepository chatRepository;
     private final UserRepository userRepository;
     private final SeqGeneratorService generator;
+	private final SimpMessagingTemplate template;
 
     /*
     TODO 리스트
@@ -136,10 +138,12 @@ public class ChatService {
     }
 
     // 차단
-    public void updateBlockStatus(User me, User other, Blocked status) {
+    public void updateBlockStatus(Long meActualId, Long otherActualId, Blocked status) {
         // 1. 나와 상대가 속해 있는 채팅방을 찾기 (수정예정)
         try{
-            ChatRoom chatRoom = chatRoomRepository.findByUsers(me, other)
+			User me = getUser(meActualId);
+			User other = getUser(otherActualId);
+			ChatRoom chatRoom = chatRoomRepository.findByUsers(me, other)
                 .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_ROOM));
 
             // 2. 해당 채팅방의 participant 정보 수정 후 save
@@ -220,6 +224,14 @@ public class ChatService {
 				chat.setReadCnt(0);
 				chatRepository.save(chat);
 			});
+	}
+
+	public void sendChatRoomToUserSubscribers(String userId, Object message){
+		template.convertAndSend("/sub/user/" + userId, message);
+	}
+
+	public void sendChatToChatRoomSubscribers(Long chatRoomId, Object message){
+		template.convertAndSend("/sub/chatRoom/" + chatRoomId, message);
 	}
 
 	private User getOther(User me, ChatRoom chatRoom) {

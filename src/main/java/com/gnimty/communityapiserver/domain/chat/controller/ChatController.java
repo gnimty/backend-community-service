@@ -1,11 +1,15 @@
 package com.gnimty.communityapiserver.domain.chat.controller;
 
+import com.gnimty.communityapiserver.domain.block.service.BlockReadService;
+import com.gnimty.communityapiserver.domain.block.service.BlockService;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatRoomDto;
+import com.gnimty.communityapiserver.domain.chat.entity.Blocked;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
 import com.gnimty.communityapiserver.domain.chat.service.ChatService;
 import com.gnimty.communityapiserver.domain.chat.service.dto.UserWithBlockDto;
 import com.gnimty.communityapiserver.domain.member.service.MemberService;
+import com.gnimty.communityapiserver.domain.member.service.dto.request.StatusUpdateServiceRequest;
 import com.gnimty.communityapiserver.global.auth.WebSocketSessionManager;
 import com.gnimty.communityapiserver.global.constant.Status;
 import java.util.List;
@@ -15,7 +19,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.socket.messaging.SessionConnectedEvent;
@@ -29,7 +32,7 @@ public class ChatController {
 
 	private final ChatService chatService;
 	private final MemberService memberService;
-	private final SimpMessagingTemplate template;
+	private final BlockReadService blockReadService;
 	private final WebSocketSessionManager webSocketSessionManager;
 
 	// 채팅의 모든 조회
@@ -50,17 +53,21 @@ public class ChatController {
 		User other = chatService.getUser(otherUserId);
 
 		// TODO janguni: 여기서 MemberService 호출해서 유저가 나를 차단했는지 정보를 가져오기
+		Boolean isMeBlock = blockReadService.existsByBlockerIdAndBlockedId(me.getActualUserId(), other.getActualUserId());
+		Boolean isOtherBlock = blockReadService.existsByBlockerIdAndBlockedId(other.getActualUserId(), me.getActualUserId());
+
 		ChatRoom chatRoom = chatService.getOrCreateChatRoom(
-			new UserWithBlockDto(me, null),
-			new UserWithBlockDto(other, null));
+			new UserWithBlockDto(me, isMeBlock.equals(true) ? Blocked.BLOCK	: Blocked.UNBLOCK),
+			new UserWithBlockDto(other, isOtherBlock.equals(false) ? Blocked.BLOCK : Blocked.UNBLOCK)
+		);
 
 		// getchatRoomNo를 호출하기 X
 		// chatRoom을 먼저 생성 또는 조회 후 그 정보를 그대로 보내주거나 DTO로 변환해서 보내주는 게 좋아 보임
-		template.convertAndSend("/sub/user/" + me.getId(), chatRoom.getChatRoomNo());
+		chatService.sendChatRoomToUserSubscribers(me.getId(), chatRoom.getChatRoomNo());
 
 		if (!chatService.isBlockParticipant(chatRoom, other)) //
 		{
-			template.convertAndSend("/sub/user/" + other.getId(), chatRoom.getChatRoomNo());
+			chatService.sendChatRoomToUserSubscribers(other.getId(), chatRoom.getChatRoomNo());
 		}
 	}
 
@@ -71,7 +78,7 @@ public class ChatController {
 							String message) {
 		User user = getUserBySessionId(sessionId);
 		chatService.saveChat(user, chatRoomNo, message);
-		template.convertAndSend("/sub/chatRoom/" + chatRoomNo, message);
+		chatService.sendChatToChatRoomSubscribers(chatRoomNo, message);
 	}
 
 	// 채팅방 나가기
@@ -87,14 +94,16 @@ public class ChatController {
 	public void sendStatus(@DestinationVariable("chatRoomNo") Long chatRoomNo,
 		  				   @Header("simpSessionId") String sessionId,
 		                   String message) {
-		template.convertAndSend("/sub/chatRoom/" + chatRoomNo, message);
+		chatService.sendChatToChatRoomSubscribers(chatRoomNo, message);
 	}
 
 	@EventListener
 	public void onClientDisconnect(SessionDisconnectEvent event) {
 		User user = getUserBySessionId(event.getSessionId());
-		if (!isMultipleUser(user.getActualUserId()))
+		if (!isMultipleUser(user.getActualUserId())) {
 			chatService.updateConnStatus(user, Status.OFFLINE);
+			memberService.updateStatus(user.getActualUserId(), StatusUpdateServiceRequest.builder().status(Status.OFFLINE).build());
+		}
 		webSocketSessionManager.deleteSession(event.getSessionId());
 	}
 
@@ -104,9 +113,11 @@ public class ChatController {
 		User user = getUserBySessionId(sessionId);
 		if (!isMultipleUser(user.getActualUserId())) {
 			chatService.updateConnStatus(user, Status.ONLINE);
-
+			memberService.updateStatus(user.getActualUserId(), StatusUpdateServiceRequest.builder().status(Status.ONLINE).build());
 		}
 	}
+
+
 
 	private User getUserBySessionId(String sessionId) {
 		Long memberId = webSocketSessionManager.getMemberId(sessionId);
