@@ -18,13 +18,9 @@ import com.gnimty.communityapiserver.global.constant.MessageType;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -59,13 +55,9 @@ public class ChatService {
     // 이미 차단정보 확인된 상황
     public ChatRoomDto getOrCreateChatRoom(UserWithBlockDto me, UserWithBlockDto other) {
         Optional<ChatRoom> nullableChatRoom = chatRoomRepository.findByUsers(me.getUser(), other.getUser());
-		ChatRoom chatRoom;
-        if (nullableChatRoom.isPresent()) {
-			chatRoom = nullableChatRoom.get();
-        } else {
-			chatRoom = chatRoomRepository.save(me, other,
-				generator.generateSequence(ChatRoom.SEQUENCE_NAME));
-		}
+		ChatRoom chatRoom = nullableChatRoom.orElseGet(() ->
+			chatRoomRepository.save(me, other, generator.generateSequence(ChatRoom.SEQUENCE_NAME))
+		);
 
 		return ChatRoomDto.builder()
 			.chatRoom(chatRoom)
@@ -134,14 +126,13 @@ public class ChatService {
 
 
     // TODO solomon : 유저정보 생성하기
-    public User createOrUpdateUser(RiotAccount riotAccount) {
-        Optional<User> user = userRepository.findByActualUserId(
-            riotAccount.getMember().getId());
-        if (user.isPresent()) {
-            return user.get();
-        } else {
-            return userRepository.save(User.toUser(riotAccount));
-        }
+    public void createOrUpdateUser(RiotAccount riotAccount) {
+		User user = userRepository.save(User.toUser(riotAccount));
+
+		List<ChatRoom> chatRooms = chatRoomRepository.findByUser(user);
+		MessageResponse response = new MessageResponse(MessageType.USERINFO, new UserDto(user));
+
+		chatRooms.forEach(chatRoom -> sendToChatRoomSubscribers(chatRoom.getChatRoomNo(), response));
     }
 
     // 차단
@@ -206,10 +197,14 @@ public class ChatService {
 	}
 
 	// TODO janguni: 접속정보 변동내역 전송
-	public Object updateConnStatus(User user, Status connectStatus) {
+	public void updateConnStatus(User user, Status connectStatus) {
 		user.setStatus(connectStatus);
 		userRepository.save(user);
-		return null;
+
+		List<ChatRoom> chatRooms = chatRoomRepository.findByUser(user);
+		MessageResponse response = new MessageResponse(MessageType.CONNECTSTATUS, connectStatus);
+
+		chatRooms.forEach(chatRoom -> sendToChatRoomSubscribers(chatRoom.getChatRoomNo(), response));
 	}
 
 	// TODO januni: 채팅방의 모든 채팅내역 Flush
@@ -233,11 +228,11 @@ public class ChatService {
 			});
 	}
 
-	public void sendChatRoomToUserSubscribers(String userId, MessageResponse response){
+	public void sendToUserSubscribers(String userId, MessageResponse response){
 		template.convertAndSend("/sub/user/" + userId, response);
 	}
 
-	public void sendChatToChatRoomSubscribers(Long chatRoomId, MessageResponse response){
+	public void sendToChatRoomSubscribers(Long chatRoomId, MessageResponse response){
 		template.convertAndSend("/sub/chatRoom/" + chatRoomId, response);
 	}
 

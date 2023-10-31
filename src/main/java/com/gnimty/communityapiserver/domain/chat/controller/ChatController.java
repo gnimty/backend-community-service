@@ -4,7 +4,6 @@ import com.gnimty.communityapiserver.domain.block.service.BlockReadService;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatRoomDto;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.MessageResponse;
 import com.gnimty.communityapiserver.domain.chat.entity.Blocked;
-import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
 import com.gnimty.communityapiserver.domain.chat.service.ChatService;
 import com.gnimty.communityapiserver.domain.chat.service.dto.UserWithBlockDto;
@@ -64,11 +63,11 @@ public class ChatController {
 
 		// getchatRoomNo를 호출하기 X
 		// chatRoom을 먼저 생성 또는 조회 후 그 정보를 그대로 보내주거나 DTO로 변환해서 보내주는 게 좋아 보임
-		chatService.sendChatRoomToUserSubscribers(me.getId(), new MessageResponse(MessageType.CHATROOMINFO, chatRoomDto));
+		chatService.sendToUserSubscribers(me.getId(), new MessageResponse(MessageType.CHATROOMINFO, chatRoomDto));
 
 		if (!isOtherBlock)
 		{
-			chatService.sendChatRoomToUserSubscribers(other.getId(), new MessageResponse(MessageType.CHATROOMINFO, chatRoomDto));
+			chatService.sendToUserSubscribers(other.getId(), new MessageResponse(MessageType.CHATROOMINFO, chatRoomDto));
 		}
 	}
 
@@ -79,7 +78,7 @@ public class ChatController {
 							String message) {
 		User user = getUserBySessionId(sessionId);
 		chatService.saveChat(user, chatRoomNo, message);
-		chatService.sendChatToChatRoomSubscribers(chatRoomNo, new MessageResponse(MessageType.CHATMESSAGE, message));
+		chatService.sendToChatRoomSubscribers(chatRoomNo, new MessageResponse(MessageType.CHATMESSAGE, message));
 	}
 
 	// 채팅방 나가기
