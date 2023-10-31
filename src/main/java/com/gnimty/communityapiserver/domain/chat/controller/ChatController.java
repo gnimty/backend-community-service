@@ -1,6 +1,9 @@
 package com.gnimty.communityapiserver.domain.chat.controller;
 
+import com.gnimty.communityapiserver.domain.block.service.BlockReadService;
+import com.gnimty.communityapiserver.domain.block.service.BlockService;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatRoomDto;
+import com.gnimty.communityapiserver.domain.chat.entity.Blocked;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
 import com.gnimty.communityapiserver.domain.chat.service.ChatService;
@@ -29,6 +32,7 @@ public class ChatController {
 
 	private final ChatService chatService;
 	private final MemberService memberService;
+	private final BlockReadService blockReadService;
 	private final WebSocketSessionManager webSocketSessionManager;
 
 	// 채팅의 모든 조회
@@ -49,9 +53,13 @@ public class ChatController {
 		User other = chatService.getUser(otherUserId);
 
 		// TODO janguni: 여기서 MemberService 호출해서 유저가 나를 차단했는지 정보를 가져오기
+		Boolean isMeBlock = blockReadService.existsByBlockerIdAndBlockedId(me.getActualUserId(), other.getActualUserId());
+		Boolean isOtherBlock = blockReadService.existsByBlockerIdAndBlockedId(other.getActualUserId(), me.getActualUserId());
+
 		ChatRoom chatRoom = chatService.getOrCreateChatRoom(
-			new UserWithBlockDto(me, null),
-			new UserWithBlockDto(other, null));
+			new UserWithBlockDto(me, isMeBlock.equals(true) ? Blocked.BLOCK	: Blocked.UNBLOCK),
+			new UserWithBlockDto(other, isOtherBlock.equals(false) ? Blocked.BLOCK : Blocked.UNBLOCK)
+		);
 
 		// getchatRoomNo를 호출하기 X
 		// chatRoom을 먼저 생성 또는 조회 후 그 정보를 그대로 보내주거나 DTO로 변환해서 보내주는 게 좋아 보임

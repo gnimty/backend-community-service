@@ -21,4 +21,13 @@ public class BlockQueryRepository {
 				.and(block.blocked.id.eq(blocked.getId())))
 			.fetchFirst() != null;
 	}
+
+	public Boolean existsByBlockerAndBlocked(Long blockerId, Long blockedId) {
+		return queryFactory
+			.selectOne()
+			.from(block)
+			.where(block.blocker.id.eq(blockerId)
+				.and(block.blocked.id.eq(blockedId)))
+			.fetchFirst() != null;
+	}
 }

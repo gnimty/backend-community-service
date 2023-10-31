@@ -36,6 +36,11 @@ public class BlockReadService {
 		return blockQueryRepository.existsByBlockerAndBlocked(blocker, blocked);
 	}
 
+
+	public Boolean existsByBlockerIdAndBlockedId(Long blockerId, Long blockedId) {
+		return blockQueryRepository.existsByBlockerAndBlocked(blockerId, blockedId);
+	}
+
 	public Block findById(Long id) {
 		return blockRepository.findById(id)
 			.orElseThrow(() -> new BaseException(ErrorCode.BLOCK_NOT_FOUND));
