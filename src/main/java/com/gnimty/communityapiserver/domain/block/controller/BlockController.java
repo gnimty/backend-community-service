@@ -10,6 +10,10 @@ import com.gnimty.communityapiserver.domain.block.controller.dto.response.BlockR
 import com.gnimty.communityapiserver.domain.block.service.BlockReadService;
 import com.gnimty.communityapiserver.domain.block.service.BlockService;
 import com.gnimty.communityapiserver.domain.block.service.dto.response.BlockReadServiceResponse;
+import com.gnimty.communityapiserver.domain.chat.entity.Blocked;
+import com.gnimty.communityapiserver.domain.chat.service.ChatService;
+import com.gnimty.communityapiserver.domain.member.entity.Member;
+import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
 import com.gnimty.communityapiserver.global.response.CommonResponse;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +31,7 @@ public class BlockController {
 
 	private final BlockReadService blockReadService;
 	private final BlockService blockService;
+	private final ChatService chatService;
 
 	@GetMapping
 	public CommonResponse<BlockReadResponse> readBlocks() {
@@ -36,13 +41,17 @@ public class BlockController {
 
 	@PostMapping
 	public CommonResponse<Void> doBlock(@RequestBody @Valid BlockRequest request) {
-		blockService.doBlock(request.toServiceRequest());
+		Member member = MemberThreadLocal.get();
+		blockService.doBlock(member, request.toServiceRequest());
+		chatService.updateBlockStatus(member.getId(), request.getId(), Blocked.BLOCK);
 		return CommonResponse.success(SUCCESS_BLOCK, OK);
 	}
 
 	@DeleteMapping
 	public CommonResponse<Void> clearBlock(@RequestBody @Valid BlockClearRequest request) {
-		blockService.clearBlock(request.toServiceRequest());
+		Member member = MemberThreadLocal.get();
+		blockService.clearBlock(member, request.toServiceRequest());
+		chatService.updateBlockStatus(member.getId(), request.getId(), Blocked.UNBLOCK);
 		return CommonResponse.success(SUCCESS_CLEAR_BLOCK, OK);
 	}
 }
