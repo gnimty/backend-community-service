@@ -16,6 +16,7 @@ import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCC
 import static org.springframework.http.HttpStatus.ACCEPTED;
 import static org.springframework.http.HttpStatus.OK;
 
+import com.gnimty.communityapiserver.domain.chat.service.ChatService;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.IntroductionUpdateRequest;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.MyProfileUpdateRequest;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.OauthLoginRequest;
@@ -29,6 +30,7 @@ import com.gnimty.communityapiserver.domain.member.service.MemberReadService;
 import com.gnimty.communityapiserver.domain.member.service.MemberService;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.MyProfileServiceResponse;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.OtherProfileServiceResponse;
+import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
 import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
 import com.gnimty.communityapiserver.global.constant.Provider;
 import com.gnimty.communityapiserver.global.response.CommonResponse;
@@ -51,12 +53,14 @@ public class MemberController {
 
 	private final MemberService memberService;
 	private final MemberReadService memberReadService;
+	private final ChatService chatService;
 
 	@PostMapping("/{member_id}/rso")
 	public CommonResponse<Void> summonerAccountLink(
 		@RequestBody @Valid OauthLoginRequest request
 	) {
-		memberService.summonerAccountLink(request.toServiceRequest());
+		RiotAccount riotAccount = memberService.summonerAccountLink(request.toServiceRequest());
+		chatService.createOrUpdateUser(riotAccount);
 		return CommonResponse.success(SUCCESS_SUMMONER_LINK, OK);
 	}
 
@@ -87,7 +91,13 @@ public class MemberController {
 		@PathVariable("member_id") Long memberId,
 		@RequestBody @Valid MyProfileUpdateRequest request
 	) {
-		memberService.updateMyProfile(memberId, request.toServiceRequest());
+		RiotAccount riotAccount = memberService.updateMyProfile(memberId, request.toServiceRequest());
+		if (request.getStatus() != null) {
+			chatService.updateConnStatus(chatService.getUser(memberId), request.getStatus());
+		}
+		if (riotAccount != null) {
+			chatService.createOrUpdateUser(riotAccount);
+		}
 		return CommonResponse.success(SUCCESS_UPDATE_PROFILE, OK);
 	}
 
@@ -120,6 +130,7 @@ public class MemberController {
 		@RequestBody @Valid StatusUpdateRequest request
 	) {
 		memberService.updateStatus(memberId, request.toServiceRequest());
+		chatService.updateConnStatus(chatService.getUser(memberId), request.getStatus());
 		return CommonResponse.success(SUCCESS_UPDATE_STATUS, OK);
 	}
 
