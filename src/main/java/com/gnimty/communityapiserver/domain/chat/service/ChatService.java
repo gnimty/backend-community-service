@@ -1,6 +1,7 @@
 package com.gnimty.communityapiserver.domain.chat.service;
 
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatRoomDto;
+import com.gnimty.communityapiserver.domain.chat.controller.dto.MessageResponse;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.UserDto;
 import com.gnimty.communityapiserver.domain.chat.entity.Blocked;
 import com.gnimty.communityapiserver.domain.chat.entity.Chat;
@@ -13,16 +14,13 @@ import com.gnimty.communityapiserver.domain.chat.repository.User.UserRepository;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatDto;
 import com.gnimty.communityapiserver.domain.chat.service.dto.UserWithBlockDto;
 import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
+import com.gnimty.communityapiserver.global.constant.MessageType;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -55,15 +53,16 @@ public class ChatService {
 
     // TODO solomon: 채팅방 생성 또는 조회
     // 이미 차단정보 확인된 상황
-    public ChatRoom getOrCreateChatRoom(UserWithBlockDto me, UserWithBlockDto other) {
-        Optional<ChatRoom> chatRoom = chatRoomRepository.findByUsers(me.getUser(), other.getUser());
+    public ChatRoomDto getOrCreateChatRoomDto(UserWithBlockDto me, UserWithBlockDto other) {
+		Optional<ChatRoom> nullableChatRoom = chatRoomRepository.findByUsers(me.getUser(), other.getUser());
+		ChatRoom chatRoom = nullableChatRoom.orElseGet(() ->
+			chatRoomRepository.save(me, other, generator.generateSequence(ChatRoom.SEQUENCE_NAME))
+		);
 
-        if (chatRoom.isPresent()) {
-            return chatRoom.get();
-        } else {
-            return chatRoomRepository.save(me, other,
-                generator.generateSequence(ChatRoom.SEQUENCE_NAME));
-        }
+		return ChatRoomDto.builder()
+			.chatRoom(chatRoom)
+			.other(new UserDto(other.getUser()))
+			.build();
     }
 
     // TODO solomon: 채팅방 목록 불러오기
@@ -128,14 +127,15 @@ public class ChatService {
 
 
     // TODO solomon : 유저정보 생성하기
-    public User createOrUpdateUser(RiotAccount riotAccount) {
-        Optional<User> user = userRepository.findByActualUserId(
-            riotAccount.getMember().getId());
-        if (user.isPresent()) {
-            return user.get();
-        } else {
-            return userRepository.save(User.toUser(riotAccount));
-        }
+    public void createOrUpdateUser(RiotAccount riotAccount) {
+		User user = userRepository.save(User.toUser(riotAccount));
+
+		List<ChatRoom> chatRooms = chatRoomRepository.findByUser(user);
+		if (!chatRooms.isEmpty()) {
+			MessageResponse response = new MessageResponse(MessageType.USERINFO, new UserDto(user));
+			chatRooms.forEach(
+				chatRoom -> sendToChatRoomSubscribers(chatRoom.getChatRoomNo(), response));
+		}
     }
 
 	// TODO so1omon : 특정 유저와 채팅을 나눈 member id list 넘기기
@@ -219,10 +219,14 @@ public class ChatService {
 	}
 
 	// TODO janguni: 접속정보 변동내역 전송
-	public Object updateConnStatus(User user, Status connectStatus) {
+	public void updateConnStatus(User user, Status connectStatus) {
 		user.setStatus(connectStatus);
 		userRepository.save(user);
-		return null;
+
+		List<ChatRoom> chatRooms = chatRoomRepository.findByUser(user);
+		MessageResponse response = new MessageResponse(MessageType.CONNECTSTATUS, connectStatus);
+
+		chatRooms.forEach(chatRoom -> sendToChatRoomSubscribers(chatRoom.getChatRoomNo(), response));
 	}
 
 	// TODO januni: 채팅방의 모든 채팅내역 Flush
@@ -246,12 +250,12 @@ public class ChatService {
 			});
 	}
 
-	public void sendChatRoomToUserSubscribers(String userId, Object message){
-		template.convertAndSend("/sub/user/" + userId, message);
+	public void sendToUserSubscribers(String userId, MessageResponse response){
+		template.convertAndSend("/sub/user/" + userId, response);
 	}
 
-	public void sendChatToChatRoomSubscribers(Long chatRoomId, Object message){
-		template.convertAndSend("/sub/chatRoom/" + chatRoomId, message);
+	public void sendToChatRoomSubscribers(Long chatRoomId, MessageResponse response){
+		template.convertAndSend("/sub/chatRoom/" + chatRoomId, response);
 	}
 
 	private User getOther(User me, ChatRoom chatRoom) {
