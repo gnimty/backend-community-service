@@ -5,9 +5,15 @@ import com.gnimty.communityapiserver.domain.member.service.dto.response.Introduc
 import com.gnimty.communityapiserver.global.constant.Status;
 import java.util.List;
 import javax.validation.Valid;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class MyProfileUpdateRequest {
 
 	private Long mainRiotAccountId;
