@@ -4,9 +4,15 @@ import com.gnimty.communityapiserver.domain.member.service.dto.request.Introduct
 import com.gnimty.communityapiserver.domain.member.service.dto.response.IntroductionEntry;
 import java.util.List;
 import javax.validation.Valid;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class IntroductionUpdateRequest {
 
 	@Valid
