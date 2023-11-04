@@ -18,6 +18,7 @@ import com.gnimty.communityapiserver.global.constant.MessageType;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
+import com.mongodb.bulk.BulkWriteResult;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -137,6 +138,12 @@ public class ChatService {
 				chatRoom -> sendToChatRoomSubscribers(chatRoom.getChatRoomNo(), response));
 		}
     }
+
+	public void createOrUpdateUser(List<RiotAccount> accounts){
+		List<User> users = accounts.stream().map(account-> User.toUser(account)).toList();
+
+		BulkWriteResult bulkWriteResult = userRepository.bulkUpdate(users);
+	}
 
 	// TODO so1omon : 특정 유저와 채팅을 나눈 member id list 넘기기
 	public List<Long> getChattedMemberIds(Long id){
@@ -300,5 +307,7 @@ public class ChatService {
 		return participants.get(0).getUser().equals(me) ^ isMe ?
 			participants.get(1) : participants.get(0);
 	}
+
+
 
 }
