@@ -15,7 +15,7 @@ import com.gnimty.communityapiserver.domain.chat.repository.User.UserRepository;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatDto;
 import com.gnimty.communityapiserver.domain.chat.service.dto.UserWithBlockDto;
 import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
-import com.gnimty.communityapiserver.global.auth.ChatRoomInOutManager;
+import com.gnimty.communityapiserver.global.auth.AccessChatRoomManager;
 import com.gnimty.communityapiserver.global.constant.MessageResponseType;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.exception.BaseException;
@@ -38,7 +38,8 @@ public class ChatService {
     private final UserRepository userRepository;
     private final SeqGeneratorService generator;
 	private final SimpMessagingTemplate template;
-	private final ChatRoomInOutManager chatRoomInOutManager;
+	private final AccessChatRoomManager accessChatRoomManager;
+
 
     /*
     TODO 리스트
@@ -206,14 +207,17 @@ public class ChatService {
 	// TODO janguni: 채팅 저장
 	public void saveChat(User user, Long chatRoomNo, MessageRequest request) {
 		Date now = new Date();
+		User other = getOther(user, getChatRoom(chatRoomNo));
 
+		int readCnt=1;
+		if (accessChatRoomManager.isUserInChatRoom(user.getActualUserId(), chatRoomNo)) readCnt = 0;
 
 		Chat chat = Chat.builder()
 			.senderId(user.getActualUserId())
 			.chatRoomNo(chatRoomNo)
 			.message(request.getData())
 			.sendDate(now)
-			.readCnt(1)
+			.readCnt(readCnt)
 			.build();
 		ChatRoom chatRoom = getChatRoom(chatRoomNo);
 
@@ -240,7 +244,7 @@ public class ChatService {
 	}
 
 	// TODO janguni: 채팅방에 있는 상대방이 보낸 채팅의 readCount update
-	public void checkChatsInChatRoom(User me, Long chatRoomNo) {
+	public void readOtherChats(User me, Long chatRoomNo) {
 		ChatRoom chatRoom = getChatRoom(chatRoomNo);
 
 		Long otherActualUserId = getOther(me, chatRoom).getActualUserId();
@@ -254,13 +258,18 @@ public class ChatService {
 			});
 	}
 
+
 	public void accessChatRoom(Long userActuralId, Long chatRoomNo) {
-		chatRoomInOutManager.access(userActuralId, chatRoomNo);
+		accessChatRoomManager.access(userActuralId, chatRoomNo);
 	}
 
-//	public void releaseAccessChatRoom(UserAccessChatRoomDto accessChatRoomDto) {
-//		chatRoomInOutManager.delete(accessChatRoomDto);
-//	}
+	public void releaseAccessChatRoom(Long userActuralId, Long chatRoomNo) {
+		accessChatRoomManager.release(userActuralId, chatRoomNo);
+	}
+
+	public void releaseChatRoomByUserId(Long userActuralId) {
+		accessChatRoomManager.releaseByUserId(userActuralId);
+	}
 
 	public void sendToUserSubscribers(String userId, MessageResponse response){
 		template.convertAndSend("/sub/user/" + userId, response);

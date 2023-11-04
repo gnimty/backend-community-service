@@ -1,6 +1,6 @@
 package com.gnimty.communityapiserver.global.auth;
 
-import com.gnimty.communityapiserver.global.auth.ChatRoomInOutManager.UserAndChatRoom;
+import com.gnimty.communityapiserver.global.auth.AccessChatRoomManager.UserAndChatRoom;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -12,10 +12,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 @Slf4j
-class ChatRoomInOutManagerTest {
+class AccessChatRoomManagerTest {
 
     @Autowired
-    private ChatRoomInOutManager manager;
+    private AccessChatRoomManager manager;
 
     @Test
     void release_테스트() {
@@ -30,17 +30,17 @@ class ChatRoomInOutManagerTest {
         manager.access(userId1, chatRoomIdB);
 
         // when
-        manager.releaseChatRoom(userId1, chatRoomIdA);
+        manager.release(userId1, chatRoomIdA);
 
         // then
-        List<UserAndChatRoom> userAndChatRooms = ChatRoomInOutManager.userAndChatRooms;
+        List<UserAndChatRoom> userAndChatRooms = AccessChatRoomManager.userAndChatRooms;
         Assertions.assertThat(userAndChatRooms.size()).isEqualTo(2);
 
         // when2
         manager.releaseByUserId(userId1);
 
         // then2
-        List<UserAndChatRoom> userAndChatRooms2 = ChatRoomInOutManager.userAndChatRooms;
+        List<UserAndChatRoom> userAndChatRooms2 = AccessChatRoomManager.userAndChatRooms;
         Assertions.assertThat(userAndChatRooms2.size()).isEqualTo(0);
     }
 

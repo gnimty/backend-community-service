@@ -46,6 +46,20 @@ public class ChatController {
 		return chatService.getChatRoomsJoined(user);
 	}
 
+	@SubscribeMapping("/enter_chatRoom/{chatRoomId}")
+	public void enterChatRoom(@DestinationVariable("chatRoomNo") final Long chatRoomNo,
+								@Header("simpSessionId") String sessionId) {
+		User user = getUserBySessionId(sessionId);
+		chatService.accessChatRoom(user.getActualUserId(), chatRoomNo);
+	}
+
+	@SubscribeMapping("/vacate_chatRoom/{chatRoomId}")
+	public void vacateChatRoom(@DestinationVariable("chatRoomNo") final Long chatRoomNo,
+								@Header("simpSessionId") String sessionId) {
+		User user = getUserBySessionId(sessionId);
+		chatService.releaseAccessChatRoom(user.getActualUserId(), chatRoomNo);
+	}
+
 	// 채팅방 구독 유도
 	// 이미 채팅방이 존재한다면 채팅방 정보만 넘겨주고 상대방 구독유도는 하지 않기 -> Front 1차 처리, Back 2차 처리
 	@MessageMapping("/user/{otherUserId}")
@@ -97,6 +111,7 @@ public class ChatController {
 			chatService.updateConnStatus(user, Status.OFFLINE);
 			memberService.updateStatus(user.getActualUserId(), StatusUpdateServiceRequest.builder().status(Status.OFFLINE).build());
 		}
+		chatService.releaseChatRoomByUserId(user.getActualUserId());
 		webSocketSessionManager.deleteSession(event.getSessionId());
 	}
 

@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.*;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatDto;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatRoomDto;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.MessageRequest;
-import com.gnimty.communityapiserver.domain.chat.controller.dto.MessageRequest.MessageRequestBuilder;
 import com.gnimty.communityapiserver.domain.chat.entity.Blocked;
 import com.gnimty.communityapiserver.domain.chat.entity.Chat;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
@@ -219,7 +218,7 @@ class ChatServiceTest {
 
 
         // when
-        chatService.checkChatsInChatRoom(user2, chatRoom.getChatRoomNo()); // user2가 채팅방 읽음
+        chatService.readOtherChats(user2, chatRoom.getChatRoomNo()); // user2가 채팅방 읽음
 
 
         // then
