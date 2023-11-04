@@ -3,6 +3,7 @@ package com.gnimty.communityapiserver.domain.chat.entity;
 import java.util.Date;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,6 +20,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
+@Builder
 public class ChatRoom {
 	// AutoIncrementSequence에서 ChatRoom을 위한 독립적인 SEQUENCE SCOPE로 작동
 	@Transient
@@ -36,6 +38,7 @@ public class ChatRoom {
 	@Setter
 	@AllArgsConstructor
 	@ToString
+	@Builder
 	public static class Participant{
 		@DBRef
 		private User user;
@@ -44,4 +47,8 @@ public class ChatRoom {
 	}
 
 	private Date lastModifiedDate;
+
+	private void refreshModifiedDate(){
+		this.lastModifiedDate = new Date();
+	}
 }

@@ -16,7 +16,8 @@ import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCC
 import static org.springframework.http.HttpStatus.ACCEPTED;
 import static org.springframework.http.HttpStatus.OK;
 
-import com.gnimty.communityapiserver.domain.chat.service.ChatService;
+import com.gnimty.communityapiserver.domain.chat.service.StompService;
+import com.gnimty.communityapiserver.domain.chat.service.UserService;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.IntroductionUpdateRequest;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.MyProfileUpdateRequest;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.OauthLoginRequest;
@@ -54,14 +55,16 @@ public class MemberController {
 
 	private final MemberService memberService;
 	private final MemberReadService memberReadService;
-	private final ChatService chatService;
+	private final StompService stompService;
+	private final UserService userService;
+
 
 	@PostMapping("/{member_id}/rso")
 	public CommonResponse<Void> summonerAccountLink(
 		@RequestBody @Valid OauthLoginRequest request
 	) {
 		RiotAccount riotAccount = memberService.summonerAccountLink(request.toServiceRequest());
-		chatService.createOrUpdateUser(riotAccount);
+		stompService.createOrUpdateUser(riotAccount);
 		return CommonResponse.success(SUCCESS_SUMMONER_LINK, OK);
 	}
 
@@ -94,10 +97,10 @@ public class MemberController {
 	) {
 		RiotAccount riotAccount = memberService.updateMyProfile(memberId, request.toServiceRequest());
 		if (request.getStatus() != null) {
-			chatService.updateConnStatus(chatService.getUser(memberId), request.getStatus());
+			stompService.updateConnStatus(userService.getUser(memberId), request.getStatus());
 		}
 		if (riotAccount != null) {
-			chatService.createOrUpdateUser(riotAccount);
+			stompService.createOrUpdateUser(riotAccount);
 		}
 		return CommonResponse.success(SUCCESS_UPDATE_PROFILE, OK);
 	}
@@ -132,7 +135,7 @@ public class MemberController {
 		@RequestBody @Valid StatusUpdateRequest request
 	) {
 		memberService.updateStatus(memberId, request.toServiceRequest());
-		chatService.updateConnStatus(chatService.getUser(memberId), request.getStatus());
+		stompService.updateConnStatus(userService.getUser(memberId), request.getStatus());
 		return CommonResponse.success(SUCCESS_UPDATE_STATUS, OK);
 	}
 

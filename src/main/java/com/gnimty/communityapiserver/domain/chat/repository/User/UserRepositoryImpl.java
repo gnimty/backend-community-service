@@ -1,8 +1,10 @@
 package com.gnimty.communityapiserver.domain.chat.repository.User;
 
+import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.mongodb.bulk.BulkWriteResult;
+import com.mongodb.client.result.UpdateResult;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,4 +44,5 @@ public class UserRepositoryImpl implements UserRepositoryCustom{
 
         return result;
     }
+
 }

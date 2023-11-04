@@ -25,14 +25,14 @@ public class Chat {
 	private Long senderId;
 	private String message;
 	private Date sendDate;
-	private Integer readCnt;
+	private Integer readCnt = 1;
 
 	@Builder
-	public Chat(Long chatRoomNo, Long senderId, String message, Date sendDate, Integer readCnt) {
+	public Chat(Long chatRoomNo, Long senderId, String message, Date sendDate) {
 		this.chatRoomNo = chatRoomNo;
 		this.senderId = senderId;
 		this.message = message;
 		this.sendDate = sendDate;
-		this.readCnt = readCnt;
+		// chat을 보내면 readCnt는 항상 1로 생성됨
 	}
 }
