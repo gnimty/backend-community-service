@@ -15,6 +15,7 @@ import com.gnimty.communityapiserver.domain.chat.repository.User.UserRepository;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatDto;
 import com.gnimty.communityapiserver.domain.chat.service.dto.UserWithBlockDto;
 import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
+import com.gnimty.communityapiserver.global.auth.ChatRoomInOutManager;
 import com.gnimty.communityapiserver.global.constant.MessageResponseType;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.exception.BaseException;
@@ -37,6 +38,7 @@ public class ChatService {
     private final UserRepository userRepository;
     private final SeqGeneratorService generator;
 	private final SimpMessagingTemplate template;
+	private final ChatRoomInOutManager chatRoomInOutManager;
 
     /*
     TODO 리스트
@@ -205,6 +207,7 @@ public class ChatService {
 	public void saveChat(User user, Long chatRoomNo, MessageRequest request) {
 		Date now = new Date();
 
+
 		Chat chat = Chat.builder()
 			.senderId(user.getActualUserId())
 			.chatRoomNo(chatRoomNo)
@@ -250,6 +253,14 @@ public class ChatService {
 				chatRepository.save(chat);
 			});
 	}
+
+	public void accessChatRoom(Long userActuralId, Long chatRoomNo) {
+		chatRoomInOutManager.access(userActuralId, chatRoomNo);
+	}
+
+//	public void releaseAccessChatRoom(UserAccessChatRoomDto accessChatRoomDto) {
+//		chatRoomInOutManager.delete(accessChatRoomDto);
+//	}
 
 	public void sendToUserSubscribers(String userId, MessageResponse response){
 		template.convertAndSend("/sub/user/" + userId, response);

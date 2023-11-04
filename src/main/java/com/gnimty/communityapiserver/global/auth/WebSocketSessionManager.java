@@ -18,7 +18,6 @@ public class WebSocketSessionManager {
         sessionStore.put(sessionId, memberId);
     }
 
-
     public void deleteSession(String sessionId) {
         sessionStore.remove(sessionId);
     }

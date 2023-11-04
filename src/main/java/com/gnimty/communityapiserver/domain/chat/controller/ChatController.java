@@ -74,7 +74,7 @@ public class ChatController {
 		}
 	}
 
-	// 메세지 전송
+
 	@MessageMapping("/chatRoom/{chatRoomNo}")
 	public void sendMessage(@DestinationVariable("chatRoomNo") Long chatRoomNo,
 							@Header("simpSessionId") String sessionId,
@@ -109,7 +109,6 @@ public class ChatController {
 			memberService.updateStatus(user.getActualUserId(), StatusUpdateServiceRequest.builder().status(Status.ONLINE).build());
 		}
 	}
-
 
 
 	private User getUserBySessionId(String sessionId) {
