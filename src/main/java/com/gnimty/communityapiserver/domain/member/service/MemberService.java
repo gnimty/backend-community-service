@@ -92,7 +92,7 @@ public class MemberService {
 	private final ScheduleRepository scheduleRepository;
 	private final MailSenderUtil mailSenderUtil;
 
-	public void summonerAccountLink(OauthLoginServiceRequest request) {
+	public RiotAccount summonerAccountLink(OauthLoginServiceRequest request) {
 		Member member = MemberThreadLocal.get();
 
 		String puuid = "puuid";
@@ -102,27 +102,29 @@ public class MemberService {
 		riotAccountReadService.throwIfExistsByPuuid(puuid);
 		Boolean existsMain = riotAccountReadService.existsByMemberId(member);
 
-		riotAccountRepository.save(RiotAccount.builder()
-			.summonerName("summonerName")
-			.isMain(!existsMain)
-			.queue(Tier.BRONZE)
-			.lp(100L)
-			.division(100)
-			.mmr(100L)
-			.frequentLane1(Lane.TOP)
-			.frequentLane2(Lane.BOTTOM)
-			.frequentChampionId1(1L)
-			.frequentChampionId2(1L)
-			.frequentChampionId3(1L)
-			.puuid(puuid)
-			.member(member)
-			.build()
+		RiotAccount riotAccount = riotAccountRepository.save(RiotAccount.builder()
+				.summonerName("summonerName")
+				.isMain(!existsMain)
+				.queue(Tier.BRONZE)
+				.lp(100L)
+				.division(100)
+				.mmr(100L)
+				.frequentLane1(Lane.TOP)
+				.frequentLane2(Lane.BOTTOM)
+				.frequentChampionId1(1L)
+				.frequentChampionId2(1L)
+				.frequentChampionId3(1L)
+				.puuid(puuid)
+				.member(member)
+				.build()
 		);
 
 		if (!existsMain) {
 			member.updateNickname("summonerName");
 			member.updateRsoLinked(true);
 		}
+
+		return riotAccount;
 	}
 
 	public void oauthAdditionalLink(Provider provider, OauthLoginServiceRequest request) {
@@ -157,15 +159,16 @@ public class MemberService {
 			.build();
 	}
 
-	public void updateMyProfile(Long memberId, MyProfileUpdateServiceRequest request) {
+	public RiotAccount updateMyProfile(Long memberId, MyProfileUpdateServiceRequest request) {
 		Member member = memberReadService.findById(memberId);
 		if (!member.getRsoLinked()) {
 			throw new BaseException(ErrorCode.NOT_LINKED_RSO);
 		}
 
-		updateMainRiotAccount(request, member);
+		RiotAccount riotAccount = updateMainRiotAccount(request, member);
 		updateStatus(request.getStatus(), member);
 		updateIntroductions(request.getIntroductions(), member);
+		return riotAccount;
 	}
 
 	@Async("mailExecutor")
@@ -344,7 +347,7 @@ public class MemberService {
 		}
 	}
 
-	private void updateMainRiotAccount(MyProfileUpdateServiceRequest request, Member member) {
+	private RiotAccount updateMainRiotAccount(MyProfileUpdateServiceRequest request, Member member) {
 		if (request.getMainRiotAccountId() != null) {
 			RiotAccount prevMainAccount = riotAccountReadService.findMainAccountByMember(
 				member);
@@ -355,7 +358,9 @@ public class MemberService {
 			}
 			prevMainAccount.updateIsMain();
 			postMainAccount.updateIsMain();
+			return postMainAccount;
 		}
+		return null;
 	}
 
 	private RiotDependentInfo getRiotDependentInfo(Member member) {

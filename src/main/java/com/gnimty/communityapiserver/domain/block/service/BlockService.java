@@ -6,7 +6,6 @@ import com.gnimty.communityapiserver.domain.block.service.dto.request.BlockClear
 import com.gnimty.communityapiserver.domain.block.service.dto.request.BlockServiceRequest;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.domain.member.service.MemberReadService;
-import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
 import java.util.Objects;
@@ -23,8 +22,7 @@ public class BlockService {
 	private final BlockRepository blockRepository;
 	private final BlockReadService blockReadService;
 
-	public void doBlock(BlockServiceRequest request) {
-		Member member = MemberThreadLocal.get();
+	public void doBlock(Member member, BlockServiceRequest request) {
 		if (Objects.equals(request.getId(), member.getId())) {
 			throw new BaseException(ErrorCode.NOT_ALLOWED_SELF_BLOCK);
 		}
@@ -35,8 +33,7 @@ public class BlockService {
 		blockRepository.save(createBlockEntity(request, member, blocked));
 	}
 
-	public void clearBlock(BlockClearServiceRequest request) {
-		Member member = MemberThreadLocal.get();
+	public void clearBlock(Member member, BlockClearServiceRequest request) {
 		Block block = blockReadService.findById(request.getId());
 		if (!Objects.equals(block.getBlocker().getId(), member.getId())) {
 			throw new BaseException(ErrorCode.NO_PERMISSION);
