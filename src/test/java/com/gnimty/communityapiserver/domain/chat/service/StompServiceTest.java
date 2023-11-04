@@ -67,7 +67,7 @@ class StompServiceTest {
                     .division(3)
                     .summonerName("so1omon")
                     .status(Status.ONLINE)
-                    .lp(3L).build());
+                    .lp(3L).build()));
         }
 
         for (Integer i = 1; i < 10; i++) {
@@ -79,7 +79,7 @@ class StompServiceTest {
         for (Integer i = 11; i < 20; i++) {
             chatRooms.add(chatRoomService.save(
                 new UserWithBlockDto(users.get(10),Blocked.UNBLOCK),
-                new UserWithBlockDto(users.get(i),Blocked.UNBLOCK),));
+                new UserWithBlockDto(users.get(i),Blocked.UNBLOCK)));
         }
     }
 
