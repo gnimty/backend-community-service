@@ -2,6 +2,7 @@ package com.gnimty.communityapiserver.domain.chat.controller;
 
 import com.gnimty.communityapiserver.domain.block.service.BlockReadService;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatRoomDto;
+import com.gnimty.communityapiserver.domain.chat.controller.dto.MessageRequest;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.MessageResponse;
 import com.gnimty.communityapiserver.domain.chat.entity.Blocked;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
@@ -10,9 +11,11 @@ import com.gnimty.communityapiserver.domain.chat.service.dto.UserWithBlockDto;
 import com.gnimty.communityapiserver.domain.member.service.MemberService;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.StatusUpdateServiceRequest;
 import com.gnimty.communityapiserver.global.auth.WebSocketSessionManager;
-import com.gnimty.communityapiserver.global.constant.MessageType;
+import com.gnimty.communityapiserver.global.constant.MessageRequestType;
+import com.gnimty.communityapiserver.global.constant.MessageResponseType;
 import com.gnimty.communityapiserver.global.constant.Status;
 import java.util.List;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -62,11 +65,12 @@ public class ChatController {
 
 		// getchatRoomNo를 호출하기 X
 		// chatRoom을 먼저 생성 또는 조회 후 그 정보를 그대로 보내주거나 DTO로 변환해서 보내주는 게 좋아 보임
-		chatService.sendToUserSubscribers(me.getId(), new MessageResponse(MessageType.CHATROOMINFO, chatRoomDto));
+		chatService.sendToUserSubscribers(me.getId(), new MessageResponse(MessageResponseType.CHATROOMINFO, chatRoomDto));
 
 		if (!isOtherBlock)
 		{
-			chatService.sendToUserSubscribers(other.getId(), new MessageResponse(MessageType.CHATROOMINFO, chatRoomDto));
+			chatService.sendToUserSubscribers(other.getId(), new MessageResponse(
+				MessageResponseType.CHATROOMINFO, chatRoomDto));
 		}
 	}
 
@@ -74,18 +78,15 @@ public class ChatController {
 	@MessageMapping("/chatRoom/{chatRoomNo}")
 	public void sendMessage(@DestinationVariable("chatRoomNo") Long chatRoomNo,
 							@Header("simpSessionId") String sessionId,
-							String message) {
+							final @Valid MessageRequest request) {
 		User user = getUserBySessionId(sessionId);
-		chatService.saveChat(user, chatRoomNo, message);
-		chatService.sendToChatRoomSubscribers(chatRoomNo, new MessageResponse(MessageType.CHATMESSAGE, message));
-	}
 
-	// 채팅방 나가기
-	@SubscribeMapping("/chatRoom/exit/{chatRoomNo}")
-	public void exitChatRoom(@DestinationVariable("chatRoomNo") Long chatRoomNo,
-							 @Header("simpSessionId") String sessionId) {
-		User user = getUserBySessionId(sessionId);
-		chatService.exitChatRoom(user, chatService.getChatRoom(chatRoomNo));
+		if (request.getType() == MessageRequestType.CHAT) {
+			chatService.saveChat(user, chatRoomNo, request);
+			chatService.sendToChatRoomSubscribers(chatRoomNo, new MessageResponse(MessageResponseType.CHATMESSAGE, request.getData()));
+		} else {
+			chatService.exitChatRoom(user, chatService.getChatRoom(chatRoomNo));
+		}
 	}
 
 

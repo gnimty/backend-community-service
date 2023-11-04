@@ -1,6 +1,7 @@
 package com.gnimty.communityapiserver.domain.chat.service;
 
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatRoomDto;
+import com.gnimty.communityapiserver.domain.chat.controller.dto.MessageRequest;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.MessageResponse;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.UserDto;
 import com.gnimty.communityapiserver.domain.chat.entity.Blocked;
@@ -14,7 +15,7 @@ import com.gnimty.communityapiserver.domain.chat.repository.User.UserRepository;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatDto;
 import com.gnimty.communityapiserver.domain.chat.service.dto.UserWithBlockDto;
 import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
-import com.gnimty.communityapiserver.global.constant.MessageType;
+import com.gnimty.communityapiserver.global.constant.MessageResponseType;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
@@ -132,7 +133,7 @@ public class ChatService {
 
 		List<ChatRoom> chatRooms = chatRoomRepository.findByUser(user);
 		if (!chatRooms.isEmpty()) {
-			MessageResponse response = new MessageResponse(MessageType.USERINFO, new UserDto(user));
+			MessageResponse response = new MessageResponse(MessageResponseType.USERINFO, new UserDto(user));
 			chatRooms.forEach(
 				chatRoom -> sendToChatRoomSubscribers(chatRoom.getChatRoomNo(), response));
 		}
@@ -201,13 +202,13 @@ public class ChatService {
 
 
 	// TODO janguni: 채팅 저장
-	public void saveChat(User user, Long chatRoomNo, String message) {
+	public void saveChat(User user, Long chatRoomNo, MessageRequest request) {
 		Date now = new Date();
 
 		Chat chat = Chat.builder()
 			.senderId(user.getActualUserId())
 			.chatRoomNo(chatRoomNo)
-			.message(message)
+			.message(request.getData())
 			.sendDate(now)
 			.readCnt(1)
 			.build();
@@ -224,7 +225,7 @@ public class ChatService {
 		userRepository.save(user);
 
 		List<ChatRoom> chatRooms = chatRoomRepository.findByUser(user);
-		MessageResponse response = new MessageResponse(MessageType.CONNECTSTATUS, connectStatus);
+		MessageResponse response = new MessageResponse(MessageResponseType.CONNECTSTATUS, connectStatus);
 
 		chatRooms.forEach(chatRoom -> sendToChatRoomSubscribers(chatRoom.getChatRoomNo(), response));
 	}

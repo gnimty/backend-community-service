@@ -5,6 +5,8 @@ import static java.lang.Thread.sleep;
 import static org.assertj.core.api.Assertions.*;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatDto;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatRoomDto;
+import com.gnimty.communityapiserver.domain.chat.controller.dto.MessageRequest;
+import com.gnimty.communityapiserver.domain.chat.controller.dto.MessageRequest.MessageRequestBuilder;
 import com.gnimty.communityapiserver.domain.chat.entity.Blocked;
 import com.gnimty.communityapiserver.domain.chat.entity.Chat;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
@@ -14,6 +16,7 @@ import com.gnimty.communityapiserver.domain.chat.repository.Chat.ChatRepository;
 import com.gnimty.communityapiserver.domain.chat.repository.ChatRoom.ChatRoomRepository;
 import com.gnimty.communityapiserver.domain.chat.repository.User.UserRepository;
 import com.gnimty.communityapiserver.domain.chat.service.dto.UserWithBlockDto;
+import com.gnimty.communityapiserver.global.constant.MessageRequestType;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.constant.Tier;
 import java.util.ArrayList;
@@ -161,11 +164,14 @@ class ChatServiceTest {
         User user = userRepository.findByActualUserId(0L).get();
         ChatRoom chatRoom = chatRoomRepository.findByChatRoomNo(1L).get();
         Date originLastModifiedDate = chatRoom.getLastModifiedDate();
-        String message = "안녕하세요";
+        MessageRequest request = MessageRequest.builder()
+            .type(MessageRequestType.CHAT)
+            .data("안녕하세요")
+            .build();
 
         // when
         sleep(3000);
-        chatService.saveChat(user, chatRoom.getChatRoomNo(), message);
+        chatService.saveChat(user, chatRoom.getChatRoomNo(), request);
 
         // then
         List<Chat> chats = chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo());

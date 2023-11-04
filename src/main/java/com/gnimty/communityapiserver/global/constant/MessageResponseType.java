@@ -1,6 +1,6 @@
 package com.gnimty.communityapiserver.global.constant;
 
-public enum MessageType {
+public enum MessageResponseType {
     USERINFO,
     CONNECTSTATUS,
     CHATROOMINFO,

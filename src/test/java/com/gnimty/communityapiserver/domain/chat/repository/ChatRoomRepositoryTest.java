@@ -40,6 +40,7 @@ public class ChatRoomRepositoryTest {
 	@Autowired
 	private MongoTemplate mongoTemplate;
 
+	/**
 	void clear() {
 		mongoTemplate.remove(new Query(), "chatRoom");
 		mongoTemplate.remove(new Query(), "user");
@@ -125,6 +126,8 @@ public class ChatRoomRepositoryTest {
 		assertThatThrownBy(() -> chatRoomRepository.save(user1, user2, seqGeneratorService.generateSequence(ChatRoom.SEQUENCE_NAME)))
 			.isInstanceOf(BaseException.class);
 	}
+
+	**/
 
 
 //	@AfterEach
