@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -16,8 +17,10 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class AccessChatRoomManager {
 
-    public static List<UserAndChatRoom> userAndChatRooms  = new LinkedList<>();
-    public static Map<Long, List<Long>> userKeys = new ConcurrentHashMap<>();
+    @Getter // 테스트 하려면 getter가 있어야 함..
+    private static List<UserAndChatRoom> userAndChatRooms  = new LinkedList<>();
+    @Getter // 테스트 하려면 getter가 있어야 함..
+    private static Map<Long, List<Long>> userKeys = new ConcurrentHashMap<>();
 
 
     public void access(Long userId, Long chatRoomNo) {
@@ -34,7 +37,9 @@ public class AccessChatRoomManager {
         for (Long chatRoomNo : chatRoomNos) {
             while (userAndChatRooms.remove(new UserAndChatRoom(userId, chatRoomNo))) {};
         }
+        userKeys.remove(userId);
     }
+
 
     public boolean isUserInChatRoom(Long userId, Long chatRoomNo) {
         List<Long> userChatRoomIds = userKeys.get(userId);
@@ -55,7 +60,6 @@ public class AccessChatRoomManager {
             chatRoomNos.add(chatRoomNo);
         }
     }
-
 
     @Data
     @AllArgsConstructor

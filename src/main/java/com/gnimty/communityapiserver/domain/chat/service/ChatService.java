@@ -263,7 +263,7 @@ public class ChatService {
 		accessChatRoomManager.access(userActuralId, chatRoomNo);
 	}
 
-	public void releaseAccessChatRoom(Long userActuralId, Long chatRoomNo) {
+	public void releaseChatRoom(Long userActuralId, Long chatRoomNo) {
 		accessChatRoomManager.release(userActuralId, chatRoomNo);
 	}
 

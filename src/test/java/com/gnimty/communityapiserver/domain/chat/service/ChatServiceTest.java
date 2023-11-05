@@ -15,13 +15,18 @@ import com.gnimty.communityapiserver.domain.chat.repository.Chat.ChatRepository;
 import com.gnimty.communityapiserver.domain.chat.repository.ChatRoom.ChatRoomRepository;
 import com.gnimty.communityapiserver.domain.chat.repository.User.UserRepository;
 import com.gnimty.communityapiserver.domain.chat.service.dto.UserWithBlockDto;
+import com.gnimty.communityapiserver.global.auth.AccessChatRoomManager;
+import com.gnimty.communityapiserver.global.auth.AccessChatRoomManager.UserAndChatRoom;
 import com.gnimty.communityapiserver.global.constant.MessageRequestType;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.constant.Tier;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +52,9 @@ class ChatServiceTest {
     private UserRepository userRepository;
     @Autowired
     private ChatRoomRepository chatRoomRepository;
+    @Autowired
+    private AccessChatRoomManager accessChatRoomManager;
+
 
 
     void clear() {
@@ -289,6 +297,79 @@ class ChatServiceTest {
         assertThat(chatList1.size()).isEqualTo(3);
         List<ChatDto> chatList2 = chatService.getChatList(user1, chatRoom.getChatRoomNo());
         assertThat(chatList2.size()).isEqualTo(5);
+    }
+
+    @Test
+    void accessChatRoom_테스트() {
+        // given
+        Long userId = 1L;
+        Long chatRoomNo = 11L;
+
+        // when
+        accessChatRoomManager.access(userId, chatRoomNo);
+
+        //then
+        List<UserAndChatRoom> userAndChatRooms = AccessChatRoomManager.getUserAndChatRooms();
+        Map<Long, List<Long>> userKeys = AccessChatRoomManager.getUserKeys();
+        assertThat(userAndChatRooms).contains(new UserAndChatRoom(userId,chatRoomNo));
+        assertThat(userKeys).containsKey(userId);
+        assertThat(userKeys).containsValue(Arrays.asList(chatRoomNo));
+    }
+
+    @Test
+    void releaseChatRoom_테스트() {
+        // given
+        Long userId = 1L;
+        Long chatRoomNo = 11L;
+
+        List<UserAndChatRoom> userAndChatRooms = AccessChatRoomManager.getUserAndChatRooms();
+        userAndChatRooms.add(new UserAndChatRoom(userId, chatRoomNo));
+
+        Map<Long, List<Long>> userKeys = AccessChatRoomManager.getUserKeys();
+        userKeys.put(userId, Arrays.asList(chatRoomNo));
+
+
+        // when
+        chatService.releaseChatRoom(userId, chatRoomNo);
+
+
+        // then
+        assertThat(userAndChatRooms).doesNotContain(new UserAndChatRoom(userId, chatRoomNo));
+        assertThat(userKeys).containsKey(userId);
+        assertThat(userKeys).containsValue(Arrays.asList(chatRoomNo));
+    }
+
+    @Test
+    void releaseChatRoomByUserId_테스트() {
+        // given
+        Long userId = 1L;
+        Long chatRoomNo1 = 11L;
+        Long chatRoomNo2 = 22L;
+
+        List<UserAndChatRoom> userAndChatRooms = AccessChatRoomManager.getUserAndChatRooms();
+        userAndChatRooms.add(new UserAndChatRoom(userId, chatRoomNo1));
+        userAndChatRooms.add(new UserAndChatRoom(userId, chatRoomNo2));
+        Map<Long, List<Long>> userKeys = AccessChatRoomManager.getUserKeys();
+        addToUserKey(userKeys, userId, chatRoomNo1);
+        addToUserKey(userKeys, userId, chatRoomNo2);
+
+        // when
+        chatService.releaseChatRoomByUserId(userId);
+
+        // then
+        assertThat(userAndChatRooms).isEmpty();
+        assertThat(userKeys).isEmpty();
+    }
+
+    private static void addToUserKey(Map<Long, List<Long>> userKeys, Long userId, Long chatRoomNo) {
+        List<Long> chatRoomNos = userKeys.get(userId);
+        if (chatRoomNos == null) {
+            ArrayList<Long> e = new ArrayList<>();
+            e.add(chatRoomNo);
+            userKeys.put(userId, e);
+        } else {
+            chatRoomNos.add(chatRoomNo);
+        }
     }
 
 

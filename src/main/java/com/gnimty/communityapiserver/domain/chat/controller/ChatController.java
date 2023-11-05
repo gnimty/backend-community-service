@@ -42,22 +42,21 @@ public class ChatController {
 	@SubscribeMapping("/init_chat")
 	public List<ChatRoomDto> getTotalChatRoomsAndChatsAndOtherUserInfo(@Header("simpSessionId") String sessionId) {
 		User user = getUserBySessionId(sessionId);
-
 		return chatService.getChatRoomsJoined(user);
 	}
 
-	@SubscribeMapping("/enter_chatRoom/{chatRoomId}")
+	@SubscribeMapping("/enter_chatRoom/{chatRoomNo}")
 	public void enterChatRoom(@DestinationVariable("chatRoomNo") final Long chatRoomNo,
 								@Header("simpSessionId") String sessionId) {
 		User user = getUserBySessionId(sessionId);
 		chatService.accessChatRoom(user.getActualUserId(), chatRoomNo);
 	}
 
-	@SubscribeMapping("/vacate_chatRoom/{chatRoomId}")
+	@SubscribeMapping("/vacate_chatRoom/{chatRoomNo}")
 	public void vacateChatRoom(@DestinationVariable("chatRoomNo") final Long chatRoomNo,
 								@Header("simpSessionId") String sessionId) {
 		User user = getUserBySessionId(sessionId);
-		chatService.releaseAccessChatRoom(user.getActualUserId(), chatRoomNo);
+		chatService.releaseChatRoom(user.getActualUserId(), chatRoomNo);
 	}
 
 	// 채팅방 구독 유도
