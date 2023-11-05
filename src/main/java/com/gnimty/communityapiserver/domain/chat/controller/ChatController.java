@@ -50,6 +50,7 @@ public class ChatController {
 								@Header("simpSessionId") String sessionId) {
 		User user = getUserBySessionId(sessionId);
 		chatService.accessChatRoom(user.getActualUserId(), chatRoomNo);
+		chatService.readOtherChats(user, chatRoomNo);
 	}
 
 	@SubscribeMapping("/vacate_chatRoom/{chatRoomNo}")
