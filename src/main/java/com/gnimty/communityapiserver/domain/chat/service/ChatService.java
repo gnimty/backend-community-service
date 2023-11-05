@@ -15,7 +15,7 @@ import com.gnimty.communityapiserver.domain.chat.repository.User.UserRepository;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatDto;
 import com.gnimty.communityapiserver.domain.chat.service.dto.UserWithBlockDto;
 import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
-import com.gnimty.communityapiserver.global.auth.OnlineInChatRoomManager;
+import com.gnimty.communityapiserver.global.connect.OnlineInChatRoomManager;
 import com.gnimty.communityapiserver.global.constant.MessageResponseType;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.exception.BaseException;

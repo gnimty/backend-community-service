@@ -1,10 +1,8 @@
 package com.gnimty.communityapiserver.global.handler;
 
-import com.gnimty.communityapiserver.domain.chat.entity.User;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.global.auth.JwtProvider;
-import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
-import com.gnimty.communityapiserver.global.auth.WebSocketSessionManager;
+import com.gnimty.communityapiserver.global.connect.WebSocketSessionManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;

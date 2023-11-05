@@ -10,7 +10,7 @@ import com.gnimty.communityapiserver.domain.chat.service.ChatService;
 import com.gnimty.communityapiserver.domain.chat.service.dto.UserWithBlockDto;
 import com.gnimty.communityapiserver.domain.member.service.MemberService;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.StatusUpdateServiceRequest;
-import com.gnimty.communityapiserver.global.auth.WebSocketSessionManager;
+import com.gnimty.communityapiserver.global.connect.WebSocketSessionManager;
 import com.gnimty.communityapiserver.global.constant.MessageRequestType;
 import com.gnimty.communityapiserver.global.constant.MessageResponseType;
 import com.gnimty.communityapiserver.global.constant.Status;

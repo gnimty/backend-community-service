@@ -1,4 +1,4 @@
-package com.gnimty.communityapiserver.global.auth;
+package com.gnimty.communityapiserver.global.connect;
 
 import java.util.ArrayList;
 import java.util.HashMap;

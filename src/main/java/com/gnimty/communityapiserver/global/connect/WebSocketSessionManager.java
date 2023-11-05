@@ -1,4 +1,4 @@
-package com.gnimty.communityapiserver.global.auth;
+package com.gnimty.communityapiserver.global.connect;
 
 import com.gnimty.communityapiserver.domain.member.service.MemberService;
 import java.util.Map;
