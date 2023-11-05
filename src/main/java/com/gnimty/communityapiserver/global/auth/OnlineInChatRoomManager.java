@@ -1,10 +1,10 @@
 package com.gnimty.communityapiserver.global.auth;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -15,34 +15,34 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class AccessChatRoomManager {
+public class OnlineInChatRoomManager {
 
-    @Getter // 테스트 하려면 getter가 있어야 함..
-    private static List<UserAndChatRoom> userAndChatRooms  = new LinkedList<>();
-    @Getter // 테스트 하려면 getter가 있어야 함..
-    private static Map<Long, List<Long>> userKeys = new ConcurrentHashMap<>();
+    @Getter
+    private List<UserCurrentlyInChatRoom> userCurrentlyInChatRooms = new LinkedList<>();
+    @Getter
+    private Map<Long, List<Long>> userKeysCurrentlyWithChatRooms = new HashMap<>();
 
 
     public void access(Long userId, Long chatRoomNo) {
-        userAndChatRooms.add(new UserAndChatRoom(userId, chatRoomNo));
+        userCurrentlyInChatRooms.add(new UserCurrentlyInChatRoom(userId, chatRoomNo));
         addToUserKey(userId, chatRoomNo);
     }
 
     public void release(Long userId, Long chatRoomNo) {
-        userAndChatRooms.remove(new UserAndChatRoom(userId, chatRoomNo));
+        userCurrentlyInChatRooms.remove(new UserCurrentlyInChatRoom(userId, chatRoomNo));
     }
 
     public void releaseByUserId(Long userId) {
-        List<Long> chatRoomNos = userKeys.get(userId);
+        List<Long> chatRoomNos = userKeysCurrentlyWithChatRooms.get(userId);
         for (Long chatRoomNo : chatRoomNos) {
-            while (userAndChatRooms.remove(new UserAndChatRoom(userId, chatRoomNo))) {};
+            while (userCurrentlyInChatRooms.remove(new UserCurrentlyInChatRoom(userId, chatRoomNo))) {};
         }
-        userKeys.remove(userId);
+        userKeysCurrentlyWithChatRooms.remove(userId);
     }
 
 
     public boolean isUserInChatRoom(Long userId, Long chatRoomNo) {
-        List<Long> userChatRoomIds = userKeys.get(userId);
+        List<Long> userChatRoomIds = userKeysCurrentlyWithChatRooms.get(userId);
         if (userChatRoomIds == null) {
             return false;
         } else {
@@ -50,12 +50,12 @@ public class AccessChatRoomManager {
         }
     }
 
-    private static void addToUserKey(Long userId, Long chatRoomNo) {
-        List<Long> chatRoomNos = userKeys.get(userId);
+    private void addToUserKey(Long userId, Long chatRoomNo) {
+        List<Long> chatRoomNos = userKeysCurrentlyWithChatRooms.get(userId);
         if (chatRoomNos == null) {
-            ArrayList<Long> e = new ArrayList<>();
-            e.add(chatRoomNo);
-            userKeys.put(userId, e);
+            chatRoomNos = new ArrayList<>();
+            chatRoomNos.add(chatRoomNo);
+            userKeysCurrentlyWithChatRooms.put(userId, chatRoomNos);
         } else {
             chatRoomNos.add(chatRoomNo);
         }
@@ -63,7 +63,7 @@ public class AccessChatRoomManager {
 
     @Data
     @AllArgsConstructor
-    public static class UserAndChatRoom {
+    public class UserCurrentlyInChatRoom {
         private Long userId;
         private Long chatRoomNo;
     }

@@ -15,7 +15,7 @@ import com.gnimty.communityapiserver.domain.chat.repository.User.UserRepository;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatDto;
 import com.gnimty.communityapiserver.domain.chat.service.dto.UserWithBlockDto;
 import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
-import com.gnimty.communityapiserver.global.auth.AccessChatRoomManager;
+import com.gnimty.communityapiserver.global.auth.OnlineInChatRoomManager;
 import com.gnimty.communityapiserver.global.constant.MessageResponseType;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.exception.BaseException;
@@ -38,7 +38,7 @@ public class ChatService {
     private final UserRepository userRepository;
     private final SeqGeneratorService generator;
 	private final SimpMessagingTemplate template;
-	private final AccessChatRoomManager accessChatRoomManager;
+	private final OnlineInChatRoomManager onlineInChatRoomManager;
 
 
     /*
@@ -210,7 +210,7 @@ public class ChatService {
 		User other = getOther(user, getChatRoom(chatRoomNo));
 
 		int readCnt=1;
-		if (accessChatRoomManager.isUserInChatRoom(user.getActualUserId(), chatRoomNo)) readCnt = 0;
+		if (onlineInChatRoomManager.isUserInChatRoom(user.getActualUserId(), chatRoomNo)) readCnt = 0;
 
 		Chat chat = Chat.builder()
 			.senderId(user.getActualUserId())
@@ -260,15 +260,15 @@ public class ChatService {
 
 
 	public void accessChatRoom(Long userActuralId, Long chatRoomNo) {
-		accessChatRoomManager.access(userActuralId, chatRoomNo);
+		onlineInChatRoomManager.access(userActuralId, chatRoomNo);
 	}
 
 	public void releaseChatRoom(Long userActuralId, Long chatRoomNo) {
-		accessChatRoomManager.release(userActuralId, chatRoomNo);
+		onlineInChatRoomManager.release(userActuralId, chatRoomNo);
 	}
 
 	public void releaseChatRoomByUserId(Long userActuralId) {
-		accessChatRoomManager.releaseByUserId(userActuralId);
+		onlineInChatRoomManager.releaseByUserId(userActuralId);
 	}
 
 	public void sendToUserSubscribers(String userId, MessageResponse response){
