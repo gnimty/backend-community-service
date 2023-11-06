@@ -3,13 +3,19 @@ package com.gnimty.communityapiserver.domain.riotaccount.controller;
 import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_UPDATE_SUMMONERS;
 import static org.springframework.http.HttpStatus.OK;
 
+import com.gnimty.communityapiserver.domain.chat.service.ChatService;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.SummonerUpdateRequest;
+import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.domain.riotaccount.controller.dto.request.RecommendedSummonersRequest;
+import com.gnimty.communityapiserver.domain.riotaccount.controller.dto.response.RecentlySummonersResponse;
 import com.gnimty.communityapiserver.domain.riotaccount.controller.dto.response.RecommendedSummonersResponse;
 import com.gnimty.communityapiserver.domain.riotaccount.service.RiotAccountService;
+import com.gnimty.communityapiserver.domain.riotaccount.service.dto.response.RecentlySummonersServiceResponse;
 import com.gnimty.communityapiserver.domain.riotaccount.service.dto.response.RecommendedSummonersServiceResponse;
+import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
 import com.gnimty.communityapiserver.global.constant.GameMode;
 import com.gnimty.communityapiserver.global.response.CommonResponse;
+import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class RiotAccountController {
 
 	private final RiotAccountService riotAccountService;
+	private final ChatService chatService;
 
 	@PatchMapping
 	public CommonResponse<Void> updateSummoners(
@@ -51,5 +58,14 @@ public class RiotAccountController {
 		RecommendedSummonersServiceResponse response = riotAccountService.getMainSummoners(
 			gameMode);
 		return CommonResponse.success(RecommendedSummonersResponse.from(response));
+	}
+
+	@GetMapping("/recently")
+	public CommonResponse<RecentlySummonersResponse> getRecentlySummoners() {
+		Member member = MemberThreadLocal.get();
+		List<Long> chattedMemberIds = chatService.getChattedMemberIds(member.getId());
+		RecentlySummonersServiceResponse response = riotAccountService
+				.getRecentlySummoners(member, chattedMemberIds);
+		return CommonResponse.success(RecentlySummonersResponse.from(response));
 	}
 }
