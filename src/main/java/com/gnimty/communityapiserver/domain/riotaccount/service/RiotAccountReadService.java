@@ -78,4 +78,9 @@ public class RiotAccountReadService {
 			.recommendedSummoners(result)
 			.build();
 	}
+
+	public RiotAccount findMainAccountByMemberId(Long memberId) {
+		return riotAccountRepository.findByMemberIdAndIsMain(memberId, true)
+				.orElseThrow(() -> new BaseException(ErrorCode.NOT_LINKED_RSO));
+	}
 }
