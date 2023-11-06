@@ -23,4 +23,6 @@ public interface RiotAccountRepository extends JpaRepository<RiotAccount, Long> 
 	@Query("delete from RiotAccount r where r.member.id = :id")
 	@Modifying
 	void deleteAllFromMember(@Param("id") Long id);
+
+	Optional<RiotAccount> findByMemberIdAndIsMain(Long memberId, Boolean isMain);
 }
