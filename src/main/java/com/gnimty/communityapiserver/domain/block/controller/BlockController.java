@@ -11,7 +11,7 @@ import com.gnimty.communityapiserver.domain.block.service.BlockReadService;
 import com.gnimty.communityapiserver.domain.block.service.BlockService;
 import com.gnimty.communityapiserver.domain.block.service.dto.response.BlockReadServiceResponse;
 import com.gnimty.communityapiserver.domain.chat.entity.Blocked;
-import com.gnimty.communityapiserver.domain.chat.service.ChatService;
+import com.gnimty.communityapiserver.domain.chat.service.StompService;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
 import com.gnimty.communityapiserver.global.response.CommonResponse;
@@ -31,7 +31,7 @@ public class BlockController {
 
 	private final BlockReadService blockReadService;
 	private final BlockService blockService;
-	private final ChatService chatService;
+	private final StompService chatService;
 
 	@GetMapping
 	public CommonResponse<BlockReadResponse> readBlocks() {
