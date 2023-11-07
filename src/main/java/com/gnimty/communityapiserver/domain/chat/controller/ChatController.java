@@ -5,8 +5,11 @@ import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatRoomDto;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.MessageRequest;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.MessageResponse;
 import com.gnimty.communityapiserver.domain.chat.entity.Blocked;
+import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
-import com.gnimty.communityapiserver.domain.chat.service.ChatService;
+import com.gnimty.communityapiserver.domain.chat.service.ChatRoomService;
+import com.gnimty.communityapiserver.domain.chat.service.StompService;
+import com.gnimty.communityapiserver.domain.chat.service.UserService;
 import com.gnimty.communityapiserver.domain.chat.service.dto.UserWithBlockDto;
 import com.gnimty.communityapiserver.domain.member.service.MemberService;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.StatusUpdateServiceRequest;
@@ -14,6 +17,8 @@ import com.gnimty.communityapiserver.global.connect.WebSocketSessionManager;
 import com.gnimty.communityapiserver.global.constant.MessageRequestType;
 import com.gnimty.communityapiserver.global.constant.MessageResponseType;
 import com.gnimty.communityapiserver.global.constant.Status;
+import com.gnimty.communityapiserver.global.exception.BaseException;
+import com.gnimty.communityapiserver.global.exception.ErrorCode;
 import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,8 +38,10 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 @Slf4j
 public class ChatController {
 
-	private final ChatService chatService;
+	private final StompService chatService;
+	private final ChatRoomService chatRoomService;
 	private final MemberService memberService;
+	private final UserService userService;
 	private final BlockReadService blockReadService;
 	private final WebSocketSessionManager webSocketSessionManager;
 
@@ -67,7 +74,7 @@ public class ChatController {
 										@Header("simpSessionId") String sessionId) {
 
 		User me = getUserBySessionId(sessionId);
-		User other = chatService.getUser(otherUserId);
+		User other = userService.getUser(otherUserId);
 
 		Boolean isMeBlock = blockReadService.existsByBlockerIdAndBlockedId(me.getActualUserId(), other.getActualUserId());
 		Boolean isOtherBlock = blockReadService.existsByBlockerIdAndBlockedId(other.getActualUserId(), me.getActualUserId());
@@ -96,10 +103,10 @@ public class ChatController {
 		User user = getUserBySessionId(sessionId);
 
 		if (request.getType() == MessageRequestType.CHAT) {
-			chatService.saveChat(user, chatRoomNo, request);
+			chatService.sendChat(user, chatRoomNo, request);
 			chatService.sendToChatRoomSubscribers(chatRoomNo, new MessageResponse(MessageResponseType.CHATMESSAGE, request.getData()));
 		} else {
-			chatService.exitChatRoom(user, chatService.getChatRoom(chatRoomNo));
+			chatService.exitChatRoom(user, chatRoomService.getChatRoom(chatRoomNo));
 		}
 	}
 
@@ -125,11 +132,9 @@ public class ChatController {
 		}
 	}
 
-
 	private User getUserBySessionId(String sessionId) {
 		Long memberId = webSocketSessionManager.getMemberId(sessionId);
-		User user = chatService.getUser(memberId);
-		return user;
+		return userService.getUser(memberId);
 	}
 
 	private boolean isMultipleUser(long memberId) {

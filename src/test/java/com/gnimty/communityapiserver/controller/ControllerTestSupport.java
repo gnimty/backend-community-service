@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gnimty.communityapiserver.domain.block.service.BlockReadService;
 import com.gnimty.communityapiserver.domain.block.service.BlockService;
 import com.gnimty.communityapiserver.domain.introduction.service.IntroductionReadService;
+import com.gnimty.communityapiserver.domain.member.controller.MemberController;
 import com.gnimty.communityapiserver.domain.member.service.AuthService;
 import com.gnimty.communityapiserver.domain.member.service.MemberReadService;
 import com.gnimty.communityapiserver.domain.member.service.MemberService;
@@ -14,6 +15,7 @@ import com.gnimty.communityapiserver.domain.riotaccount.service.RiotAccountServi
 import com.gnimty.communityapiserver.domain.schedule.service.ScheduleReadService;
 import com.gnimty.communityapiserver.domain.schedule.service.ScheduleService;
 import com.gnimty.communityapiserver.global.auth.JwtProvider;
+import com.gnimty.communityapiserver.global.interceptor.MemberAuthInterceptor;
 import com.gnimty.communityapiserver.global.interceptor.TokenAuthInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -23,7 +25,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 @ActiveProfiles("test")
-@WebMvcTest(controllers = {})
+@WebMvcTest(controllers = {MemberController.class})
 @MockBean(JpaMetamodelMappingContext.class)
 public abstract class ControllerTestSupport {
 
@@ -74,4 +76,7 @@ public abstract class ControllerTestSupport {
 
 	@MockBean
 	protected TokenAuthInterceptor tokenAuthInterceptor;
+
+	@MockBean
+	protected MemberAuthInterceptor memberAuthInterceptor;
 }

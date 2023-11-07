@@ -17,4 +17,6 @@ public interface ChatRepository extends MongoRepository<Chat, String>, ChatRepos
 	//void updateReadCountById(Long id, Integer readCount);
 
 	void deleteByChatRoomNo(Long chatRoomNo);
+
+
 }

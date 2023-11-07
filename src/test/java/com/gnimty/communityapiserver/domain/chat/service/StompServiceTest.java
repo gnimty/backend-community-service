@@ -34,14 +34,22 @@ import org.springframework.test.context.ActiveProfiles;
 @Slf4j
 @SpringBootTest
 @ActiveProfiles("test")
-class ChatServiceTest {
+class StompServiceTest {
 
     @Autowired
     private SeqGeneratorService seqGeneratorService;
     @Autowired
+    private StompService stompService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private ChatRoomService chatRoomService;
+    @Autowired
     private ChatService chatService;
+
     @Autowired
     private MongoTemplate mongoTemplate;
+
     @Autowired
     private ChatRepository chatRepository;
     @Autowired
@@ -66,23 +74,26 @@ class ChatServiceTest {
         List<ChatRoom> chatRooms = new ArrayList<>();
 //
         for (Integer i = 0; i < 20; i++) {
-            users.add(userRepository.save(
-                new User(null, i.longValue(), 3L, Tier.DIAMOND, 3,
-                    "so1omon", Status.ONLINE)));
+            users.add(userService.save(
+                User.builder()
+                    .actualUserId(i.longValue())
+                    .tier(Tier.DIAMOND)
+                    .division(3)
+                    .summonerName("so1omon")
+                    .status(Status.ONLINE)
+                    .lp(3L).build()));
         }
 
         for (Integer i = 1; i < 10; i++) {
-            chatRooms.add(chatRoomRepository.save(
+            chatRooms.add(chatRoomService.save(
                 new UserWithBlockDto(users.get(0),Blocked.UNBLOCK),
-                new UserWithBlockDto(users.get(i),Blocked.UNBLOCK),
-                seqGeneratorService.generateSequence(ChatRoom.SEQUENCE_NAME)));
+                new UserWithBlockDto(users.get(i),Blocked.UNBLOCK)));
         }
 
         for (Integer i = 11; i < 20; i++) {
-            chatRooms.add(chatRoomRepository.save(
+            chatRooms.add(chatRoomService.save(
                 new UserWithBlockDto(users.get(10),Blocked.UNBLOCK),
-                new UserWithBlockDto(users.get(i),Blocked.UNBLOCK),
-                seqGeneratorService.generateSequence(ChatRoom.SEQUENCE_NAME)));
+                new UserWithBlockDto(users.get(i),Blocked.UNBLOCK)));
         }
     }
 
@@ -96,7 +107,7 @@ class ChatServiceTest {
     void getUser_테스트() {
         // 1L부터 20L에 해당하는 유저가 존재해야 함
         for (Integer i = 0; i < 20; i++) {
-            User user = chatService.getUser(i.longValue());
+            User user = userService.getUser(i.longValue());
 
             System.out.println("user = " + user);
         }
@@ -104,8 +115,8 @@ class ChatServiceTest {
 
     @Test
     void getChatRoomsJoined_테스트() {
-        User me = userRepository.findByActualUserId(10L).get();
-        List<ChatRoomDto> chatRoomsJoined = chatService.getChatRoomsJoined(me);
+        User me = userService.getUser(10L);
+        List<ChatRoomDto> chatRoomsJoined = stompService.getChatRoomsJoined(me);
 
         for (ChatRoomDto chatRoomDto : chatRoomsJoined) {
             System.out.printf("chatRoomId = %d, otherUserId = %d\n",
@@ -116,18 +127,18 @@ class ChatServiceTest {
 
     @Test
     void getOrCreateChatRoom_테스트() {
-        List<User> all = userRepository.findAll();
+        List<User> all = userService.findUser();
 
-        List<ChatRoom> chatRooms = chatRoomRepository.findByUser(all.get(0));
+        List<ChatRoom> chatRooms = chatRoomService.findChatRoom(all.get(0));
         // 이미 존재하는 유저 쌍(0, 1번 유저)은 호출 시 기존 chatRoom인 첫 번째 chatRoom과 같음
-        ChatRoomDto chatRoomDto1 = chatService.getOrCreateChatRoomDto(
+        ChatRoomDto chatRoomDto1 = stompService.getOrCreateChatRoomDto(
             new UserWithBlockDto(all.get(0), Blocked.UNBLOCK),
             new UserWithBlockDto(all.get(1), Blocked.UNBLOCK)
         );
         assertThat(chatRooms.get(0).getChatRoomNo()).isEqualTo(chatRoomDto1.getChatRoomNo());
         // 새로운 유저 쌍 생성
 
-        ChatRoomDto chatRoomDto2 = chatService.getOrCreateChatRoomDto(
+        ChatRoomDto chatRoomDto2 = stompService.getOrCreateChatRoomDto(
             new UserWithBlockDto(all.get(1), Blocked.UNBLOCK),
             new UserWithBlockDto(all.get(2), Blocked.UNBLOCK));
         assertThat(chatRoomDto2.getChatRoomNo()).isEqualTo(19);
@@ -143,16 +154,16 @@ class ChatServiceTest {
     void isBlockParticipant_테스트() {
         // given
         //      유저 2명
-        User user1 = userRepository.findByActualUserId(0L).get();
-        User user2 = userRepository.findByActualUserId(1L).get();
+        User user1 = userService.getUser(0L);
+        User user2 = userService.getUser(1L);
 
         //      user1이 user2를 차단
         ChatRoom chatRoom = block(user1, user2);
 
 
         // when
-        boolean result1 = chatService.isBlockParticipant(chatRoom, user1);
-        boolean result2 = chatService.isBlockParticipant(chatRoom, user2);
+        boolean result1 = stompService.isBlockParticipant(chatRoom, user1);
+        boolean result2 = stompService.isBlockParticipant(chatRoom, user2);
 
 
         // then
@@ -164,8 +175,8 @@ class ChatServiceTest {
     void saveChat_테스트() throws InterruptedException {
 
         // given
-        User user = userRepository.findByActualUserId(0L).get();
-        ChatRoom chatRoom = chatRoomRepository.findByChatRoomNo(1L).get();
+        User user = userService.getUser(0L);
+        ChatRoom chatRoom = chatRoomService.getChatRoom(1L);
         Date originLastModifiedDate = chatRoom.getLastModifiedDate();
         MessageRequest request = MessageRequest.builder()
             .type(MessageRequestType.CHAT)
@@ -174,11 +185,12 @@ class ChatServiceTest {
 
         // when
         sleep(3000);
-        chatService.saveChat(user, chatRoom.getChatRoomNo(), request);
+        stompService.sendChat(user, chatRoom.getChatRoomNo(), request);
+
 
         // then
-        List<Chat> chats = chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo());
-        ChatRoom updatedChatRoom = chatRoomRepository.findByChatRoomNo(chatRoom.getChatRoomNo()).get();
+        List<Chat> chats = chatService.findChat(chatRoom.getChatRoomNo());
+        ChatRoom updatedChatRoom = chatRoomService.getChatRoom(chatRoom.getChatRoomNo());
         assertThat(chats.size()).isEqualTo(1);
         assertThat(originLastModifiedDate).isBefore(updatedChatRoom.getLastModifiedDate());
     }
@@ -186,47 +198,46 @@ class ChatServiceTest {
     @Test
     void updateConnStatus_테스트() {
         // given
-        User user = userRepository.findByActualUserId(0L).get();
+        User user = userService.getUser(0L);
 
         // when
-        chatService.updateConnStatus(user, Status.AWAY);
+        stompService.updateConnStatus(user, Status.AWAY);
 
         // then
-        User updatedUser = userRepository.findByActualUserId(0L).get();
+        User updatedUser = userService.getUser(0L);
         assertThat(updatedUser.getStatus()).isEqualTo(Status.AWAY);
     }
 
     @Test
-    void checkChatsInChatRoom_테스트() {
+    void readChatsInChatRoom_테스트() {
         // given
         //      유저 2명
-        User user1 = userRepository.findByActualUserId(0L).get();
-        User user2 = userRepository.findByActualUserId(1L).get();
+        User user1 = userService.getUser(0L);
+        User user2 = userService.getUser(1L);
 
         //      채팅방
-        ChatRoom chatRoom = chatRoomRepository.findByUsers(user1, user2).get();
+        ChatRoom chatRoom = chatRoomService.getChatRoom(user1, user2);
 
         //      user2가 읽지 않은 채팅 5개
         for (int i = 0; i < 5; i++) {
-            Chat chat = new Chat(chatRoom.getChatRoomNo(), user1.getActualUserId(), "hi",
-                new Date(), 1);
-            chatRepository.save(chat);
+            Chat chat = new Chat(chatRoom.getChatRoomNo(), user1.getActualUserId(), "hi", new Date());
+            chatService.save(chat);
         }
 
         //      user1가 읽지 않은 채팅 5개
         for (int i = 0; i < 5; i++) {
-            Chat chat = new Chat(chatRoom.getChatRoomNo(), user2.getActualUserId(), "hello",
-                new Date(), 1);
-            chatRepository.save(chat);
+            Chat chat = new Chat(chatRoom.getChatRoomNo(), user2.getActualUserId(), "hello", new Date());
+            chatService.save(chat);
         }
 
 
         // when
-        chatService.readOtherChats(user2, chatRoom.getChatRoomNo()); // user2가 채팅방 읽음
+        stompService.readOtherChats(user2, chatRoom.getChatRoomNo()); // user2가 채팅방 읽음
+        stompService.readOtherChats(user2, chatRoom.getChatRoomNo()); // user2가 채팅방 읽음
 
 
         // then
-        List<Chat> chats = chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo());
+        List<Chat> chats = chatService.findChat(chatRoom.getChatRoomNo());
         for (Chat chat : chats) {
             if (chat.getSenderId().equals(user1.getActualUserId())) {
                 assertThat(chat.getReadCnt()).isEqualTo(0);
@@ -238,7 +249,7 @@ class ChatServiceTest {
 
 
     private ChatRoom block(User user1, User user2) {
-        ChatRoom chatRoom = chatRoomRepository.findByUsers(user1, user2).get();
+        ChatRoom chatRoom = chatRoomService.getChatRoom(user1, user2);
         List<Participant> originParticipants = chatRoom.getParticipants();
 
         List<Participant> updateParticipants = new ArrayList<>();
@@ -250,7 +261,7 @@ class ChatServiceTest {
         updateParticipants.add(participant1);
         updateParticipants.add(participant2);
         chatRoom.setParticipants(updateParticipants);
-        chatRoomRepository.save(chatRoom);
+        chatRoomService.update(chatRoom);
         return chatRoom;
     }
 
@@ -258,22 +269,21 @@ class ChatServiceTest {
     void getChatList_테스트() {
         // given
         //      유저 2명
-        User user1 = userRepository.findByActualUserId(0L).get();
-        User user2 = userRepository.findByActualUserId(1L).get();
+        User user1 = userService.getUser(0L);
+        User user2 = userService.getUser(1L);
 
         //      채팅방
-        ChatRoom chatRoom = chatRoomRepository.findByUsers(user1, user2).get();
+        ChatRoom chatRoom = chatRoomService.getChatRoom(user1, user2);
 
         // when
         //      2번 채팅 -> user2가 나감 -> 3번 채팅(user1)
         for (int i = 0; i < 2; i++) {
             Chat chat = Chat.builder()
                 .chatRoomNo(chatRoom.getChatRoomNo())
-                .readCnt(1)
                 .senderId(user1.getActualUserId())
                 .sendDate(new Date())
                 .message("hi").build();
-            chatRepository.save(chat);
+            chatService.save(chat);
         }
 
         quitRoom(chatRoom);
@@ -281,17 +291,16 @@ class ChatServiceTest {
         for (int i = 0; i < 3; i++) {
             Chat chat = Chat.builder()
                 .chatRoomNo(chatRoom.getChatRoomNo())
-                .readCnt(1)
                 .senderId(user1.getActualUserId())
                 .sendDate(new Date())
                 .message("hi").build();
-            chatRepository.save(chat);
+            chatService.save(chat);
         }
 
         // then
-        List<ChatDto> chatList1 = chatService.getChatList(user2, chatRoom.getChatRoomNo());
+        List<ChatDto> chatList1 = stompService.getChatList(user2, chatRoom.getChatRoomNo());
         assertThat(chatList1.size()).isEqualTo(3);
-        List<ChatDto> chatList2 = chatService.getChatList(user1, chatRoom.getChatRoomNo());
+        List<ChatDto> chatList2 = stompService.getChatList(user1, chatRoom.getChatRoomNo());
         assertThat(chatList2.size()).isEqualTo(5);
     }
 
@@ -305,7 +314,7 @@ class ChatServiceTest {
         participants.add(participant1);
         participants.add(participant2);
         chatRoom.setParticipants(participants);
-        chatRoomRepository.save(chatRoom);
+        chatRoomService.update(chatRoom);
     }
 
 }

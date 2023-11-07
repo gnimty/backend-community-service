@@ -1,25 +1,36 @@
 package com.gnimty.communityapiserver.domain.chat.repository.ChatRoom;
 
+import static org.springframework.data.mongodb.core.FindAndModifyOptions.options;
+import static org.springframework.data.mongodb.core.query.Criteria.where;
+import static org.springframework.data.mongodb.core.query.Query.query;
+
+import com.gnimty.communityapiserver.domain.chat.entity.AutoIncrementSequence;
 import com.gnimty.communityapiserver.domain.chat.entity.Blocked;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
+import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom.Participant;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
 import com.gnimty.communityapiserver.domain.chat.service.dto.UserWithBlockDto;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
+import com.mongodb.client.result.UpdateResult;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 
 @RequiredArgsConstructor
 public class ChatRoomRepositoryImpl implements ChatRoomRepositoryCustom {
 	@Autowired
 	private final MongoTemplate mongoTemplate;
+
+	private final String COL = "chatRoom";
 
 	@Override
 	public List<ChatRoom> findByUser(User user) {
@@ -44,35 +55,35 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepositoryCustom {
 		return Optional.ofNullable(chatRoom);
 	}
 	@Override
-	public ChatRoom save(UserWithBlockDto user1, UserWithBlockDto user2, Long chatRoomNo) {
-		// 0. participant가 둘다 속해 있는 chatRoom이 없는지 확인
-		Optional<ChatRoom> bothJoined = findByUsers(user1.getUser(), user2.getUser());
-
-		if (bothJoined.isPresent()){
-			throw new BaseException(ErrorCode.CHATROOM_ALREADY_EXISTS);
-		}
-
-		// 1. unique한 chatRoomNo를 찾기 -> chatRoomNo 최댓값 + 1
-		// 변경 : 이미 Sequence generator를 통해서 chatRoomNo 가져옴
-
-		// 2. chatRoom에 User Set
-		List<ChatRoom.Participant> participants = new ArrayList<>();
-		participants.add(new ChatRoom.Participant(user1.getUser(), null, user1.getStatus()));
-		participants.add(new ChatRoom.Participant(user2.getUser(), null, user2.getStatus()));
-
-		ChatRoom chatRoom = new ChatRoom(null, chatRoomNo, participants, new Date(), new Date());
-
+	public ChatRoom save(List<Participant> participants) {
 		// 3. 저장하고 리턴
-		return mongoTemplate.save(chatRoom);
+		return mongoTemplate.save(ChatRoom.builder()
+				.chatRoomNo(generateSequence())
+				.createdDate(new Date())
+				.lastModifiedDate(new Date())
+				.participants(participants)
+			.build());
 	}
 
 	@Override
-	public void updateExitDate(Long chatRoomNo, User me){
+	public UpdateResult update(ChatRoom chatRoom){
+		Query query = new Query(Criteria.where("chatRoomNo").is(chatRoom.getChatRoomNo()));
+		Update update = new Update()
+			.set("participants", chatRoom.getParticipants())
+			.set("lastModifiedDate", chatRoom.getLastModifiedDate());
 
+		UpdateResult updateResult = mongoTemplate.updateFirst(query, update, ChatRoom.class);
+
+		return updateResult;
 	}
 
-	@Override
-	public void updateBlock(Long chatRoomNo, User me){
+	public Long generateSequence(){
+		AutoIncrementSequence counter = mongoTemplate.findAndModify(
+			query(where("_id").is(COL)), new Update().inc("seq", 1),
+			options().returnNew(true).upsert(true),
+			AutoIncrementSequence.class);
 
+		return !Objects.isNull(counter) ? counter.getSeq() : 1;
 	}
+
 }

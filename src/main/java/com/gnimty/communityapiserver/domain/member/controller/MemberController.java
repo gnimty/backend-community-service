@@ -16,6 +16,8 @@ import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCC
 import static org.springframework.http.HttpStatus.ACCEPTED;
 import static org.springframework.http.HttpStatus.OK;
 
+import com.gnimty.communityapiserver.domain.chat.service.StompService;
+import com.gnimty.communityapiserver.domain.chat.service.UserService;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.IntroductionUpdateRequest;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.MyProfileUpdateRequest;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.OauthLoginRequest;
@@ -29,6 +31,7 @@ import com.gnimty.communityapiserver.domain.member.service.MemberReadService;
 import com.gnimty.communityapiserver.domain.member.service.MemberService;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.MyProfileServiceResponse;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.OtherProfileServiceResponse;
+import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
 import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
 import com.gnimty.communityapiserver.global.constant.Provider;
 import com.gnimty.communityapiserver.global.response.CommonResponse;
@@ -42,6 +45,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -51,12 +55,16 @@ public class MemberController {
 
 	private final MemberService memberService;
 	private final MemberReadService memberReadService;
+	private final StompService stompService;
+	private final UserService userService;
+
 
 	@PostMapping("/{member_id}/rso")
 	public CommonResponse<Void> summonerAccountLink(
 		@RequestBody @Valid OauthLoginRequest request
 	) {
-		memberService.summonerAccountLink(request.toServiceRequest());
+		RiotAccount riotAccount = memberService.summonerAccountLink(request.toServiceRequest());
+		stompService.createOrUpdateUser(riotAccount);
 		return CommonResponse.success(SUCCESS_SUMMONER_LINK, OK);
 	}
 
@@ -87,10 +95,17 @@ public class MemberController {
 		@PathVariable("member_id") Long memberId,
 		@RequestBody @Valid MyProfileUpdateRequest request
 	) {
-		memberService.updateMyProfile(memberId, request.toServiceRequest());
+		RiotAccount riotAccount = memberService.updateMyProfile(memberId, request.toServiceRequest());
+		if (request.getStatus() != null) {
+			stompService.updateConnStatus(userService.getUser(memberId), request.getStatus());
+		}
+		if (riotAccount != null) {
+			stompService.createOrUpdateUser(riotAccount);
+		}
 		return CommonResponse.success(SUCCESS_UPDATE_PROFILE, OK);
 	}
 
+	@ResponseStatus(ACCEPTED)
 	@PostMapping("/{member_id}/password/email")
 	public CommonResponse<Void> sendEmailAuthCode() {
 		memberService.sendEmailAuthCode(MemberThreadLocal.get());
@@ -120,6 +135,7 @@ public class MemberController {
 		@RequestBody @Valid StatusUpdateRequest request
 	) {
 		memberService.updateStatus(memberId, request.toServiceRequest());
+		stompService.updateConnStatus(userService.getUser(memberId), request.getStatus());
 		return CommonResponse.success(SUCCESS_UPDATE_STATUS, OK);
 	}
 
