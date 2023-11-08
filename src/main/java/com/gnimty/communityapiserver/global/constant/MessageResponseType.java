@@ -1,8 +1,8 @@
 package com.gnimty.communityapiserver.global.constant;
 
 public enum MessageResponseType {
-    USERINFO,
-    CONNECTSTATUS,
-    CHATROOMINFO,
-    CHATMESSAGE
+    USER_INFO,
+    CONNECT_STATUS,
+    CHATROOM_INFO,
+    CHAT_MESSAGE
 }

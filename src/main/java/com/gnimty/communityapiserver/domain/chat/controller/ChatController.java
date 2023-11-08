@@ -5,7 +5,6 @@ import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatRoomDto;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.MessageRequest;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.MessageResponse;
 import com.gnimty.communityapiserver.domain.chat.entity.Blocked;
-import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
 import com.gnimty.communityapiserver.domain.chat.service.ChatRoomService;
 import com.gnimty.communityapiserver.domain.chat.service.StompService;
@@ -17,8 +16,6 @@ import com.gnimty.communityapiserver.global.connect.WebSocketSessionManager;
 import com.gnimty.communityapiserver.global.constant.MessageRequestType;
 import com.gnimty.communityapiserver.global.constant.MessageResponseType;
 import com.gnimty.communityapiserver.global.constant.Status;
-import com.gnimty.communityapiserver.global.exception.BaseException;
-import com.gnimty.communityapiserver.global.exception.ErrorCode;
 import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -52,20 +49,6 @@ public class ChatController {
 		return chatService.getChatRoomsJoined(user);
 	}
 
-	@SubscribeMapping("/enter_chatRoom/{chatRoomNo}")
-	public void enterChatRoom(@DestinationVariable("chatRoomNo") final Long chatRoomNo,
-								@Header("simpSessionId") String sessionId) {
-		User user = getUserBySessionId(sessionId);
-		chatService.accessChatRoom(user.getActualUserId(), chatRoomNo);
-		chatService.readOtherChats(user, chatRoomNo);
-	}
-
-	@SubscribeMapping("/vacate_chatRoom/{chatRoomNo}")
-	public void vacateChatRoom(@DestinationVariable("chatRoomNo") final Long chatRoomNo,
-								@Header("simpSessionId") String sessionId) {
-		User user = getUserBySessionId(sessionId);
-		chatService.releaseChatRoom(user.getActualUserId(), chatRoomNo);
-	}
 
 	// 채팅방 구독 유도
 	// 이미 채팅방이 존재한다면 채팅방 정보만 넘겨주고 상대방 구독유도는 하지 않기 -> Front 1차 처리, Back 2차 처리
@@ -86,12 +69,12 @@ public class ChatController {
 
 		// getchatRoomNo를 호출하기 X
 		// chatRoom을 먼저 생성 또는 조회 후 그 정보를 그대로 보내주거나 DTO로 변환해서 보내주는 게 좋아 보임
-		chatService.sendToUserSubscribers(me.getId(), new MessageResponse(MessageResponseType.CHATROOMINFO, chatRoomDto));
+		chatService.sendToUserSubscribers(me.getId(), new MessageResponse(MessageResponseType.CHATROOM_INFO, chatRoomDto));
 
 		if (!isOtherBlock)
 		{
 			chatService.sendToUserSubscribers(other.getId(), new MessageResponse(
-				MessageResponseType.CHATROOMINFO, chatRoomDto));
+				MessageResponseType.CHATROOM_INFO, chatRoomDto));
 		}
 	}
 
@@ -104,7 +87,7 @@ public class ChatController {
 
 		if (request.getType() == MessageRequestType.CHAT) {
 			chatService.sendChat(user, chatRoomNo, request);
-			chatService.sendToChatRoomSubscribers(chatRoomNo, new MessageResponse(MessageResponseType.CHATMESSAGE, request.getData()));
+			chatService.sendToChatRoomSubscribers(chatRoomNo, new MessageResponse(MessageResponseType.CHAT_MESSAGE, request.getData()));
 		} else {
 			chatService.exitChatRoom(user, chatRoomService.getChatRoom(chatRoomNo));
 		}

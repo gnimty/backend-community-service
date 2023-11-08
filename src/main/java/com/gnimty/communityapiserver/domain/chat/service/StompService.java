@@ -114,7 +114,7 @@ public class StompService {
 
 		List<ChatRoom> chatRooms = chatRoomService.findChatRoom(user);
 		if (!chatRooms.isEmpty()) {
-			MessageResponse response = new MessageResponse(MessageResponseType.USERINFO, new UserDto(user));
+			MessageResponse response = new MessageResponse(MessageResponseType.USER_INFO, new UserDto(user));
 			chatRooms.forEach(
 				chatRoom -> sendToChatRoomSubscribers(chatRoom.getChatRoomNo(), response));
 		}
@@ -196,13 +196,14 @@ public class StompService {
 		chatRoomService.update(chatRoom);
 	}
 
+
 	// TODO janguni: 접속정보 변동내역 전송
 	public void updateConnStatus(User user, Status connectStatus) {
 		user.setStatus(connectStatus);
 		userService.save(user);
 
 		List<ChatRoom> chatRooms = chatRoomService.findChatRoom(user);
-		MessageResponse response = new MessageResponse(MessageResponseType.CONNECTSTATUS, connectStatus);
+		MessageResponse response = new MessageResponse(MessageResponseType.CONNECT_STATUS, connectStatus);
 
 		chatRooms.forEach(chatRoom ->
 			sendToChatRoomSubscribers(chatRoom.getChatRoomNo(), response));
