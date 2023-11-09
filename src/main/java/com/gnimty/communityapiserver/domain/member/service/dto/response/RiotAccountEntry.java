@@ -23,6 +23,7 @@ public class RiotAccountEntry {
 	private Long frequentChampionId1;
 	private Long frequentChampionId2;
 	private Long frequentChampionId3;
+	private Long iconId;
 
 	public static RiotAccountEntry from(RiotAccount riotAccount) {
 		return RiotAccountEntry.builder()
@@ -40,6 +41,7 @@ public class RiotAccountEntry {
 			.frequentChampionId1(riotAccount.getFrequentChampionId1())
 			.frequentChampionId2(riotAccount.getFrequentChampionId2())
 			.frequentChampionId3(riotAccount.getFrequentChampionId3())
+			.iconId(riotAccount.getIconId())
 			.build();
 	}
 }
