@@ -4,6 +4,7 @@ import com.gnimty.communityapiserver.config.RedisTestConfig;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
 
 @ActiveProfiles("test")
@@ -11,4 +12,6 @@ import org.springframework.test.context.ActiveProfiles;
 @ExtendWith(RedisTestConfig.class)
 public abstract class ServiceTestSupport {
 
+	@LocalServerPort
+	public int port;
 }

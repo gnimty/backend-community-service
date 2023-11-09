@@ -16,8 +16,8 @@ public class RedisTestConfig implements BeforeAllCallback {
 		redis = new GenericContainer(DockerImageName.parse(REDIS_IMAGE))
 			.withExposedPorts(REDIS_PORT);
 		redis.start();
-		System.setProperty("spring.data.redis.host", redis.getHost());
-		System.setProperty("spring.data.redis.port",
+		System.setProperty("spring.redis.host", redis.getHost());
+		System.setProperty("spring.redis.port",
 			String.valueOf(redis.getMappedPort(REDIS_PORT)));
 	}
 }
