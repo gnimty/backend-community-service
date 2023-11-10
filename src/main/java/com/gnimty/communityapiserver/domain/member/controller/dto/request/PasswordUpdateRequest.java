@@ -18,11 +18,16 @@ public class PasswordUpdateRequest {
 
 	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
 	@Pattern(regexp = RequestPattern.PASSWORD_PATTERN, message = ErrorMessage.INVALID_INPUT_VALUE)
-	private String password;
+	private String currentPassword;
+
+	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+	@Pattern(regexp = RequestPattern.PASSWORD_PATTERN, message = ErrorMessage.INVALID_INPUT_VALUE)
+	private String newPassword;
 
 	public PasswordUpdateServiceRequest toServiceRequest() {
 		return PasswordUpdateServiceRequest.builder()
-			.password(password)
+			.currentPassword(currentPassword)
+			.newPassword(newPassword)
 			.build();
 	}
 }
