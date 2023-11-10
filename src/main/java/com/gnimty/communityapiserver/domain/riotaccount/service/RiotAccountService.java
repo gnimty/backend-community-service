@@ -33,7 +33,7 @@ public class RiotAccountService {
 	private final ScheduleReadService scheduleReadService;
 	private final MemberLikeReadService memberLikeReadService;
 
-	public void updateSummoners(SummonerUpdateServiceRequest request) {
+	public List<RiotAccount> updateSummoners(SummonerUpdateServiceRequest request) {
 		List<SummonerUpdateEntry> summonerUpdateEntries = request.getSummonerUpdates()
 			.stream()
 			.filter(v -> riotAccountReadService.findByPuuid(v.getPuuid()) != null)
@@ -41,6 +41,7 @@ public class RiotAccountService {
 		List<RiotAccount> existRiotAccounts = riotAccountReadService.findByPuuids(
 			summonerUpdateEntries.stream().map(SummonerUpdateEntry::getPuuid).toList());
 		riotAccountJdbcRepository.processBatchUpdate(existRiotAccounts, summonerUpdateEntries);
+		return existRiotAccounts;
 	}
 
 	public RecommendedSummonersServiceResponse getRecommendedSummoners(
