@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gnimty.communityapiserver.domain.block.service.BlockReadService;
 import com.gnimty.communityapiserver.domain.block.service.BlockService;
 import com.gnimty.communityapiserver.domain.chat.service.StompService;
+import com.gnimty.communityapiserver.domain.chat.service.UserService;
 import com.gnimty.communityapiserver.domain.introduction.service.IntroductionReadService;
 import com.gnimty.communityapiserver.domain.member.controller.MemberController;
 import com.gnimty.communityapiserver.domain.member.service.AuthService;
@@ -83,4 +84,7 @@ public abstract class ControllerTestSupport {
 
 	@MockBean
 	protected StompService stompService;
+
+	@MockBean
+	protected UserService userService;
 }
