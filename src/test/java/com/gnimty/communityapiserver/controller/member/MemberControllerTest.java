@@ -69,6 +69,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.http.MediaType;
 
@@ -424,6 +425,26 @@ public class MemberControllerTest extends ControllerTestSupport {
 						SUCCESS_SEND_EMAIL_AUTH_CODE.getMessage())
 				);
 		}
+
+		@DisplayName("이메일 형태가 올바르지 않을 경우 실패한다.")
+		@ParameterizedTest
+		@NullAndEmptySource
+		@ValueSource(strings = {"abc123", "abc@@asdf", "abc123@naver", "abc123@.com"})
+		void should_fail_when_invalidEmail(String email) throws Exception {
+
+			SendEmailRequest request = SendEmailRequest.builder()
+				.email(email)
+				.build();
+
+			mockMvc.perform(post(REQUEST_URL)
+					.content(om.writeValueAsString(request))
+					.contentType(MediaType.APPLICATION_JSON)
+					.characterEncoding(StandardCharsets.UTF_8))
+				.andExpectAll(
+					status().isBadRequest(),
+					jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
+				);
+		}
 	}
 
 	@DisplayName("비밀번호 변경 인증 코드 전송 시")
@@ -478,6 +499,26 @@ public class MemberControllerTest extends ControllerTestSupport {
 				);
 		}
 
+		@DisplayName("이메일 형태가 올바르지 않을 경우 실패한다.")
+		@ParameterizedTest
+		@NullAndEmptySource
+		@ValueSource(strings = {"abc123", "abc@@asdf", "abc123@naver", "abc123@.com"})
+		void should_fail_when_invalidEmail(String email) throws Exception {
+
+			PasswordEmailVerifyRequest request = PasswordEmailVerifyRequest.builder()
+				.email(email)
+				.build();
+
+			mockMvc.perform(post(REQUEST_URL)
+					.content(om.writeValueAsString(request))
+					.contentType(MediaType.APPLICATION_JSON)
+					.characterEncoding(StandardCharsets.UTF_8))
+				.andExpectAll(
+					status().isBadRequest(),
+					jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
+				);
+		}
+
 		private PasswordEmailVerifyRequest createRequest(String code) {
 			return PasswordEmailVerifyRequest.builder()
 				.email("email@email.com")
@@ -521,6 +562,45 @@ public class MemberControllerTest extends ControllerTestSupport {
 			willDoNothing()
 				.given(memberService)
 				.updatePassword(any(Long.class), any(PasswordUpdateServiceRequest.class));
+
+			mockMvc.perform(patch(REQUEST_URL)
+					.content(om.writeValueAsString(request))
+					.contentType(MediaType.APPLICATION_JSON)
+					.characterEncoding(StandardCharsets.UTF_8))
+				.andExpectAll(
+					status().isBadRequest(),
+					jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
+				);
+		}
+
+		@DisplayName("이메일 형태가 올바르지 않을 경우 실패한다.")
+		@ParameterizedTest
+		@NullAndEmptySource
+		@ValueSource(strings = {"abc123", "abc@@asdf", "abc123@naver", "abc123@.com"})
+		void should_fail_when_invalidEmail(String email) throws Exception {
+
+			PasswordResetRequest request = PasswordResetRequest.builder()
+				.email(email)
+				.build();
+
+			mockMvc.perform(patch(REQUEST_URL)
+					.content(om.writeValueAsString(request))
+					.contentType(MediaType.APPLICATION_JSON)
+					.characterEncoding(StandardCharsets.UTF_8))
+				.andExpectAll(
+					status().isBadRequest(),
+					jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
+				);
+		}
+
+		@DisplayName("uuid가 null일 경우 실패한다.")
+		@ParameterizedTest
+		@NullSource
+		void should_fail_when_invalidUUID(String uuid) throws Exception {
+
+			PasswordResetRequest request = PasswordResetRequest.builder()
+				.uuid(uuid)
+				.build();
 
 			mockMvc.perform(patch(REQUEST_URL)
 					.content(om.writeValueAsString(request))
