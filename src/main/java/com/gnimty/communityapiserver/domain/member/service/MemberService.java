@@ -180,16 +180,12 @@ public class MemberService {
 		if (member.getEmail() == null) {
 			throw new BaseException(ErrorCode.NOT_LOGIN_BY_FORM);
 		}
-		String code = RandomCodeGenerator.generateCodeByLength(6);
-		sendEmail(member, code);
-		String key = getRedisKey(PASSWORD, member.getEmail());
-		saveInRedis(key, code, Auth.EMAIL_CODE_EXPIRATION.getExpiration());
-	}
 
-	@Async("mailExecutor")
-	public void sendEmail(Member member, String code) {
+		String code = RandomCodeGenerator.generateCodeByLength(6);
 		mailSenderUtil.sendEmail(Auth.EMAIL_SUBJECT.getContent(), member.getEmail(), code,
 			"password-mail", "static/images/banner-urf.png");
+		String key = getRedisKey(PASSWORD, member.getEmail());
+		saveInRedis(key, code, Auth.EMAIL_CODE_EXPIRATION.getExpiration());
 	}
 
 	public PasswordEmailVerifyServiceResponse verifyEmailAuthCode(
@@ -220,14 +216,14 @@ public class MemberService {
 		}
 		Member member = memberReadService.findByEmailOrElseThrow(request.getEmail(),
 			new BaseException(ErrorCode.NOT_LOGIN_BY_FORM));
-		member.updatePassword(request.getPassword());
+		member.updatePassword(passwordEncoder.encode(request.getPassword()));
 
 		redisTemplate.delete(getRedisKey(UPDATE_PASSWORD, request.getEmail()));
 	}
 
 	public void updatePassword(Long memberId, PasswordUpdateServiceRequest request) {
 		Member member = memberReadService.findById(memberId);
-		if (passwordEncoder.matches(request.getCurrentPassword(), member.getPassword())) {
+		if (!passwordEncoder.matches(request.getCurrentPassword(), member.getPassword())) {
 			throw new BaseException(ErrorCode.INVALID_PASSWORD);
 		}
 		member.updatePassword(passwordEncoder.encode(request.getNewPassword()));
