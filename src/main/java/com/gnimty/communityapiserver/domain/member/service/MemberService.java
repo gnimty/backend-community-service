@@ -212,7 +212,7 @@ public class MemberService {
 
 		String uuid = valueOperations.get(getRedisKey(UPDATE_PASSWORD, request.getEmail()));
 		if (!request.getUuid().equals(uuid)) {
-			throw new BaseException(ErrorCode.UNAUTHORIZED_EMAIL);
+			throw new BaseException(ErrorCode.INVALID_UUID);
 		}
 		Member member = memberReadService.findByEmailOrElseThrow(request.getEmail(),
 			new BaseException(ErrorCode.NOT_LOGIN_BY_FORM));
