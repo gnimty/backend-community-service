@@ -11,7 +11,6 @@ import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCC
 import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_UPDATE_PREFER_GAME_MODE;
 import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_UPDATE_PROFILE;
 import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_UPDATE_STATUS;
-import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_VERIFY_EMAIL;
 import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_WITHDRAWAL;
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage.INVALID_INPUT_VALUE;
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage.MISSING_REQUEST_PARAMETER;
@@ -31,20 +30,25 @@ import com.gnimty.communityapiserver.domain.member.controller.dto.request.Introd
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.MyProfileUpdateRequest;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.OauthLoginRequest;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.PasswordEmailVerifyRequest;
+import com.gnimty.communityapiserver.domain.member.controller.dto.request.PasswordResetRequest;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.PasswordUpdateRequest;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.PreferGameModeUpdateRequest;
+import com.gnimty.communityapiserver.domain.member.controller.dto.request.SendEmailRequest;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.StatusUpdateRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.IntroductionUpdateServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.MyProfileUpdateServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.OauthLoginServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.PasswordEmailVerifyServiceRequest;
+import com.gnimty.communityapiserver.domain.member.service.dto.request.PasswordResetServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.PasswordUpdateServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.PreferGameModeUpdateServiceRequest;
+import com.gnimty.communityapiserver.domain.member.service.dto.request.SendEmailServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.StatusUpdateServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.IntroductionEntry;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.MyProfileServiceResponse;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.OauthInfoEntry;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.OtherProfileServiceResponse;
+import com.gnimty.communityapiserver.domain.member.service.dto.response.PasswordEmailVerifyServiceResponse;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.PreferGameModeEntry;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.RiotAccountEntry;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.RiotDependentInfo;
@@ -56,6 +60,7 @@ import com.gnimty.communityapiserver.global.constant.Provider;
 import com.gnimty.communityapiserver.global.constant.Status;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
@@ -101,7 +106,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 			given(memberService.summonerAccountLink(any(OauthLoginServiceRequest.class)))
 				.willReturn(null);
 			willDoNothing()
-				.given(chatService)
+				.given(stompService)
 				.createOrUpdateUser(any(RiotAccount.class));
 
 			mockMvc.perform(post(REQUEST_URL, MEMBER_ID)
@@ -125,7 +130,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 			given(memberService.summonerAccountLink(any(OauthLoginServiceRequest.class)))
 				.willReturn(null);
 			willDoNothing()
-				.given(chatService)
+				.given(stompService)
 				.createOrUpdateUser(any(RiotAccount.class));
 
 			mockMvc.perform(post(REQUEST_URL, MEMBER_ID)
@@ -312,10 +317,10 @@ public class MemberControllerTest extends ControllerTestSupport {
 				any(MyProfileUpdateServiceRequest.class)))
 				.willReturn(null);
 			willDoNothing()
-				.given(chatService)
+				.given(stompService)
 				.updateConnStatus(any(User.class), any(Status.class));
 			willDoNothing()
-				.given(chatService)
+				.given(stompService)
 				.createOrUpdateUser(any(RiotAccount.class));
 
 			mockMvc.perform(patch(REQUEST_URL, MEMBER_ID)
@@ -337,10 +342,10 @@ public class MemberControllerTest extends ControllerTestSupport {
 				any(MyProfileUpdateServiceRequest.class)))
 				.willReturn(null);
 			willDoNothing()
-				.given(chatService)
+				.given(stompService)
 				.updateConnStatus(any(User.class), any(Status.class));
 			willDoNothing()
-				.given(chatService)
+				.given(stompService)
 				.createOrUpdateUser(any(RiotAccount.class));
 
 			mockMvc.perform(patch(REQUEST_URL, MEMBER_ID)
@@ -362,10 +367,10 @@ public class MemberControllerTest extends ControllerTestSupport {
 				any(MyProfileUpdateServiceRequest.class)))
 				.willReturn(null);
 			willDoNothing()
-				.given(chatService)
+				.given(stompService)
 				.updateConnStatus(any(User.class), any(Status.class));
 			willDoNothing()
-				.given(chatService)
+				.given(stompService)
 				.createOrUpdateUser(any(RiotAccount.class));
 
 			mockMvc.perform(patch(REQUEST_URL, MEMBER_ID)
@@ -395,18 +400,24 @@ public class MemberControllerTest extends ControllerTestSupport {
 	@Nested
 	class SendEmailAuthCode {
 
-		private static final String REQUEST_URL = "/members/{member_id}/password/email";
-		private static final Long MEMBER_ID = 1L;
+		private static final String REQUEST_URL = "/members/password/email";
 
-		@DisplayName("로그인 한 유저의 경우 이메일이 전송된다.")
+		@DisplayName("form 로그인 회원의 경우 이메일이 전송된다.")
 		@Test
 		void should_sendEmail_when_invokeMethod() throws Exception {
 
+			SendEmailRequest request = SendEmailRequest.builder()
+				.email("email@email.com")
+				.build();
+
 			willDoNothing()
 				.given(memberService)
-				.sendEmailAuthCode();
+				.sendEmailAuthCode(any(SendEmailServiceRequest.class));
 
-			mockMvc.perform(post(REQUEST_URL, MEMBER_ID))
+			mockMvc.perform(post(REQUEST_URL)
+					.content(om.writeValueAsString(request))
+					.contentType(MediaType.APPLICATION_JSON)
+					.characterEncoding(StandardCharsets.UTF_8))
 				.andExpectAll(
 					status().isAccepted(),
 					jsonPath("$.status.message").value(
@@ -419,26 +430,27 @@ public class MemberControllerTest extends ControllerTestSupport {
 	@Nested
 	class VerifyEmailAuthCode {
 
-		private static final String REQUEST_URL = "/members/{member_id}/password/email/code";
-		private static final Long MEMBER_ID = 1L;
+		private static final String REQUEST_URL = "/members/password/email/code";
 
 		@DisplayName("올바른 코드를 요청하면 성공한다.")
 		@Test
 		void should_success_when_validCode() throws Exception {
 
 			PasswordEmailVerifyRequest request = createRequest("ABC123");
+			PasswordEmailVerifyServiceResponse response = PasswordEmailVerifyServiceResponse.builder()
+				.uuid(UUID.randomUUID().toString())
+				.build();
 
-			willDoNothing()
-				.given(memberService)
-				.verifyEmailAuthCode(any(PasswordEmailVerifyServiceRequest.class));
+			given(memberService.verifyEmailAuthCode(any(PasswordEmailVerifyServiceRequest.class)))
+				.willReturn(response);
 
-			mockMvc.perform(post(REQUEST_URL, MEMBER_ID)
+			mockMvc.perform(post(REQUEST_URL)
 					.content(om.writeValueAsString(request))
 					.contentType(MediaType.APPLICATION_JSON)
 					.characterEncoding(StandardCharsets.UTF_8))
 				.andExpectAll(
 					status().isOk(),
-					jsonPath("$.status.message").value(SUCCESS_VERIFY_EMAIL.getMessage())
+					jsonPath("$.data.uuid").value(response.getUuid())
 				);
 		}
 
@@ -449,12 +461,14 @@ public class MemberControllerTest extends ControllerTestSupport {
 		void should_fail_when_inValidCode(String code) throws Exception {
 
 			PasswordEmailVerifyRequest request = createRequest(code);
+			PasswordEmailVerifyServiceResponse response = PasswordEmailVerifyServiceResponse.builder()
+				.uuid(UUID.randomUUID().toString())
+				.build();
 
-			willDoNothing()
-				.given(memberService)
-				.verifyEmailAuthCode(any(PasswordEmailVerifyServiceRequest.class));
+			given(memberService.verifyEmailAuthCode(any(PasswordEmailVerifyServiceRequest.class)))
+				.willReturn(response);
 
-			mockMvc.perform(post(REQUEST_URL, MEMBER_ID)
+			mockMvc.perform(post(REQUEST_URL)
 					.content(om.writeValueAsString(request))
 					.contentType(MediaType.APPLICATION_JSON)
 					.characterEncoding(StandardCharsets.UTF_8))
@@ -466,7 +480,63 @@ public class MemberControllerTest extends ControllerTestSupport {
 
 		private PasswordEmailVerifyRequest createRequest(String code) {
 			return PasswordEmailVerifyRequest.builder()
+				.email("email@email.com")
 				.code(code)
+				.build();
+		}
+	}
+
+	@DisplayName("비밀번호 재설정 시")
+	@Nested
+	class ResetPassword {
+
+		private static final String REQUEST_URL = "/members/password";
+
+		@DisplayName("올바른 요청이면 성공한다.")
+		@Test
+		void should_success_when_validRequest() throws Exception {
+			PasswordResetRequest request = createRequest(UUID.randomUUID().toString(), "Abc123**");
+
+			willDoNothing()
+				.given(memberService)
+				.resetPassword(any(PasswordResetServiceRequest.class));
+
+			mockMvc.perform(patch(REQUEST_URL)
+					.content(om.writeValueAsString(request))
+					.contentType(MediaType.APPLICATION_JSON)
+					.characterEncoding(StandardCharsets.UTF_8))
+				.andExpectAll(
+					status().isOk(),
+					jsonPath("$.status.message").value(SUCCESS_UPDATE_PASSWORD.getMessage())
+				);
+		}
+
+		@DisplayName("비밀번호가 null이거나 정규 표현식에 위배되면 실패한다.")
+		@NullAndEmptySource
+		@ParameterizedTest
+		@ValueSource(strings = {"abc123**", "ABC123*", "ABC123***********", "ABC12345", "ABCD****"})
+		void should_fail_when_invalidPassword(String password) throws Exception {
+			PasswordResetRequest request = createRequest(UUID.randomUUID().toString(), password);
+
+			willDoNothing()
+				.given(memberService)
+				.updatePassword(any(Long.class), any(PasswordUpdateServiceRequest.class));
+
+			mockMvc.perform(patch(REQUEST_URL)
+					.content(om.writeValueAsString(request))
+					.contentType(MediaType.APPLICATION_JSON)
+					.characterEncoding(StandardCharsets.UTF_8))
+				.andExpectAll(
+					status().isBadRequest(),
+					jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
+				);
+		}
+
+		private PasswordResetRequest createRequest(String uuid, String password) {
+			return PasswordResetRequest.builder()
+				.email("email@email.com")
+				.uuid(uuid)
+				.password(password)
 				.build();
 		}
 	}
@@ -520,7 +590,8 @@ public class MemberControllerTest extends ControllerTestSupport {
 
 		private PasswordUpdateRequest createRequest(String password) {
 			return PasswordUpdateRequest.builder()
-				.password(password)
+				.currentPassword("aBC123**")
+				.newPassword(password)
 				.build();
 		}
 	}
@@ -542,7 +613,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.given(memberService)
 				.updateStatus(any(Long.class), any(StatusUpdateServiceRequest.class));
 			willDoNothing()
-				.given(chatService)
+				.given(stompService)
 				.updateConnStatus(any(User.class), any(Status.class));
 
 			mockMvc.perform(patch(REQUEST_URL, MEMBER_ID)
@@ -565,7 +636,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.given(memberService)
 				.updateStatus(any(Long.class), any(StatusUpdateServiceRequest.class));
 			willDoNothing()
-				.given(chatService)
+				.given(stompService)
 				.updateConnStatus(any(User.class), any(Status.class));
 
 			mockMvc.perform(patch(REQUEST_URL, MEMBER_ID)
