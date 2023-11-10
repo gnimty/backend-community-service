@@ -26,6 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.gnimty.communityapiserver.controller.ControllerTestSupport;
+import com.gnimty.communityapiserver.domain.chat.entity.User;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.IntroductionUpdateRequest;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.MyProfileUpdateRequest;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.OauthLoginRequest;
@@ -47,6 +48,7 @@ import com.gnimty.communityapiserver.domain.member.service.dto.response.OtherPro
 import com.gnimty.communityapiserver.domain.member.service.dto.response.PreferGameModeEntry;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.RiotAccountEntry;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.RiotDependentInfo;
+import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
 import com.gnimty.communityapiserver.domain.schedule.controller.dto.request.ScheduleEntry;
 import com.gnimty.communityapiserver.global.constant.DayOfWeek;
 import com.gnimty.communityapiserver.global.constant.GameMode;
@@ -70,16 +72,16 @@ public class MemberControllerTest extends ControllerTestSupport {
 	@BeforeEach
 	void setUp() throws Exception {
 		given(memberAuthInterceptor.preHandle(
-				any(HttpServletRequest.class),
-				any(HttpServletResponse.class),
-				any(Object.class)))
-				.willReturn(true);
+			any(HttpServletRequest.class),
+			any(HttpServletResponse.class),
+			any(Object.class)))
+			.willReturn(true);
 
 		given(tokenAuthInterceptor.preHandle(
-				any(HttpServletRequest.class),
-				any(HttpServletResponse.class),
-				any(Object.class)))
-				.willReturn(true);
+			any(HttpServletRequest.class),
+			any(HttpServletResponse.class),
+			any(Object.class)))
+			.willReturn(true);
 	}
 
 	@Nested
@@ -93,43 +95,47 @@ public class MemberControllerTest extends ControllerTestSupport {
 		@Test
 		void should_success_when_validRequest() throws Exception {
 			OauthLoginRequest request = OauthLoginRequest.builder()
-					.authCode("authCode")
-					.build();
+				.authCode("authCode")
+				.build();
 
+			given(memberService.summonerAccountLink(any(OauthLoginServiceRequest.class)))
+				.willReturn(null);
 			willDoNothing()
-					.given(memberService)
-					.summonerAccountLink(any(OauthLoginServiceRequest.class));
+				.given(chatService)
+				.createOrUpdateUser(any(RiotAccount.class));
 
 			mockMvc.perform(post(REQUEST_URL, MEMBER_ID)
-							.content(om.writeValueAsString(request))
-							.contentType(MediaType.APPLICATION_JSON)
-							.characterEncoding(StandardCharsets.UTF_8))
-					.andExpectAll(
-							status().isOk(),
-							jsonPath("$.status.message")
-									.value(SUCCESS_SUMMONER_LINK.getMessage())
-					);
+					.content(om.writeValueAsString(request))
+					.contentType(MediaType.APPLICATION_JSON)
+					.characterEncoding(StandardCharsets.UTF_8))
+				.andExpectAll(
+					status().isOk(),
+					jsonPath("$.status.message")
+						.value(SUCCESS_SUMMONER_LINK.getMessage())
+				);
 		}
 
 		@DisplayName("authCode를 입력하지 않으면 실패한다.")
 		@Test
 		void should_fail_when_authCodeIsNull() throws Exception {
 			OauthLoginRequest request = OauthLoginRequest.builder()
-					.authCode(null)
-					.build();
+				.authCode(null)
+				.build();
 
+			given(memberService.summonerAccountLink(any(OauthLoginServiceRequest.class)))
+				.willReturn(null);
 			willDoNothing()
-					.given(memberService)
-					.summonerAccountLink(any(OauthLoginServiceRequest.class));
+				.given(chatService)
+				.createOrUpdateUser(any(RiotAccount.class));
 
 			mockMvc.perform(post(REQUEST_URL, MEMBER_ID)
-							.content(om.writeValueAsString(request))
-							.contentType(MediaType.APPLICATION_JSON)
-							.characterEncoding(StandardCharsets.UTF_8))
-					.andExpectAll(
-							status().isBadRequest(),
-							jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
-					);
+					.content(om.writeValueAsString(request))
+					.contentType(MediaType.APPLICATION_JSON)
+					.characterEncoding(StandardCharsets.UTF_8))
+				.andExpectAll(
+					status().isBadRequest(),
+					jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
+				);
 		}
 	}
 
@@ -144,43 +150,43 @@ public class MemberControllerTest extends ControllerTestSupport {
 		@Test
 		void should_success_when_validRequest() throws Exception {
 			OauthLoginRequest request = OauthLoginRequest.builder()
-					.authCode("authCode")
-					.build();
+				.authCode("authCode")
+				.build();
 
 			willDoNothing()
-					.given(memberService)
-					.oauthAdditionalLink(any(Provider.class), any(OauthLoginServiceRequest.class));
+				.given(memberService)
+				.oauthAdditionalLink(any(Provider.class), any(OauthLoginServiceRequest.class));
 
 			mockMvc.perform(post(REQUEST_URL, MEMBER_ID)
-							.content(om.writeValueAsString(request))
-							.contentType(MediaType.APPLICATION_JSON)
-							.characterEncoding(StandardCharsets.UTF_8))
-					.andExpectAll(
-							status().isOk(),
-							jsonPath("$.status.message")
-									.value(SUCCESS_KAKAO_LINK.getMessage())
-					);
+					.content(om.writeValueAsString(request))
+					.contentType(MediaType.APPLICATION_JSON)
+					.characterEncoding(StandardCharsets.UTF_8))
+				.andExpectAll(
+					status().isOk(),
+					jsonPath("$.status.message")
+						.value(SUCCESS_KAKAO_LINK.getMessage())
+				);
 		}
 
 		@DisplayName("authCode를 입력하지 않으면 실패한다.")
 		@Test
 		void should_fail_when_authCodeIsNull() throws Exception {
 			OauthLoginRequest request = OauthLoginRequest.builder()
-					.authCode(null)
-					.build();
+				.authCode(null)
+				.build();
 
 			willDoNothing()
-					.given(memberService)
-					.oauthAdditionalLink(any(Provider.class), any(OauthLoginServiceRequest.class));
+				.given(memberService)
+				.oauthAdditionalLink(any(Provider.class), any(OauthLoginServiceRequest.class));
 
 			mockMvc.perform(post(REQUEST_URL, MEMBER_ID)
-							.content(om.writeValueAsString(request))
-							.contentType(MediaType.APPLICATION_JSON)
-							.characterEncoding(StandardCharsets.UTF_8))
-					.andExpectAll(
-							status().isBadRequest(),
-							jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
-					);
+					.content(om.writeValueAsString(request))
+					.contentType(MediaType.APPLICATION_JSON)
+					.characterEncoding(StandardCharsets.UTF_8))
+				.andExpectAll(
+					status().isBadRequest(),
+					jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
+				);
 		}
 	}
 
@@ -195,43 +201,43 @@ public class MemberControllerTest extends ControllerTestSupport {
 		@Test
 		void should_success_when_validRequest() throws Exception {
 			OauthLoginRequest request = OauthLoginRequest.builder()
-					.authCode("authCode")
-					.build();
+				.authCode("authCode")
+				.build();
 
 			willDoNothing()
-					.given(memberService)
-					.oauthAdditionalLink(any(Provider.class), any(OauthLoginServiceRequest.class));
+				.given(memberService)
+				.oauthAdditionalLink(any(Provider.class), any(OauthLoginServiceRequest.class));
 
 			mockMvc.perform(post(REQUEST_URL, MEMBER_ID)
-							.content(om.writeValueAsString(request))
-							.contentType(MediaType.APPLICATION_JSON)
-							.characterEncoding(StandardCharsets.UTF_8))
-					.andExpectAll(
-							status().isOk(),
-							jsonPath("$.status.message")
-									.value(SUCCESS_GOOGLE_LINK.getMessage())
-					);
+					.content(om.writeValueAsString(request))
+					.contentType(MediaType.APPLICATION_JSON)
+					.characterEncoding(StandardCharsets.UTF_8))
+				.andExpectAll(
+					status().isOk(),
+					jsonPath("$.status.message")
+						.value(SUCCESS_GOOGLE_LINK.getMessage())
+				);
 		}
 
 		@DisplayName("authCode를 입력하지 않으면 실패한다.")
 		@Test
 		void should_fail_when_authCodeIsNull() throws Exception {
 			OauthLoginRequest request = OauthLoginRequest.builder()
-					.authCode(null)
-					.build();
+				.authCode(null)
+				.build();
 
 			willDoNothing()
-					.given(memberService)
-					.oauthAdditionalLink(any(Provider.class), any(OauthLoginServiceRequest.class));
+				.given(memberService)
+				.oauthAdditionalLink(any(Provider.class), any(OauthLoginServiceRequest.class));
 
 			mockMvc.perform(post(REQUEST_URL, MEMBER_ID)
-							.content(om.writeValueAsString(request))
-							.contentType(MediaType.APPLICATION_JSON)
-							.characterEncoding(StandardCharsets.UTF_8))
-					.andExpectAll(
-							status().isBadRequest(),
-							jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
-					);
+					.content(om.writeValueAsString(request))
+					.contentType(MediaType.APPLICATION_JSON)
+					.characterEncoding(StandardCharsets.UTF_8))
+				.andExpectAll(
+					status().isBadRequest(),
+					jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
+				);
 		}
 	}
 
@@ -246,47 +252,47 @@ public class MemberControllerTest extends ControllerTestSupport {
 		void should_success_when_validRequest() throws Exception {
 
 			RiotDependentInfo riotDependentInfo = RiotDependentInfo.builder()
-					.isLinked(true)
-					.status(Status.ONLINE)
-					.riotAccounts(List.of(
-							RiotAccountEntry.builder()
-									.summonerName("소환사이름")
-									.build()))
-					.build();
+				.isLinked(true)
+				.status(Status.ONLINE)
+				.riotAccounts(List.of(
+					RiotAccountEntry.builder()
+						.summonerName("소환사이름")
+						.build()))
+				.build();
 			OauthInfoEntry oauthInfoEntry = OauthInfoEntry.builder()
-					.email("email@email.com")
-					.build();
+				.email("email@email.com")
+				.build();
 			MyProfileServiceResponse response = MyProfileServiceResponse.builder()
-					.id(1L)
-					.email("email")
-					.nickname("nickanme")
-					.favoriteChampionId(1L)
-					.upCount(100L)
-					.riotDependentInfo(riotDependentInfo)
-					.oauthInfos(List.of(oauthInfoEntry))
-					.build();
+				.id(1L)
+				.email("email")
+				.nickname("nickanme")
+				.favoriteChampionId(1L)
+				.upCount(100L)
+				.riotDependentInfo(riotDependentInfo)
+				.oauthInfos(List.of(oauthInfoEntry))
+				.build();
 
 			given(memberService.getMyProfile())
-					.willReturn(response);
+				.willReturn(response);
 
 			mockMvc.perform(get(REQUEST_URL))
-					.andExpectAll(
-							status().isOk(),
-							jsonPath("$.data.id").value(response.getId()),
-							jsonPath("$.data.email").value(response.getEmail()),
-							jsonPath("$.data.favoriteChampionId")
-									.value(response.getFavoriteChampionId()),
-							jsonPath("$.data.upCount").value(response.getUpCount()),
-							jsonPath("$.data.riotDependentInfo.isLinked")
-									.value(response.getRiotDependentInfo().getIsLinked()),
-							jsonPath("$.data.riotDependentInfo.status")
-									.value(response.getRiotDependentInfo().getStatus().toString()),
-							jsonPath("$.data.riotDependentInfo.riotAccounts[0].summonerName")
-									.value(response.getRiotDependentInfo().getRiotAccounts().get(0)
-											.getSummonerName()),
-							jsonPath("$.data.oauthInfos[0].email")
-									.value(response.getOauthInfos().get(0).getEmail())
-					);
+				.andExpectAll(
+					status().isOk(),
+					jsonPath("$.data.id").value(response.getId()),
+					jsonPath("$.data.email").value(response.getEmail()),
+					jsonPath("$.data.favoriteChampionId")
+						.value(response.getFavoriteChampionId()),
+					jsonPath("$.data.upCount").value(response.getUpCount()),
+					jsonPath("$.data.riotDependentInfo.isLinked")
+						.value(response.getRiotDependentInfo().getIsLinked()),
+					jsonPath("$.data.riotDependentInfo.status")
+						.value(response.getRiotDependentInfo().getStatus().toString()),
+					jsonPath("$.data.riotDependentInfo.riotAccounts[0].summonerName")
+						.value(response.getRiotDependentInfo().getRiotAccounts().get(0)
+							.getSummonerName()),
+					jsonPath("$.data.oauthInfos[0].email")
+						.value(response.getOauthInfos().get(0).getEmail())
+				);
 		}
 	}
 
@@ -302,18 +308,24 @@ public class MemberControllerTest extends ControllerTestSupport {
 		void should_success_when_validRequest() throws Exception {
 			MyProfileUpdateRequest request = createRequest(true, "content");
 
+			given(memberService.updateMyProfile(any(Long.class),
+				any(MyProfileUpdateServiceRequest.class)))
+				.willReturn(null);
 			willDoNothing()
-					.given(memberService)
-					.updateMyProfile(any(Long.class), any(MyProfileUpdateServiceRequest.class));
+				.given(chatService)
+				.updateConnStatus(any(User.class), any(Status.class));
+			willDoNothing()
+				.given(chatService)
+				.createOrUpdateUser(any(RiotAccount.class));
 
 			mockMvc.perform(patch(REQUEST_URL, MEMBER_ID)
-							.content(om.writeValueAsString(request))
-							.contentType(MediaType.APPLICATION_JSON)
-							.characterEncoding(StandardCharsets.UTF_8))
-					.andExpectAll(
-							status().isOk(),
-							jsonPath("$.status.message")
-									.value(SUCCESS_UPDATE_PROFILE.getMessage()));
+					.content(om.writeValueAsString(request))
+					.contentType(MediaType.APPLICATION_JSON)
+					.characterEncoding(StandardCharsets.UTF_8))
+				.andExpectAll(
+					status().isOk(),
+					jsonPath("$.status.message")
+						.value(SUCCESS_UPDATE_PROFILE.getMessage()));
 		}
 
 		@DisplayName("content 또는 isMain이 null이면 실패한다.")
@@ -321,18 +333,24 @@ public class MemberControllerTest extends ControllerTestSupport {
 		void should_fail_when_contentOrIsMainIsNull() throws Exception {
 			MyProfileUpdateRequest request = createRequest(null, null);
 
+			given(memberService.updateMyProfile(any(Long.class),
+				any(MyProfileUpdateServiceRequest.class)))
+				.willReturn(null);
 			willDoNothing()
-					.given(memberService)
-					.updateMyProfile(any(Long.class), any(MyProfileUpdateServiceRequest.class));
+				.given(chatService)
+				.updateConnStatus(any(User.class), any(Status.class));
+			willDoNothing()
+				.given(chatService)
+				.createOrUpdateUser(any(RiotAccount.class));
 
 			mockMvc.perform(patch(REQUEST_URL, MEMBER_ID)
-							.content(om.writeValueAsString(request))
-							.contentType(MediaType.APPLICATION_JSON)
-							.characterEncoding(StandardCharsets.UTF_8))
-					.andExpectAll(
-							status().isBadRequest(),
-							jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
-					);
+					.content(om.writeValueAsString(request))
+					.contentType(MediaType.APPLICATION_JSON)
+					.characterEncoding(StandardCharsets.UTF_8))
+				.andExpectAll(
+					status().isBadRequest(),
+					jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
+				);
 		}
 
 		@DisplayName("content가 90가 초과이면 실패한다.")
@@ -340,30 +358,36 @@ public class MemberControllerTest extends ControllerTestSupport {
 		void should_fail_when_contentLengthExceed90() throws Exception {
 			MyProfileUpdateRequest request = createRequest(true, "a".repeat(91));
 
+			given(memberService.updateMyProfile(any(Long.class),
+				any(MyProfileUpdateServiceRequest.class)))
+				.willReturn(null);
 			willDoNothing()
-					.given(memberService)
-					.updateMyProfile(any(Long.class), any(MyProfileUpdateServiceRequest.class));
+				.given(chatService)
+				.updateConnStatus(any(User.class), any(Status.class));
+			willDoNothing()
+				.given(chatService)
+				.createOrUpdateUser(any(RiotAccount.class));
 
 			mockMvc.perform(patch(REQUEST_URL, MEMBER_ID)
-							.content(om.writeValueAsString(request))
-							.contentType(MediaType.APPLICATION_JSON)
-							.characterEncoding(StandardCharsets.UTF_8))
-					.andExpectAll(
-							status().isBadRequest(),
-							jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
-					);
+					.content(om.writeValueAsString(request))
+					.contentType(MediaType.APPLICATION_JSON)
+					.characterEncoding(StandardCharsets.UTF_8))
+				.andExpectAll(
+					status().isBadRequest(),
+					jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
+				);
 		}
 
 		private MyProfileUpdateRequest createRequest(Boolean isMain, String content) {
 			return MyProfileUpdateRequest.builder()
-					.mainRiotAccountId(1L)
-					.status(Status.AWAY)
-					.introductions(List.of(IntroductionEntry.builder()
-							.id(1L)
-							.isMain(isMain)
-							.content(content)
-							.build()))
-					.build();
+				.mainRiotAccountId(1L)
+				.status(Status.AWAY)
+				.introductions(List.of(IntroductionEntry.builder()
+					.id(1L)
+					.isMain(isMain)
+					.content(content)
+					.build()))
+				.build();
 		}
 	}
 
@@ -377,12 +401,17 @@ public class MemberControllerTest extends ControllerTestSupport {
 		@DisplayName("로그인 한 유저의 경우 이메일이 전송된다.")
 		@Test
 		void should_sendEmail_when_invokeMethod() throws Exception {
+
+			willDoNothing()
+				.given(memberService)
+				.sendEmailAuthCode();
+
 			mockMvc.perform(post(REQUEST_URL, MEMBER_ID))
-					.andExpectAll(
-							status().isAccepted(),
-							jsonPath("$.status.message").value(
-									SUCCESS_SEND_EMAIL_AUTH_CODE.getMessage())
-					);
+				.andExpectAll(
+					status().isAccepted(),
+					jsonPath("$.status.message").value(
+						SUCCESS_SEND_EMAIL_AUTH_CODE.getMessage())
+				);
 		}
 	}
 
@@ -400,17 +429,17 @@ public class MemberControllerTest extends ControllerTestSupport {
 			PasswordEmailVerifyRequest request = createRequest("ABC123");
 
 			willDoNothing()
-					.given(memberService)
-					.verifyEmailAuthCode(any(PasswordEmailVerifyServiceRequest.class));
+				.given(memberService)
+				.verifyEmailAuthCode(any(PasswordEmailVerifyServiceRequest.class));
 
 			mockMvc.perform(post(REQUEST_URL, MEMBER_ID)
-							.content(om.writeValueAsString(request))
-							.contentType(MediaType.APPLICATION_JSON)
-							.characterEncoding(StandardCharsets.UTF_8))
-					.andExpectAll(
-							status().isOk(),
-							jsonPath("$.status.message").value(SUCCESS_VERIFY_EMAIL.getMessage())
-					);
+					.content(om.writeValueAsString(request))
+					.contentType(MediaType.APPLICATION_JSON)
+					.characterEncoding(StandardCharsets.UTF_8))
+				.andExpectAll(
+					status().isOk(),
+					jsonPath("$.status.message").value(SUCCESS_VERIFY_EMAIL.getMessage())
+				);
 		}
 
 		@DisplayName("code가 null이거나 형태가 올바르지 않으면 실패한다.")
@@ -422,23 +451,23 @@ public class MemberControllerTest extends ControllerTestSupport {
 			PasswordEmailVerifyRequest request = createRequest(code);
 
 			willDoNothing()
-					.given(memberService)
-					.verifyEmailAuthCode(any(PasswordEmailVerifyServiceRequest.class));
+				.given(memberService)
+				.verifyEmailAuthCode(any(PasswordEmailVerifyServiceRequest.class));
 
 			mockMvc.perform(post(REQUEST_URL, MEMBER_ID)
-							.content(om.writeValueAsString(request))
-							.contentType(MediaType.APPLICATION_JSON)
-							.characterEncoding(StandardCharsets.UTF_8))
-					.andExpectAll(
-							status().isBadRequest(),
-							jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
-					);
+					.content(om.writeValueAsString(request))
+					.contentType(MediaType.APPLICATION_JSON)
+					.characterEncoding(StandardCharsets.UTF_8))
+				.andExpectAll(
+					status().isBadRequest(),
+					jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
+				);
 		}
 
 		private PasswordEmailVerifyRequest createRequest(String code) {
 			return PasswordEmailVerifyRequest.builder()
-					.code(code)
-					.build();
+				.code(code)
+				.build();
 		}
 	}
 
@@ -455,17 +484,17 @@ public class MemberControllerTest extends ControllerTestSupport {
 			PasswordUpdateRequest request = createRequest("Abc123**");
 
 			willDoNothing()
-					.given(memberService)
-					.updatePassword(any(Long.class), any(PasswordUpdateServiceRequest.class));
+				.given(memberService)
+				.updatePassword(any(Long.class), any(PasswordUpdateServiceRequest.class));
 
 			mockMvc.perform(patch(REQUEST_URL, MEMBER_ID)
-							.content(om.writeValueAsString(request))
-							.contentType(MediaType.APPLICATION_JSON)
-							.characterEncoding(StandardCharsets.UTF_8))
-					.andExpectAll(
-							status().isOk(),
-							jsonPath("$.status.message").value(SUCCESS_UPDATE_PASSWORD.getMessage())
-					);
+					.content(om.writeValueAsString(request))
+					.contentType(MediaType.APPLICATION_JSON)
+					.characterEncoding(StandardCharsets.UTF_8))
+				.andExpectAll(
+					status().isOk(),
+					jsonPath("$.status.message").value(SUCCESS_UPDATE_PASSWORD.getMessage())
+				);
 		}
 
 		@DisplayName("비밀번호가 null이거나 정규 표현식에 위배되면 실패한다.")
@@ -476,23 +505,23 @@ public class MemberControllerTest extends ControllerTestSupport {
 			PasswordUpdateRequest request = createRequest(password);
 
 			willDoNothing()
-					.given(memberService)
-					.updatePassword(any(Long.class), any(PasswordUpdateServiceRequest.class));
+				.given(memberService)
+				.updatePassword(any(Long.class), any(PasswordUpdateServiceRequest.class));
 
 			mockMvc.perform(patch(REQUEST_URL, MEMBER_ID)
-							.content(om.writeValueAsString(request))
-							.contentType(MediaType.APPLICATION_JSON)
-							.characterEncoding(StandardCharsets.UTF_8))
-					.andExpectAll(
-							status().isBadRequest(),
-							jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
-					);
+					.content(om.writeValueAsString(request))
+					.contentType(MediaType.APPLICATION_JSON)
+					.characterEncoding(StandardCharsets.UTF_8))
+				.andExpectAll(
+					status().isBadRequest(),
+					jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
+				);
 		}
 
 		private PasswordUpdateRequest createRequest(String password) {
 			return PasswordUpdateRequest.builder()
-					.password(password)
-					.build();
+				.password(password)
+				.build();
 		}
 	}
 
@@ -510,17 +539,20 @@ public class MemberControllerTest extends ControllerTestSupport {
 			StatusUpdateRequest request = createRequest(Status.AWAY);
 
 			willDoNothing()
-					.given(memberService)
-					.updateStatus(any(Long.class), any(StatusUpdateServiceRequest.class));
+				.given(memberService)
+				.updateStatus(any(Long.class), any(StatusUpdateServiceRequest.class));
+			willDoNothing()
+				.given(chatService)
+				.updateConnStatus(any(User.class), any(Status.class));
 
 			mockMvc.perform(patch(REQUEST_URL, MEMBER_ID)
-							.content(om.writeValueAsString(request))
-							.contentType(MediaType.APPLICATION_JSON)
-							.characterEncoding(StandardCharsets.UTF_8))
-					.andExpectAll(
-							status().isOk(),
-							jsonPath("$.status.message").value(SUCCESS_UPDATE_STATUS.getMessage())
-					);
+					.content(om.writeValueAsString(request))
+					.contentType(MediaType.APPLICATION_JSON)
+					.characterEncoding(StandardCharsets.UTF_8))
+				.andExpectAll(
+					status().isOk(),
+					jsonPath("$.status.message").value(SUCCESS_UPDATE_STATUS.getMessage())
+				);
 		}
 
 		@DisplayName("status가 null이면 실패한다.")
@@ -530,23 +562,26 @@ public class MemberControllerTest extends ControllerTestSupport {
 			StatusUpdateRequest request = createRequest(null);
 
 			willDoNothing()
-					.given(memberService)
-					.updateStatus(any(Long.class), any(StatusUpdateServiceRequest.class));
+				.given(memberService)
+				.updateStatus(any(Long.class), any(StatusUpdateServiceRequest.class));
+			willDoNothing()
+				.given(chatService)
+				.updateConnStatus(any(User.class), any(Status.class));
 
 			mockMvc.perform(patch(REQUEST_URL, MEMBER_ID)
-							.content(om.writeValueAsString(request))
-							.contentType(MediaType.APPLICATION_JSON)
-							.characterEncoding(StandardCharsets.UTF_8))
-					.andExpectAll(
-							status().isBadRequest(),
-							jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
-					);
+					.content(om.writeValueAsString(request))
+					.contentType(MediaType.APPLICATION_JSON)
+					.characterEncoding(StandardCharsets.UTF_8))
+				.andExpectAll(
+					status().isBadRequest(),
+					jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
+				);
 		}
 
 		private StatusUpdateRequest createRequest(Status status) {
 			return StatusUpdateRequest.builder()
-					.status(status)
-					.build();
+				.status(status)
+				.build();
 		}
 	}
 
@@ -564,19 +599,19 @@ public class MemberControllerTest extends ControllerTestSupport {
 			IntroductionUpdateRequest request = createRequest(true, "content");
 
 			willDoNothing()
-					.given(memberService)
-					.updateIntroduction(any(Long.class),
-							any(IntroductionUpdateServiceRequest.class));
+				.given(memberService)
+				.updateIntroduction(any(Long.class),
+					any(IntroductionUpdateServiceRequest.class));
 
 			mockMvc.perform(patch(REQUEST_URL, MEMBER_ID)
-							.content(om.writeValueAsString(request))
-							.contentType(MediaType.APPLICATION_JSON)
-							.characterEncoding(StandardCharsets.UTF_8))
-					.andExpectAll(
-							status().isOk(),
-							jsonPath("$.status.message").value(
-									SUCCESS_UPDATE_INTRODUCTION.getMessage())
-					);
+					.content(om.writeValueAsString(request))
+					.contentType(MediaType.APPLICATION_JSON)
+					.characterEncoding(StandardCharsets.UTF_8))
+				.andExpectAll(
+					status().isOk(),
+					jsonPath("$.status.message").value(
+						SUCCESS_UPDATE_INTRODUCTION.getMessage())
+				);
 		}
 
 		@DisplayName("content또는 isMain이 null이면 실패한다.")
@@ -586,18 +621,18 @@ public class MemberControllerTest extends ControllerTestSupport {
 			IntroductionUpdateRequest request = createRequest(null, null);
 
 			willDoNothing()
-					.given(memberService)
-					.updateIntroduction(any(Long.class),
-							any(IntroductionUpdateServiceRequest.class));
+				.given(memberService)
+				.updateIntroduction(any(Long.class),
+					any(IntroductionUpdateServiceRequest.class));
 
 			mockMvc.perform(patch(REQUEST_URL, MEMBER_ID)
-							.content(om.writeValueAsString(request))
-							.contentType(MediaType.APPLICATION_JSON)
-							.characterEncoding(StandardCharsets.UTF_8))
-					.andExpectAll(
-							status().isBadRequest(),
-							jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
-					);
+					.content(om.writeValueAsString(request))
+					.contentType(MediaType.APPLICATION_JSON)
+					.characterEncoding(StandardCharsets.UTF_8))
+				.andExpectAll(
+					status().isBadRequest(),
+					jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
+				);
 		}
 
 		@DisplayName("content가 90자 초과이면 실패한다.")
@@ -607,28 +642,28 @@ public class MemberControllerTest extends ControllerTestSupport {
 			IntroductionUpdateRequest request = createRequest(true, "a".repeat(91));
 
 			willDoNothing()
-					.given(memberService)
-					.updateIntroduction(any(Long.class),
-							any(IntroductionUpdateServiceRequest.class));
+				.given(memberService)
+				.updateIntroduction(any(Long.class),
+					any(IntroductionUpdateServiceRequest.class));
 
 			mockMvc.perform(patch(REQUEST_URL, MEMBER_ID)
-							.content(om.writeValueAsString(request))
-							.contentType(MediaType.APPLICATION_JSON)
-							.characterEncoding(StandardCharsets.UTF_8))
-					.andExpectAll(
-							status().isBadRequest(),
-							jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
-					);
+					.content(om.writeValueAsString(request))
+					.contentType(MediaType.APPLICATION_JSON)
+					.characterEncoding(StandardCharsets.UTF_8))
+				.andExpectAll(
+					status().isBadRequest(),
+					jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
+				);
 		}
 
 		private IntroductionUpdateRequest createRequest(Boolean isMain, String content) {
 			return IntroductionUpdateRequest.builder()
-					.introductions(List.of(IntroductionEntry.builder()
-							.id(1L)
-							.isMain(isMain)
-							.content(content)
-							.build()))
-					.build();
+				.introductions(List.of(IntroductionEntry.builder()
+					.id(1L)
+					.isMain(isMain)
+					.content(content)
+					.build()))
+				.build();
 		}
 	}
 
@@ -646,18 +681,18 @@ public class MemberControllerTest extends ControllerTestSupport {
 			PreferGameModeUpdateRequest request = createRequest(GameMode.RANK_SOLO);
 
 			willDoNothing()
-					.given(memberService)
-					.updatePreferGameMode(any(PreferGameModeUpdateServiceRequest.class));
+				.given(memberService)
+				.updatePreferGameMode(any(PreferGameModeUpdateServiceRequest.class));
 
 			mockMvc.perform(patch(REQUEST_URL, MEMBER_ID)
-							.content(om.writeValueAsString(request))
-							.contentType(MediaType.APPLICATION_JSON)
-							.characterEncoding(StandardCharsets.UTF_8))
-					.andExpectAll(
-							status().isOk(),
-							jsonPath("$.status.message").value(
-									SUCCESS_UPDATE_PREFER_GAME_MODE.getMessage())
-					);
+					.content(om.writeValueAsString(request))
+					.contentType(MediaType.APPLICATION_JSON)
+					.characterEncoding(StandardCharsets.UTF_8))
+				.andExpectAll(
+					status().isOk(),
+					jsonPath("$.status.message").value(
+						SUCCESS_UPDATE_PREFER_GAME_MODE.getMessage())
+				);
 		}
 
 		@DisplayName("preferGameMode가 null이면 실패한다.")
@@ -667,27 +702,27 @@ public class MemberControllerTest extends ControllerTestSupport {
 			PreferGameModeUpdateRequest request = createRequest(null);
 
 			willDoNothing()
-					.given(memberService)
-					.updatePreferGameMode(any(PreferGameModeUpdateServiceRequest.class));
+				.given(memberService)
+				.updatePreferGameMode(any(PreferGameModeUpdateServiceRequest.class));
 
 			mockMvc.perform(patch(REQUEST_URL, MEMBER_ID)
-							.content(om.writeValueAsString(request))
-							.contentType(MediaType.APPLICATION_JSON)
-							.characterEncoding(StandardCharsets.UTF_8))
-					.andExpectAll(
-							status().isBadRequest(),
-							jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
-					);
+					.content(om.writeValueAsString(request))
+					.contentType(MediaType.APPLICATION_JSON)
+					.characterEncoding(StandardCharsets.UTF_8))
+				.andExpectAll(
+					status().isBadRequest(),
+					jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
+				);
 		}
 
 		private PreferGameModeUpdateRequest createRequest(GameMode gameMode) {
 			return PreferGameModeUpdateRequest.builder()
-					.preferGameModes(List.of(
-							PreferGameModeEntry.builder()
-									.gameMode(gameMode)
-									.build()
-					))
-					.build();
+				.preferGameModes(List.of(
+					PreferGameModeEntry.builder()
+						.gameMode(gameMode)
+						.build()
+				))
+				.build();
 		}
 	}
 
@@ -703,16 +738,16 @@ public class MemberControllerTest extends ControllerTestSupport {
 		void should_success_when_validRequest() throws Exception {
 
 			willDoNothing()
-					.given(memberService)
-					.deleteOauthInfo(any(Provider.class));
+				.given(memberService)
+				.deleteOauthInfo(any(Provider.class));
 
 			mockMvc.perform(delete(REQUEST_URL, MEMBER_ID)
-							.param("provider", Provider.KAKAO.name()))
-					.andExpectAll(
-							status().isOk(),
-							jsonPath("$.status.message").value(
-									SUCCESS_DISCONNECT_OAUTH.getMessage())
-					);
+					.param("provider", Provider.KAKAO.name()))
+				.andExpectAll(
+					status().isOk(),
+					jsonPath("$.status.message").value(
+						SUCCESS_DISCONNECT_OAUTH.getMessage())
+				);
 		}
 
 		@DisplayName("provider가 null이면 실패한다.")
@@ -721,14 +756,14 @@ public class MemberControllerTest extends ControllerTestSupport {
 			String message = String.format(MISSING_REQUEST_PARAMETER, "provider");
 
 			willDoNothing()
-					.given(memberService)
-					.deleteOauthInfo(any(Provider.class));
+				.given(memberService)
+				.deleteOauthInfo(any(Provider.class));
 
 			mockMvc.perform(delete(REQUEST_URL, MEMBER_ID))
-					.andExpectAll(
-							status().isNotFound(),
-							jsonPath("$.status.message").value(message)
-					);
+				.andExpectAll(
+					status().isNotFound(),
+					jsonPath("$.status.message").value(message)
+				);
 		}
 	}
 
@@ -744,14 +779,14 @@ public class MemberControllerTest extends ControllerTestSupport {
 		void should_success_when_authenticated() throws Exception {
 
 			willDoNothing()
-					.given(memberService)
-					.logout();
+				.given(memberService)
+				.logout();
 
 			mockMvc.perform(delete(REQUEST_URL, MEMBER_ID))
-					.andExpectAll(
-							status().isOk(),
-							jsonPath("$.status.message").value(SUCCESS_LOGOUT.getMessage())
-					);
+				.andExpectAll(
+					status().isOk(),
+					jsonPath("$.status.message").value(SUCCESS_LOGOUT.getMessage())
+				);
 		}
 	}
 
@@ -767,14 +802,14 @@ public class MemberControllerTest extends ControllerTestSupport {
 		void should_success_when_authenticated() throws Exception {
 
 			willDoNothing()
-					.given(memberService)
-					.withdrawal();
+				.given(memberService)
+				.withdrawal();
 
 			mockMvc.perform(delete(REQUEST_URL, MEMBER_ID))
-					.andExpectAll(
-							status().isOk(),
-							jsonPath("$.status.message").value(SUCCESS_WITHDRAWAL.getMessage())
-					);
+				.andExpectAll(
+					status().isOk(),
+					jsonPath("$.status.message").value(SUCCESS_WITHDRAWAL.getMessage())
+				);
 		}
 	}
 
@@ -790,36 +825,36 @@ public class MemberControllerTest extends ControllerTestSupport {
 		void should_success_when_authenticated() throws Exception {
 
 			OtherProfileServiceResponse response = OtherProfileServiceResponse.builder()
-					.schedules(List.of(
-							ScheduleEntry.builder()
-									.dayOfWeek(DayOfWeek.SUNDAY)
-									.startTime(0)
-									.endTime(24)
-									.build()))
-					.mainIntroduction("소개글")
-					.preferGameModes(List.of(
-							PreferGameModeEntry.builder()
-									.gameMode(GameMode.RANK_SOLO)
-									.build()))
-					.build();
+				.schedules(List.of(
+					ScheduleEntry.builder()
+						.dayOfWeek(DayOfWeek.SUNDAY)
+						.startTime(0)
+						.endTime(24)
+						.build()))
+				.mainIntroduction("소개글")
+				.preferGameModes(List.of(
+					PreferGameModeEntry.builder()
+						.gameMode(GameMode.RANK_SOLO)
+						.build()))
+				.build();
 
 			given(memberReadService.findOtherById(any(Long.class)))
-					.willReturn(response);
+				.willReturn(response);
 
 			mockMvc.perform(get(REQUEST_URL, MEMBER_ID))
-					.andExpectAll(
-							status().isOk(),
-							jsonPath("$.data.schedules[0].dayOfWeek")
-									.value(response.getSchedules().get(0).getDayOfWeek().name()),
-							jsonPath("$.data.schedules[0].startTime")
-									.value(response.getSchedules().get(0).getStartTime()),
-							jsonPath("$.data.schedules[0].endTime")
-									.value(response.getSchedules().get(0).getEndTime()),
-							jsonPath("$.data.mainIntroduction")
-									.value(response.getMainIntroduction()),
-							jsonPath("$.data.preferGameModes[0].gameMode")
-									.value(response.getPreferGameModes().get(0).getGameMode().name())
-					);
+				.andExpectAll(
+					status().isOk(),
+					jsonPath("$.data.schedules[0].dayOfWeek")
+						.value(response.getSchedules().get(0).getDayOfWeek().name()),
+					jsonPath("$.data.schedules[0].startTime")
+						.value(response.getSchedules().get(0).getStartTime()),
+					jsonPath("$.data.schedules[0].endTime")
+						.value(response.getSchedules().get(0).getEndTime()),
+					jsonPath("$.data.mainIntroduction")
+						.value(response.getMainIntroduction()),
+					jsonPath("$.data.preferGameModes[0].gameMode")
+						.value(response.getPreferGameModes().get(0).getGameMode().name())
+				);
 		}
 	}
 }

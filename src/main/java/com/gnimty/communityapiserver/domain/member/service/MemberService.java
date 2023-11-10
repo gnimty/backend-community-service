@@ -171,11 +171,16 @@ public class MemberService {
 		return riotAccount;
 	}
 
-	@Async("mailExecutor")
-	public void sendEmailAuthCode(Member member) {
+	public void sendEmailAuthCode() {
+		Member member = MemberThreadLocal.get();
 		if (member.getEmail() == null) {
 			throw new BaseException(ErrorCode.NOT_LOGIN_BY_FORM);
 		}
+		sendEmail(member);
+	}
+
+	@Async("mailExecutor")
+	public void sendEmail(Member member) {
 		String code = RandomCodeGenerator.generateCodeByLength(6);
 		mailSenderUtil.sendEmail(Auth.EMAIL_SUBJECT.getContent(), member.getEmail(), code,
 			"password-mail", "static/images/banner-urf.png");

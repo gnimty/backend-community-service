@@ -32,7 +32,6 @@ import com.gnimty.communityapiserver.domain.member.service.MemberService;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.MyProfileServiceResponse;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.OtherProfileServiceResponse;
 import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
-import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
 import com.gnimty.communityapiserver.global.constant.Provider;
 import com.gnimty.communityapiserver.global.response.CommonResponse;
 import javax.validation.Valid;
@@ -108,7 +107,7 @@ public class MemberController {
 	@ResponseStatus(ACCEPTED)
 	@PostMapping("/{member_id}/password/email")
 	public CommonResponse<Void> sendEmailAuthCode() {
-		memberService.sendEmailAuthCode(MemberThreadLocal.get());
+		memberService.sendEmailAuthCode();
 		return CommonResponse.success(SUCCESS_SEND_EMAIL_AUTH_CODE, ACCEPTED);
 	}
 
