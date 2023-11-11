@@ -65,7 +65,7 @@ public class RiotAccountController {
 		Member member = MemberThreadLocal.get();
 		List<Long> chattedMemberIds = stompService.getChattedMemberIds(member.getId());
 		RecentlySummonersServiceResponse response = riotAccountService
-				.getRecentlySummoners(member, chattedMemberIds);
+			.getRecentlySummoners(member, chattedMemberIds);
 		return CommonResponse.success(RecentlySummonersResponse.from(response));
 	}
 }

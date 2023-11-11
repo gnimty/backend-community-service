@@ -8,6 +8,7 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
@@ -24,10 +25,13 @@ import com.gnimty.communityapiserver.domain.member.service.MemberService;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.MyProfileUpdateServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.OauthLoginServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.PasswordEmailVerifyServiceRequest;
+import com.gnimty.communityapiserver.domain.member.service.dto.request.PasswordResetServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.PasswordUpdateServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.PreferGameModeUpdateServiceRequest;
+import com.gnimty.communityapiserver.domain.member.service.dto.request.SendEmailServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.IntroductionEntry;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.MyProfileServiceResponse;
+import com.gnimty.communityapiserver.domain.member.service.dto.response.PasswordEmailVerifyServiceResponse;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.PreferGameModeEntry;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.RiotAccountEntry;
 import com.gnimty.communityapiserver.domain.member.service.utils.GoogleOauthUtil;
@@ -62,7 +66,7 @@ import com.gnimty.communityapiserver.global.exception.ErrorCode;
 import com.gnimty.communityapiserver.service.ServiceTestSupport;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CountDownLatch;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -71,6 +75,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
@@ -497,7 +502,8 @@ public class MemberServiceTest extends ServiceTestSupport {
 			memberService.updateMyProfile(member.getId(), request);
 
 			// then
-			Optional<Introduction> insertedIntroduction = introductionRepository.findByMember(member)
+			Optional<Introduction> insertedIntroduction = introductionRepository.findByMember(
+					member)
 				.stream()
 				.filter(introduction -> introduction.getContent()
 					.equals(request.getIntroductions().get(1).getContent()))
@@ -716,18 +722,17 @@ public class MemberServiceTest extends ServiceTestSupport {
 	@Nested
 	class SendEmailAuthCode {
 
-		private CountDownLatch countDownLatch;
+		private Member member;
 
 		@BeforeEach
 		void setUp() {
-			Member member = memberRepository.save(
+			member = memberRepository.save(
 				createMemberByEmailAndNickname("zkfzpf56@naver.com", "nickname"));
-			countDownLatch = new CountDownLatch(1);
 			MemberThreadLocal.set(member);
 		}
 
 		@AfterEach
-		void cleanUp() {
+		void tearDown() {
 			memberRepository.deleteAllInBatch();
 			MemberThreadLocal.remove();
 		}
@@ -735,6 +740,10 @@ public class MemberServiceTest extends ServiceTestSupport {
 		@DisplayName("form 로그인 회원인 경우, 이메일이 전송된다.")
 		@Test
 		void should_sendEmail_when_formLoginMember() throws Exception {
+			// given
+			SendEmailServiceRequest request = SendEmailServiceRequest.builder()
+				.email(member.getEmail())
+				.build();
 
 			// stub
 			ValueOperations<String, String> valueOperations = mock(ValueOperations.class);
@@ -750,10 +759,12 @@ public class MemberServiceTest extends ServiceTestSupport {
 				.given(mailSenderUtil)
 				.sendEmail(any(String.class), any(String.class), any(String.class),
 					any(String.class), any(String.class));
+			given(memberReadService.findByEmailOrElseThrow(any(String.class),
+				any(BaseException.class)))
+				.willReturn(member);
 
 			// when
-			memberService.sendEmailAuthCode();
-			countDownLatch.await(3, TimeUnit.SECONDS);
+			memberService.sendEmailAuthCode(request);
 
 			// then
 			then(mailSenderUtil)
@@ -769,12 +780,19 @@ public class MemberServiceTest extends ServiceTestSupport {
 		@Test
 		void should_fail_when_notFormLoginMember() {
 			// given
+			SendEmailServiceRequest request = SendEmailServiceRequest.builder()
+				.email("email")
+				.build();
 			Member newMember = createMemberByEmailAndNickname(null, "nickname");
-			MemberThreadLocal.set(newMember);
 			BaseException exception = new BaseException(ErrorCode.NOT_LOGIN_BY_FORM);
 
+			// stub
+			given(memberReadService.findByEmailOrElseThrow(any(String.class),
+				any(BaseException.class)))
+				.willReturn(newMember);
+
 			// when & then
-			assertThatThrownBy(() -> memberService.sendEmailAuthCode())
+			assertThatThrownBy(() -> memberService.sendEmailAuthCode(request))
 				.isInstanceOf(exception.getClass())
 				.hasMessage(exception.getMessage());
 		}
@@ -797,14 +815,15 @@ public class MemberServiceTest extends ServiceTestSupport {
 			MemberThreadLocal.remove();
 		}
 
-		@DisplayName("올바른 입력 코드를 요청하면 성공하며, verified가 저장된다.")
+		@DisplayName("올바른 입력 코드를 요청하면 성공하며, uuid가 반환된다.")
 		@Test
-		void should_success_when_validRequest() {
+		void should_returnUUID_when_validRequest() {
 			// given
 			String authCode = "ABC123";
 			PasswordEmailVerifyServiceRequest request = PasswordEmailVerifyServiceRequest.builder()
 				.code(authCode)
 				.build();
+			UUID uuid = UUID.randomUUID();
 
 			// stub
 			ValueOperations<String, String> valueOperations = mock(ValueOperations.class);
@@ -818,9 +837,18 @@ public class MemberServiceTest extends ServiceTestSupport {
 			given(valueOperations.getAndExpire(any(String.class), any(Long.class),
 				any(TimeUnit.class)))
 				.willReturn("verified");
+			try (MockedStatic<UUID> generator = mockStatic(UUID.class)) {
+				// Stub
+				given(UUID.randomUUID())
+					.willReturn(uuid);
 
-			// when
-			memberService.verifyEmailAuthCode(request);
+				// when
+				PasswordEmailVerifyServiceResponse response = memberService.verifyEmailAuthCode(
+					request);
+
+				assertThat(response.getUuid()).isEqualTo(uuid.toString());
+			}
+			;
 
 			// then
 			then(valueOperations)
@@ -837,6 +865,102 @@ public class MemberServiceTest extends ServiceTestSupport {
 				.opsForValue();
 		}
 
+		@DisplayName("올바르지 않은 인증 코드를 입력 시 실패한다.")
+		@Test
+		void should_fail_when_invalidAuthCode() {
+			String savedCode = "ABC123";
+			PasswordEmailVerifyServiceRequest request = PasswordEmailVerifyServiceRequest.builder()
+				.code("ABC124")
+				.build();
+			BaseException exception = new BaseException(ErrorCode.INVALID_EMAIL_AUTH_CODE);
+
+			// stub
+			ValueOperations<String, String> valueOperations = mock(ValueOperations.class);
+			given(redisTemplate.opsForValue())
+				.willReturn(valueOperations);
+			given(valueOperations.get(any(String.class)))
+				.willReturn(savedCode);
+
+			assertThatThrownBy(() -> memberService.verifyEmailAuthCode(request))
+				.isInstanceOf(exception.getClass())
+				.hasMessage(exception.getMessage());
+		}
+	}
+
+	@DisplayName("비밀번호 재설정 시")
+	@Nested
+	class ResetPassword {
+
+		private Member member;
+
+		@BeforeEach
+		void setUp() {
+			member = memberRepository.save(
+				createMemberByEmailAndNickname("email@email.com", "nickname"));
+		}
+
+		@AfterEach
+		void tearDown() {
+			memberRepository.deleteAllInBatch();
+		}
+
+		@DisplayName("요청의 uuid가 올바르면 비밀번호가 변경된다.")
+		@Test
+		void should_updatePassword_when_uuidIsValid() {
+			// given
+			String uuid = "uuid";
+			PasswordResetServiceRequest request = PasswordResetServiceRequest.builder()
+				.email(member.getEmail())
+				.uuid(uuid)
+				.password("newPassword")
+				.build();
+
+			given(memberReadService.findByEmailOrElseThrow(any(String.class),
+				any(BaseException.class)))
+				.willReturn(member);
+			ValueOperations<String, String> valueOperations = mock(ValueOperations.class);
+			given(redisTemplate.opsForValue())
+				.willReturn(valueOperations);
+			given(valueOperations.get(any(String.class)))
+				.willReturn(uuid);
+			given(passwordEncoder.matches(any(CharSequence.class), any(String.class)))
+				.willReturn(true);
+			given(passwordEncoder.encode(any(CharSequence.class)))
+				.willReturn(request.getPassword());
+
+			memberService.resetPassword(request);
+
+			assertThat(member.getPassword()).isEqualTo(request.getPassword());
+		}
+
+		@DisplayName("요청의 uuid가 올바르지 않으면 예외를 반환한다.")
+		@Test
+		void should_returnException_when_uuidIsInvalid() {
+			// given
+			String uuid = "uuid";
+			PasswordResetServiceRequest request = PasswordResetServiceRequest.builder()
+				.email(member.getEmail())
+				.uuid(uuid)
+				.password("newPassword")
+				.build();
+			BaseException exception = new BaseException(ErrorCode.INVALID_UUID);
+
+			given(memberReadService.findByEmailOrElseThrow(any(String.class),
+				any(BaseException.class)))
+				.willReturn(member);
+			ValueOperations<String, String> valueOperations = mock(ValueOperations.class);
+			given(redisTemplate.opsForValue())
+				.willReturn(valueOperations);
+			given(valueOperations.get(any(String.class)))
+				.willReturn("uuid2");
+			given(passwordEncoder.matches(any(CharSequence.class), any(String.class)))
+				.willReturn(false);
+
+			assertThatThrownBy(() ->
+				memberService.resetPassword(request))
+				.isInstanceOf(exception.getClass())
+				.hasMessage(exception.getMessage());
+		}
 	}
 
 	@DisplayName("비밀번호 변경 시")
@@ -856,12 +980,13 @@ public class MemberServiceTest extends ServiceTestSupport {
 			memberRepository.deleteAllInBatch();
 		}
 
-		@DisplayName("이메일 인증이 완료됐으면 비밀번호가 변경되고 redis의 key, value가 삭제된다.")
+		@DisplayName("올바른 currentPassword를 입력하면 비밀번호가 변경된다.")
 		@Test
-		void should_updatePassword_when_emailAuthIsOk() {
+		void should_updatePassword_when_currentPasswordIsValid() {
 			// given
 			PasswordUpdateServiceRequest request = PasswordUpdateServiceRequest.builder()
-				.password("newPassword")
+				.currentPassword(member.getPassword())
+				.newPassword("newPassword")
 				.build();
 
 			// stub
@@ -872,36 +997,27 @@ public class MemberServiceTest extends ServiceTestSupport {
 				.willReturn(member);
 			given(valueOperations.get(any()))
 				.willReturn("verified");
+			given(passwordEncoder.matches(any(CharSequence.class), any(String.class)))
+				.willReturn(true);
 			given(passwordEncoder.encode(any(CharSequence.class)))
-				.willReturn(request.getPassword());
+				.willReturn(request.getNewPassword());
 
 			// when
 			memberService.updatePassword(member.getId(), request);
 
 			// then
-			assertThat(member.getPassword()).isEqualTo(request.getPassword());
-			then(redisTemplate)
-				.should(times(1))
-				.delete(any(String.class));
-			then(valueOperations)
-				.should(times(1))
-				.get(any(String.class));
-			then(redisTemplate)
-				.should(times(1))
-				.opsForValue();
-			then(passwordEncoder)
-				.should(times(1))
-				.encode(any(CharSequence.class));
+			assertThat(request.getNewPassword()).isEqualTo(member.getPassword());
 		}
 
-		@DisplayName("이메일 인증 정보가 없으면 실패한다.")
+		@DisplayName("올바르지 않은 currentPassword를 입력하면 비밀번호가 예외를 반환한다.")
 		@Test
-		void should_fail_when_notExistEmailAuth() {
+		void should_returnException_when_currentPasswordIsInvalid() {
 			// given
 			PasswordUpdateServiceRequest request = PasswordUpdateServiceRequest.builder()
-				.password("newPassword")
+				.currentPassword(member.getPassword())
+				.newPassword("newPassword")
 				.build();
-			BaseException exception = new BaseException(ErrorCode.UNAUTHORIZED_EMAIL);
+			BaseException exception = new BaseException(ErrorCode.INVALID_PASSWORD);
 
 			// stub
 			ValueOperations<String, String> valueOperations = mock(ValueOperations.class);
@@ -911,16 +1027,16 @@ public class MemberServiceTest extends ServiceTestSupport {
 				.willReturn(member);
 			given(valueOperations.get(any()))
 				.willReturn(null);
+			given(passwordEncoder.matches(any(CharSequence.class), any(String.class)))
+				.willReturn(false);
 
 			// when & then
 			assertThatThrownBy(() -> memberService.updatePassword(member.getId(), request))
 				.isInstanceOf(exception.getClass())
 				.hasMessage(exception.getMessage());
 			then(passwordEncoder)
-				.shouldHaveNoInteractions();
-			then(redisTemplate)
-				.should(never())
-				.delete(any(String.class));
+				.should(times(1))
+				.matches(any(CharSequence.class), any(String.class));
 		}
 	}
 

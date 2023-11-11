@@ -27,9 +27,9 @@ public class MemberReadService {
 		}
 	}
 
-	public Member findByEmailOrElseThrow(String email) {
+	public Member findByEmailOrElseThrow(String email, BaseException exception) {
 		return memberRepository.findByEmail(email)
-			.orElseThrow(() -> new BaseException(ErrorCode.INVALID_LOGIN));
+			.orElseThrow(() -> exception);
 	}
 
 	public Member findById(Long id) {
