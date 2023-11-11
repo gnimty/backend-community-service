@@ -101,7 +101,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 			given(memberService.summonerAccountLink(any(OauthLoginServiceRequest.class)))
 				.willReturn(null);
 			willDoNothing()
-				.given(chatService)
+				.given(stompService)
 				.createOrUpdateUser(any(RiotAccount.class));
 
 			mockMvc.perform(post(REQUEST_URL, MEMBER_ID)
@@ -125,7 +125,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 			given(memberService.summonerAccountLink(any(OauthLoginServiceRequest.class)))
 				.willReturn(null);
 			willDoNothing()
-				.given(chatService)
+				.given(stompService)
 				.createOrUpdateUser(any(RiotAccount.class));
 
 			mockMvc.perform(post(REQUEST_URL, MEMBER_ID)
@@ -312,10 +312,10 @@ public class MemberControllerTest extends ControllerTestSupport {
 				any(MyProfileUpdateServiceRequest.class)))
 				.willReturn(null);
 			willDoNothing()
-				.given(chatService)
+				.given(stompService)
 				.updateConnStatus(any(User.class), any(Status.class));
 			willDoNothing()
-				.given(chatService)
+				.given(stompService)
 				.createOrUpdateUser(any(RiotAccount.class));
 
 			mockMvc.perform(patch(REQUEST_URL, MEMBER_ID)
@@ -337,10 +337,10 @@ public class MemberControllerTest extends ControllerTestSupport {
 				any(MyProfileUpdateServiceRequest.class)))
 				.willReturn(null);
 			willDoNothing()
-				.given(chatService)
+				.given(stompService)
 				.updateConnStatus(any(User.class), any(Status.class));
 			willDoNothing()
-				.given(chatService)
+				.given(stompService)
 				.createOrUpdateUser(any(RiotAccount.class));
 
 			mockMvc.perform(patch(REQUEST_URL, MEMBER_ID)
@@ -362,10 +362,10 @@ public class MemberControllerTest extends ControllerTestSupport {
 				any(MyProfileUpdateServiceRequest.class)))
 				.willReturn(null);
 			willDoNothing()
-				.given(chatService)
+				.given(stompService)
 				.updateConnStatus(any(User.class), any(Status.class));
 			willDoNothing()
-				.given(chatService)
+				.given(stompService)
 				.createOrUpdateUser(any(RiotAccount.class));
 
 			mockMvc.perform(patch(REQUEST_URL, MEMBER_ID)
@@ -542,7 +542,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.given(memberService)
 				.updateStatus(any(Long.class), any(StatusUpdateServiceRequest.class));
 			willDoNothing()
-				.given(chatService)
+				.given(stompService)
 				.updateConnStatus(any(User.class), any(Status.class));
 
 			mockMvc.perform(patch(REQUEST_URL, MEMBER_ID)
@@ -565,7 +565,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.given(memberService)
 				.updateStatus(any(Long.class), any(StatusUpdateServiceRequest.class));
 			willDoNothing()
-				.given(chatService)
+				.given(stompService)
 				.updateConnStatus(any(User.class), any(Status.class));
 
 			mockMvc.perform(patch(REQUEST_URL, MEMBER_ID)
