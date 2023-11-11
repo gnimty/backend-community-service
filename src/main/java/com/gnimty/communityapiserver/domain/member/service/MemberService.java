@@ -2,7 +2,6 @@ package com.gnimty.communityapiserver.domain.member.service;
 
 import static com.gnimty.communityapiserver.global.constant.KeyPrefix.PASSWORD;
 import static com.gnimty.communityapiserver.global.constant.KeyPrefix.REFRESH;
-import static com.gnimty.communityapiserver.global.constant.KeyPrefix.SIGNUP;
 import static com.gnimty.communityapiserver.global.constant.KeyPrefix.UPDATE_PASSWORD;
 
 import com.gnimty.communityapiserver.domain.block.repository.BlockRepository;
@@ -15,12 +14,15 @@ import com.gnimty.communityapiserver.domain.member.service.dto.request.Introduct
 import com.gnimty.communityapiserver.domain.member.service.dto.request.MyProfileUpdateServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.OauthLoginServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.PasswordEmailVerifyServiceRequest;
+import com.gnimty.communityapiserver.domain.member.service.dto.request.PasswordResetServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.PasswordUpdateServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.PreferGameModeUpdateServiceRequest;
+import com.gnimty.communityapiserver.domain.member.service.dto.request.SendEmailServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.StatusUpdateServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.IntroductionEntry;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.MyProfileServiceResponse;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.OauthInfoEntry;
+import com.gnimty.communityapiserver.domain.member.service.dto.response.PasswordEmailVerifyServiceResponse;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.PreferGameModeEntry;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.RiotAccountEntry;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.RiotDependentInfo;
@@ -56,6 +58,7 @@ import com.gnimty.communityapiserver.global.exception.ErrorCode;
 import com.gnimty.communityapiserver.global.utils.RandomCodeGenerator;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -103,20 +106,20 @@ public class MemberService {
 		Boolean existsMain = riotAccountReadService.existsByMemberId(member);
 
 		RiotAccount riotAccount = riotAccountRepository.save(RiotAccount.builder()
-				.summonerName("summonerName")
-				.isMain(!existsMain)
-				.queue(Tier.BRONZE)
-				.lp(100L)
-				.division(100)
-				.mmr(100L)
-				.frequentLane1(Lane.TOP)
-				.frequentLane2(Lane.BOTTOM)
-				.frequentChampionId1(1L)
-				.frequentChampionId2(1L)
-				.frequentChampionId3(1L)
-				.puuid(puuid)
-				.member(member)
-				.build()
+			.summonerName("summonerName")
+			.isMain(!existsMain)
+			.queue(Tier.BRONZE)
+			.lp(100L)
+			.division(100)
+			.mmr(100L)
+			.frequentLane1(Lane.TOP)
+			.frequentLane2(Lane.BOTTOM)
+			.frequentChampionId1(1L)
+			.frequentChampionId2(1L)
+			.frequentChampionId3(1L)
+			.puuid(puuid)
+			.member(member)
+			.build()
 		);
 
 		if (!existsMain) {
@@ -171,51 +174,60 @@ public class MemberService {
 		return riotAccount;
 	}
 
-	public void sendEmailAuthCode() {
-		Member member = MemberThreadLocal.get();
+	public void sendEmailAuthCode(SendEmailServiceRequest request) {
+		Member member = memberReadService.findByEmailOrElseThrow(
+			request.getEmail(), new BaseException(ErrorCode.NOT_LOGIN_BY_FORM));
 		if (member.getEmail() == null) {
 			throw new BaseException(ErrorCode.NOT_LOGIN_BY_FORM);
 		}
-		sendEmail(member);
-	}
 
-	@Async("mailExecutor")
-	public void sendEmail(Member member) {
 		String code = RandomCodeGenerator.generateCodeByLength(6);
 		mailSenderUtil.sendEmail(Auth.EMAIL_SUBJECT.getContent(), member.getEmail(), code,
 			"password-mail", "static/images/banner-urf.png");
-		String key = getRedisKey(PASSWORD, String.valueOf(member.getId()));
+		String key = getRedisKey(PASSWORD, member.getEmail());
 		saveInRedis(key, code, Auth.EMAIL_CODE_EXPIRATION.getExpiration());
 	}
 
-	public void verifyEmailAuthCode(PasswordEmailVerifyServiceRequest request) {
-		Member member = MemberThreadLocal.get();
+	public PasswordEmailVerifyServiceResponse verifyEmailAuthCode(
+		PasswordEmailVerifyServiceRequest request) {
 		ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
 
-		String emailAuthKey = getRedisKey(PASSWORD, String.valueOf(member.getId()));
+		String emailAuthKey = getRedisKey(PASSWORD, request.getEmail());
 		String savedCode = valueOperations.get(emailAuthKey);
 
 		if (!request.getCode().equals(savedCode)) {
 			throw new BaseException(ErrorCode.INVALID_EMAIL_AUTH_CODE);
 		}
-		String passwordKey = getRedisKey(UPDATE_PASSWORD, String.valueOf(member.getId()));
-		saveInRedis(passwordKey, "verified", Auth.PASSWORD_EXPIRATION.getExpiration());
+		UUID uuid = UUID.randomUUID();
+		String passwordKey = getRedisKey(UPDATE_PASSWORD, request.getEmail());
+		saveInRedis(passwordKey, uuid.toString(), Auth.PASSWORD_EXPIRATION.getExpiration());
 		valueOperations.getAndDelete(emailAuthKey);
+		return PasswordEmailVerifyServiceResponse.builder()
+			.uuid(uuid.toString())
+			.build();
+	}
+
+	public void resetPassword(PasswordResetServiceRequest request) {
+		ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
+
+		String uuid = valueOperations.get(getRedisKey(UPDATE_PASSWORD, request.getEmail()));
+		if (!request.getUuid().equals(uuid)) {
+			throw new BaseException(ErrorCode.INVALID_UUID);
+		}
+		Member member = memberReadService.findByEmailOrElseThrow(request.getEmail(),
+			new BaseException(ErrorCode.NOT_LOGIN_BY_FORM));
+		member.updatePassword(passwordEncoder.encode(request.getPassword()));
+
+		redisTemplate.delete(getRedisKey(UPDATE_PASSWORD, request.getEmail()));
 	}
 
 	public void updatePassword(Long memberId, PasswordUpdateServiceRequest request) {
 		Member member = memberReadService.findById(memberId);
-		ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
-		String verify = valueOperations.get(
-			getRedisKey(SIGNUP, String.valueOf(member.getId())));
-		if (verify == null) {
-			throw new BaseException(ErrorCode.UNAUTHORIZED_EMAIL);
+		if (!passwordEncoder.matches(request.getCurrentPassword(), member.getPassword())) {
+			throw new BaseException(ErrorCode.INVALID_PASSWORD);
 		}
-		member.updatePassword(passwordEncoder.encode(request.getPassword()));
+		member.updatePassword(passwordEncoder.encode(request.getNewPassword()));
 		memberRepository.save(member);
-
-		redisTemplate.delete(
-			getRedisKey(UPDATE_PASSWORD, String.valueOf(member.getId())));
 	}
 
 	public void updateStatus(Long memberId, StatusUpdateServiceRequest request) {
@@ -352,7 +364,8 @@ public class MemberService {
 		}
 	}
 
-	private RiotAccount updateMainRiotAccount(MyProfileUpdateServiceRequest request, Member member) {
+	private RiotAccount updateMainRiotAccount(MyProfileUpdateServiceRequest request,
+		Member member) {
 		if (request.getMainRiotAccountId() != null) {
 			RiotAccount prevMainAccount = riotAccountReadService.findMainAccountByMember(
 				member);

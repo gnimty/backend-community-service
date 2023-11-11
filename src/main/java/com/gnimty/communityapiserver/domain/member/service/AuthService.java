@@ -69,7 +69,8 @@ public class AuthService {
 	}
 
 	public AuthToken login(LoginServiceRequest request) {
-		Member member = memberReadService.findByEmailOrElseThrow(request.getEmail());
+		Member member = memberReadService.findByEmailOrElseThrow(request.getEmail(),
+			new BaseException(ErrorCode.INVALID_LOGIN));
 		throwIfMismatchPassword(request.getPassword(), member.getPassword());
 
 		AuthToken authToken = generateTokenPair(member.getId());
