@@ -40,7 +40,7 @@ public class ChatRoomRepositoryTest {
 	@Autowired
 	private MongoTemplate mongoTemplate;
 
-	/**
+
 	void clear() {
 		mongoTemplate.remove(new Query(), "chatRoom");
 		mongoTemplate.remove(new Query(), "user");
@@ -127,7 +127,7 @@ public class ChatRoomRepositoryTest {
 			.isInstanceOf(BaseException.class);
 	}
 
-	**/
+
 
 
 

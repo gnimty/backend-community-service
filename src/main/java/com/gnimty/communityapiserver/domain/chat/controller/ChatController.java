@@ -105,7 +105,6 @@ public class ChatController {
 			chatService.updateConnStatus(user, Status.OFFLINE);
 			memberService.updateStatus(user.getActualUserId(), StatusUpdateServiceRequest.builder().status(Status.OFFLINE).build());
 		}
-		chatService.releaseChatRoomByUserId(user.getActualUserId());
 		webSocketSessionManager.deleteSession(event.getSessionId());
 	}
 

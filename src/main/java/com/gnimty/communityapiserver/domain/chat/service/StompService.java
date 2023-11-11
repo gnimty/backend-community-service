@@ -33,7 +33,6 @@ public class StompService {
 	private final UserService userService;
 	private final ChatService chatService;
 	private final ChatRoomService chatRoomService;
-	private final OnlineInChatRoomManager onlineInChatRoomManager;
 
     /*
     TODO 리스트
@@ -284,18 +283,6 @@ public class StompService {
 
 		//3. isMe에 따라 return하기
 		return isMe ? participants.get(stdUserIdx) : participants.get(1-stdUserIdx);
-	}
-
-	public void accessChatRoom(Long userActuralId, Long chatRoomNo) {
-		onlineInChatRoomManager.access(userActuralId, chatRoomNo);
-	}
-
-	public void releaseChatRoom(Long userActuralId, Long chatRoomNo) {
-		onlineInChatRoomManager.release(userActuralId, chatRoomNo);
-	}
-
-	public void releaseChatRoomByUserId(Long userActuralId) {
-		onlineInChatRoomManager.releaseByUserId(userActuralId);
 	}
 
 
