@@ -64,10 +64,8 @@ public class UserRepositoryTest {
 
 		clear();
 		// 1. 유저 한명 생성 테스트
-		User user1 = new User(null, 1L, 3L, Tier.DIAMOND, 3,
-			"so1omon", Status.ONLINE);
-		User user2 = new User(null, 1L, 3L, Tier.DIAMOND, 3,
-			"so1omon", Status.ONLINE);
+		User user1 = new User(null, 1L, 3L, Tier.DIAMOND, 3, "so1omon", Status.ONLINE);
+		User user2 = new User(null, 1L, 3L, Tier.DIAMOND, 3, "so1omon", Status.ONLINE);
 		assertThatThrownBy(() -> userRepository.saveAll(List.of(user1, user2)))
 				.isInstanceOf(DuplicateKeyException.class);
 	}

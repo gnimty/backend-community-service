@@ -5,6 +5,7 @@ import static java.lang.Thread.sleep;
 import static org.assertj.core.api.Assertions.*;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatDto;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatRoomDto;
+import com.gnimty.communityapiserver.domain.chat.controller.dto.MessageRequest;
 import com.gnimty.communityapiserver.domain.chat.entity.Blocked;
 import com.gnimty.communityapiserver.domain.chat.entity.Chat;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
@@ -14,6 +15,7 @@ import com.gnimty.communityapiserver.domain.chat.repository.Chat.ChatRepository;
 import com.gnimty.communityapiserver.domain.chat.repository.ChatRoom.ChatRoomRepository;
 import com.gnimty.communityapiserver.domain.chat.repository.User.UserRepository;
 import com.gnimty.communityapiserver.domain.chat.service.dto.UserWithBlockDto;
+import com.gnimty.communityapiserver.global.constant.MessageRequestType;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.constant.Tier;
 import java.util.ArrayList;
@@ -46,6 +48,17 @@ class StompServiceTest {
 
     @Autowired
     private MongoTemplate mongoTemplate;
+
+    @Autowired
+    private ChatRepository chatRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private ChatRoomRepository chatRoomRepository;
+    @Autowired
+    private OnlineInChatRoomManager onlineInChatRoomManager;
+
+
 
     void clear() {
         mongoTemplate.remove(new Query(), "chatRoom");
@@ -164,11 +177,15 @@ class StompServiceTest {
         User user = userService.getUser(0L);
         ChatRoom chatRoom = chatRoomService.getChatRoom(1L);
         Date originLastModifiedDate = chatRoom.getLastModifiedDate();
-        String message = "안녕하세요";
+        MessageRequest request = MessageRequest.builder()
+            .type(MessageRequestType.CHAT)
+            .data("안녕하세요")
+            .build();
 
         // when
         sleep(3000);
-        stompService.sendChat(user, chatRoom.getChatRoomNo(), message);
+        stompService.sendChat(user, chatRoom.getChatRoomNo(), request);
+
 
         // then
         List<Chat> chats = chatService.findChat(chatRoom.getChatRoomNo());
@@ -191,7 +208,7 @@ class StompServiceTest {
     }
 
     @Test
-    void checkChatsInChatRoom_테스트() {
+    void readChatsInChatRoom_테스트() {
         // given
         //      유저 2명
         User user1 = userService.getUser(0L);
@@ -214,7 +231,8 @@ class StompServiceTest {
 
 
         // when
-        stompService.checkChatsInChatRoom(user2, chatRoom.getChatRoomNo()); // user2가 채팅방 읽음
+        stompService.readOtherChats(user2, chatRoom.getChatRoomNo()); // user2가 채팅방 읽음
+        stompService.readOtherChats(user2, chatRoom.getChatRoomNo()); // user2가 채팅방 읽음
 
 
         // then
