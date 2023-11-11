@@ -88,9 +88,13 @@ public class ChatController {
 		if (request.getType() == MessageRequestType.CHAT) {
 			chatService.sendChat(user, chatRoomNo, request);
 			chatService.sendToChatRoomSubscribers(chatRoomNo, new MessageResponse(MessageResponseType.CHAT_MESSAGE, request.getData()));
+		} else if (request.getType() == MessageRequestType.READ) {
+			chatService.readOtherChats(user, chatRoomNo);
+			chatService.sendToUserSubscribers(user.getId(), new MessageResponse(MessageResponseType.READ_CHATS, chatRoomNo));
 		} else {
 			chatService.exitChatRoom(user, chatRoomService.getChatRoom(chatRoomNo));
 		}
+
 	}
 
 
