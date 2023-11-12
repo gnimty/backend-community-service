@@ -17,7 +17,6 @@ import com.gnimty.communityapiserver.domain.riotaccount.service.RiotAccountServi
 import com.gnimty.communityapiserver.domain.schedule.service.ScheduleReadService;
 import com.gnimty.communityapiserver.domain.schedule.service.ScheduleService;
 import com.gnimty.communityapiserver.global.auth.JwtProvider;
-import com.gnimty.communityapiserver.global.interceptor.MemberAuthInterceptor;
 import com.gnimty.communityapiserver.global.interceptor.TokenAuthInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -78,9 +77,6 @@ public abstract class ControllerTestSupport {
 
 	@MockBean
 	protected TokenAuthInterceptor tokenAuthInterceptor;
-
-	@MockBean
-	protected MemberAuthInterceptor memberAuthInterceptor;
 
 	@MockBean
 	protected StompService stompService;
