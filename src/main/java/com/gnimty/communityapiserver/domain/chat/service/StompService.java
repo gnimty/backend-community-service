@@ -3,6 +3,7 @@ package com.gnimty.communityapiserver.domain.chat.service;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatRoomDto;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.MessageRequest;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.MessageResponse;
+import com.gnimty.communityapiserver.domain.chat.controller.dto.UserConnStatusDto;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.UserDto;
 import com.gnimty.communityapiserver.domain.chat.entity.Blocked;
 import com.gnimty.communityapiserver.domain.chat.entity.Chat;
@@ -182,16 +183,18 @@ public class StompService {
 
 
 	// TODO janguni: 채팅 저장
-	public void sendChat(User user, Long chatRoomNo, MessageRequest request) {
+	public ChatDto sendChat(User user, Long chatRoomNo, MessageRequest request) {
 		Date now = new Date();
 
 		ChatRoom chatRoom = chatRoomService.findChatRoom(chatRoomNo)
 			.orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_ROOM));
 
-		chatService.save(user, chatRoomNo, request.getData(), now);
+		Chat savedChat = chatService.save(user, chatRoomNo, request.getData(), now);
 
 		chatRoom.setLastModifiedDate(now);
 		chatRoomService.update(chatRoom);
+
+		return new ChatDto(savedChat);
 	}
 
 
@@ -201,7 +204,7 @@ public class StompService {
 		userService.save(user);
 
 		List<ChatRoom> chatRooms = chatRoomService.findChatRoom(user);
-		MessageResponse response = new MessageResponse(MessageResponseType.CONNECT_STATUS, connectStatus);
+		MessageResponse response = new MessageResponse(MessageResponseType.CONNECT_STATUS, new UserConnStatusDto(user.getActualUserId(), connectStatus));
 
 		chatRooms.forEach(chatRoom ->
 			sendToChatRoomSubscribers(chatRoom.getChatRoomNo(), response));
