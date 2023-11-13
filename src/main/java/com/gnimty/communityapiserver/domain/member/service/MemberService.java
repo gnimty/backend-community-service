@@ -63,7 +63,6 @@ import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -162,8 +161,8 @@ public class MemberService {
 			.build();
 	}
 
-	public RiotAccount updateMyProfile(Long memberId, MyProfileUpdateServiceRequest request) {
-		Member member = memberReadService.findById(memberId);
+	public RiotAccount updateMyProfile(MyProfileUpdateServiceRequest request) {
+		Member member = MemberThreadLocal.get();
 		if (!member.getRsoLinked()) {
 			throw new BaseException(ErrorCode.NOT_LINKED_RSO);
 		}
@@ -171,6 +170,7 @@ public class MemberService {
 		RiotAccount riotAccount = updateMainRiotAccount(request, member);
 		updateStatus(request.getStatus(), member);
 		updateIntroductions(request.getIntroductions(), member);
+		memberRepository.save(member);
 		return riotAccount;
 	}
 
@@ -221,8 +221,8 @@ public class MemberService {
 		redisTemplate.delete(getRedisKey(UPDATE_PASSWORD, request.getEmail()));
 	}
 
-	public void updatePassword(Long memberId, PasswordUpdateServiceRequest request) {
-		Member member = memberReadService.findById(memberId);
+	public void updatePassword(PasswordUpdateServiceRequest request) {
+		Member member = MemberThreadLocal.get();
 		if (!passwordEncoder.matches(request.getCurrentPassword(), member.getPassword())) {
 			throw new BaseException(ErrorCode.INVALID_PASSWORD);
 		}
@@ -230,8 +230,8 @@ public class MemberService {
 		memberRepository.save(member);
 	}
 
-	public void updateStatus(Long memberId, StatusUpdateServiceRequest request) {
-		Member member = memberReadService.findById(memberId);
+	public void updateStatus(StatusUpdateServiceRequest request) {
+		Member member = MemberThreadLocal.get();
 		if (!member.getRsoLinked()) {
 			throw new BaseException(ErrorCode.NOT_LINKED_RSO);
 		}
@@ -239,13 +239,12 @@ public class MemberService {
 		memberRepository.save(member);
 	}
 
-	public void updateIntroduction(Long memberId, IntroductionUpdateServiceRequest request) {
-		Member member = memberReadService.findById(memberId);
+	public void updateIntroduction(IntroductionUpdateServiceRequest request) {
+		Member member = MemberThreadLocal.get();
 		if (!member.getRsoLinked()) {
 			throw new BaseException(ErrorCode.NOT_LINKED_RSO);
 		}
 		updateIntroductions(request.getIntroductions(), member);
-		memberRepository.save(member);
 	}
 
 	public void updatePreferGameMode(PreferGameModeUpdateServiceRequest request) {

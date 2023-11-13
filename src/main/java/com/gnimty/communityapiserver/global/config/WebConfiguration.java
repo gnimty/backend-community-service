@@ -2,7 +2,6 @@ package com.gnimty.communityapiserver.global.config;
 
 
 import com.gnimty.communityapiserver.global.constant.converter.StringToEnumConverterFactory;
-import com.gnimty.communityapiserver.global.interceptor.MemberAuthInterceptor;
 import com.gnimty.communityapiserver.global.interceptor.TokenAuthInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -16,7 +15,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfiguration implements WebMvcConfigurer {
 
 	private final TokenAuthInterceptor tokenAuthInterceptor;
-	private final MemberAuthInterceptor memberAuthInterceptor;
 
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {
@@ -43,12 +41,5 @@ public class WebConfiguration implements WebMvcConfigurer {
 				"/css/**", "/*.ico"
 				, "/error", "/error-page/**"
 			);
-
-		registry
-			.addInterceptor(memberAuthInterceptor)
-			.addPathPatterns("/members/**")
-			.excludePathPatterns(
-				"/css/**", "/*.ico"
-				, "/error", "/error-page/**", "/members/me", "/members/password/**");
 	}
 }

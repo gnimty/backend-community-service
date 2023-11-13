@@ -103,7 +103,7 @@ public class ChatController {
 		User user = getUserBySessionId(event.getSessionId());
 		if (!isMultipleUser(user.getActualUserId())) {
 			chatService.updateConnStatus(user, Status.OFFLINE);
-			memberService.updateStatus(user.getActualUserId(), StatusUpdateServiceRequest.builder().status(Status.OFFLINE).build());
+			memberService.updateStatus(StatusUpdateServiceRequest.builder().status(Status.OFFLINE).build());
 		}
 		webSocketSessionManager.deleteSession(event.getSessionId());
 	}
@@ -114,7 +114,7 @@ public class ChatController {
 		User user = getUserBySessionId(sessionId);
 		if (!isMultipleUser(user.getActualUserId())) {
 			chatService.updateConnStatus(user, Status.ONLINE);
-			memberService.updateStatus(user.getActualUserId(), StatusUpdateServiceRequest.builder().status(Status.ONLINE).build());
+			memberService.updateStatus(StatusUpdateServiceRequest.builder().status(Status.ONLINE).build());
 		}
 	}
 
