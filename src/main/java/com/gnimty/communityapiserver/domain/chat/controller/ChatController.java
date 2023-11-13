@@ -1,6 +1,7 @@
 package com.gnimty.communityapiserver.domain.chat.controller;
 
 import com.gnimty.communityapiserver.domain.block.service.BlockReadService;
+import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatDto;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatRoomDto;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.MessageRequest;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.MessageResponse;
@@ -86,8 +87,8 @@ public class ChatController {
 		User user = getUserBySessionId(sessionId);
 
 		if (request.getType() == MessageRequestType.CHAT) {
-			chatService.sendChat(user, chatRoomNo, request);
-			chatService.sendToChatRoomSubscribers(chatRoomNo, new MessageResponse(MessageResponseType.CHAT_MESSAGE, request.getData()));
+			ChatDto chatDto = chatService.sendChat(user, chatRoomNo, request);
+			chatService.sendToChatRoomSubscribers(chatRoomNo, new MessageResponse(MessageResponseType.CHAT_MESSAGE, chatDto));
 		} else if (request.getType() == MessageRequestType.READ) {
 			chatService.readOtherChats(user, chatRoomNo);
 			chatService.sendToUserSubscribers(user.getId(), new MessageResponse(MessageResponseType.READ_CHATS, chatRoomNo));

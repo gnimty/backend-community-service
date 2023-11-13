@@ -183,16 +183,18 @@ public class StompService {
 
 
 	// TODO janguni: 채팅 저장
-	public void sendChat(User user, Long chatRoomNo, MessageRequest request) {
+	public ChatDto sendChat(User user, Long chatRoomNo, MessageRequest request) {
 		Date now = new Date();
 
 		ChatRoom chatRoom = chatRoomService.findChatRoom(chatRoomNo)
 			.orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_ROOM));
 
-		chatService.save(user, chatRoomNo, request.getData(), now);
+		Chat savedChat = chatService.save(user, chatRoomNo, request.getData(), now);
 
 		chatRoom.setLastModifiedDate(now);
 		chatRoomService.update(chatRoom);
+
+		return new ChatDto(savedChat);
 	}
 
 
