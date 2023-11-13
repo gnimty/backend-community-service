@@ -77,12 +77,6 @@ public class MemberControllerTest extends ControllerTestSupport {
 
 	@BeforeEach
 	void setUp() throws Exception {
-		given(memberAuthInterceptor.preHandle(
-			any(HttpServletRequest.class),
-			any(HttpServletResponse.class),
-			any(Object.class)))
-			.willReturn(true);
-
 		given(tokenAuthInterceptor.preHandle(
 			any(HttpServletRequest.class),
 			any(HttpServletResponse.class),
@@ -94,8 +88,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 	@DisplayName("rso 연동 시")
 	class SummonerAccountLink {
 
-		private static final String REQUEST_URL = "/members/{member_id}/rso";
-		private static final Long MEMBER_ID = 1L;
+		private static final String REQUEST_URL = "/members/me/rso";
 
 		@DisplayName("올바른 요청을 보내면 성공한다.")
 		@Test
@@ -110,7 +103,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.given(stompService)
 				.createOrUpdateUser(any(RiotAccount.class));
 
-			mockMvc.perform(post(REQUEST_URL, MEMBER_ID)
+			mockMvc.perform(post(REQUEST_URL)
 					.content(om.writeValueAsString(request))
 					.contentType(MediaType.APPLICATION_JSON)
 					.characterEncoding(StandardCharsets.UTF_8))
@@ -134,7 +127,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.given(stompService)
 				.createOrUpdateUser(any(RiotAccount.class));
 
-			mockMvc.perform(post(REQUEST_URL, MEMBER_ID)
+			mockMvc.perform(post(REQUEST_URL)
 					.content(om.writeValueAsString(request))
 					.contentType(MediaType.APPLICATION_JSON)
 					.characterEncoding(StandardCharsets.UTF_8))
@@ -149,8 +142,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 	@DisplayName("kakao 추가 연동 시")
 	class KakaoAdditionalLink {
 
-		private static final String REQUEST_URL = "/members/{member_id}/oauth/kakao";
-		private static final Long MEMBER_ID = 1L;
+		private static final String REQUEST_URL = "/members/me/oauth/kakao";
 
 		@DisplayName("올바른 요청을 보내면 성공한다.")
 		@Test
@@ -163,7 +155,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.given(memberService)
 				.oauthAdditionalLink(any(Provider.class), any(OauthLoginServiceRequest.class));
 
-			mockMvc.perform(post(REQUEST_URL, MEMBER_ID)
+			mockMvc.perform(post(REQUEST_URL)
 					.content(om.writeValueAsString(request))
 					.contentType(MediaType.APPLICATION_JSON)
 					.characterEncoding(StandardCharsets.UTF_8))
@@ -185,7 +177,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.given(memberService)
 				.oauthAdditionalLink(any(Provider.class), any(OauthLoginServiceRequest.class));
 
-			mockMvc.perform(post(REQUEST_URL, MEMBER_ID)
+			mockMvc.perform(post(REQUEST_URL)
 					.content(om.writeValueAsString(request))
 					.contentType(MediaType.APPLICATION_JSON)
 					.characterEncoding(StandardCharsets.UTF_8))
@@ -200,8 +192,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 	@DisplayName("google 추가 연동 시")
 	class GoogleAdditionalLink {
 
-		private static final String REQUEST_URL = "/members/{member_id}/oauth/google";
-		private static final Long MEMBER_ID = 1L;
+		private static final String REQUEST_URL = "/members/me/oauth/google";
 
 		@DisplayName("올바른 요청을 보내면 성공한다.")
 		@Test
@@ -214,7 +205,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.given(memberService)
 				.oauthAdditionalLink(any(Provider.class), any(OauthLoginServiceRequest.class));
 
-			mockMvc.perform(post(REQUEST_URL, MEMBER_ID)
+			mockMvc.perform(post(REQUEST_URL)
 					.content(om.writeValueAsString(request))
 					.contentType(MediaType.APPLICATION_JSON)
 					.characterEncoding(StandardCharsets.UTF_8))
@@ -236,7 +227,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.given(memberService)
 				.oauthAdditionalLink(any(Provider.class), any(OauthLoginServiceRequest.class));
 
-			mockMvc.perform(post(REQUEST_URL, MEMBER_ID)
+			mockMvc.perform(post(REQUEST_URL)
 					.content(om.writeValueAsString(request))
 					.contentType(MediaType.APPLICATION_JSON)
 					.characterEncoding(StandardCharsets.UTF_8))
@@ -306,16 +297,14 @@ public class MemberControllerTest extends ControllerTestSupport {
 	@Nested
 	class UpdateMyProfile {
 
-		private static final String REQUEST_URL = "/members/{member_id}";
-		private static final Long MEMBER_ID = 1L;
+		private static final String REQUEST_URL = "/members/me";
 
 		@DisplayName("올바른 요청을 하면 성공한다.")
 		@Test
 		void should_success_when_validRequest() throws Exception {
 			MyProfileUpdateRequest request = createRequest(true, "content");
 
-			given(memberService.updateMyProfile(any(Long.class),
-				any(MyProfileUpdateServiceRequest.class)))
+			given(memberService.updateMyProfile(any(MyProfileUpdateServiceRequest.class)))
 				.willReturn(null);
 			willDoNothing()
 				.given(stompService)
@@ -324,7 +313,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.given(stompService)
 				.createOrUpdateUser(any(RiotAccount.class));
 
-			mockMvc.perform(patch(REQUEST_URL, MEMBER_ID)
+			mockMvc.perform(patch(REQUEST_URL)
 					.content(om.writeValueAsString(request))
 					.contentType(MediaType.APPLICATION_JSON)
 					.characterEncoding(StandardCharsets.UTF_8))
@@ -339,8 +328,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 		void should_fail_when_contentOrIsMainIsNull() throws Exception {
 			MyProfileUpdateRequest request = createRequest(null, null);
 
-			given(memberService.updateMyProfile(any(Long.class),
-				any(MyProfileUpdateServiceRequest.class)))
+			given(memberService.updateMyProfile(any(MyProfileUpdateServiceRequest.class)))
 				.willReturn(null);
 			willDoNothing()
 				.given(stompService)
@@ -349,7 +337,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.given(stompService)
 				.createOrUpdateUser(any(RiotAccount.class));
 
-			mockMvc.perform(patch(REQUEST_URL, MEMBER_ID)
+			mockMvc.perform(patch(REQUEST_URL)
 					.content(om.writeValueAsString(request))
 					.contentType(MediaType.APPLICATION_JSON)
 					.characterEncoding(StandardCharsets.UTF_8))
@@ -364,8 +352,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 		void should_fail_when_contentLengthExceed90() throws Exception {
 			MyProfileUpdateRequest request = createRequest(true, "a".repeat(91));
 
-			given(memberService.updateMyProfile(any(Long.class),
-				any(MyProfileUpdateServiceRequest.class)))
+			given(memberService.updateMyProfile(any(MyProfileUpdateServiceRequest.class)))
 				.willReturn(null);
 			willDoNothing()
 				.given(stompService)
@@ -374,7 +361,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.given(stompService)
 				.createOrUpdateUser(any(RiotAccount.class));
 
-			mockMvc.perform(patch(REQUEST_URL, MEMBER_ID)
+			mockMvc.perform(patch(REQUEST_URL)
 					.content(om.writeValueAsString(request))
 					.contentType(MediaType.APPLICATION_JSON)
 					.characterEncoding(StandardCharsets.UTF_8))
@@ -561,7 +548,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 
 			willDoNothing()
 				.given(memberService)
-				.updatePassword(any(Long.class), any(PasswordUpdateServiceRequest.class));
+				.resetPassword(any(PasswordResetServiceRequest.class));
 
 			mockMvc.perform(patch(REQUEST_URL)
 					.content(om.writeValueAsString(request))
@@ -625,8 +612,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 	@Nested
 	class UpdatePassword {
 
-		private static final String REQUEST_URL = "/members/{member_id}/password";
-		private static final Long MEMBER_ID = 1L;
+		private static final String REQUEST_URL = "/members/me/password";
 
 		@DisplayName("올바른 요청이면 성공한다.")
 		@Test
@@ -635,9 +621,9 @@ public class MemberControllerTest extends ControllerTestSupport {
 
 			willDoNothing()
 				.given(memberService)
-				.updatePassword(any(Long.class), any(PasswordUpdateServiceRequest.class));
+				.updatePassword(any(PasswordUpdateServiceRequest.class));
 
-			mockMvc.perform(patch(REQUEST_URL, MEMBER_ID)
+			mockMvc.perform(patch(REQUEST_URL)
 					.content(om.writeValueAsString(request))
 					.contentType(MediaType.APPLICATION_JSON)
 					.characterEncoding(StandardCharsets.UTF_8))
@@ -656,9 +642,9 @@ public class MemberControllerTest extends ControllerTestSupport {
 
 			willDoNothing()
 				.given(memberService)
-				.updatePassword(any(Long.class), any(PasswordUpdateServiceRequest.class));
+				.updatePassword(any(PasswordUpdateServiceRequest.class));
 
-			mockMvc.perform(patch(REQUEST_URL, MEMBER_ID)
+			mockMvc.perform(patch(REQUEST_URL)
 					.content(om.writeValueAsString(request))
 					.contentType(MediaType.APPLICATION_JSON)
 					.characterEncoding(StandardCharsets.UTF_8))
@@ -680,8 +666,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 	@Nested
 	class UpdateStatus {
 
-		private static final String REQUEST_URL = "/members/{member_id}/status";
-		private static final Long MEMBER_ID = 1L;
+		private static final String REQUEST_URL = "/members/me/status";
 
 		@DisplayName("올바른 요청이면 성공한다.")
 		@Test
@@ -691,12 +676,12 @@ public class MemberControllerTest extends ControllerTestSupport {
 
 			willDoNothing()
 				.given(memberService)
-				.updateStatus(any(Long.class), any(StatusUpdateServiceRequest.class));
+				.updateStatus(any(StatusUpdateServiceRequest.class));
 			willDoNothing()
 				.given(stompService)
 				.updateConnStatus(any(User.class), any(Status.class));
 
-			mockMvc.perform(patch(REQUEST_URL, MEMBER_ID)
+			mockMvc.perform(patch(REQUEST_URL)
 					.content(om.writeValueAsString(request))
 					.contentType(MediaType.APPLICATION_JSON)
 					.characterEncoding(StandardCharsets.UTF_8))
@@ -714,12 +699,12 @@ public class MemberControllerTest extends ControllerTestSupport {
 
 			willDoNothing()
 				.given(memberService)
-				.updateStatus(any(Long.class), any(StatusUpdateServiceRequest.class));
+				.updateStatus(any(StatusUpdateServiceRequest.class));
 			willDoNothing()
 				.given(stompService)
 				.updateConnStatus(any(User.class), any(Status.class));
 
-			mockMvc.perform(patch(REQUEST_URL, MEMBER_ID)
+			mockMvc.perform(patch(REQUEST_URL)
 					.content(om.writeValueAsString(request))
 					.contentType(MediaType.APPLICATION_JSON)
 					.characterEncoding(StandardCharsets.UTF_8))
@@ -740,8 +725,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 	@Nested
 	class UpdateIntroduction {
 
-		private static final String REQUEST_URL = "/members/{member_id}/introductions";
-		private static final Long MEMBER_ID = 1L;
+		private static final String REQUEST_URL = "/members/me/introductions";
 
 		@DisplayName("올바른 요청이면 성공한다.")
 		@Test
@@ -751,10 +735,9 @@ public class MemberControllerTest extends ControllerTestSupport {
 
 			willDoNothing()
 				.given(memberService)
-				.updateIntroduction(any(Long.class),
-					any(IntroductionUpdateServiceRequest.class));
+				.updateIntroduction(any(IntroductionUpdateServiceRequest.class));
 
-			mockMvc.perform(patch(REQUEST_URL, MEMBER_ID)
+			mockMvc.perform(patch(REQUEST_URL)
 					.content(om.writeValueAsString(request))
 					.contentType(MediaType.APPLICATION_JSON)
 					.characterEncoding(StandardCharsets.UTF_8))
@@ -773,10 +756,9 @@ public class MemberControllerTest extends ControllerTestSupport {
 
 			willDoNothing()
 				.given(memberService)
-				.updateIntroduction(any(Long.class),
-					any(IntroductionUpdateServiceRequest.class));
+				.updateIntroduction(any(IntroductionUpdateServiceRequest.class));
 
-			mockMvc.perform(patch(REQUEST_URL, MEMBER_ID)
+			mockMvc.perform(patch(REQUEST_URL)
 					.content(om.writeValueAsString(request))
 					.contentType(MediaType.APPLICATION_JSON)
 					.characterEncoding(StandardCharsets.UTF_8))
@@ -794,10 +776,9 @@ public class MemberControllerTest extends ControllerTestSupport {
 
 			willDoNothing()
 				.given(memberService)
-				.updateIntroduction(any(Long.class),
-					any(IntroductionUpdateServiceRequest.class));
+				.updateIntroduction(any(IntroductionUpdateServiceRequest.class));
 
-			mockMvc.perform(patch(REQUEST_URL, MEMBER_ID)
+			mockMvc.perform(patch(REQUEST_URL)
 					.content(om.writeValueAsString(request))
 					.contentType(MediaType.APPLICATION_JSON)
 					.characterEncoding(StandardCharsets.UTF_8))
@@ -822,8 +803,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 	@Nested
 	class UpdatePreferGameMode {
 
-		private static final String REQUEST_URL = "/members/{member_id}/prefer-game-mode";
-		private static final Long MEMBER_ID = 1L;
+		private static final String REQUEST_URL = "/members/me/prefer-game-mode";
 
 		@DisplayName("올바른 요청이면 성공한다.")
 		@Test
@@ -835,7 +815,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.given(memberService)
 				.updatePreferGameMode(any(PreferGameModeUpdateServiceRequest.class));
 
-			mockMvc.perform(patch(REQUEST_URL, MEMBER_ID)
+			mockMvc.perform(patch(REQUEST_URL)
 					.content(om.writeValueAsString(request))
 					.contentType(MediaType.APPLICATION_JSON)
 					.characterEncoding(StandardCharsets.UTF_8))
@@ -856,7 +836,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.given(memberService)
 				.updatePreferGameMode(any(PreferGameModeUpdateServiceRequest.class));
 
-			mockMvc.perform(patch(REQUEST_URL, MEMBER_ID)
+			mockMvc.perform(patch(REQUEST_URL)
 					.content(om.writeValueAsString(request))
 					.contentType(MediaType.APPLICATION_JSON)
 					.characterEncoding(StandardCharsets.UTF_8))
@@ -881,8 +861,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 	@Nested
 	class DeleteOauthInfo {
 
-		private static final String REQUEST_URL = "/members/{member_id}/oauth";
-		private static final Long MEMBER_ID = 1L;
+		private static final String REQUEST_URL = "/members/me/oauth";
 
 		@DisplayName("올바른 요청을 하면 성공한다.")
 		@Test
@@ -892,7 +871,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.given(memberService)
 				.deleteOauthInfo(any(Provider.class));
 
-			mockMvc.perform(delete(REQUEST_URL, MEMBER_ID)
+			mockMvc.perform(delete(REQUEST_URL)
 					.param("provider", Provider.KAKAO.name()))
 				.andExpectAll(
 					status().isOk(),
@@ -910,7 +889,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.given(memberService)
 				.deleteOauthInfo(any(Provider.class));
 
-			mockMvc.perform(delete(REQUEST_URL, MEMBER_ID))
+			mockMvc.perform(delete(REQUEST_URL))
 				.andExpectAll(
 					status().isNotFound(),
 					jsonPath("$.status.message").value(message)
@@ -922,8 +901,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 	@Nested
 	class Logout {
 
-		private static final String REQUEST_URL = "/members/{member_id}/logout";
-		private static final Long MEMBER_ID = 1L;
+		private static final String REQUEST_URL = "/members/me/logout";
 
 		@DisplayName("인증된 상태로 요청하면 성공한다.")
 		@Test
@@ -933,7 +911,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.given(memberService)
 				.logout();
 
-			mockMvc.perform(delete(REQUEST_URL, MEMBER_ID))
+			mockMvc.perform(delete(REQUEST_URL))
 				.andExpectAll(
 					status().isOk(),
 					jsonPath("$.status.message").value(SUCCESS_LOGOUT.getMessage())
@@ -945,8 +923,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 	@Nested
 	class Withdrawal {
 
-		private static final String REQUEST_URL = "/members/{member_id}";
-		private static final Long MEMBER_ID = 1L;
+		private static final String REQUEST_URL = "/members/me";
 
 		@DisplayName("인증된 상태로 요청하면 성공한다.")
 		@Test
@@ -956,7 +933,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.given(memberService)
 				.withdrawal();
 
-			mockMvc.perform(delete(REQUEST_URL, MEMBER_ID))
+			mockMvc.perform(delete(REQUEST_URL))
 				.andExpectAll(
 					status().isOk(),
 					jsonPath("$.status.message").value(SUCCESS_WITHDRAWAL.getMessage())

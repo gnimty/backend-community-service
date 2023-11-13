@@ -9,7 +9,6 @@ import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
@@ -409,6 +408,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 				createMemberByEmailAndNickname("email@email.com", "nickname"));
 			given(memberReadService.findById(any(Long.class)))
 				.willReturn(member);
+			MemberThreadLocal.set(member);
 		}
 
 		@AfterEach
@@ -417,6 +417,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 			scheduleRepository.deleteAllInBatch();
 			riotAccountRepository.deleteAllInBatch();
 			memberRepository.deleteAllInBatch();
+			MemberThreadLocal.remove();
 		}
 
 		@DisplayName("올바른 mainRiotAccountId를 입력하면 수정된다.")
@@ -438,7 +439,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 				.willReturn(riotAccounts.get(1));
 
 			// when
-			memberService.updateMyProfile(member.getId(), request);
+			memberService.updateMyProfile(request);
 
 			// then
 			assertThat(riotAccounts.get(0).getIsMain()).isFalse();
@@ -454,7 +455,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 				.build();
 
 			// when
-			memberService.updateMyProfile(member.getId(), request);
+			memberService.updateMyProfile(request);
 
 			// then
 			assertThat(member.getStatus()).isEqualTo(request.getStatus());
@@ -499,7 +500,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 				.throwIfNotExistsOrExceedMain(any(Member.class));
 
 			// when
-			memberService.updateMyProfile(member.getId(), request);
+			memberService.updateMyProfile(request);
 
 			// then
 			Optional<Introduction> insertedIntroduction = introductionRepository.findByMember(
@@ -526,7 +527,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 			BaseException exception = new BaseException(ErrorCode.NOT_LINKED_RSO);
 
 			// when & then
-			assertThatThrownBy(() -> memberService.updateMyProfile(member.getId(), null))
+			assertThatThrownBy(() -> memberService.updateMyProfile(null))
 				.isInstanceOf(exception.getClass())
 				.hasMessage(exception.getMessage());
 		}
@@ -552,7 +553,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 				.willReturn(newRiotAccount);
 
 			// when & then
-			assertThatThrownBy(() -> memberService.updateMyProfile(member.getId(), request))
+			assertThatThrownBy(() -> memberService.updateMyProfile(request))
 				.isInstanceOf(exception.getClass())
 				.hasMessage(exception.getMessage());
 		}
@@ -578,7 +579,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 				.willReturn(introduction);
 
 			// when & then
-			assertThatThrownBy(() -> memberService.updateMyProfile(member.getId(), request))
+			assertThatThrownBy(() -> memberService.updateMyProfile(request))
 				.isInstanceOf(exception.getClass())
 				.hasMessage(exception.getMessage());
 		}
@@ -601,7 +602,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 				.findById(any(Long.class));
 
 			// when & then
-			assertThatThrownBy(() -> memberService.updateMyProfile(member.getId(), request))
+			assertThatThrownBy(() -> memberService.updateMyProfile(request))
 				.isInstanceOf(exception.getClass())
 				.hasMessage(exception.getMessage());
 		}
@@ -628,7 +629,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 				.willReturn(introduction);
 
 			// when & then
-			assertThatThrownBy(() -> memberService.updateMyProfile(member.getId(), request))
+			assertThatThrownBy(() -> memberService.updateMyProfile(request))
 				.isInstanceOf(exception.getClass())
 				.hasMessage(exception.getMessage());
 		}
@@ -654,7 +655,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 				.willReturn(introduction);
 
 			// when & then
-			assertThatThrownBy(() -> memberService.updateMyProfile(member.getId(), request))
+			assertThatThrownBy(() -> memberService.updateMyProfile(request))
 				.isInstanceOf(exception.getClass())
 				.hasMessage(exception.getMessage());
 		}
@@ -682,7 +683,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 				.willReturn(mockIntroductions);
 
 			// when & then
-			assertThatThrownBy(() -> memberService.updateMyProfile(member.getId(), request))
+			assertThatThrownBy(() -> memberService.updateMyProfile(request))
 				.isInstanceOf(exception.getClass())
 				.hasMessage(exception.getMessage());
 		}
@@ -712,7 +713,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 				.throwIfNotExistsOrExceedMain(any(Member.class));
 
 			// when & then
-			assertThatThrownBy(() -> memberService.updateMyProfile(member.getId(), request))
+			assertThatThrownBy(() -> memberService.updateMyProfile(request))
 				.isInstanceOf(exception.getClass())
 				.hasMessage(exception.getMessage());
 		}
@@ -837,7 +838,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 			given(valueOperations.getAndExpire(any(String.class), any(Long.class),
 				any(TimeUnit.class)))
 				.willReturn("verified");
-			try (MockedStatic<UUID> generator = mockStatic(UUID.class)) {
+			try (MockedStatic<UUID> ignored = mockStatic(UUID.class)) {
 				// Stub
 				given(UUID.randomUUID())
 					.willReturn(uuid);
@@ -848,7 +849,6 @@ public class MemberServiceTest extends ServiceTestSupport {
 
 				assertThat(response.getUuid()).isEqualTo(uuid.toString());
 			}
-			;
 
 			// then
 			then(valueOperations)
@@ -973,11 +973,13 @@ public class MemberServiceTest extends ServiceTestSupport {
 		void setUp() {
 			member = memberRepository.save(
 				createMemberByEmailAndNickname("email@email.com", "nickname"));
+			MemberThreadLocal.set(member);
 		}
 
 		@AfterEach
 		void tearDown() {
 			memberRepository.deleteAllInBatch();
+			MemberThreadLocal.remove();
 		}
 
 		@DisplayName("올바른 currentPassword를 입력하면 비밀번호가 변경된다.")
@@ -1003,7 +1005,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 				.willReturn(request.getNewPassword());
 
 			// when
-			memberService.updatePassword(member.getId(), request);
+			memberService.updatePassword(request);
 
 			// then
 			assertThat(request.getNewPassword()).isEqualTo(member.getPassword());
@@ -1031,7 +1033,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 				.willReturn(false);
 
 			// when & then
-			assertThatThrownBy(() -> memberService.updatePassword(member.getId(), request))
+			assertThatThrownBy(() -> memberService.updatePassword(request))
 				.isInstanceOf(exception.getClass())
 				.hasMessage(exception.getMessage());
 			then(passwordEncoder)

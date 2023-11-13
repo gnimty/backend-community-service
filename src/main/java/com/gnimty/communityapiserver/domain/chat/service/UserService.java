@@ -2,6 +2,7 @@ package com.gnimty.communityapiserver.domain.chat.service;
 
 import com.gnimty.communityapiserver.domain.chat.entity.User;
 import com.gnimty.communityapiserver.domain.chat.repository.User.UserRepository;
+import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
@@ -29,6 +30,11 @@ public class UserService {
 
     public User getUser(Long actualUserId) {
         return findUser(actualUserId)
+            .orElseThrow(()-> new BaseException(ErrorCode.NOT_FOUND_CHAT_USER));
+    }
+
+    public User getUserByMember(Member member) {
+        return findUser(member.getId())
             .orElseThrow(()-> new BaseException(ErrorCode.NOT_FOUND_CHAT_USER));
     }
 
