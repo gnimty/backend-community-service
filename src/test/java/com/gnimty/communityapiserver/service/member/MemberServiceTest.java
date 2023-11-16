@@ -1282,7 +1282,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 		return RiotAccount.builder()
 			.summonerName(summonerName)
 			.isMain(isMain)
-			.queue(Tier.DIAMOND)
+			.queue(Tier.diamond)
 			.lp(1000L)
 			.division(1)
 			.mmr(10000L)
