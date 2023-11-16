@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +55,7 @@ public class ChatRoomRepositoryTest {
 //
 		for (Integer i = 0; i < 20; i++) {
 			users.add(userRepository.save(
-				new User(null, i.longValue(), 3L, Tier.DIAMOND, 3,
+				new User(null, i.longValue(), 3L, Tier.diamond, 3,
 					"so1omon", Status.ONLINE)));
 		}
 
@@ -82,10 +81,10 @@ public class ChatRoomRepositoryTest {
 	@Test
 	void 유저두명_생성해서_chatRoom에_넣기_테스트() {
 		User user1 = userRepository.save(
-			new User(null, 130L, 3L, Tier.DIAMOND, 3,
+			new User(null, 130L, 3L, Tier.diamond, 3,
 				"so1omon", Status.ONLINE));
 		User user2 = userRepository.save(
-			new User(null, 131L, 4L, Tier.DIAMOND, 3,
+			new User(null, 131L, 4L, Tier.diamond, 3,
 				"solmin23", Status.ONLINE));
 
 		ChatRoom save = chatRoomRepository.save(user1, user2, seqGeneratorService.generateSequence(ChatRoom.SEQUENCE_NAME) );
