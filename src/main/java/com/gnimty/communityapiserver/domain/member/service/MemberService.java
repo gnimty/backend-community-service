@@ -223,6 +223,9 @@ public class MemberService {
 
 	public void updatePassword(PasswordUpdateServiceRequest request) {
 		Member member = MemberThreadLocal.get();
+		if (member.getEmail() == null) {
+			throw new BaseException(ErrorCode.NOT_LOGIN_BY_FORM);
+		}
 		if (!passwordEncoder.matches(request.getCurrentPassword(), member.getPassword())) {
 			throw new BaseException(ErrorCode.INVALID_PASSWORD);
 		}
