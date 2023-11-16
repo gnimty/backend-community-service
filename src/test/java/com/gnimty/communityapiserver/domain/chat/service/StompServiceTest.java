@@ -76,7 +76,7 @@ class StompServiceTest {
             users.add(userService.save(
                 User.builder()
                     .actualUserId(i.longValue())
-                    .tier(Tier.DIAMOND)
+                    .tier(Tier.diamond)
                     .division(3)
                     .summonerName("so1omon")
                     .status(Status.ONLINE)

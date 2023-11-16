@@ -107,7 +107,7 @@ public class MemberService {
 		RiotAccount riotAccount = riotAccountRepository.save(RiotAccount.builder()
 			.summonerName("summonerName")
 			.isMain(!existsMain)
-			.queue(Tier.BRONZE)
+			.queue(Tier.bronze)
 			.lp(100L)
 			.division(100)
 			.mmr(100L)

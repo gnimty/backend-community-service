@@ -180,7 +180,7 @@ public class RiotAccountQueryRepository {
 	}
 
 	private BooleanExpression excludeMasterGoe() {
-		return riotAccount.mmr.lt(getMmrByTier(Tier.MASTER));
+		return riotAccount.mmr.lt(getMmrByTier(Tier.master));
 	}
 
 	private BooleanExpression duoable(
@@ -191,36 +191,36 @@ public class RiotAccountQueryRepository {
 		if (duoable == null || !duoable) {
 			return null;
 		}
-		if (tier.equals(Tier.IRON) || tier.equals(Tier.BRONZE)) {
-			return riotAccount.mmr.lt(getMmrByTier(Tier.GOLD));
+		if (tier.equals(Tier.iron) || tier.equals(Tier.bronze)) {
+			return riotAccount.mmr.lt(getMmrByTier(Tier.gold));
 		}
-		if (tier.equals(Tier.SILVER)) {
-			return riotAccount.mmr.lt(getMmrByTier(Tier.PLATINUM));
+		if (tier.equals(Tier.silver)) {
+			return riotAccount.mmr.lt(getMmrByTier(Tier.platinum));
 		}
-		if (tier.equals(Tier.GOLD)) {
-			return riotAccount.mmr.goe(getMmrByTier(Tier.SILVER))
-				.and(riotAccount.mmr.lt(getMmrByTier(Tier.EMERALD)));
+		if (tier.equals(Tier.gold)) {
+			return riotAccount.mmr.goe(getMmrByTier(Tier.silver))
+				.and(riotAccount.mmr.lt(getMmrByTier(Tier.emerald)));
 		}
-		if (tier.equals(Tier.PLATINUM)) {
-			return riotAccount.mmr.goe(getMmrByTier(Tier.GOLD))
-				.and(riotAccount.mmr.lt(getMmrByTier(Tier.DIAMOND)));
+		if (tier.equals(Tier.platinum)) {
+			return riotAccount.mmr.goe(getMmrByTier(Tier.gold))
+				.and(riotAccount.mmr.lt(getMmrByTier(Tier.diamond)));
 		}
-		if (tier.equals(Tier.EMERALD)) {
-			BooleanExpression be = riotAccount.mmr.goe(getMmrByTier(Tier.PLATINUM));
+		if (tier.equals(Tier.emerald)) {
+			BooleanExpression be = riotAccount.mmr.goe(getMmrByTier(Tier.platinum));
 			if (division > 2) {
-				return be.and(riotAccount.mmr.lt(getMmrByTier(Tier.DIAMOND)));
+				return be.and(riotAccount.mmr.lt(getMmrByTier(Tier.diamond)));
 			}
 			if (division == 2) {
 				return be
-					.and(riotAccount.mmr.lt(getMmrByTierAndDivision(Tier.DIAMOND, 3)));
+					.and(riotAccount.mmr.lt(getMmrByTierAndDivision(Tier.diamond, 3)));
 			}
 			return be
-				.and(riotAccount.mmr.lt(getMmrByTierAndDivision(Tier.DIAMOND, 2)));
+				.and(riotAccount.mmr.lt(getMmrByTierAndDivision(Tier.diamond, 2)));
 		}
 
 		// tier = DIAMOND
 		return riotAccount.mmr.goe(
-			getMmrByTierAndDivision(Tier.DIAMOND, 3) - (division - 1) * 100L);
+			getMmrByTierAndDivision(Tier.diamond, 3) - (division - 1) * 100L);
 	}
 
 	private BooleanExpression gameModeEq(GameMode gameMode) {
@@ -311,14 +311,14 @@ public class RiotAccountQueryRepository {
 	 * 마스터 /그랜드마스터 / 챌린저	LP+2800
 	 */
 	private Long getMmrByTierAndDivision(Tier tier, Integer division) {
-		if (tier.getWeight() >= Tier.MASTER.getWeight()) {
+		if (tier.getWeight() >= Tier.master.getWeight()) {
 			return 2800L;
 		}
 		return tier.getWeight() * 400 + (4 - division) * 100L;
 	}
 
 	private Long getMmrByTier(Tier tier) {
-		if (tier.getWeight() >= Tier.MASTER.getWeight()) {
+		if (tier.getWeight() >= Tier.master.getWeight()) {
 			return 2800L;
 		}
 		return tier.getWeight() * 400L;

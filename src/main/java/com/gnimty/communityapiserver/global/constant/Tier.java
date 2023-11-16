@@ -9,17 +9,17 @@ import lombok.Getter;
 @Getter
 public enum Tier {
 
-	CHALLENGER("challenger", 9),
-	GRANDMASTER("grandmaster", 8),
-	MASTER("master", 7),
-	DIAMOND("diamond", 6),
-	EMERALD("emerald", 5),
-	PLATINUM("platinum", 4),
-	GOLD("gold", 3),
-	SILVER("silver", 2),
-	BRONZE("bronze", 1),
-	IRON("iron", 0),
-	NULL("null", -1);
+	challenger("challenger", 9),
+	grandmaster("grandmaster", 8),
+	master("master", 7),
+	diamond("diamond", 6),
+	emerald("emerald", 5),
+	platinum("platinum", 4),
+	gold("gold", 3),
+	silver("silver", 2),
+	bronze("bronze", 1),
+	iron("iron", 0),
+	unranked("null", -1);
 
 	private final String tier;
 	private final Integer weight;
