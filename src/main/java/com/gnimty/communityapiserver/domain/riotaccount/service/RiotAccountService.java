@@ -36,7 +36,7 @@ public class RiotAccountService {
 	public List<RiotAccount> updateSummoners(SummonerUpdateServiceRequest request) {
 		List<SummonerUpdateEntry> summonerUpdateEntries = request.getSummonerUpdates()
 			.stream()
-			.filter(v -> riotAccountReadService.findByPuuid(v.getPuuid()) != null)
+			.filter(v -> riotAccountReadService.existsByPuuid(v.getPuuid()))
 			.toList();
 		List<RiotAccount> existRiotAccounts = riotAccountReadService.findByPuuids(
 			summonerUpdateEntries.stream().map(SummonerUpdateEntry::getPuuid).toList());

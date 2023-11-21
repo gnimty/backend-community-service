@@ -53,9 +53,8 @@ public class RiotAccountReadService {
 		return riotAccountRepository.findByPuuids(puuids);
 	}
 
-	public RiotAccount findByPuuid(String puuid) {
-		return riotAccountRepository.findByPuuid(puuid)
-			.orElse(null);
+	public Boolean existsByPuuid(String puuid) {
+		return riotAccountQueryRepository.existsByPuuid(puuid);
 	}
 
 	public RecommendedSummonersServiceResponse getRecommendedSummoners(
