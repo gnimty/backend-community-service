@@ -201,7 +201,7 @@ public class MemberService {
 		UUID uuid = UUID.randomUUID();
 		String passwordKey = getRedisKey(UPDATE_PASSWORD, request.getEmail());
 		saveInRedis(passwordKey, uuid.toString(), Auth.PASSWORD_EXPIRATION.getExpiration());
-		valueOperations.getAndDelete(emailAuthKey);
+		redisTemplate.delete(emailAuthKey);
 		return PasswordEmailVerifyServiceResponse.builder()
 			.uuid(uuid.toString())
 			.build();
@@ -269,8 +269,7 @@ public class MemberService {
 
 	public void logout() {
 		Member member = MemberThreadLocal.get();
-		ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
-		valueOperations.getAndDelete(getRedisKey(REFRESH, String.valueOf(member.getId())));
+		redisTemplate.delete(getRedisKey(REFRESH, String.valueOf(member.getId())));
 	}
 
 	public void withdrawal() {
@@ -411,7 +410,7 @@ public class MemberService {
 		ValueOperations<String, String> stringValueOperations = redisTemplate.opsForValue();
 
 		stringValueOperations.set(key, value);
-		stringValueOperations.getAndExpire(
+		redisTemplate.expire(
 			key,
 			timeout,
 			TimeUnit.MILLISECONDS

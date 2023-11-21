@@ -131,7 +131,7 @@ public class AuthService {
 		}
 
 		saveInRedis(signupKey, "verified", Auth.SIGNUP_EXPIRATION.getExpiration());
-		valueOperations.getAndDelete(emailAuthKey);
+		redisTemplate.delete(emailAuthKey);
 	}
 
 	public AuthToken tokenRefresh(String refreshToken) {
@@ -204,7 +204,7 @@ public class AuthService {
 		ValueOperations<String, String> stringValueOperations = redisTemplate.opsForValue();
 
 		stringValueOperations.set(key, value);
-		stringValueOperations.getAndExpire(
+		redisTemplate.expire(
 			key,
 			timeout,
 			TimeUnit.MILLISECONDS
