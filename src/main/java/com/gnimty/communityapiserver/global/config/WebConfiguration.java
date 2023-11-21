@@ -37,6 +37,7 @@ public class WebConfiguration implements WebMvcConfigurer {
 			.addPathPatterns("/**")
 			.excludePathPatterns("/auth/**")
 			.excludePathPatterns("/oauth/**")
+			.excludePathPatterns("/members/password/**")
 			.excludePathPatterns(
 				"/css/**", "/*.ico"
 				, "/error", "/error-page/**"
