@@ -29,8 +29,8 @@ public class RiotAccountJdbcRepository {
 				+ "r.frequent_lane_2=?, "
 				+ "r.frequent_champion_id_1=?, "
 				+ "r.frequent_champion_id_2=?, "
-				+ "r.frequent_champion_id_3=? "
-				+ "r.icon_id=?"
+				+ "r.frequent_champion_id_3=?, "
+				+ "r.icon_id=? "
 				+ "where r.puuid=?";
 
 		jdbcTemplate.batchUpdate(
