@@ -2,6 +2,7 @@ package com.gnimty.communityapiserver.domain.chat.repository;
 
 import static org.assertj.core.api.Assertions.*;
 
+import com.gnimty.communityapiserver.domain.chat.entity.Blocked;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
 import com.gnimty.communityapiserver.domain.chat.repository.Chat.ChatRepository;
@@ -55,20 +56,26 @@ public class ChatRoomRepositoryTest {
 //
 		for (Integer i = 0; i < 20; i++) {
 			users.add(userRepository.save(
-				new User(null, i.longValue(), 3L, Tier.diamond, 3,
-					"so1omon", Status.ONLINE)));
+				new User(null, i.longValue(), 3L, Tier.DIAMOND, 3, 30L,
+					"so1omon", Status.ONLINE,null, null)));
+
 		}
 
 		for (Integer i = 1; i < 10; i++) {
-			chatRooms.add(chatRoomRepository.save(
-				users.get(0),
-				users.get(i),seqGeneratorService.generateSequence(ChatRoom.SEQUENCE_NAME)));
+			List<ChatRoom.Participant> participants = List.of(
+					ChatRoom.Participant.builder().user(users.get(0)).exitDate(null).blockedStatus(Blocked.UNBLOCK).build(),
+					ChatRoom.Participant.builder().user(users.get(i)).exitDate(null).blockedStatus(Blocked.UNBLOCK).build()
+			);
+
+			chatRooms.add(chatRoomRepository.save(participants));
 		}
 
 		for (Integer i = 11; i < 20; i++) {
-			chatRooms.add(chatRoomRepository.save(
-				users.get(10),
-				users.get(i),seqGeneratorService.generateSequence(ChatRoom.SEQUENCE_NAME)));
+			List<ChatRoom.Participant> participants = List.of(
+					ChatRoom.Participant.builder().user(users.get(10)).exitDate(null).blockedStatus(Blocked.UNBLOCK).build(),
+					ChatRoom.Participant.builder().user(users.get(i)).exitDate(null).blockedStatus(Blocked.UNBLOCK).build()
+			);
+			chatRooms.add(chatRoomRepository.save(participants));
 		}
 	}
 
@@ -81,13 +88,16 @@ public class ChatRoomRepositoryTest {
 	@Test
 	void 유저두명_생성해서_chatRoom에_넣기_테스트() {
 		User user1 = userRepository.save(
-			new User(null, 130L, 3L, Tier.diamond, 3,
-				"so1omon", Status.ONLINE));
+			new User(null, 130L, 3L, Tier.DIAMOND, 3, 30L,
+				"so1omon", Status.ONLINE, null, null));
 		User user2 = userRepository.save(
-			new User(null, 131L, 4L, Tier.diamond, 3,
-				"solmin23", Status.ONLINE));
+			new User(null, 131L, 4L, Tier.DIAMOND, 3, 40L,
+				"solmin23", Status.ONLINE, null, null));
 
-		ChatRoom save = chatRoomRepository.save(user1, user2, seqGeneratorService.generateSequence(ChatRoom.SEQUENCE_NAME) );
+		ChatRoom save = chatRoomRepository.save(
+				List.of(
+						ChatRoom.Participant.builder().user(user1).exitDate(null).blockedStatus(Blocked.UNBLOCK).build(),
+						ChatRoom.Participant.builder().user(user2).exitDate(null).blockedStatus(Blocked.UNBLOCK).build()));
 		System.out.println("save = " + save);
 	}
 
@@ -122,7 +132,9 @@ public class ChatRoomRepositoryTest {
 		User user1 = all.get(0);
 		User user2 = all.get(1);
 
-		assertThatThrownBy(() -> chatRoomRepository.save(user1, user2, seqGeneratorService.generateSequence(ChatRoom.SEQUENCE_NAME)))
+		assertThatThrownBy(() -> chatRoomRepository.save(List.of(
+				ChatRoom.Participant.builder().user(user1).exitDate(null).blockedStatus(Blocked.UNBLOCK).build(),
+				ChatRoom.Participant.builder().user(user2).exitDate(null).blockedStatus(Blocked.UNBLOCK).build())))
 			.isInstanceOf(BaseException.class);
 	}
 

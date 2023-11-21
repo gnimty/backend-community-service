@@ -41,7 +41,8 @@ public class UserRepositoryTest {
 
 		clear();
 		// 1. 유저 한명 생성 테스트
-		User user = new User(null, 1L, 3L, Tier.diamond, 3, "so1omon", Status.ONLINE);
+		User user = new User(null, 1L, 3L, Tier.DIAMOND, 3, 40L,
+				"so1omon", Status.ONLINE, null, null);
 		List<User> all = userRepository.findAll();
 
 		System.out.println("저장 전");
@@ -63,8 +64,10 @@ public class UserRepositoryTest {
 
 		clear();
 		// 1. 유저 한명 생성 테스트
-		User user1 = new User(null, 1L, 3L, Tier.diamond, 3, "so1omon", Status.ONLINE);
-		User user2 = new User(null, 1L, 3L, Tier.diamond, 3, "so1omon", Status.ONLINE);
+		User user1 = new User(null, 1L, 3L, Tier.DIAMOND, 3, 30L,
+				"so1omon", Status.ONLINE,null, null);
+		User user2 = new User(null, 1L, 3L, Tier.DIAMOND, 3, 30L,
+				"so1omon", Status.ONLINE,null, null);
 		assertThatThrownBy(() -> userRepository.saveAll(List.of(user1, user2)))
 				.isInstanceOf(DuplicateKeyException.class);
 	}

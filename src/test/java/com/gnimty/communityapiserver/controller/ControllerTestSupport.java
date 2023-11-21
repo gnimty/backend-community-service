@@ -3,8 +3,8 @@ package com.gnimty.communityapiserver.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gnimty.communityapiserver.domain.block.service.BlockReadService;
 import com.gnimty.communityapiserver.domain.block.service.BlockService;
+import com.gnimty.communityapiserver.domain.chat.service.ChatService;
 import com.gnimty.communityapiserver.domain.chat.service.StompService;
-import com.gnimty.communityapiserver.domain.chat.service.UserService;
 import com.gnimty.communityapiserver.domain.introduction.service.IntroductionReadService;
 import com.gnimty.communityapiserver.domain.member.controller.AuthController;
 import com.gnimty.communityapiserver.domain.member.controller.MemberController;
@@ -83,5 +83,5 @@ public abstract class ControllerTestSupport {
 	protected StompService stompService;
 
 	@MockBean
-	protected UserService userService;
+	protected StompService stompService;
 }
