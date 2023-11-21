@@ -1,4 +1,4 @@
-package com.gnimty.communityapiserver.global.auth;
+package com.gnimty.communityapiserver.global.connect;
 
 import com.gnimty.communityapiserver.domain.member.service.MemberService;
 import java.util.Map;
@@ -17,7 +17,6 @@ public class WebSocketSessionManager {
     public void addSession(String sessionId, Long memberId) {
         sessionStore.put(sessionId, memberId);
     }
-
 
     public void deleteSession(String sessionId) {
         sessionStore.remove(sessionId);

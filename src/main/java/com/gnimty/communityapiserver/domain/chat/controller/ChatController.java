@@ -1,10 +1,11 @@
 package com.gnimty.communityapiserver.domain.chat.controller;
 
 import com.gnimty.communityapiserver.domain.block.service.BlockReadService;
+import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatDto;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatRoomDto;
+import com.gnimty.communityapiserver.domain.chat.controller.dto.MessageRequest;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.MessageResponse;
 import com.gnimty.communityapiserver.domain.chat.entity.Blocked;
-import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
 import com.gnimty.communityapiserver.domain.chat.service.ChatRoomService;
 import com.gnimty.communityapiserver.domain.chat.service.StompService;
@@ -12,12 +13,12 @@ import com.gnimty.communityapiserver.domain.chat.service.UserService;
 import com.gnimty.communityapiserver.domain.chat.service.dto.UserWithBlockDto;
 import com.gnimty.communityapiserver.domain.member.service.MemberService;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.StatusUpdateServiceRequest;
-import com.gnimty.communityapiserver.global.auth.WebSocketSessionManager;
-import com.gnimty.communityapiserver.global.constant.MessageType;
+import com.gnimty.communityapiserver.global.connect.WebSocketSessionManager;
+import com.gnimty.communityapiserver.global.constant.MessageRequestType;
+import com.gnimty.communityapiserver.global.constant.MessageResponseType;
 import com.gnimty.communityapiserver.global.constant.Status;
-import com.gnimty.communityapiserver.global.exception.BaseException;
-import com.gnimty.communityapiserver.global.exception.ErrorCode;
 import java.util.List;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -46,9 +47,9 @@ public class ChatController {
 	@SubscribeMapping("/init_chat")
 	public List<ChatRoomDto> getTotalChatRoomsAndChatsAndOtherUserInfo(@Header("simpSessionId") String sessionId) {
 		User user = getUserBySessionId(sessionId);
-
 		return chatService.getChatRoomsJoined(user);
 	}
+
 
 	// 채팅방 구독 유도
 	// 이미 채팅방이 존재한다면 채팅방 정보만 넘겨주고 상대방 구독유도는 하지 않기 -> Front 1차 처리, Back 2차 처리
@@ -69,35 +70,32 @@ public class ChatController {
 
 		// getchatRoomNo를 호출하기 X
 		// chatRoom을 먼저 생성 또는 조회 후 그 정보를 그대로 보내주거나 DTO로 변환해서 보내주는 게 좋아 보임
-		chatService.sendToUserSubscribers(me.getId(), new MessageResponse(MessageType.CHATROOMINFO, chatRoomDto));
+		chatService.sendToUserSubscribers(me.getId(), new MessageResponse(MessageResponseType.CHATROOM_INFO, chatRoomDto));
 
 		if (!isOtherBlock)
 		{
-			chatService.sendToUserSubscribers(other.getId(), new MessageResponse(MessageType.CHATROOMINFO, chatRoomDto));
+			chatService.sendToUserSubscribers(other.getId(), new MessageResponse(
+				MessageResponseType.CHATROOM_INFO, chatRoomDto));
 		}
 	}
 
-	// 메세지 전송
+
 	@MessageMapping("/chatRoom/{chatRoomNo}")
 	public void sendMessage(@DestinationVariable("chatRoomNo") Long chatRoomNo,
 							@Header("simpSessionId") String sessionId,
-							String message) {
-		User user = getUserBySessionId(sessionId);
-		chatService.sendChat(user, chatRoomNo, message);
-		chatService.sendToChatRoomSubscribers(chatRoomNo, new MessageResponse(MessageType.CHATMESSAGE, message));
-	}
-
-	// 채팅방 나가기
-	@SubscribeMapping("/chatRoom/exit/{chatRoomNo}")
-	public void exitChatRoom(@DestinationVariable("chatRoomNo") Long chatRoomNo,
-							 @Header("simpSessionId") String sessionId) {
+							final @Valid MessageRequest request) {
 		User user = getUserBySessionId(sessionId);
 
-		ChatRoom chatRoom = chatRoomService.findChatRoom(chatRoomNo).orElseThrow(
-			() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_ROOM,
-				String.format(ErrorCode.NOT_FOUND_CHAT_ROOM.getMessage(), chatRoomNo)));
+		if (request.getType() == MessageRequestType.CHAT) {
+			ChatDto chatDto = chatService.sendChat(user, chatRoomNo, request);
+			chatService.sendToChatRoomSubscribers(chatRoomNo, new MessageResponse(MessageResponseType.CHAT_MESSAGE, chatDto));
+		} else if (request.getType() == MessageRequestType.READ) {
+			chatService.readOtherChats(user, chatRoomNo);
+			chatService.sendToUserSubscribers(user.getId(), new MessageResponse(MessageResponseType.READ_CHATS, chatRoomNo));
+		} else {
+			chatService.exitChatRoom(user, chatRoomService.getChatRoom(chatRoomNo));
+		}
 
-		chatService.exitChatRoom(user, chatRoom);
 	}
 
 
@@ -106,7 +104,7 @@ public class ChatController {
 		User user = getUserBySessionId(event.getSessionId());
 		if (!isMultipleUser(user.getActualUserId())) {
 			chatService.updateConnStatus(user, Status.OFFLINE);
-			memberService.updateStatus(user.getActualUserId(), StatusUpdateServiceRequest.builder().status(Status.OFFLINE).build());
+			memberService.updateStatus(StatusUpdateServiceRequest.builder().status(Status.OFFLINE).build());
 		}
 		webSocketSessionManager.deleteSession(event.getSessionId());
 	}
@@ -117,7 +115,7 @@ public class ChatController {
 		User user = getUserBySessionId(sessionId);
 		if (!isMultipleUser(user.getActualUserId())) {
 			chatService.updateConnStatus(user, Status.ONLINE);
-			memberService.updateStatus(user.getActualUserId(), StatusUpdateServiceRequest.builder().status(Status.ONLINE).build());
+			memberService.updateStatus(StatusUpdateServiceRequest.builder().status(Status.ONLINE).build());
 		}
 	}
 

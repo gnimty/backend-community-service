@@ -9,6 +9,7 @@ import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.domain.riotaccount.controller.dto.request.RecommendedSummonersRequest;
 import com.gnimty.communityapiserver.domain.riotaccount.controller.dto.response.RecentlySummonersResponse;
 import com.gnimty.communityapiserver.domain.riotaccount.controller.dto.response.RecommendedSummonersResponse;
+import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
 import com.gnimty.communityapiserver.domain.riotaccount.service.RiotAccountService;
 import com.gnimty.communityapiserver.domain.riotaccount.service.dto.response.RecentlySummonersServiceResponse;
 import com.gnimty.communityapiserver.domain.riotaccount.service.dto.response.RecommendedSummonersServiceResponse;
@@ -38,7 +39,9 @@ public class RiotAccountController {
 	public CommonResponse<Void> updateSummoners(
 		@RequestBody @Valid SummonerUpdateRequest request
 	) {
-		riotAccountService.updateSummoners(request.toServiceRequest());
+		List<RiotAccount> riotAccounts = riotAccountService.updateSummoners(
+			request.toServiceRequest());
+		stompService.createOrUpdateUser(riotAccounts);
 		return CommonResponse.success(SUCCESS_UPDATE_SUMMONERS, OK);
 	}
 
@@ -65,7 +68,7 @@ public class RiotAccountController {
 		Member member = MemberThreadLocal.get();
 		List<Long> chattedMemberIds = stompService.getChattedMemberIds(member.getId());
 		RecentlySummonersServiceResponse response = riotAccountService
-				.getRecentlySummoners(member, chattedMemberIds);
+			.getRecentlySummoners(member, chattedMemberIds);
 		return CommonResponse.success(RecentlySummonersResponse.from(response));
 	}
 }

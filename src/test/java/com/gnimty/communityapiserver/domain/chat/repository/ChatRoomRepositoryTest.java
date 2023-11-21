@@ -40,6 +40,7 @@ public class ChatRoomRepositoryTest {
 	@Autowired
 	private MongoTemplate mongoTemplate;
 
+
 	void clear() {
 		mongoTemplate.remove(new Query(), "chatRoom");
 		mongoTemplate.remove(new Query(), "user");
@@ -136,6 +137,10 @@ public class ChatRoomRepositoryTest {
 				ChatRoom.Participant.builder().user(user2).exitDate(null).blockedStatus(Blocked.UNBLOCK).build())))
 			.isInstanceOf(BaseException.class);
 	}
+
+
+
+
 
 
 //	@AfterEach

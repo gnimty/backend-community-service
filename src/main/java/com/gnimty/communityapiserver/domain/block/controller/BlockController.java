@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/members/{member_id}/block")
+@RequestMapping("/members/me/block")
 public class BlockController {
 
 	private final BlockReadService blockReadService;

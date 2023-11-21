@@ -11,7 +11,6 @@ import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCC
 import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_UPDATE_PREFER_GAME_MODE;
 import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_UPDATE_PROFILE;
 import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_UPDATE_STATUS;
-import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_VERIFY_EMAIL;
 import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_WITHDRAWAL;
 import static org.springframework.http.HttpStatus.ACCEPTED;
 import static org.springframework.http.HttpStatus.OK;
@@ -22,16 +21,21 @@ import com.gnimty.communityapiserver.domain.member.controller.dto.request.Introd
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.MyProfileUpdateRequest;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.OauthLoginRequest;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.PasswordEmailVerifyRequest;
+import com.gnimty.communityapiserver.domain.member.controller.dto.request.PasswordResetRequest;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.PasswordUpdateRequest;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.PreferGameModeUpdateRequest;
+import com.gnimty.communityapiserver.domain.member.controller.dto.request.SendEmailRequest;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.StatusUpdateRequest;
 import com.gnimty.communityapiserver.domain.member.controller.dto.response.MyProfileResponse;
 import com.gnimty.communityapiserver.domain.member.controller.dto.response.OtherProfileResponse;
+import com.gnimty.communityapiserver.domain.member.controller.dto.response.PasswordEmailVerifyResponse;
 import com.gnimty.communityapiserver.domain.member.service.MemberReadService;
 import com.gnimty.communityapiserver.domain.member.service.MemberService;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.MyProfileServiceResponse;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.OtherProfileServiceResponse;
+import com.gnimty.communityapiserver.domain.member.service.dto.response.PasswordEmailVerifyServiceResponse;
 import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
+import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
 import com.gnimty.communityapiserver.global.constant.Provider;
 import com.gnimty.communityapiserver.global.response.CommonResponse;
 import javax.validation.Valid;
@@ -58,7 +62,7 @@ public class MemberController {
 	private final UserService userService;
 
 
-	@PostMapping("/{member_id}/rso")
+	@PostMapping("/me/rso")
 	public CommonResponse<Void> summonerAccountLink(
 		@RequestBody @Valid OauthLoginRequest request
 	) {
@@ -67,7 +71,7 @@ public class MemberController {
 		return CommonResponse.success(SUCCESS_SUMMONER_LINK, OK);
 	}
 
-	@PostMapping("/{member_id}/oauth/kakao")
+	@PostMapping("/me/oauth/kakao")
 	public CommonResponse<Void> kakaoAdditionalLink(
 		@RequestBody @Valid OauthLoginRequest request
 	) {
@@ -75,7 +79,7 @@ public class MemberController {
 		return CommonResponse.success(SUCCESS_KAKAO_LINK, OK);
 	}
 
-	@PostMapping("/{member_id}/oauth/google")
+	@PostMapping("/me/oauth/google")
 	public CommonResponse<Void> googleAdditionalLink(
 		@RequestBody @Valid OauthLoginRequest request
 	) {
@@ -89,14 +93,14 @@ public class MemberController {
 		return CommonResponse.success(MyProfileResponse.from(response));
 	}
 
-	@PatchMapping("/{member_id}")
+	@PatchMapping("/me")
 	public CommonResponse<Void> updateMyProfile(
-		@PathVariable("member_id") Long memberId,
 		@RequestBody @Valid MyProfileUpdateRequest request
 	) {
-		RiotAccount riotAccount = memberService.updateMyProfile(memberId, request.toServiceRequest());
+		RiotAccount riotAccount = memberService.updateMyProfile(request.toServiceRequest());
 		if (request.getStatus() != null) {
-			stompService.updateConnStatus(userService.getUser(memberId), request.getStatus());
+			stompService.updateConnStatus(userService.getUserByMember(MemberThreadLocal.get()),
+				request.getStatus());
 		}
 		if (riotAccount != null) {
 			stompService.createOrUpdateUser(riotAccount);
@@ -105,49 +109,50 @@ public class MemberController {
 	}
 
 	@ResponseStatus(ACCEPTED)
-	@PostMapping("/{member_id}/password/email")
-	public CommonResponse<Void> sendEmailAuthCode() {
-		memberService.sendEmailAuthCode();
+	@PostMapping("/password/email")
+	public CommonResponse<Void> sendEmailAuthCode(@RequestBody @Valid SendEmailRequest request) {
+		memberService.sendEmailAuthCode(request.toServiceRequest());
 		return CommonResponse.success(SUCCESS_SEND_EMAIL_AUTH_CODE, ACCEPTED);
 	}
 
-	@PostMapping("/{member_id}/password/email/code")
-	public CommonResponse<Void> verifyEmailAuthCode(
+	@PostMapping("/password/email/code")
+	public CommonResponse<PasswordEmailVerifyResponse> verifyEmailAuthCode(
 		@RequestBody @Valid PasswordEmailVerifyRequest request
 	) {
-		memberService.verifyEmailAuthCode(request.toServiceRequest());
-		return CommonResponse.success(SUCCESS_VERIFY_EMAIL, OK);
+		PasswordEmailVerifyServiceResponse response = memberService.verifyEmailAuthCode(
+			request.toServiceRequest());
+		return CommonResponse.success(PasswordEmailVerifyResponse.from(response));
 	}
 
-	@PatchMapping("/{member_id}/password")
-	public CommonResponse<Void> updatePassword(
-		@PathVariable("member_id") Long memberId,
-		@RequestBody @Valid PasswordUpdateRequest request
-	) {
-		memberService.updatePassword(memberId, request.toServiceRequest());
+	@PatchMapping("/password")
+	public CommonResponse<Void> resetPassword(@RequestBody @Valid PasswordResetRequest request) {
+		memberService.resetPassword(request.toServiceRequest());
 		return CommonResponse.success(SUCCESS_UPDATE_PASSWORD, OK);
 	}
 
-	@PatchMapping("/{member_id}/status")
-	public CommonResponse<Void> updateStatus(
-		@PathVariable("member_id") Long memberId,
-		@RequestBody @Valid StatusUpdateRequest request
-	) {
-		memberService.updateStatus(memberId, request.toServiceRequest());
-		stompService.updateConnStatus(userService.getUser(memberId), request.getStatus());
+	@PatchMapping("/me/password")
+	public CommonResponse<Void> updatePassword(@RequestBody @Valid PasswordUpdateRequest request) {
+		memberService.updatePassword(request.toServiceRequest());
+		return CommonResponse.success(SUCCESS_UPDATE_PASSWORD, OK);
+	}
+
+	@PatchMapping("/me/status")
+	public CommonResponse<Void> updateStatus(@RequestBody @Valid StatusUpdateRequest request) {
+		memberService.updateStatus(request.toServiceRequest());
+		stompService.updateConnStatus(userService.getUserByMember(MemberThreadLocal.get()),
+			request.getStatus());
 		return CommonResponse.success(SUCCESS_UPDATE_STATUS, OK);
 	}
 
-	@PatchMapping("/{member_id}/introductions")
+	@PatchMapping("/me/introductions")
 	public CommonResponse<Void> updateIntroduction(
-		@PathVariable("member_id") Long memberId,
 		@RequestBody @Valid IntroductionUpdateRequest request
 	) {
-		memberService.updateIntroduction(memberId, request.toServiceRequest());
+		memberService.updateIntroduction(request.toServiceRequest());
 		return CommonResponse.success(SUCCESS_UPDATE_INTRODUCTION, OK);
 	}
 
-	@PatchMapping("/{member_id}/prefer-game-mode")
+	@PatchMapping("/me/prefer-game-mode")
 	public CommonResponse<Void> updatePreferGameMode(
 		@RequestBody @Valid PreferGameModeUpdateRequest request
 	) {
@@ -155,19 +160,19 @@ public class MemberController {
 		return CommonResponse.success(SUCCESS_UPDATE_PREFER_GAME_MODE, OK);
 	}
 
-	@DeleteMapping("/{member_id}/oauth")
+	@DeleteMapping("/me/oauth")
 	public CommonResponse<Void> deleteOauthInfo(@RequestParam Provider provider) {
 		memberService.deleteOauthInfo(provider);
 		return CommonResponse.success(SUCCESS_DISCONNECT_OAUTH, OK);
 	}
 
-	@DeleteMapping("/{member_id}/logout")
+	@DeleteMapping("/me/logout")
 	public CommonResponse<Void> logout() {
 		memberService.logout();
 		return CommonResponse.success(SUCCESS_LOGOUT, OK);
 	}
 
-	@DeleteMapping("/{member_id}")
+	@DeleteMapping("/me")
 	public CommonResponse<Void> withdrawal() {
 		memberService.withdrawal();
 		return CommonResponse.success(SUCCESS_WITHDRAWAL, OK);
