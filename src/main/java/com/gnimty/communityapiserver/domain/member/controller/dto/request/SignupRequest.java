@@ -8,9 +8,15 @@ import com.gnimty.communityapiserver.global.constant.RequestPattern;
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class SignupRequest {
 
 	@NotNull(message = INVALID_INPUT_VALUE)

@@ -6,9 +6,15 @@ import com.gnimty.communityapiserver.domain.member.service.dto.request.EmailAuth
 import com.gnimty.communityapiserver.global.constant.RequestPattern;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class EmailAuthRequest {
 
 	@NotNull(message = INVALID_INPUT_VALUE)
