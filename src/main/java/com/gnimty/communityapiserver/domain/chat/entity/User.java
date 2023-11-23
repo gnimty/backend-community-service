@@ -44,12 +44,12 @@ public class User {
 	private List<Long> mostChampions;
 
 	public static User toUser(RiotAccount riotAccount){
-		List<Lane> mostLanes = List.of(riotAccount.getFrequentLane1(),
-			riotAccount.getFrequentLane2());
-		List<Long> mostChampions = List.of(
+		List<Lane> mostLanes = new ArrayList<> (List.of(
+			riotAccount.getFrequentLane1(), riotAccount.getFrequentLane2()));
+		List<Long> mostChampions = new ArrayList<> (List.of(
 			riotAccount.getFrequentChampionId1(),
 			riotAccount.getFrequentChampionId2(),
-			riotAccount.getFrequentChampionId3());
+			riotAccount.getFrequentChampionId3()));
 
 		mostLanes.removeIf(lane -> lane==null);
 		mostChampions.removeIf(champion -> champion==null);
@@ -65,4 +65,30 @@ public class User {
 			.lp(riotAccount.getLp())
 			.build();
 	}
+
+	public static User toUserWithId(RiotAccount riotAccount, String userId){
+		List<Lane> mostLanes = new ArrayList<> (List.of(
+			riotAccount.getFrequentLane1(), riotAccount.getFrequentLane2()));
+		List<Long> mostChampions = new ArrayList<> (List.of(
+			riotAccount.getFrequentChampionId1(),
+			riotAccount.getFrequentChampionId2(),
+			riotAccount.getFrequentChampionId3()));
+
+		mostLanes.removeIf(lane -> lane==null);
+		mostChampions.removeIf(champion -> champion==null);
+
+		return User.builder()
+			.id(userId)
+			.actualUserId(riotAccount.getMember().getId())
+			.profileIconId(riotAccount.getIconId())
+			.tier(riotAccount.getQueue())
+			.division(riotAccount.getDivision())
+			.summonerName(riotAccount.getSummonerName())
+			.mostLanes(mostLanes)
+			.mostChampions(mostChampions)
+			.lp(riotAccount.getLp())
+			.build();
+	}
+
+
 }

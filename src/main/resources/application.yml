@@ -64,14 +64,21 @@ spring:
     properties:
       hibernate:
         hbm2ddl:
-          auto: create-drop
+          auto: update
+
   data:
     mongodb:
-      database: ${MONGO_DATABASE}
-      host: ${MONGO_HOST}
-      port: ${MONGO_PORT}
-      timeZone: Asia/Seoul
-      auto-index-creation: true
+      uri: mongodb://localhost:27017/community
+
+  logging:
+    level:
+      org:
+        springframework:
+          data:
+            mongodb:
+              core:
+                ReactiveMongoTemplate: DEBUG
+
 
 oauth:
   kakao:
@@ -165,3 +172,4 @@ oauth:
     redirect_uri: ${OAUTH_GOOGLE_REDIRECT_URI}
   riot:
     redirect_uri: ${OAUTH_GOOGLE_REDIRECT_URI}
+

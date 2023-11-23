@@ -39,7 +39,12 @@ public class UserService {
     }
 
     public User save(RiotAccount riotAccount){
-        return userRepository.save(User.toUser(riotAccount));
+        Long actualUserId = riotAccount.getMember().getId();
+
+        return userRepository.findByActualUserId(actualUserId)
+            .map(user -> userRepository.save(User.toUserWithId(riotAccount, user.getId())))
+            .orElseGet(() -> userRepository.save(User.toUser(riotAccount)));
+
     }
 
     public User save(User user){
