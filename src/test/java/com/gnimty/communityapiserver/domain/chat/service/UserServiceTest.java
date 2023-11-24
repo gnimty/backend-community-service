@@ -19,17 +19,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @SpringBootTest
@@ -45,20 +41,6 @@ class UserServiceTest {
     @Autowired
     private UserService userService;
 
-//    @BeforeEach
-//    void createUser() {
-//        for (Integer i = 0; i < 20; i++) {
-//            userRepository.save(
-//                User.builder()
-//                    .actualUserId(i.longValue())
-//                    .tier(Tier.diamond)
-//                    .division(3)
-//                    .summonerName("uni")
-//                    .status(Status.ONLINE)
-//                    .lp(3L).build()
-//            );
-//        }
-//    }
 
     @AfterEach
     void deleteAll() {
@@ -96,6 +78,7 @@ class UserServiceTest {
             assertThat(findUser).isEqualTo(user);
         }
 
+
         @DisplayName("member id와 동일한 actualUserId가 없을 시 실패")
         @Test
         void failGetUserByMember() {
@@ -111,6 +94,7 @@ class UserServiceTest {
 
         }
     }
+
 
     @DisplayName("member id로 user 가져오기")
     @Nested
@@ -148,14 +132,15 @@ class UserServiceTest {
             Member member = new Member(true, "aaa@naver.com", "asdD12!", 1L, "uni2", Status.OFFLINE, 3L);
             memberRepository.save(member);
 
+
             // when & then
             assertThatThrownBy(() -> userService.getUser(member.getId()))
                 .isInstanceOf(BaseException.class)
                 .satisfies(exception -> {assertThat(((BaseException)exception).getErrorCode()).isEqualTo(ErrorCode.NOT_FOUND_CHAT_USER);})
                 .hasMessageContaining(ErrorMessage.NOT_FOUND_CHAT_USER);
-
         }
     }
+
 
     @DisplayName("모든 user 가져오기")
     @Nested
@@ -195,10 +180,9 @@ class UserServiceTest {
     @Nested
     class saveUser {
 
-        @DisplayName("riotAccount로 user 저장 시 기존에 존재한 user라면 덮어쓰기")
+        @DisplayName("riotAccount로 user 저장 시 기존의 user 수정")
         @Test
-        void getAllUser() {
-
+        void saveByRiotAccount() {
             // given
             Member member = new Member(true, "uni@naver.com", "afD23!", 1L, "uni", Status.ONLINE,
                 1L);
@@ -230,8 +214,42 @@ class UserServiceTest {
             // then
             ArrayList<Lane> lanes = new ArrayList<>(Arrays.asList(Lane.BOTTOM, Lane.JUNGLE));
 
+
             assertThat(savedUser.getMostLanes()).containsAll(lanes);
             assertThat(savedUser.getActualUserId()).isEqualTo(member.getId());
+            assertThat(savedUser.getStatus()).isEqualTo(Status.ONLINE);
+        }
+
+
+        @DisplayName("user 저장 시 기존의 user 수정")
+        @Test
+        void saveUser() {
+            // given
+            userRepository.save(User.builder()
+                .actualUserId(1L)
+                .tier(Tier.diamond)
+                .lp(1L)
+                .status(Status.ONLINE)
+                .summonerName("uni")
+                .profileIconId(1L)
+                .division(3)
+                .build());
+
+            User changedUser = User.builder()
+                .actualUserId(1L)
+                .tier(Tier.gold)
+                .status(Status.AWAY)
+                .build();
+
+
+            // when
+            userService.save(changedUser);
+
+
+            // then
+            User findUser = userRepository.findByActualUserId(1L).get();
+            assertThat(findUser.getTier()).isEqualTo(Tier.gold);
+            assertThat(findUser.getSummonerName()).isEqualTo("uni");
         }
     }
 

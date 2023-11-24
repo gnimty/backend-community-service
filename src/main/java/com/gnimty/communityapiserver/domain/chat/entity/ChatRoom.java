@@ -16,7 +16,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "chatRoom")
 @Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
@@ -48,7 +47,11 @@ public class ChatRoom {
 
 	private Date lastModifiedDate;
 
-	private void refreshModifiedDate(){
-		this.lastModifiedDate = new Date();
+	public void refreshModifiedDate(Date date){
+		this.lastModifiedDate = date;
+	}
+
+	public void updateParticipants (List<Participant> participants) {
+		this.participants = participants;
 	}
 }

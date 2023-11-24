@@ -7,6 +7,7 @@ import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.constant.Tier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import javax.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,7 +21,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "user")
 @Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
@@ -66,7 +66,7 @@ public class User {
 			.build();
 	}
 
-	public static User toUserWithId(RiotAccount riotAccount, String userId){
+	public void updateByRiotAccount(RiotAccount riotAccount) {
 		List<Lane> mostLanes = new ArrayList<> (List.of(
 			riotAccount.getFrequentLane1(), riotAccount.getFrequentLane2()));
 		List<Long> mostChampions = new ArrayList<> (List.of(
@@ -77,17 +77,29 @@ public class User {
 		mostLanes.removeIf(lane -> lane==null);
 		mostChampions.removeIf(champion -> champion==null);
 
-		return User.builder()
-			.id(userId)
-			.actualUserId(riotAccount.getMember().getId())
-			.profileIconId(riotAccount.getIconId())
-			.tier(riotAccount.getQueue())
-			.division(riotAccount.getDivision())
-			.summonerName(riotAccount.getSummonerName())
-			.mostLanes(mostLanes)
-			.mostChampions(mostChampions)
-			.lp(riotAccount.getLp())
-			.build();
+
+		this.actualUserId = riotAccount.getMember().getId();
+		this.profileIconId = riotAccount.getIconId();
+		this.tier = riotAccount.getQueue();
+		this.summonerName = riotAccount.getSummonerName();
+		this.lp = riotAccount.getLp();
+		this.division = riotAccount.getDivision();
+		this.mostChampions = mostChampions;
+		this.mostLanes = mostLanes;
+	}
+
+	public void updateByUser(User updatedUser) {
+		this.profileIconId = Optional.ofNullable(updatedUser.getProfileIconId()).orElse(this.profileIconId);
+		this.tier = Optional.ofNullable(updatedUser.getTier()).orElse(this.tier);
+		this.summonerName = Optional.ofNullable(updatedUser.getSummonerName()).orElse(this.summonerName);
+		this.lp = Optional.ofNullable(updatedUser.getLp()).orElse(this.lp);
+		this.division = Optional.ofNullable(updatedUser.getDivision()).orElse(this.division);
+		this.status = Optional.ofNullable(updatedUser.getStatus()).orElse(this.status);
+	}
+
+
+	public void updateStatus(Status status) {
+		this.status = status;
 	}
 
 

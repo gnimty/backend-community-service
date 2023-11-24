@@ -174,7 +174,8 @@ public class StompService {
 	// TODO janguni: 채팅방별 채팅 목록 불러오기 (exitDate < sendDate)
 	public List<ChatDto> getChatList(User me, Long chatRoomNo) {
 
-		// TODO: 시간 순서대로 오는건지 확인
+
+		// TODO: chatRoomNo 체크 해야함
 		List<Chat> totalChats = chatService.findChat(chatRoomNo);
 		Date exitDate = getExitDate(chatRoomNo, me);
 
@@ -191,7 +192,7 @@ public class StompService {
 
 		Chat savedChat = chatService.save(user, chatRoomNo, request.getData(), now);
 
-		chatRoom.setLastModifiedDate(now);
+		chatRoom.refreshModifiedDate(now);
 		chatRoomService.update(chatRoom);
 
 		return new ChatDto(savedChat);
@@ -200,7 +201,7 @@ public class StompService {
 
 	// TODO janguni: 접속정보 변동내역 전송
 	public void updateConnStatus(User user, Status connectStatus) {
-		user.setStatus(connectStatus);
+		user.updateStatus(connectStatus);
 		userService.save(user);
 
 		List<ChatRoom> chatRooms = chatRoomService.findChatRoom(user);
@@ -209,6 +210,7 @@ public class StompService {
 		chatRooms.forEach(chatRoom ->
 			sendToChatRoomSubscribers(chatRoom.getChatRoomNo(), response));
 	}
+
 
 	// TODO janguni: 채팅방에 있는 상대방이 보낸 채팅의 readCount update
 	public void readOtherChats(User me, Long chatRoomNo) {
@@ -222,18 +224,21 @@ public class StompService {
 		totalChats.stream()
 			.filter(chat -> (chat.getReadCnt() == 1 && chat.getSenderId().equals(otherActualUserId)))
 			.forEach(chat -> {
-				chat.setReadCnt(0);
+				chat.readByAllUser();
 				chatService.save(chat);
 			});
 	}
+
 
 	public void sendToUserSubscribers(String userId, MessageResponse response){
 		template.convertAndSend("/sub/user/" + userId, response);
 	}
 
+
 	public void sendToChatRoomSubscribers(Long chatRoomId, MessageResponse response){
 		template.convertAndSend("/sub/chatRoom/" + chatRoomId, response);
 	}
+
 
 	private User getOther(User me, ChatRoom chatRoom) {
 		List<Participant> participants = chatRoom.getParticipants();

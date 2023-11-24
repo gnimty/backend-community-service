@@ -38,17 +38,24 @@ public class UserService {
             .orElseThrow(()-> new BaseException(ErrorCode.NOT_FOUND_CHAT_USER));
     }
 
-    public User save(RiotAccount riotAccount){
-        Long actualUserId = riotAccount.getMember().getId();
-
-        return userRepository.findByActualUserId(actualUserId)
-            .map(user -> userRepository.save(User.toUserWithId(riotAccount, user.getId())))
+    public User save(RiotAccount riotAccount) {
+        return userRepository.findByActualUserId(riotAccount.getMember().getId())
+            .map(user -> {
+                user.updateByRiotAccount(riotAccount);
+                return userRepository.save(user);
+            })
             .orElseGet(() -> userRepository.save(User.toUser(riotAccount)));
 
     }
 
+
     public User save(User user){
-        return userRepository.save(user);
+        return userRepository.findByActualUserId(user.getActualUserId())
+            .map(existingUser -> {
+                existingUser.updateByUser(user);
+                return userRepository.save(existingUser);
+            })
+            .orElseGet(() -> userRepository.save(user));
     }
 
     public BulkWriteResult updateMany(List<User> users) {

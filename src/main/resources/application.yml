@@ -68,16 +68,19 @@ spring:
 
   data:
     mongodb:
-      uri: mongodb://localhost:27017/community
+      uri: ${MONGO_URI}
 
-  logging:
-    level:
-      org:
-        springframework:
-          data:
-            mongodb:
-              core:
-                ReactiveMongoTemplate: DEBUG
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: DEBUG
+        orm.jdbc.bind: TRACE
+      springframework:
+        data:
+          mongodb:
+            core:
+              MongoTemplate: DEBUG
 
 
 oauth:

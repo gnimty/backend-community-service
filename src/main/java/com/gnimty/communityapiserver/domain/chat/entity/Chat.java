@@ -14,7 +14,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document("chat")
 @Getter
-@Setter
 @NoArgsConstructor
 @EqualsAndHashCode(exclude = "_id")
 public class Chat {
@@ -34,5 +33,9 @@ public class Chat {
 		this.message = message;
 		this.sendDate = sendDate;
 		// chat을 보내면 readCnt는 항상 1로 생성됨
+	}
+
+	public void readByAllUser () {
+		this.readCnt = 0;
 	}
 }
