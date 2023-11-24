@@ -64,11 +64,15 @@ spring:
     properties:
       hibernate:
         hbm2ddl:
-          auto: update
+          auto: create-drop
 
   data:
     mongodb:
-      uri: ${MONGO_URI}
+      database: ${MONGO_DATABASE}
+      host: ${MONGO_HOST}
+      port: ${MONGO_PORT}
+      timeZone: Asia/Seoul
+      auto-index-creation: true
 
 logging:
   level:
