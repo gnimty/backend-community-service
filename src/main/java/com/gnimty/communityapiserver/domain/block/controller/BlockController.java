@@ -12,6 +12,7 @@ import com.gnimty.communityapiserver.domain.block.service.BlockService;
 import com.gnimty.communityapiserver.domain.block.service.dto.response.BlockReadServiceResponse;
 import com.gnimty.communityapiserver.domain.chat.entity.Blocked;
 import com.gnimty.communityapiserver.domain.chat.service.StompService;
+import com.gnimty.communityapiserver.domain.chat.service.UserService;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
 import com.gnimty.communityapiserver.global.response.CommonResponse;
@@ -31,7 +32,8 @@ public class BlockController {
 
 	private final BlockReadService blockReadService;
 	private final BlockService blockService;
-	private final StompService chatService;
+	private final StompService stompService;
+	private final UserService userService;
 
 	@GetMapping
 	public CommonResponse<BlockReadResponse> readBlocks() {
@@ -43,7 +45,7 @@ public class BlockController {
 	public CommonResponse<Void> doBlock(@RequestBody @Valid BlockRequest request) {
 		Member member = MemberThreadLocal.get();
 		blockService.doBlock(member, request.toServiceRequest());
-		chatService.updateBlockStatus(member.getId(), request.getId(), Blocked.BLOCK);
+		stompService.updateBlockStatus(userService.getUser(member.getId()), userService.getUser(request.getId()), Blocked.BLOCK);
 		return CommonResponse.success(SUCCESS_BLOCK, OK);
 	}
 
@@ -51,7 +53,7 @@ public class BlockController {
 	public CommonResponse<Void> clearBlock(@RequestBody @Valid BlockClearRequest request) {
 		Member member = MemberThreadLocal.get();
 		blockService.clearBlock(member, request.toServiceRequest());
-		chatService.updateBlockStatus(member.getId(), request.getId(), Blocked.UNBLOCK);
+		stompService.updateBlockStatus(userService.getUser(member.getId()), userService.getUser(request.getId()), Blocked.UNBLOCK);
 		return CommonResponse.success(SUCCESS_CLEAR_BLOCK, OK);
 	}
 }

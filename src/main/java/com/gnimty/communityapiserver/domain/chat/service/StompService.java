@@ -73,7 +73,7 @@ public class StompService {
 
         return chatRooms.stream().map(chatRoom ->
             ChatRoomDto.builder()
-                .chats(getChatList(me, chatRoom.getChatRoomNo()))
+                .chats(getChatList(me, chatRoom))
                 .chatRoom(chatRoom)
                 .other(new UserDto(
                     extractParticipant(me, chatRoom.getParticipants(), false).getUser()))
@@ -126,17 +126,14 @@ public class StompService {
 	}
 
 	// TODO so1omon : 특정 유저와 채팅을 나눈 member id list 넘기기
-	public List<Long> getChattedMemberIds(Long id){
-
-		// 0. 유저 정보 검색
-		User me = userService.getUser(id);
+	public List<Long> getChattedMemberIds(User user){
 
 		// 1. 내 정보로 chatRoom 리스트 검색
-		List<ChatRoom> chatRooms = chatRoomService.findChatRoom(me);
+		List<ChatRoom> chatRooms = chatRoomService.findChatRoom(user);
 
 		// 2. chatRoom에 속해 있는 모든 other participants 정보 검색하여 Id 추출
 		List<Long> memberIds = chatRooms.stream().map(chatRoom ->
-			 getOther(me, chatRoom).getActualUserId()).toList();
+			 getOther(user, chatRoom).getActualUserId()).toList();
 
 		// 3. return
 		return memberIds;
@@ -144,10 +141,7 @@ public class StompService {
 
 
     // 차단
-    public void updateBlockStatus(Long myActualId, Long otherActualId, Blocked status) {
-        // 1. 나와 상대가 속해 있는 채팅방을 찾기 (수정예정)
-		User me = userService.getUser(myActualId);
-		User other = userService.getUser(otherActualId);
+    public void updateBlockStatus(User me, User other, Blocked status) {
 
 		ChatRoom chatRoom = chatRoomService.findChatRoom(me, other)
 			.orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_ROOM, "두 유저가 존재하는 채팅방이 존재하지 않습니다."));
@@ -172,24 +166,21 @@ public class StompService {
 
 
 	// TODO janguni: 채팅방별 채팅 목록 불러오기 (exitDate < sendDate)
-	public List<ChatDto> getChatList(User me, Long chatRoomNo) {
+	public List<ChatDto> getChatList(User me, ChatRoom chatRoom) {
 
 		// TODO: 시간 순서대로 오는건지 확인
-		List<Chat> totalChats = chatService.findChat(chatRoomNo);
-		Date exitDate = getExitDate(chatRoomNo, me);
+		List<Chat> totalChats = chatService.findChat(chatRoom.getChatRoomNo());
+		Date exitDate = getExitDate(chatRoom, me);
 
 		return getChatDtoAfterExitDate(totalChats, exitDate);
 	}
 
 
 	// TODO janguni: 채팅 저장
-	public ChatDto sendChat(User user, Long chatRoomNo, MessageRequest request) {
+	public ChatDto sendChat(User user, ChatRoom chatRoom, MessageRequest request) {
 		Date now = new Date();
 
-		ChatRoom chatRoom = chatRoomService.findChatRoom(chatRoomNo)
-			.orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_ROOM));
-
-		Chat savedChat = chatService.save(user, chatRoomNo, request.getData(), now);
+		Chat savedChat = chatService.save(user, chatRoom.getChatRoomNo(), request.getData(), now);
 
 		chatRoom.setLastModifiedDate(now);
 		chatRoomService.update(chatRoom);
@@ -211,13 +202,10 @@ public class StompService {
 	}
 
 	// TODO janguni: 채팅방에 있는 상대방이 보낸 채팅의 readCount update
-	public void readOtherChats(User me, Long chatRoomNo) {
-		ChatRoom chatRoom = chatRoomService.findChatRoom(chatRoomNo)
-			.orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_ROOM));
-
+	public void readOtherChats(User me, ChatRoom chatRoom) {
 		Long otherActualUserId = getOther(me, chatRoom).getActualUserId();
 
-		List<Chat> totalChats = chatService.findChat(chatRoomNo);
+		List<Chat> totalChats = chatService.findChat(chatRoom.getChatRoomNo());
 
 		totalChats.stream()
 			.filter(chat -> (chat.getReadCnt() == 1 && chat.getSenderId().equals(otherActualUserId)))
@@ -251,9 +239,7 @@ public class StompService {
 	}
 
 
-	private Date getExitDate(Long chatRoomNo, User user) {
-		ChatRoom chatRoom = chatRoomService.getChatRoom(chatRoomNo);
-
+	private Date getExitDate(ChatRoom chatRoom, User user) {
 		return extractParticipant(user,chatRoom.getParticipants(), true)
 			.getExitDate();
 	}
