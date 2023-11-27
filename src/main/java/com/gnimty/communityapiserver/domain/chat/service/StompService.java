@@ -119,6 +119,20 @@ public class StompService {
 		}
     }
 
+
+	public void destroyWithdrawnUserData(Long actualUserId) {
+		User user = userService.getUser(actualUserId);
+		userService.delete(user);
+
+		chatRoomService.findChatRoom(user)
+			.forEach(chatRoom -> {
+				chatRoomService.delete(chatRoom.getChatRoomNo());
+				chatService.delete(chatRoom.getChatRoomNo());
+				sendToChatRoomSubscribers(chatRoom.getChatRoomNo(), new MessageResponse(MessageResponseType.DELETED_CHATROOM, chatRoom.getId()));
+			});
+	}
+
+
 	public void createOrUpdateUser(List<RiotAccount> accounts){
 		List<User> users = accounts.stream().map(account-> User.toUser(account)).toList();
 
@@ -226,6 +240,7 @@ public class StompService {
 				chatService.save(chat);
 			});
 	}
+
 
 	public void sendToUserSubscribers(String userId, MessageResponse response){
 		template.convertAndSend("/sub/user/" + userId, response);
