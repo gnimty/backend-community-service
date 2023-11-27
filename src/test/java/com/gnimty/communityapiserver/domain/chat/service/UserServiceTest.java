@@ -49,11 +49,11 @@ class UserServiceTest {
     }
 
 
-    @DisplayName("member로 user 가져오기")
+    @DisplayName("member로 user 조회")
     @Nested
     class getUserByMember {
 
-        @DisplayName("member id와 동일한 actualUserId가 존재 시 user를 가져오는데 성공")
+        @DisplayName("member id와 동일한 actualUserId가 존재 시 user 조회 성공")
         @Test
         void successGetUserByMember() {
             // given
@@ -96,11 +96,11 @@ class UserServiceTest {
     }
 
 
-    @DisplayName("member id로 user 가져오기")
+    @DisplayName("member id로 user 조회")
     @Nested
     class getUserByMemberId {
 
-        @DisplayName("member id와 동일한 actualUserId가 존재 시 user를 가져오는데 성공")
+        @DisplayName("member id와 동일한 actualUserId가 존재 시 user 조회 성공")
         @Test
         void successGetUserByMember() {
             // given
@@ -142,11 +142,11 @@ class UserServiceTest {
     }
 
 
-    @DisplayName("모든 user 가져오기")
+    @DisplayName("모든 user 조회")
     @Nested
     class findAllUsers {
 
-        @DisplayName("저장한 모든 user 가져오기 성공")
+        @DisplayName("저장한 모든 user 조회 성공")
         @Test
         void getAllUser() {
             // given
@@ -176,7 +176,7 @@ class UserServiceTest {
     }
 
 
-    @DisplayName("user 저장하기")
+    @DisplayName("user 저장")
     @Nested
     class saveUser {
 
@@ -221,7 +221,7 @@ class UserServiceTest {
         }
 
 
-        @DisplayName("user 저장 시 기존의 user 수정")
+        @DisplayName("기존 user 저장 시에는 수정")
         @Test
         void saveUser() {
             // given
