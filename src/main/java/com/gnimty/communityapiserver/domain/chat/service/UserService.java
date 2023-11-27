@@ -20,21 +20,21 @@ import org.springframework.stereotype.Service;
 public class UserService {
     private final UserRepository userRepository;
 
-    public List<User> findUser(){
+    public List<User> findAllUser(){
         return userRepository.findAll();
     }
 
-    public Optional<User> findUser(Long actualUserId){
+    public Optional<User> findAllUser(Long actualUserId){
         return userRepository.findByActualUserId(actualUserId);
     }
 
     public User getUser(Long actualUserId) {
-        return findUser(actualUserId)
+        return findAllUser(actualUserId)
             .orElseThrow(()-> new BaseException(ErrorCode.NOT_FOUND_CHAT_USER));
     }
 
     public User getUserByMember(Member member) {
-        return findUser(member.getId())
+        return findAllUser(member.getId())
             .orElseThrow(()-> new BaseException(ErrorCode.NOT_FOUND_CHAT_USER));
     }
 

@@ -18,6 +18,7 @@ import com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -167,7 +168,7 @@ class UserServiceTest {
 
 
             // when
-            List<User> findUsers = userService.findUser();
+            List<User> findUsers = userService.findAllUser();
 
 
             // then
@@ -180,9 +181,9 @@ class UserServiceTest {
     @Nested
     class saveUser {
 
-        @DisplayName("riotAccount로 user 저장 시 기존의 user 수정")
+        @DisplayName("user가 이미 있는 상태에서 riotAccount를 저장하면 기존의 데이터 덮어쓰기")
         @Test
-        void saveByRiotAccount() {
+        void updateByRiotAccount() {
             // given
             Member member = new Member(true, "uni@naver.com", "afD23!", 1L, "uni", Status.ONLINE,
                 1L);
@@ -221,9 +222,10 @@ class UserServiceTest {
         }
 
 
-        @DisplayName("기존 user 저장 시에는 수정")
+
+        @DisplayName("user가 이미 있는 상태에서 user를 저장하면 기존의 데이터 덮어쓰기")
         @Test
-        void saveUser() {
+        void updateUser() {
             // given
             userRepository.save(User.builder()
                 .actualUserId(1L)
@@ -250,6 +252,61 @@ class UserServiceTest {
             User findUser = userRepository.findByActualUserId(1L).get();
             assertThat(findUser.getTier()).isEqualTo(Tier.gold);
             assertThat(findUser.getSummonerName()).isEqualTo("uni");
+        }
+
+
+        @DisplayName("User로 새로 생성")
+        @Test
+        void createUserByUser() {
+            // given
+            User user = User.builder()
+                .actualUserId(2L)
+                .tier(Tier.diamond)
+                .lp(1L)
+                .status(Status.ONLINE)
+                .summonerName("uni")
+                .profileIconId(1L)
+                .division(3)
+                .build();
+
+            // when
+            userService.save(user);
+
+            // then
+            Optional<User> optionalUser = userRepository.findByActualUserId(2L);
+            assertThat(optionalUser).isPresent()
+                .satisfies(findUser -> assertThat(findUser.get()).isEqualTo(user));
+        }
+
+
+        @DisplayName("RiotAccount로 새로 생성")
+        @Test
+        void createUserByRiotAccount() {
+            // given
+            Member member = new Member(true, "uni@naver.com", "afD23!", 1L, "uni", Status.ONLINE,
+                1L);
+            memberRepository.save(member);
+
+            User user = User.builder()
+                .actualUserId(member.getId())
+                .tier(Tier.diamond)
+                .lp(1L)
+                .status(Status.ONLINE)
+                .summonerName("uni")
+                .profileIconId(1L)
+                .division(3)
+                .build();
+
+
+            // when
+            userService.save(user);
+
+
+            // then
+            Optional<User> optionalUser = userRepository.findByActualUserId(member.getId());
+            assertThat(optionalUser)
+                .isPresent()
+                .satisfies(findUser -> assertThat(findUser.get()).isEqualTo(user));
         }
     }
 

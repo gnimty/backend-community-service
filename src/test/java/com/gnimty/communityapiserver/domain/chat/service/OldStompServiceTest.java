@@ -122,7 +122,7 @@ class OldStompServiceTest {
 
     @Test
     void getOrCreateChatRoom_테스트() {
-        List<User> all = userService.findUser();
+        List<User> all = userService.findAllUser();
 
         List<ChatRoom> chatRooms = chatRoomService.findChatRoom(all.get(0));
         // 이미 존재하는 유저 쌍(0, 1번 유저)은 호출 시 기존 chatRoom인 첫 번째 chatRoom과 같음
