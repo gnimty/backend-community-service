@@ -31,7 +31,7 @@ public class BlockController {
 
 	private final BlockReadService blockReadService;
 	private final BlockService blockService;
-	private final StompService chatService;
+	private final StompService stompService;
 
 	@GetMapping
 	public CommonResponse<BlockReadResponse> readBlocks() {
@@ -43,7 +43,7 @@ public class BlockController {
 	public CommonResponse<Void> doBlock(@RequestBody @Valid BlockRequest request) {
 		Member member = MemberThreadLocal.get();
 		blockService.doBlock(member, request.toServiceRequest());
-		chatService.updateBlockStatus(member.getId(), request.getId(), Blocked.BLOCK);
+		stompService.updateBlockStatus(member.getId(), request.getId(), Blocked.BLOCK);
 		return CommonResponse.success(SUCCESS_BLOCK, OK);
 	}
 
@@ -51,7 +51,7 @@ public class BlockController {
 	public CommonResponse<Void> clearBlock(@RequestBody @Valid BlockClearRequest request) {
 		Member member = MemberThreadLocal.get();
 		blockService.clearBlock(member, request.toServiceRequest());
-		chatService.updateBlockStatus(member.getId(), request.getId(), Blocked.UNBLOCK);
+		stompService.updateBlockStatus(member.getId(), request.getId(), Blocked.UNBLOCK);
 		return CommonResponse.success(SUCCESS_CLEAR_BLOCK, OK);
 	}
 }
