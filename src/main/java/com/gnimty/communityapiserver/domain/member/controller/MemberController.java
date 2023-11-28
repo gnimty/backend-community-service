@@ -99,7 +99,7 @@ public class MemberController {
 	) {
 		RiotAccount riotAccount = memberService.updateMyProfile(request.toServiceRequest());
 		if (request.getStatus() != null) {
-			stompService.updateConnStatus(userService.getUserByMember(MemberThreadLocal.get()),
+			stompService.updateConnStatus(userService.getUser(MemberThreadLocal.get().getId()),
 				request.getStatus());
 		}
 		if (riotAccount != null) {
@@ -139,7 +139,7 @@ public class MemberController {
 	@PatchMapping("/me/status")
 	public CommonResponse<Void> updateStatus(@RequestBody @Valid StatusUpdateRequest request) {
 		memberService.updateStatus(request.toServiceRequest());
-		stompService.updateConnStatus(userService.getUserByMember(MemberThreadLocal.get()),
+		stompService.updateConnStatus(userService.getUser(MemberThreadLocal.get().getId()),
 			request.getStatus());
 		return CommonResponse.success(SUCCESS_UPDATE_STATUS, OK);
 	}

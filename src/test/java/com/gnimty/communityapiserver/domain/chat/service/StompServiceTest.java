@@ -30,6 +30,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.context.ActiveProfiles;
 
+/**
 @Slf4j
 @SpringBootTest
 @ActiveProfiles("test")
@@ -317,3 +318,5 @@ class StompServiceTest {
     }
 
 }
+
+ **/

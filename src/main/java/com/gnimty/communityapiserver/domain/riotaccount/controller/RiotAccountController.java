@@ -4,6 +4,7 @@ import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCC
 import static org.springframework.http.HttpStatus.OK;
 
 import com.gnimty.communityapiserver.domain.chat.service.StompService;
+import com.gnimty.communityapiserver.domain.chat.service.UserService;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.SummonerUpdateRequest;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.domain.riotaccount.controller.dto.request.RecommendedSummonersRequest;
@@ -34,6 +35,7 @@ public class RiotAccountController {
 
 	private final RiotAccountService riotAccountService;
 	private final StompService stompService;
+	private final UserService userService;
 
 	@PatchMapping
 	public CommonResponse<Void> updateSummoners(
@@ -66,7 +68,7 @@ public class RiotAccountController {
 	@GetMapping("/recently")
 	public CommonResponse<RecentlySummonersResponse> getRecentlySummoners() {
 		Member member = MemberThreadLocal.get();
-		List<Long> chattedMemberIds = stompService.getChattedMemberIds(member.getId());
+		List<Long> chattedMemberIds = stompService.getChattedMemberIds(userService.getUser(member.getId()));
 		RecentlySummonersServiceResponse response = riotAccountService
 			.getRecentlySummoners(member, chattedMemberIds);
 		return CommonResponse.success(RecentlySummonersResponse.from(response));
