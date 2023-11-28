@@ -49,4 +49,8 @@ public class UserService {
     public BulkWriteResult updateMany(List<User> users) {
         return userRepository.bulkUpdate(users);
     }
+
+    public void delete(User user) {
+        userRepository.delete(user);
+    }
 }
