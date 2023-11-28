@@ -139,7 +139,7 @@ public class JwtProvider {
 		String value = stringValueOperations.get(key);
 
 		if (value == null || !value.equals(refreshToken)) {
-			stringValueOperations.getAndDelete(key);
+			redisTemplate.delete(key);
 			return false;
 		}
 

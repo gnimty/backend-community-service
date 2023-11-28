@@ -3,6 +3,7 @@ package com.gnimty.communityapiserver.service.member;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.BDDMockito.willDoNothing;
@@ -77,7 +78,6 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -119,7 +119,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 	private ScheduleReadService scheduleReadService;
 	@MockBean
 	private PreferGameModeReadService preferGameModeReadService;
-	@SpyBean
+	@MockBean
 	private StringRedisTemplate redisTemplate;
 	@MockBean
 	private PasswordEncoder passwordEncoder;
@@ -772,9 +772,9 @@ public class MemberServiceTest extends ServiceTestSupport {
 				.should(times(1))
 				.sendEmail(any(String.class), any(String.class), any(String.class),
 					any(String.class), any(String.class));
-			then(valueOperations)
+			then(redisTemplate)
 				.should(times(1))
-				.getAndExpire(any(String.class), any(Long.class), any(TimeUnit.class));
+				.expire(any(String.class), any(Long.class), any(TimeUnit.class));
 		}
 
 		@DisplayName("form 로그인 회원이 아닐 경우, 실패한다.")
@@ -851,9 +851,9 @@ public class MemberServiceTest extends ServiceTestSupport {
 			}
 
 			// then
-			then(valueOperations)
+			then(redisTemplate)
 				.should(times(1))
-				.getAndExpire(any(String.class), any(Long.class), any(TimeUnit.class));
+				.expire(any(String.class), any(Long.class), any(TimeUnit.class));
 			then(valueOperations)
 				.should(times(1))
 				.set(any(String.class), any(String.class));
@@ -1188,22 +1188,21 @@ public class MemberServiceTest extends ServiceTestSupport {
 		@Test
 		void should_deleteRefreshTokenInRedis_when_logout() {
 			// given
-			String refreshToken = "refreshToken";
 
 			// stub
 			ValueOperations<String, String> valueOperations = mock(ValueOperations.class);
 			given(redisTemplate.opsForValue())
 				.willReturn(valueOperations);
-			given(valueOperations.getAndDelete(any(String.class)))
-				.willReturn(refreshToken);
+			given(redisTemplate.delete(anyString()))
+				.willReturn(true);
 
 			// when
 			memberService.logout();
 
 			// then
-			then(valueOperations)
+			then(redisTemplate)
 				.should(times(1))
-				.getAndDelete(any(String.class));
+				.delete(any(String.class));
 		}
 	}
 

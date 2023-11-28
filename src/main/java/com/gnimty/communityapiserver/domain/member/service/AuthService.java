@@ -25,7 +25,6 @@ import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -109,7 +108,6 @@ public class AuthService {
 		return authToken;
 	}
 
-	@Async("mailExecutor")
 	public void sendEmailAuthCode(EmailAuthServiceRequest request) {
 
 		String code = RandomCodeGenerator.generateCodeByLength(6);
@@ -131,7 +129,7 @@ public class AuthService {
 		}
 
 		saveInRedis(signupKey, "verified", Auth.SIGNUP_EXPIRATION.getExpiration());
-		valueOperations.getAndDelete(emailAuthKey);
+		redisTemplate.delete(emailAuthKey);
 	}
 
 	public AuthToken tokenRefresh(String refreshToken) {
@@ -204,7 +202,7 @@ public class AuthService {
 		ValueOperations<String, String> stringValueOperations = redisTemplate.opsForValue();
 
 		stringValueOperations.set(key, value);
-		stringValueOperations.getAndExpire(
+		redisTemplate.expire(
 			key,
 			timeout,
 			TimeUnit.MILLISECONDS
