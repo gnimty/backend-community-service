@@ -6,8 +6,10 @@ import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatRoomDto;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.MessageRequest;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.MessageResponse;
 import com.gnimty.communityapiserver.domain.chat.entity.Blocked;
+import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
 import com.gnimty.communityapiserver.domain.chat.service.ChatRoomService;
+import com.gnimty.communityapiserver.domain.chat.service.ChatService;
 import com.gnimty.communityapiserver.domain.chat.service.StompService;
 import com.gnimty.communityapiserver.domain.chat.service.UserService;
 import com.gnimty.communityapiserver.domain.chat.service.dto.UserWithBlockDto;
@@ -36,19 +38,21 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 @Slf4j
 public class ChatController {
 
-    private final StompService chatService;
+    private final StompService stompService;
+    private final ChatService chatService;
     private final ChatRoomService chatRoomService;
-    private final MemberService memberService;
     private final UserService userService;
+    private final MemberService memberService;
     private final BlockReadService blockReadService;
     private final WebSocketSessionManager webSocketSessionManager;
+
 
     // 채팅의 모든 조회
     @SubscribeMapping("/init_chat")
     public List<ChatRoomDto> getTotalChatRoomsAndChatsAndOtherUserInfo(
         @Header("simpSessionId") String sessionId) {
         User user = getUserBySessionId(sessionId);
-        return chatService.getChatRoomsJoined(user);
+        return stompService.getChatRoomsJoined(user);
     }
 
 
@@ -66,18 +70,18 @@ public class ChatController {
         Boolean isOtherBlock = blockReadService.existsByBlockerIdAndBlockedId(
             other.getActualUserId(), me.getActualUserId());
 
-        ChatRoomDto chatRoomDto = chatService.getOrCreateChatRoomDto(
+        ChatRoomDto chatRoomDto = stompService.getOrCreateChatRoomDto(
             new UserWithBlockDto(me, isMeBlock.equals(true) ? Blocked.BLOCK : Blocked.UNBLOCK),
             new UserWithBlockDto(other, isOtherBlock.equals(true) ? Blocked.BLOCK : Blocked.UNBLOCK)
         );
 
         // getchatRoomNo를 호출하기 X
         // chatRoom을 먼저 생성 또는 조회 후 그 정보를 그대로 보내주거나 DTO로 변환해서 보내주는 게 좋아 보임
-        chatService.sendToUserSubscribers(me.getId(),
+        stompService.sendToUserSubscribers(me.getId(),
             new MessageResponse(MessageResponseType.CHATROOM_INFO, chatRoomDto));
 
         if (!isOtherBlock) {
-            chatService.sendToUserSubscribers(other.getId(), new MessageResponse(
+            stompService.sendToUserSubscribers(other.getId(), new MessageResponse(
                 MessageResponseType.CHATROOM_INFO, chatRoomDto));
         }
     }
@@ -88,17 +92,18 @@ public class ChatController {
         @Header("simpSessionId") String sessionId,
         final @Valid MessageRequest request) {
         User user = getUserBySessionId(sessionId);
+        ChatRoom chatRoom = chatRoomService.getChatRoom(chatRoomNo);
 
         if (request.getType() == MessageRequestType.CHAT) {
-            ChatDto chatDto = chatService.sendChat(user, chatRoomNo, request);
-            chatService.sendToChatRoomSubscribers(chatRoomNo,
+            ChatDto chatDto = stompService.sendChat(user, chatRoom, request);
+            stompService.sendToChatRoomSubscribers(chatRoomNo,
                 new MessageResponse(MessageResponseType.CHAT_MESSAGE, chatDto));
         } else if (request.getType() == MessageRequestType.READ) {
-            chatService.readOtherChats(user, chatRoomNo);
-            chatService.sendToUserSubscribers(user.getId(),
+            stompService.readOtherChats(user, chatRoom);
+            stompService.sendToUserSubscribers(user.getId(),
                 new MessageResponse(MessageResponseType.READ_CHATS, chatRoomNo));
         } else {
-            chatService.exitChatRoom(user, chatRoomService.getChatRoom(chatRoomNo));
+            stompService.exitChatRoom(user, chatRoomService.getChatRoom(chatRoomNo));
         }
 
     }
@@ -108,7 +113,7 @@ public class ChatController {
     public void onClientDisconnect(SessionDisconnectEvent event) {
         User user = getUserBySessionId(event.getSessionId());
         if (!isMultipleUser(user.getActualUserId())) {
-            chatService.updateConnStatus(user, Status.OFFLINE);
+            stompService.updateConnStatus(user, Status.OFFLINE);
             memberService.updateStatus(
                 StatusUpdateServiceRequest.builder().status(Status.OFFLINE).build());
         }
@@ -120,18 +125,19 @@ public class ChatController {
         String sessionId = String.valueOf(event.getMessage().getHeaders().get("simpSessionId"));
         User user = getUserBySessionId(sessionId);
         if (!isMultipleUser(user.getActualUserId())) {
-            chatService.updateConnStatus(user, Status.ONLINE);
+            stompService.updateConnStatus(user, Status.ONLINE);
             memberService.updateStatus(
                 StatusUpdateServiceRequest.builder().status(Status.ONLINE).build());
         }
     }
 
     private User getUserBySessionId(String sessionId) {
-        Long memberId = webSocketSessionManager.getMemberId(sessionId);
-        return userService.getUser(memberId);
+        Long actualUserId = webSocketSessionManager.getMemberId(sessionId);
+        return userService.getUser(actualUserId);
     }
 
-    private boolean isMultipleUser(long memberId) {
+    private boolean isMultipleUser(Long memberId) {
         return webSocketSessionManager.getSessionCountByMemberId(memberId) > 1;
     }
+
 }

@@ -1,11 +1,13 @@
 package com.gnimty.communityapiserver.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gnimty.communityapiserver.domain.block.controller.BlockController;
 import com.gnimty.communityapiserver.domain.block.service.BlockReadService;
 import com.gnimty.communityapiserver.domain.block.service.BlockService;
 import com.gnimty.communityapiserver.domain.chat.service.StompService;
 import com.gnimty.communityapiserver.domain.chat.service.UserService;
 import com.gnimty.communityapiserver.domain.introduction.service.IntroductionReadService;
+import com.gnimty.communityapiserver.domain.member.controller.AuthController;
 import com.gnimty.communityapiserver.domain.member.controller.MemberController;
 import com.gnimty.communityapiserver.domain.member.service.AuthService;
 import com.gnimty.communityapiserver.domain.member.service.MemberReadService;
@@ -26,7 +28,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 @ActiveProfiles("test")
-@WebMvcTest(controllers = {MemberController.class})
+@WebMvcTest(controllers = {MemberController.class, AuthController.class, BlockController.class})
 @MockBean(JpaMetamodelMappingContext.class)
 public abstract class ControllerTestSupport {
 

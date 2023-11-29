@@ -28,8 +28,8 @@ public class BlockReadService {
 		return BlockReadServiceResponse.builder()
 			.blocks(block.stream()
 				.map(BlockEntry::from)
-				.toList()
-			).build();
+				.toList())
+			.build();
 	}
 
 	public Boolean existsByBlockerAndBlocked(Member blocker, Member blocked) {

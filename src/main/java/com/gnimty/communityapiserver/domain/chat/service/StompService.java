@@ -74,7 +74,7 @@ public class StompService {
 
         return chatRooms.stream().map(chatRoom ->
             ChatRoomDto.builder()
-                .chats(getChatList(me, chatRoom.getChatRoomNo()))
+                .chats(getChatList(me, chatRoom))
                 .chatRoom(chatRoom)
                 .other(new UserDto(
                     extractParticipant(me, chatRoom.getParticipants(), false).getUser()))
@@ -121,35 +121,43 @@ public class StompService {
         }
     }
 
+
+    public void destroyWithdrawnUserData(Long actualUserId) {
+        User user = userService.getUser(actualUserId);
+        userService.delete(user);
+
+        chatRoomService.findChatRoom(user)
+            .forEach(chatRoom -> {
+                chatRoomService.delete(chatRoom.getChatRoomNo());
+                chatService.delete(chatRoom.getChatRoomNo());
+                sendToChatRoomSubscribers(chatRoom.getChatRoomNo(),
+                    new MessageResponse(MessageResponseType.DELETED_CHATROOM, chatRoom.getId()));
+            });
+    }
+
+
     public void createOrUpdateUser(List<RiotAccount> accounts) {
         List<User> users = accounts.stream().map(account -> User.toUser(account)).toList();
-
         BulkWriteResult bulkWriteResult = userService.updateMany(users);
     }
 
     // TODO so1omon : 특정 유저와 채팅을 나눈 member id list 넘기기
-    public List<Long> getChattedMemberIds(Long id) {
-
-        // 0. 유저 정보 검색
-        User me = userService.getUser(id);
+    public List<Long> getChattedMemberIds(User user) {
 
         // 1. 내 정보로 chatRoom 리스트 검색
-        List<ChatRoom> chatRooms = chatRoomService.findChatRoom(me);
+        List<ChatRoom> chatRooms = chatRoomService.findChatRoom(user);
 
         // 2. chatRoom에 속해 있는 모든 other participants 정보 검색하여 Id 추출
         List<Long> memberIds = chatRooms.stream().map(chatRoom ->
-            getOther(me, chatRoom).getActualUserId()).toList();
+            getOther(user, chatRoom).getActualUserId()).toList();
 
         // 3. return
         return memberIds;
     }
 
-
     // 차단
-    public void updateBlockStatus(Long myActualId, Long otherActualId, Blocked status) {
-        // 1. 나와 상대가 속해 있는 채팅방을 찾기 (수정예정)
-        User me = userService.getUser(myActualId);
-        User other = userService.getUser(otherActualId);
+
+    public void updateBlockStatus(User me, User other, Blocked status) {
 
         ChatRoom chatRoom = chatRoomService.findChatRoom(me, other)
             .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_ROOM,
@@ -175,24 +183,21 @@ public class StompService {
 
 
     // TODO janguni: 채팅방별 채팅 목록 불러오기 (exitDate < sendDate)
-    public List<ChatDto> getChatList(User me, Long chatRoomNo) {
+    public List<ChatDto> getChatList(User me, ChatRoom chatRoom) {
 
-        // TODO: chatRoomNo 체크 해야함
-        List<Chat> totalChats = chatService.findChat(chatRoomNo);
-        Date exitDate = getExitDate(chatRoomNo, me);
+        // TODO: 시간 순서대로 오는건지 확인
+        List<Chat> totalChats = chatService.findChat(chatRoom.getChatRoomNo());
+        Date exitDate = getExitDate(chatRoom, me);
 
         return getChatDtoAfterExitDate(totalChats, exitDate);
     }
 
 
     // TODO janguni: 채팅 저장
-    public ChatDto sendChat(User user, Long chatRoomNo, MessageRequest request) {
+    public ChatDto sendChat(User user, ChatRoom chatRoom, MessageRequest request) {
         Date now = new Date();
 
-        ChatRoom chatRoom = chatRoomService.findChatRoom(chatRoomNo)
-            .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_ROOM));
-
-        Chat savedChat = chatService.save(user, chatRoomNo, request.getData(), now);
+        Chat savedChat = chatService.save(user, chatRoom.getChatRoomNo(), request.getData(), now);
 
         chatRoom.refreshModifiedDate(now);
         chatRoomService.update(chatRoom);
@@ -212,6 +217,30 @@ public class StompService {
 
         chatRooms.forEach(chatRoom ->
             sendToChatRoomSubscribers(chatRoom.getChatRoomNo(), response));
+    }
+
+    // TODO janguni: 채팅방에 있는 상대방이 보낸 채팅의 readCount update
+    public void readOtherChats(User me, ChatRoom chatRoom) {
+        Long otherActualUserId = getOther(me, chatRoom).getActualUserId();
+
+        List<Chat> totalChats = chatService.findChat(chatRoom.getChatRoomNo());
+
+        totalChats.stream()
+            .filter(
+                chat -> (chat.getReadCnt() == 1 && chat.getSenderId().equals(otherActualUserId)))
+            .forEach(chat -> {
+                chat.readByAllUser();
+                chatService.save(chat);
+            });
+    }
+
+
+    public void sendToUserSubscribers(String userId, MessageResponse response) {
+        template.convertAndSend("/sub/user/" + userId, response);
+    }
+
+    public void sendToChatRoomSubscribers(Long chatRoomId, MessageResponse response) {
+        template.convertAndSend("/sub/chatRoom/" + chatRoomId, response);
     }
 
 
@@ -234,13 +263,9 @@ public class StompService {
     }
 
 
-    public void sendToUserSubscribers(String userId, MessageResponse response) {
-        template.convertAndSend("/sub/user/" + userId, response);
-    }
-
-
-    public void sendToChatRoomSubscribers(Long chatRoomId, MessageResponse response) {
-        template.convertAndSend("/sub/chatRoom/" + chatRoomId, response);
+    private Date getExitDate(ChatRoom chatRoom, User user) {
+        return extractParticipant(user, chatRoom.getParticipants(), true)
+            .getExitDate();
     }
 
 

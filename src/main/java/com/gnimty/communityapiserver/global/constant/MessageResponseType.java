@@ -6,5 +6,7 @@ public enum MessageResponseType {
     CHATROOM_INFO,
     CHAT_MESSAGE,
 
+    DELETED_CHATROOM,
+
     READ_CHATS
 }

@@ -180,7 +180,7 @@ class OldStompServiceTest {
 
         // when
         sleep(3000);
-        stompService.sendChat(user, chatRoom.getChatRoomNo(), request);
+        stompService.sendChat(user, chatRoom, request);
 
 
         // then
@@ -293,9 +293,9 @@ class OldStompServiceTest {
         }
 
         // then
-        List<ChatDto> chatList1 = stompService.getChatList(user2, chatRoom.getChatRoomNo());
+        List<ChatDto> chatList1 = stompService.getChatList(user2, chatRoom);
         assertThat(chatList1.size()).isEqualTo(3);
-        List<ChatDto> chatList2 = stompService.getChatList(user1, chatRoom.getChatRoomNo());
+        List<ChatDto> chatList2 = stompService.getChatList(user1, chatRoom);
         assertThat(chatList2.size()).isEqualTo(5);
     }
 
