@@ -186,7 +186,7 @@ public class StompService {
     public List<ChatDto> getChatList(User me, ChatRoom chatRoom) {
 
         // TODO: 시간 순서대로 오는건지 확인
-        List<Chat> totalChats = chatService.findChat(chatRoom);
+        List<Chat> totalChats = chatService.findChats(chatRoom);
         Date exitDate = getExitDate(chatRoom, me);
 
         return getChatDtoAfterExitDate(totalChats, exitDate);
@@ -223,7 +223,7 @@ public class StompService {
     public void readOtherChats(User me, ChatRoom chatRoom) {
         Long otherActualUserId = getOther(me, chatRoom).getActualUserId();
 
-        List<Chat> totalChats = chatService.findChat(chatRoom);
+        List<Chat> totalChats = chatService.findChats(chatRoom);
 
         totalChats.stream()
             .filter(
@@ -251,7 +251,7 @@ public class StompService {
 
         Long otherActualUserId = getOther(me, chatRoom).getActualUserId();
 
-        List<Chat> totalChats = chatService.findChat(chatRoom);
+        List<Chat> totalChats = chatService.findChats(chatRoom);
 
         totalChats.stream()
             .filter(
