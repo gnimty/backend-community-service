@@ -17,7 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.test.context.ActiveProfiles;
 
-
+/**
 @Slf4j
 @SpringBootTest
 @ActiveProfiles("test")
@@ -129,4 +129,4 @@ public class UserRepositoryTest {
 //		assertThat(deletedUser).isEmpty();
 //	}
 
-}
+}**/

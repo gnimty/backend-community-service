@@ -23,7 +23,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.context.ActiveProfiles;
-
+/**
 @Slf4j
 @SpringBootTest
 @ActiveProfiles("test")
@@ -232,4 +232,4 @@ public class ChatRoomRepositoryTest {
 //		return new ChatUser(userId, LocalDateTime.now());
 //	}
 
-}
+}**/

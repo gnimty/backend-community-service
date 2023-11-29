@@ -16,39 +16,44 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "chatRoom")
 @Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
 @Builder
 public class ChatRoom {
-	// AutoIncrementSequence에서 ChatRoom을 위한 독립적인 SEQUENCE SCOPE로 작동
-	@Transient
-	public static final String SEQUENCE_NAME = "chatroom_sequence";
 
-	@Id
-	private String id;
+    // AutoIncrementSequence에서 ChatRoom을 위한 독립적인 SEQUENCE SCOPE로 작동
+    @Transient
+    public static final String SEQUENCE_NAME = "chatroom_sequence";
 
-	@Indexed(unique=true)
-	private Long chatRoomNo;
-	private List<Participant> participants;
-	private Date createdDate;
+    @Id
+    private String id;
 
-	@Getter
-	@Setter
-	@AllArgsConstructor
-	@ToString
-	@Builder
-	public static class Participant{
-		@DBRef
-		private User user;
-		private Date exitDate;
-		private Blocked blockedStatus;
-	}
+    @Indexed(unique = true)
+    private Long chatRoomNo;
+    private List<Participant> participants;
+    private Date createdDate;
 
-	private Date lastModifiedDate;
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @ToString
+    @Builder
+    public static class Participant {
 
-	private void refreshModifiedDate(){
-		this.lastModifiedDate = new Date();
-	}
+        @DBRef
+        private User user;
+        private Date exitDate;
+        private Blocked blockedStatus;
+    }
+
+    private Date lastModifiedDate;
+
+    public void refreshModifiedDate(Date date) {
+        this.lastModifiedDate = date;
+    }
+
+    public void updateParticipants(List<Participant> participants) {
+        this.participants = participants;
+    }
 }

@@ -8,8 +8,8 @@ import org.springframework.stereotype.Repository;
 
 public interface UserRepository extends MongoRepository<User, Long>, UserRepositoryCustom {
 
-	Optional<User> findByActualUserId(Long userId);
+    Optional<User> findByActualUserId(Long actualUserId);
 
-	List<User> findAll();
+    List<User> findAll();
 
 }
