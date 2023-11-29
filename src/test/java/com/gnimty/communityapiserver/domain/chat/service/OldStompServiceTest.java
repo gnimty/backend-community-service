@@ -184,7 +184,7 @@ class OldStompServiceTest {
 
 
         // then
-        List<Chat> chats = chatService.findChat(chatRoom.getChatRoomNo());
+        List<Chat> chats = chatService.findChats(chatRoom);
         ChatRoom updatedChatRoom = chatRoomService.getChatRoom(chatRoom.getChatRoomNo());
         assertThat(chats.size()).isEqualTo(1);
         assertThat(originLastModifiedDate).isBefore(updatedChatRoom.getLastModifiedDate());
@@ -232,7 +232,7 @@ class OldStompServiceTest {
 
 
         // then
-        List<Chat> chats = chatService.findChat(chatRoom.getChatRoomNo());
+        List<Chat> chats = chatService.findChats(chatRoom);
         for (Chat chat : chats) {
             if (chat.getSenderId().equals(user1.getActualUserId())) {
                 assertThat(chat.getReadCnt()).isEqualTo(0);

@@ -97,7 +97,7 @@ public class StompService {
 
             Long chatRoomNo = chatRoom.getChatRoomNo();
 
-            chatService.delete(chatRoomNo);
+            chatService.delete(chatRoom);
             chatRoomService.delete(chatRoomNo);
         }
         // (상대방이 채팅방 나가지 않은 상황) lastModifiedDate가 상대의 exitDate 이후일 때 : exitDate update
@@ -129,7 +129,7 @@ public class StompService {
         chatRoomService.findChatRoom(user)
             .forEach(chatRoom -> {
                 chatRoomService.delete(chatRoom.getChatRoomNo());
-                chatService.delete(chatRoom.getChatRoomNo());
+                chatService.delete(chatRoom);
                 sendToChatRoomSubscribers(chatRoom.getChatRoomNo(),
                     new MessageResponse(MessageResponseType.DELETED_CHATROOM, chatRoom.getId()));
             });
@@ -186,7 +186,7 @@ public class StompService {
     public List<ChatDto> getChatList(User me, ChatRoom chatRoom) {
 
         // TODO: 시간 순서대로 오는건지 확인
-        List<Chat> totalChats = chatService.findChat(chatRoom.getChatRoomNo());
+        List<Chat> totalChats = chatService.findChat(chatRoom);
         Date exitDate = getExitDate(chatRoom, me);
 
         return getChatDtoAfterExitDate(totalChats, exitDate);
@@ -197,7 +197,7 @@ public class StompService {
     public ChatDto sendChat(User user, ChatRoom chatRoom, MessageRequest request) {
         Date now = new Date();
 
-        Chat savedChat = chatService.save(user, chatRoom.getChatRoomNo(), request.getData(), now);
+        Chat savedChat = chatService.save(user, chatRoom, request.getData(), now);
 
         chatRoom.refreshModifiedDate(now);
         chatRoomService.update(chatRoom);
@@ -223,7 +223,7 @@ public class StompService {
     public void readOtherChats(User me, ChatRoom chatRoom) {
         Long otherActualUserId = getOther(me, chatRoom).getActualUserId();
 
-        List<Chat> totalChats = chatService.findChat(chatRoom.getChatRoomNo());
+        List<Chat> totalChats = chatService.findChat(chatRoom);
 
         totalChats.stream()
             .filter(
@@ -251,7 +251,7 @@ public class StompService {
 
         Long otherActualUserId = getOther(me, chatRoom).getActualUserId();
 
-        List<Chat> totalChats = chatService.findChat(chatRoomNo);
+        List<Chat> totalChats = chatService.findChat(chatRoom);
 
         totalChats.stream()
             .filter(
