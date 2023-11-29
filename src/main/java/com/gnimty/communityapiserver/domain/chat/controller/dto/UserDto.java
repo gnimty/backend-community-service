@@ -6,9 +6,9 @@ import com.gnimty.communityapiserver.global.constant.Tier;
 import lombok.Data;
 
 
-
 @Data
 public class UserDto {
+
     private Long userId;
     private String summonerName;
     private Tier tier;
@@ -16,7 +16,7 @@ public class UserDto {
     private Long iconId;
     private Status status;
 
-    public UserDto(User user){
+    public UserDto(User user) {
         this.userId = user.getActualUserId();
         this.status = user.getStatus();
         this.tier = user.getTier();

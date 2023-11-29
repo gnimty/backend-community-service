@@ -36,95 +36,102 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 @Slf4j
 public class ChatController {
 
-	private final StompService chatService;
-	private final ChatRoomService chatRoomService;
-	private final MemberService memberService;
-	private final UserService userService;
-	private final BlockReadService blockReadService;
-	private final WebSocketSessionManager webSocketSessionManager;
+    private final StompService chatService;
+    private final ChatRoomService chatRoomService;
+    private final MemberService memberService;
+    private final UserService userService;
+    private final BlockReadService blockReadService;
+    private final WebSocketSessionManager webSocketSessionManager;
 
-	// 채팅의 모든 조회
-	@SubscribeMapping("/init_chat")
-	public List<ChatRoomDto> getTotalChatRoomsAndChatsAndOtherUserInfo(@Header("simpSessionId") String sessionId) {
-		User user = getUserBySessionId(sessionId);
-		return chatService.getChatRoomsJoined(user);
-	}
-
-
-	// 채팅방 구독 유도
-	// 이미 채팅방이 존재한다면 채팅방 정보만 넘겨주고 상대방 구독유도는 하지 않기 -> Front 1차 처리, Back 2차 처리
-	@MessageMapping("/user/{otherUserId}")
-	public void createChatRoomAndDerive(@DestinationVariable("otherUserId") Long otherUserId,
-										@Header("simpSessionId") String sessionId) {
-
-		User me = getUserBySessionId(sessionId);
-		User other = userService.getUser(otherUserId);
-
-		Boolean isMeBlock = blockReadService.existsByBlockerIdAndBlockedId(me.getActualUserId(), other.getActualUserId());
-		Boolean isOtherBlock = blockReadService.existsByBlockerIdAndBlockedId(other.getActualUserId(), me.getActualUserId());
-
-		ChatRoomDto chatRoomDto = chatService.getOrCreateChatRoomDto(
-			new UserWithBlockDto(me, isMeBlock.equals(true) ? Blocked.BLOCK : Blocked.UNBLOCK),
-			new UserWithBlockDto(other, isOtherBlock.equals(true) ? Blocked.BLOCK : Blocked.UNBLOCK)
-		);
-
-		// getchatRoomNo를 호출하기 X
-		// chatRoom을 먼저 생성 또는 조회 후 그 정보를 그대로 보내주거나 DTO로 변환해서 보내주는 게 좋아 보임
-		chatService.sendToUserSubscribers(me.getId(), new MessageResponse(MessageResponseType.CHATROOM_INFO, chatRoomDto));
-
-		if (!isOtherBlock)
-		{
-			chatService.sendToUserSubscribers(other.getId(), new MessageResponse(
-				MessageResponseType.CHATROOM_INFO, chatRoomDto));
-		}
-	}
+    // 채팅의 모든 조회
+    @SubscribeMapping("/init_chat")
+    public List<ChatRoomDto> getTotalChatRoomsAndChatsAndOtherUserInfo(
+        @Header("simpSessionId") String sessionId) {
+        User user = getUserBySessionId(sessionId);
+        return chatService.getChatRoomsJoined(user);
+    }
 
 
-	@MessageMapping("/chatRoom/{chatRoomNo}")
-	public void sendMessage(@DestinationVariable("chatRoomNo") Long chatRoomNo,
-							@Header("simpSessionId") String sessionId,
-							final @Valid MessageRequest request) {
-		User user = getUserBySessionId(sessionId);
+    // 채팅방 구독 유도
+    // 이미 채팅방이 존재한다면 채팅방 정보만 넘겨주고 상대방 구독유도는 하지 않기 -> Front 1차 처리, Back 2차 처리
+    @MessageMapping("/user/{otherUserId}")
+    public void createChatRoomAndDerive(@DestinationVariable("otherUserId") Long otherUserId,
+        @Header("simpSessionId") String sessionId) {
 
-		if (request.getType() == MessageRequestType.CHAT) {
-			ChatDto chatDto = chatService.sendChat(user, chatRoomNo, request);
-			chatService.sendToChatRoomSubscribers(chatRoomNo, new MessageResponse(MessageResponseType.CHAT_MESSAGE, chatDto));
-		} else if (request.getType() == MessageRequestType.READ) {
-			chatService.readOtherChats(user, chatRoomNo);
-			chatService.sendToUserSubscribers(user.getId(), new MessageResponse(MessageResponseType.READ_CHATS, chatRoomNo));
-		} else {
-			chatService.exitChatRoom(user, chatRoomService.getChatRoom(chatRoomNo));
-		}
+        User me = getUserBySessionId(sessionId);
+        User other = userService.getUser(otherUserId);
 
-	}
+        Boolean isMeBlock = blockReadService.existsByBlockerIdAndBlockedId(me.getActualUserId(),
+            other.getActualUserId());
+        Boolean isOtherBlock = blockReadService.existsByBlockerIdAndBlockedId(
+            other.getActualUserId(), me.getActualUserId());
+
+        ChatRoomDto chatRoomDto = chatService.getOrCreateChatRoomDto(
+            new UserWithBlockDto(me, isMeBlock.equals(true) ? Blocked.BLOCK : Blocked.UNBLOCK),
+            new UserWithBlockDto(other, isOtherBlock.equals(true) ? Blocked.BLOCK : Blocked.UNBLOCK)
+        );
+
+        // getchatRoomNo를 호출하기 X
+        // chatRoom을 먼저 생성 또는 조회 후 그 정보를 그대로 보내주거나 DTO로 변환해서 보내주는 게 좋아 보임
+        chatService.sendToUserSubscribers(me.getId(),
+            new MessageResponse(MessageResponseType.CHATROOM_INFO, chatRoomDto));
+
+        if (!isOtherBlock) {
+            chatService.sendToUserSubscribers(other.getId(), new MessageResponse(
+                MessageResponseType.CHATROOM_INFO, chatRoomDto));
+        }
+    }
 
 
-	@EventListener
-	public void onClientDisconnect(SessionDisconnectEvent event) {
-		User user = getUserBySessionId(event.getSessionId());
-		if (!isMultipleUser(user.getActualUserId())) {
-			chatService.updateConnStatus(user, Status.OFFLINE);
-			memberService.updateStatus(StatusUpdateServiceRequest.builder().status(Status.OFFLINE).build());
-		}
-		webSocketSessionManager.deleteSession(event.getSessionId());
-	}
+    @MessageMapping("/chatRoom/{chatRoomNo}")
+    public void sendMessage(@DestinationVariable("chatRoomNo") Long chatRoomNo,
+        @Header("simpSessionId") String sessionId,
+        final @Valid MessageRequest request) {
+        User user = getUserBySessionId(sessionId);
 
-	@EventListener
-	public void onClientConnect(SessionConnectedEvent event) {
-		String sessionId = String.valueOf(event.getMessage().getHeaders().get("simpSessionId"));
-		User user = getUserBySessionId(sessionId);
-		if (!isMultipleUser(user.getActualUserId())) {
-			chatService.updateConnStatus(user, Status.ONLINE);
-			memberService.updateStatus(StatusUpdateServiceRequest.builder().status(Status.ONLINE).build());
-		}
-	}
+        if (request.getType() == MessageRequestType.CHAT) {
+            ChatDto chatDto = chatService.sendChat(user, chatRoomNo, request);
+            chatService.sendToChatRoomSubscribers(chatRoomNo,
+                new MessageResponse(MessageResponseType.CHAT_MESSAGE, chatDto));
+        } else if (request.getType() == MessageRequestType.READ) {
+            chatService.readOtherChats(user, chatRoomNo);
+            chatService.sendToUserSubscribers(user.getId(),
+                new MessageResponse(MessageResponseType.READ_CHATS, chatRoomNo));
+        } else {
+            chatService.exitChatRoom(user, chatRoomService.getChatRoom(chatRoomNo));
+        }
 
-	private User getUserBySessionId(String sessionId) {
-		Long memberId = webSocketSessionManager.getMemberId(sessionId);
-		return userService.getUser(memberId);
-	}
+    }
 
-	private boolean isMultipleUser(long memberId) {
-		return webSocketSessionManager.getSessionCountByMemberId(memberId) > 1;
-	}
+
+    @EventListener
+    public void onClientDisconnect(SessionDisconnectEvent event) {
+        User user = getUserBySessionId(event.getSessionId());
+        if (!isMultipleUser(user.getActualUserId())) {
+            chatService.updateConnStatus(user, Status.OFFLINE);
+            memberService.updateStatus(
+                StatusUpdateServiceRequest.builder().status(Status.OFFLINE).build());
+        }
+        webSocketSessionManager.deleteSession(event.getSessionId());
+    }
+
+    @EventListener
+    public void onClientConnect(SessionConnectedEvent event) {
+        String sessionId = String.valueOf(event.getMessage().getHeaders().get("simpSessionId"));
+        User user = getUserBySessionId(sessionId);
+        if (!isMultipleUser(user.getActualUserId())) {
+            chatService.updateConnStatus(user, Status.ONLINE);
+            memberService.updateStatus(
+                StatusUpdateServiceRequest.builder().status(Status.ONLINE).build());
+        }
+    }
+
+    private User getUserBySessionId(String sessionId) {
+        Long memberId = webSocketSessionManager.getMemberId(sessionId);
+        return userService.getUser(memberId);
+    }
+
+    private boolean isMultipleUser(long memberId) {
+        return webSocketSessionManager.getSessionCountByMemberId(memberId) > 1;
+    }
 }

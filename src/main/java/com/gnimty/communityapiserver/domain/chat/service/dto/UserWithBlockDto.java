@@ -8,6 +8,7 @@ import lombok.Data;
 @AllArgsConstructor
 @Data
 public class UserWithBlockDto {
+
     private User user;
     private Blocked status;
 }

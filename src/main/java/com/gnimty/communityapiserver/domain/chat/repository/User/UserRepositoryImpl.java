@@ -17,7 +17,7 @@ import org.springframework.data.mongodb.core.query.Update;
 
 
 @RequiredArgsConstructor
-public class UserRepositoryImpl implements UserRepositoryCustom{
+public class UserRepositoryImpl implements UserRepositoryCustom {
 
     @Autowired
     private final MongoTemplate mongoTemplate;

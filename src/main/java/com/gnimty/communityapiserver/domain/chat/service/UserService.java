@@ -18,24 +18,25 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 public class UserService {
+
     private final UserRepository userRepository;
 
-    public List<User> findAllUser(){
+    public List<User> findAllUser() {
         return userRepository.findAll();
     }
 
-    public Optional<User> findAllUser(Long actualUserId){
+    public Optional<User> findAllUser(Long actualUserId) {
         return userRepository.findByActualUserId(actualUserId);
     }
 
     public User getUser(Long actualUserId) {
         return findAllUser(actualUserId)
-            .orElseThrow(()-> new BaseException(ErrorCode.NOT_FOUND_CHAT_USER));
+            .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_USER));
     }
 
     public User getUserByMember(Member member) {
         return findAllUser(member.getId())
-            .orElseThrow(()-> new BaseException(ErrorCode.NOT_FOUND_CHAT_USER));
+            .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_USER));
     }
 
     public User save(RiotAccount riotAccount) {
@@ -49,7 +50,7 @@ public class UserService {
     }
 
 
-    public User save(User user){
+    public User save(User user) {
         return userRepository.findByActualUserId(user.getActualUserId())
             .map(existingUser -> {
                 existingUser.updateByUser(user);

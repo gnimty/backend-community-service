@@ -29,54 +29,56 @@ public class ChatRoomService {
 
     private final ChatRoomRepository chatRoomRepository;
 
-    public Boolean checkChatRoom(Long chatRoomNo){
+    public Boolean checkChatRoom(Long chatRoomNo) {
         return chatRoomRepository.existsByChatRoomNo(chatRoomNo);
     }
 
-    public Optional<ChatRoom> findChatRoom(User me, User other){
+    public Optional<ChatRoom> findChatRoom(User me, User other) {
         return chatRoomRepository.findByUsers(me, other);
     }
 
-    public List<ChatRoom> findChatRoom(User user){
+    public List<ChatRoom> findChatRoom(User user) {
         return chatRoomRepository.findByUser(user);
     }
 
 
     // TODO solomon : 단일 채팅방 정보 가져오기
-    public Optional<ChatRoom> findChatRoom(Long chatRoomNo){
+    public Optional<ChatRoom> findChatRoom(Long chatRoomNo) {
         return chatRoomRepository.findByChatRoomNo(chatRoomNo);
     }
 
-    public ChatRoom getChatRoom(Long chatRoomNo){
+    public ChatRoom getChatRoom(Long chatRoomNo) {
         return findChatRoom(chatRoomNo)
             .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_ROOM));
     }
 
-    public ChatRoom getChatRoom(User me, User other){
+    public ChatRoom getChatRoom(User me, User other) {
         return findChatRoom(me, other)
             .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_ROOM));
     }
 
-    public ChatRoom save(UserWithBlockDto me, UserWithBlockDto other){
+    public ChatRoom save(UserWithBlockDto me, UserWithBlockDto other) {
         Optional<ChatRoom> bothJoined = findChatRoom(me.getUser(), other.getUser());
 
-        if (bothJoined.isPresent()){
+        if (bothJoined.isPresent()) {
             throw new BaseException(ErrorCode.CHATROOM_ALREADY_EXISTS);
         }
 
         List<Participant> participants = List.of(
-            Participant.builder().user(me.getUser()).exitDate(null).blockedStatus(me.getStatus()).build(),
-            Participant.builder().user(other.getUser()).exitDate(null).blockedStatus(other.getStatus()).build()
+            Participant.builder().user(me.getUser()).exitDate(null).blockedStatus(me.getStatus())
+                .build(),
+            Participant.builder().user(other.getUser()).exitDate(null)
+                .blockedStatus(other.getStatus()).build()
         );
 
         return chatRoomRepository.save(participants);
     }
 
-    public void delete(Long chatRoomNo){
+    public void delete(Long chatRoomNo) {
         chatRoomRepository.deleteByChatRoomNo(chatRoomNo);
     }
 
-    public void update(ChatRoom chatRoom){
+    public void update(ChatRoom chatRoom) {
         chatRoomRepository.update(chatRoom);
     }
 }

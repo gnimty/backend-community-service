@@ -34,8 +34,6 @@ public class StompServiceTest {
     private UserService userService;
 
 
-
-
     @AfterEach
     void deleteAll() {
         userRepository.deleteAll();
@@ -59,10 +57,8 @@ public class StompServiceTest {
                 .lp(3L).build();
             userRepository.save(user);
 
-
             // when
             stompService.updateConnStatus(user, Status.OFFLINE);
-
 
             // then
             User findUser = userService.getUser(1L);
