@@ -10,7 +10,7 @@ import javax.validation.ConstraintValidatorContext;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class ChatMessageValidator implements ConstraintValidator<NotNullIfChatType, MessageRequest> {
+public class ChatTypeValidator implements ConstraintValidator<NotNullIfChatType, MessageRequest> {
 
 
     @Override
