@@ -180,7 +180,7 @@ class OldStompServiceTest {
 
         // when
         sleep(3000);
-        stompService.sendChat(user, chatRoom, request);
+        stompService.sendChat(user, chatRoom, request.getData());
 
 
         // then
@@ -227,8 +227,8 @@ class OldStompServiceTest {
 
 
         // when
-        stompService.readOtherChats(user2, chatRoom.getChatRoomNo()); // user2가 채팅방 읽음
-        stompService.readOtherChats(user2, chatRoom.getChatRoomNo()); // user2가 채팅방 읽음
+        stompService.readOtherChats(user2, chatRoom); // user2가 채팅방 읽음
+        stompService.readOtherChats(user2, chatRoom); // user2가 채팅방 읽음
 
 
         // then

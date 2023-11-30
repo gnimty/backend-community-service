@@ -194,10 +194,10 @@ public class StompService {
 
 
     // TODO janguni: 채팅 저장
-    public ChatDto sendChat(User user, ChatRoom chatRoom, MessageRequest request) {
+    public ChatDto sendChat(User user, ChatRoom chatRoom, String message) {
         Date now = new Date();
 
-        Chat savedChat = chatService.save(user, chatRoom, request.getData(), now);
+        Chat savedChat = chatService.save(user, chatRoom, message, now);
 
         chatRoom.refreshModifiedDate(now);
         chatRoomService.update(chatRoom);
@@ -241,25 +241,6 @@ public class StompService {
 
     public void sendToChatRoomSubscribers(Long chatRoomId, MessageResponse response) {
         template.convertAndSend("/sub/chatRoom/" + chatRoomId, response);
-    }
-
-
-    // TODO janguni: 채팅방에 있는 상대방이 보낸 채팅의 readCount update
-    public void readOtherChats(User me, Long chatRoomNo) {
-        ChatRoom chatRoom = chatRoomService.findChatRoom(chatRoomNo)
-            .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_ROOM));
-
-        Long otherActualUserId = getOther(me, chatRoom).getActualUserId();
-
-        List<Chat> totalChats = chatService.findChats(chatRoom);
-
-        totalChats.stream()
-            .filter(
-                chat -> (chat.getReadCnt() == 1 && chat.getSenderId().equals(otherActualUserId)))
-            .forEach(chat -> {
-                chat.readByAllUser();
-                chatService.save(chat);
-            });
     }
 
 

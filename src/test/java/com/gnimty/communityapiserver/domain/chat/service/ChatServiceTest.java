@@ -12,7 +12,9 @@ import com.gnimty.communityapiserver.domain.chat.repository.User.UserRepository;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.constant.Tier;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
@@ -45,6 +47,7 @@ class ChatServiceTest {
     void deleteAll() {
         userRepository.deleteAll();
         chatRepository.deleteAll();
+        chatRoomRepository.deleteAll();
     }
 
     @DisplayName("chat으로 저장")
@@ -145,4 +148,108 @@ class ChatServiceTest {
 
     }
 
+    public List<Chat> findChats(ChatRoom chatRoom) {
+        return chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo());
+    }
+
+
+    @DisplayName("chatRoom으로 조회")
+    @Nested
+    class findByChatRoom {
+
+        @DisplayName("채팅방의 모든 채팅내역 조회")
+        @Test
+        void findAllChats() {
+            // given
+            ChatRoom chatRoom = ChatRoom.builder()
+                .createdDate(new Date())
+                .lastModifiedDate(new Date())
+                .participants(null)
+                .chatRoomNo(1L)
+                .build();
+            chatRoomRepository.save(chatRoom);
+
+            for (int i = 0; i < 20; i++) {
+                chatRepository.save(Chat.builder()
+                    .senderId(1L)
+                    .chatRoomNo(chatRoom.getChatRoomNo())
+                    .message("hi")
+                    .sendDate(new Date())
+                    .build());
+            }
+
+            // when
+            List<Chat> chats = chatService.findChats(chatRoom);
+
+            // then
+            assertThat(chats.size()).isEqualTo(20);
+
+        }
+
+    }
+
+
+    @DisplayName("chat의 readCount 수정")
+    @Nested
+    class updateReadCount {
+
+        @DisplayName("readCount를 1에서 0으로 수정")
+        @Test
+        void updateReadCountTo0() {
+            // given
+            ChatRoom chatRoom = ChatRoom.builder()
+                .createdDate(new Date())
+                .lastModifiedDate(new Date())
+                .participants(null)
+                .chatRoomNo(1L)
+                .build();
+            chatRoomRepository.save(chatRoom);
+
+            Chat chat = Chat.builder()
+                .senderId(1L)
+                .chatRoomNo(chatRoom.getChatRoomNo())
+                .message("hi")
+                .sendDate(new Date())
+                .build();
+            chatRepository.save(chat);
+
+            // when
+            chat.readByAllUser();
+            chatService.save(chat);
+
+            // then
+            Chat findChat = chatRepository.findById(chat.getId()).get();
+            assertThat(findChat.getReadCnt()).isEqualTo(0);
+        }
+
+        @DisplayName("채팅방의 모든 채팅내역 삭제")
+        @Test
+        void deleteAllChatByChatRoom() {
+            // given
+            ChatRoom chatRoom = ChatRoom.builder()
+                .createdDate(new Date())
+                .lastModifiedDate(new Date())
+                .participants(null)
+                .chatRoomNo(1L)
+                .build();
+            chatRoomRepository.save(chatRoom);
+
+            for (int i = 0; i < 10; i++) {
+                chatRepository.save(Chat.builder()
+                    .senderId(1L)
+                    .chatRoomNo(chatRoom.getChatRoomNo())
+                    .message("hi")
+                    .sendDate(new Date())
+                    .build());
+            }
+
+            // when
+            chatService.delete(chatRoom);
+
+            // then
+            List<Chat> chats = chatService.findChats(chatRoom);
+            assertThat(chats).isEmpty();
+
+        }
+    }
 }
