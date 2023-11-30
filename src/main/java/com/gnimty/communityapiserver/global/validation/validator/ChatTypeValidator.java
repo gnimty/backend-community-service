@@ -20,7 +20,7 @@ public class ChatTypeValidator implements ConstraintValidator<NotNullIfChatType,
 
     @Override
     public boolean isValid(MessageRequest messageRequest, ConstraintValidatorContext context) {
-        if (messageRequest.getType() == MessageRequestType.CHAT) {
+        if (messageRequest.getType() == MessageRequestType.CHAT && messageRequest.getData()==null) {
             throw new BaseException(ErrorCode.INVALID_CHAT_DATE);
         }
         return true;
