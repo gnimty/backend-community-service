@@ -3,17 +3,20 @@ package com.gnimty.communityapiserver.domain.chat.service;
 
 import static org.assertj.core.api.Assertions.*;
 
+import com.gnimty.communityapiserver.domain.chat.controller.dto.MessageRequest;
 import com.gnimty.communityapiserver.domain.chat.entity.Chat;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
 import com.gnimty.communityapiserver.domain.chat.repository.Chat.ChatRepository;
 import com.gnimty.communityapiserver.domain.chat.repository.ChatRoom.ChatRoomRepository;
 import com.gnimty.communityapiserver.domain.chat.repository.User.UserRepository;
+import com.gnimty.communityapiserver.global.constant.MessageRequestType;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.constant.Tier;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import javax.validation.Valid;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
@@ -249,7 +252,19 @@ class ChatServiceTest {
             // then
             List<Chat> chats = chatService.findChats(chatRoom);
             assertThat(chats).isEmpty();
-
         }
+    }
+
+    @Test
+    void test() {
+        MessageRequest hi = call(MessageRequest.builder().type(MessageRequestType.CHAT).build());
+
+    }
+
+
+    public MessageRequest call(@Valid MessageRequest reqeust) {
+        log.info("request.type = {}", reqeust.getType());
+        log.info("request.data = {}", reqeust.getData());
+        return reqeust;
     }
 }

@@ -1,10 +1,12 @@
 package com.gnimty.communityapiserver.domain.chat.service;
 
 
+import com.gnimty.communityapiserver.domain.chat.controller.dto.MessageRequest;
 import com.gnimty.communityapiserver.domain.chat.entity.Chat;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
 import com.gnimty.communityapiserver.domain.chat.repository.Chat.ChatRepository;
+import com.gnimty.communityapiserver.global.constant.MessageRequestType;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -42,4 +44,5 @@ public class ChatService {
     public void delete(ChatRoom chatRoom) {
         chatRepository.deleteByChatRoomNo(chatRoom.getChatRoomNo());
     }
+
 }
