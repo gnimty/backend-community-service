@@ -5,6 +5,7 @@ import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static org.springframework.data.mongodb.core.query.Query.query;
 
 import com.gnimty.communityapiserver.domain.chat.entity.AutoIncrementSequence;
+import com.gnimty.communityapiserver.domain.chat.entity.Chat;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom.Participant;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
@@ -75,8 +76,8 @@ public class ChatRoomService {
         return chatRoomRepository.save(participants);
     }
 
-    public void delete(Long chatRoomNo) {
-        chatRoomRepository.deleteByChatRoomNo(chatRoomNo);
+    public void delete(ChatRoom chatRoom) {
+        chatRoomRepository.deleteByChatRoomNo(chatRoom.getChatRoomNo());
     }
 
     public void update(ChatRoom chatRoom) {

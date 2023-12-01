@@ -100,7 +100,7 @@ public class StompService {
             Long chatRoomNo = chatRoom.getChatRoomNo();
 
             chatService.delete(chatRoomNo);
-            chatRoomService.delete(chatRoomNo);
+            chatRoomService.delete(chatRoom);
         }
         // (상대방이 채팅방 나가지 않은 상황) lastModifiedDate가 상대의 exitDate 이후일 때 : exitDate update
         //      -> chatRoomRepository.updateExitDate(me);
@@ -130,7 +130,7 @@ public class StompService {
 
         chatRoomService.findChatRoom(user)
             .forEach(chatRoom -> {
-                chatRoomService.delete(chatRoom.getChatRoomNo());
+                chatRoomService.delete(chatRoom);
                 chatService.delete(chatRoom.getChatRoomNo());
                 sendToChatRoomSubscribers(chatRoom.getChatRoomNo(),
                     new MessageResponse(MessageResponseType.DELETED_CHATROOM, chatRoom.getId()));
