@@ -124,6 +124,8 @@ public enum ErrorCode {
 		public static final String ALREADY_CHAMPION_COMMENTS_LIKE = "이미 좋아요 또는 싫어요를 한 댓글입니다.";
 		public static final String CHAMPION_COMMENTS_LIKE_NOT_FOUND = "좋아요 또는 싫어요를 하지 않은 댓글입니다.";
 		public static final String NOT_FOUND_CHAT_ROOM = "%d번 채팅방 정보가 존재하지 않습니다.";
+
+		public static final String NOT_FOUND_CHAT_ROOM_BY_USERS = "두 유저가 존재하는 채팅방이 존재하지 않습니다.";
 		public static final String INVALID_PASSWORD = "현재 비밀번호가 일치하지 않습니다.";
 		public static final String INVALID_UUID = "올바르지 않은 uuid입니다.";
 	}

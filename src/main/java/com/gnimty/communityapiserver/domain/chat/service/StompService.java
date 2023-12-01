@@ -1,5 +1,7 @@
 package com.gnimty.communityapiserver.domain.chat.service;
 
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage.NOT_FOUND_CHAT_ROOM_BY_USERS;
+
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatRoomDto;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.MessageRequest;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.MessageResponse;
@@ -155,15 +157,11 @@ public class StompService {
         return memberIds;
     }
 
-    // 차단
 
     public void updateBlockStatus(User me, User other, Blocked status) {
 
-        ChatRoom chatRoom = chatRoomService.findChatRoom(me, other)
-            .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_ROOM,
-                "두 유저가 존재하는 채팅방이 존재하지 않습니다."));
+        ChatRoom chatRoom = chatRoomService.getChatRoom(me, other);
 
-        // 2. 해당 채팅방의 participant 정보 수정 후 save
         extractParticipant(me, chatRoom.getParticipants(), true).setBlockedStatus(status);
 
         chatRoomService.update(chatRoom);

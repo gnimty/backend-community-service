@@ -12,6 +12,7 @@ import com.gnimty.communityapiserver.domain.chat.repository.ChatRoom.ChatRoomRep
 import com.gnimty.communityapiserver.domain.chat.service.dto.UserWithBlockDto;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
+import com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -54,7 +55,7 @@ public class ChatRoomService {
 
     public ChatRoom getChatRoom(User me, User other) {
         return findChatRoom(me, other)
-            .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_ROOM));
+            .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_ROOM, ErrorMessage.NOT_FOUND_CHAT_USER));
     }
 
     public ChatRoom save(UserWithBlockDto me, UserWithBlockDto other) {
