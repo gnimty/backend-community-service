@@ -254,17 +254,4 @@ class ChatServiceTest {
             assertThat(chats).isEmpty();
         }
     }
-
-    @Test
-    void test() {
-        MessageRequest hi = call(MessageRequest.builder().type(MessageRequestType.CHAT).build());
-
-    }
-
-
-    public MessageRequest call(@Valid MessageRequest reqeust) {
-        log.info("request.type = {}", reqeust.getType());
-        log.info("request.data = {}", reqeust.getData());
-        return reqeust;
-    }
 }
