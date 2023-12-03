@@ -56,7 +56,7 @@ public class ChatRoomService {
 
     public ChatRoom getChatRoom(User me, User other) {
         return findChatRoom(me, other)
-            .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_ROOM, ErrorMessage.NOT_FOUND_CHAT_USER));
+            .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_ROOM, ErrorMessage.NOT_FOUND_CHAT_ROOM_BY_USERS));
     }
 
     public ChatRoom save(UserWithBlockDto me, UserWithBlockDto other) {
