@@ -2,8 +2,10 @@ package com.gnimty.communityapiserver.domain.chat.entity;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,6 +22,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 @ToString
 @Builder
+@EqualsAndHashCode
 public class ChatRoom {
 
     // AutoIncrementSequence에서 ChatRoom을 위한 독립적인 SEQUENCE SCOPE로 작동
@@ -39,6 +42,7 @@ public class ChatRoom {
     @AllArgsConstructor
     @ToString
     @Builder
+    @EqualsAndHashCode
     public static class Participant {
 
         @DBRef

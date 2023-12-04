@@ -5,6 +5,7 @@ import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static org.springframework.data.mongodb.core.query.Query.query;
 
 import com.gnimty.communityapiserver.domain.chat.entity.AutoIncrementSequence;
+import com.gnimty.communityapiserver.domain.chat.entity.Chat;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom.Participant;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
@@ -12,6 +13,7 @@ import com.gnimty.communityapiserver.domain.chat.repository.ChatRoom.ChatRoomRep
 import com.gnimty.communityapiserver.domain.chat.service.dto.UserWithBlockDto;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
+import com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -54,7 +56,7 @@ public class ChatRoomService {
 
     public ChatRoom getChatRoom(User me, User other) {
         return findChatRoom(me, other)
-            .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_ROOM));
+            .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_ROOM, ErrorMessage.NOT_FOUND_CHAT_ROOM_BY_USERS));
     }
 
     public ChatRoom save(UserWithBlockDto me, UserWithBlockDto other) {
@@ -74,8 +76,8 @@ public class ChatRoomService {
         return chatRoomRepository.save(participants);
     }
 
-    public void delete(Long chatRoomNo) {
-        chatRoomRepository.deleteByChatRoomNo(chatRoomNo);
+    public void delete(ChatRoom chatRoom) {
+        chatRoomRepository.deleteByChatRoomNo(chatRoom.getChatRoomNo());
     }
 
     public void update(ChatRoom chatRoom) {

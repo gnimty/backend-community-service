@@ -1,5 +1,7 @@
 package com.gnimty.communityapiserver.domain.chat.service;
 
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage.NOT_FOUND_CHAT_ROOM_BY_USERS;
+
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatRoomDto;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.MessageRequest;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.MessageResponse;
@@ -95,10 +97,8 @@ public class StompService {
         if (other.getExitDate() != null
             && chatRoom.getLastModifiedDate().before(other.getExitDate())) {
 
-            Long chatRoomNo = chatRoom.getChatRoomNo();
-
+            chatRoomService.delete(chatRoom);
             chatService.delete(chatRoom);
-            chatRoomService.delete(chatRoomNo);
         }
         // (상대방이 채팅방 나가지 않은 상황) lastModifiedDate가 상대의 exitDate 이후일 때 : exitDate update
         //      -> chatRoomRepository.updateExitDate(me);
@@ -128,7 +128,7 @@ public class StompService {
 
         chatRoomService.findChatRoom(user)
             .forEach(chatRoom -> {
-                chatRoomService.delete(chatRoom.getChatRoomNo());
+                chatRoomService.delete(chatRoom);
                 chatService.delete(chatRoom);
                 sendToChatRoomSubscribers(chatRoom.getChatRoomNo(),
                     new MessageResponse(MessageResponseType.DELETED_CHATROOM, chatRoom.getId()));
@@ -155,15 +155,11 @@ public class StompService {
         return memberIds;
     }
 
-    // 차단
 
     public void updateBlockStatus(User me, User other, Blocked status) {
 
-        ChatRoom chatRoom = chatRoomService.findChatRoom(me, other)
-            .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_ROOM,
-                "두 유저가 존재하는 채팅방이 존재하지 않습니다."));
+        ChatRoom chatRoom = chatRoomService.getChatRoom(me, other);
 
-        // 2. 해당 채팅방의 participant 정보 수정 후 save
         extractParticipant(me, chatRoom.getParticipants(), true).setBlockedStatus(status);
 
         chatRoomService.update(chatRoom);
