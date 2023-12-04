@@ -95,10 +95,8 @@ public class StompService {
         if (other.getExitDate() != null
             && chatRoom.getLastModifiedDate().before(other.getExitDate())) {
 
-            Long chatRoomNo = chatRoom.getChatRoomNo();
-
             chatService.delete(chatRoom);
-            chatRoomService.delete(chatRoomNo);
+            chatRoomService.delete(chatRoom.getChatRoomNo());
         }
         // (상대방이 채팅방 나가지 않은 상황) lastModifiedDate가 상대의 exitDate 이후일 때 : exitDate update
         //      -> chatRoomRepository.updateExitDate(me);
