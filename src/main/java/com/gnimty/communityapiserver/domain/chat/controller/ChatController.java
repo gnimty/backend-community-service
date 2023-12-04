@@ -28,6 +28,8 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.socket.messaging.SessionConnectedEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
@@ -95,7 +97,7 @@ public class ChatController {
         ChatRoom chatRoom = chatRoomService.getChatRoom(chatRoomNo);
 
         if (request.getType() == MessageRequestType.CHAT) {
-            ChatDto chatDto = stompService.sendChat(user, chatRoom, request);
+            ChatDto chatDto = stompService.sendChat(user, chatRoom, request.getData());
             stompService.sendToChatRoomSubscribers(chatRoomNo,
                 new MessageResponse(MessageResponseType.CHAT_MESSAGE, chatDto));
         } else if (request.getType() == MessageRequestType.READ) {
