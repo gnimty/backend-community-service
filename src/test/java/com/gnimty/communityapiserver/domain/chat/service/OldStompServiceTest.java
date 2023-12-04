@@ -180,11 +180,11 @@ class OldStompServiceTest {
 
         // when
         sleep(3000);
-        stompService.sendChat(user, chatRoom, request);
+        stompService.sendChat(user, chatRoom, request.getData());
 
 
         // then
-        List<Chat> chats = chatService.findChat(chatRoom.getChatRoomNo());
+        List<Chat> chats = chatService.findChats(chatRoom);
         ChatRoom updatedChatRoom = chatRoomService.getChatRoom(chatRoom.getChatRoomNo());
         assertThat(chats.size()).isEqualTo(1);
         assertThat(originLastModifiedDate).isBefore(updatedChatRoom.getLastModifiedDate());
@@ -227,12 +227,12 @@ class OldStompServiceTest {
 
 
         // when
-        stompService.readOtherChats(user2, chatRoom.getChatRoomNo()); // user2가 채팅방 읽음
-        stompService.readOtherChats(user2, chatRoom.getChatRoomNo()); // user2가 채팅방 읽음
+        stompService.readOtherChats(user2, chatRoom); // user2가 채팅방 읽음
+        stompService.readOtherChats(user2, chatRoom); // user2가 채팅방 읽음
 
 
         // then
-        List<Chat> chats = chatService.findChat(chatRoom.getChatRoomNo());
+        List<Chat> chats = chatService.findChats(chatRoom);
         for (Chat chat : chats) {
             if (chat.getSenderId().equals(user1.getActualUserId())) {
                 assertThat(chat.getReadCnt()).isEqualTo(0);

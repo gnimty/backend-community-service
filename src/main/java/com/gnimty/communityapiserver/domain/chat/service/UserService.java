@@ -46,7 +46,6 @@ public class UserService {
                 return userRepository.save(user);
             })
             .orElseGet(() -> userRepository.save(User.toUser(riotAccount)));
-
     }
 
 

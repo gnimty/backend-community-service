@@ -97,10 +97,8 @@ public class StompService {
         if (other.getExitDate() != null
             && chatRoom.getLastModifiedDate().before(other.getExitDate())) {
 
-            Long chatRoomNo = chatRoom.getChatRoomNo();
-
-            chatService.delete(chatRoomNo);
             chatRoomService.delete(chatRoom);
+            chatService.delete(chatRoom);
         }
         // (상대방이 채팅방 나가지 않은 상황) lastModifiedDate가 상대의 exitDate 이후일 때 : exitDate update
         //      -> chatRoomRepository.updateExitDate(me);
@@ -131,7 +129,7 @@ public class StompService {
         chatRoomService.findChatRoom(user)
             .forEach(chatRoom -> {
                 chatRoomService.delete(chatRoom);
-                chatService.delete(chatRoom.getChatRoomNo());
+                chatService.delete(chatRoom);
                 sendToChatRoomSubscribers(chatRoom.getChatRoomNo(),
                     new MessageResponse(MessageResponseType.DELETED_CHATROOM, chatRoom.getId()));
             });
@@ -184,7 +182,7 @@ public class StompService {
     public List<ChatDto> getChatList(User me, ChatRoom chatRoom) {
 
         // TODO: 시간 순서대로 오는건지 확인
-        List<Chat> totalChats = chatService.findChat(chatRoom.getChatRoomNo());
+        List<Chat> totalChats = chatService.findChats(chatRoom);
         Date exitDate = getExitDate(chatRoom, me);
 
         return getChatDtoAfterExitDate(totalChats, exitDate);
@@ -192,10 +190,10 @@ public class StompService {
 
 
     // TODO janguni: 채팅 저장
-    public ChatDto sendChat(User user, ChatRoom chatRoom, MessageRequest request) {
+    public ChatDto sendChat(User user, ChatRoom chatRoom, String message) {
         Date now = new Date();
 
-        Chat savedChat = chatService.save(user, chatRoom.getChatRoomNo(), request.getData(), now);
+        Chat savedChat = chatService.save(user, chatRoom, message, now);
 
         chatRoom.refreshModifiedDate(now);
         chatRoomService.update(chatRoom);
@@ -221,7 +219,7 @@ public class StompService {
     public void readOtherChats(User me, ChatRoom chatRoom) {
         Long otherActualUserId = getOther(me, chatRoom).getActualUserId();
 
-        List<Chat> totalChats = chatService.findChat(chatRoom.getChatRoomNo());
+        List<Chat> totalChats = chatService.findChats(chatRoom);
 
         totalChats.stream()
             .filter(
@@ -239,25 +237,6 @@ public class StompService {
 
     public void sendToChatRoomSubscribers(Long chatRoomId, MessageResponse response) {
         template.convertAndSend("/sub/chatRoom/" + chatRoomId, response);
-    }
-
-
-    // TODO janguni: 채팅방에 있는 상대방이 보낸 채팅의 readCount update
-    public void readOtherChats(User me, Long chatRoomNo) {
-        ChatRoom chatRoom = chatRoomService.findChatRoom(chatRoomNo)
-            .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_ROOM));
-
-        Long otherActualUserId = getOther(me, chatRoom).getActualUserId();
-
-        List<Chat> totalChats = chatService.findChat(chatRoomNo);
-
-        totalChats.stream()
-            .filter(
-                chat -> (chat.getReadCnt() == 1 && chat.getSenderId().equals(otherActualUserId)))
-            .forEach(chat -> {
-                chat.readByAllUser();
-                chatService.save(chat);
-            });
     }
 
 
