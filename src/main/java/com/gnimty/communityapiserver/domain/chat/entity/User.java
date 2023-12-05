@@ -5,7 +5,6 @@ import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
 import com.gnimty.communityapiserver.global.constant.Lane;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.constant.Tier;
-import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Id;
 import lombok.AllArgsConstructor;
@@ -37,7 +36,8 @@ public class User {
 	private Tier tier;
 	private Integer division;
 	private Long lp;
-	private String summonerName;
+	private String name;
+	private String tagLine;
 	private Status status;
 
 	private List<Lane> mostLanes;
@@ -59,7 +59,8 @@ public class User {
 			.profileIconId(riotAccount.getIconId())
 			.tier(riotAccount.getQueue())
 			.division(riotAccount.getDivision())
-			.summonerName(riotAccount.getSummonerName())
+			.name(riotAccount.getName())
+			.tagLine(riotAccount.getTagLine())
 			.mostLanes(mostLanes)
 			.mostChampions(mostChampions)
 			.lp(riotAccount.getLp())

@@ -10,7 +10,8 @@ import lombok.Data;
 @Data
 public class UserDto {
     private Long userId;
-    private String summonerName;
+    private String name;
+    private String tagLine;
     private Tier tier;
     private Integer division;
     private Long iconId;
@@ -22,7 +23,8 @@ public class UserDto {
         this.tier = user.getTier();
         this.division = user.getDivision();
         this.iconId = user.getProfileIconId();
-        this.summonerName = user.getSummonerName();
+        this.name = user.getName();
+        this.tagLine = user.getTagLine();
     }
 
 }

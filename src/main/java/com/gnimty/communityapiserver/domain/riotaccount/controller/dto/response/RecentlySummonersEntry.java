@@ -12,7 +12,8 @@ public class RecentlySummonersEntry {
 
 	private Long memberId;
 	private Long iconId;
-	private String summonerName;
+	private String name;
+	private String tagLine;
 	private Tier tier;
 	private Integer division;
 	private Long lp;
@@ -31,7 +32,8 @@ public class RecentlySummonersEntry {
 		return RecentlySummonersEntry.builder()
 			.memberId(matchingRiotAccount.getMember().getId())
 			.iconId(matchingRiotAccount.getIconId())
-			.summonerName(matchingRiotAccount.getSummonerName())
+			.name(matchingRiotAccount.getName())
+			.tagLine(matchingRiotAccount.getTagLine())
 			.tier(matchingRiotAccount.getQueue())
 			.division(matchingRiotAccount.getDivision())
 			.lp(matchingRiotAccount.getLp())

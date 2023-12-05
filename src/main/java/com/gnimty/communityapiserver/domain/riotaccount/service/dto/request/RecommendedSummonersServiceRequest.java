@@ -22,7 +22,7 @@ public class RecommendedSummonersServiceRequest {
 	private Boolean timeMatch;
 	private SortBy sortBy;
 	private Long lastSummonerId;
-	private String lastSummonerName;
+	private String lastName;
 	private Long lastSummonerMmr;
 	private Long lastSummonerUpCount;
 	private Integer pageSize;

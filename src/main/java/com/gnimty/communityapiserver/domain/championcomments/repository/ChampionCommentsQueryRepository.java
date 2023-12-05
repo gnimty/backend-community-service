@@ -57,7 +57,8 @@ public class ChampionCommentsQueryRepository {
 			championComments.deleted.as("deleted"),
 			selectBlocked(me),
 			championComments.member.id.as("memberId"),
-			riotAccount.summonerName.as("summonerName"),
+			riotAccount.name.as("name"),
+			riotAccount.tagLine.as("tagLine"),
 			championCommentsLike.likeOrNot.as("reaction")
 		);
 	}
