@@ -15,7 +15,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-@ValidateCursor(sortBy = "sortBy", lastSummonerName = "lastSummonerName",
+@ValidateCursor(sortBy = "sortBy", lastName = "lastName",
 	lastSummonerMmr = "lastSummonerMmr", lastSummonerUpCount = "lastSummonerUpCount")
 public class RecommendedSummonersRequest {
 
@@ -31,7 +31,7 @@ public class RecommendedSummonersRequest {
 	private Boolean timeMatch;
 	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
 	private Long lastSummonerId;
-	private String lastSummonerName;
+	private String lastName;
 	private Long lastSummonerMmr;
 	private Long lastSummonerUpCount;
 	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
@@ -48,7 +48,7 @@ public class RecommendedSummonersRequest {
 			.sortBy(sortBy)
 			.timeMatch(timeMatch)
 			.lastSummonerId(lastSummonerId)
-			.lastSummonerName(lastSummonerName)
+			.lastName(lastName)
 			.lastSummonerMmr(lastSummonerMmr)
 			.lastSummonerUpCount(lastSummonerUpCount)
 			.pageSize(pageSize)

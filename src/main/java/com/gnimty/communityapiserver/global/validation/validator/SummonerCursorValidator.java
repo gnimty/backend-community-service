@@ -11,14 +11,14 @@ import javax.validation.ConstraintValidatorContext;
 public class SummonerCursorValidator implements ConstraintValidator<ValidateCursor, Object> {
 
 	private String sortBy;
-	private String lastSummonerName;
+	private String lastName;
 	private String lastSummonerMmr;
 	private String lastSummonerUpCount;
 
 	@Override
 	public void initialize(ValidateCursor constraintAnnotation) {
 		sortBy = constraintAnnotation.sortBy();
-		lastSummonerName = constraintAnnotation.lastSummonerName();
+		lastName = constraintAnnotation.lastName();
 		lastSummonerMmr = constraintAnnotation.lastSummonerMmr();
 		lastSummonerUpCount = constraintAnnotation.lastSummonerUpCount();
 	}
@@ -26,7 +26,7 @@ public class SummonerCursorValidator implements ConstraintValidator<ValidateCurs
 	@Override
 	public boolean isValid(Object value, ConstraintValidatorContext context) {
 		SortBy sortByField = getObjectValue(value, sortBy, SortBy.class);
-		String lastSummonerNameField = getObjectValue(value, lastSummonerName, String.class);
+		String lastNameField = getObjectValue(value, lastName, String.class);
 		Long lastSummonerMmrField = getObjectValue(value, lastSummonerMmr, Long.class);
 		Long lastSummonerUpCountField = getObjectValue(value, lastSummonerUpCount, Long.class);
 
@@ -34,7 +34,7 @@ public class SummonerCursorValidator implements ConstraintValidator<ValidateCurs
 			throw new BaseException(ErrorCode.CONSTRAINT_VIOLATION);
 		}
 		if (sortByField.equals(SortBy.ATOZ)) {
-			return lastSummonerNameField != null;
+			return lastNameField != null;
 		}
 		if (sortByField.equals(SortBy.TIER)) {
 			return lastSummonerMmrField != null;
