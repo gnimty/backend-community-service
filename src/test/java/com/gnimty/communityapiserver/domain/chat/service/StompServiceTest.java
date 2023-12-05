@@ -4,6 +4,7 @@ package com.gnimty.communityapiserver.domain.chat.service;
 import static org.assertj.core.api.Assertions.*;
 
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.client5.http.auth.AuthStateCacheable;
+import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatDto;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatRoomDto;
 import com.gnimty.communityapiserver.domain.chat.entity.Blocked;
 import com.gnimty.communityapiserver.domain.chat.entity.Chat;
@@ -391,6 +392,164 @@ public class StompServiceTest {
 
             // then
             assertThat(chatRoomsJoined).isEmpty();
+        }
+    }
+
+    @DisplayName("채팅 리스트 조회 시")
+    @Nested
+    class getChats {
+
+        private User userA;
+        private User userB;
+        private ChatRoom chatRoom;
+
+        @BeforeEach
+        void saveUserAndChatRoom() {
+            userA = User.builder()
+                .actualUserId(1L)
+                .tier(Tier.gold)
+                .division(3)
+                .summonerName("uni")
+                .status(Status.ONLINE)
+                .lp(3L).build();
+            userRepository.save(userA);
+
+            userB = User.builder()
+                .actualUserId(2L)
+                .tier(Tier.gold)
+                .division(3)
+                .summonerName("inu")
+                .status(Status.ONLINE)
+                .lp(3L).build();
+            userRepository.save(userB);
+
+            chatRoom = ChatRoom.builder()
+                .chatRoomNo(1L)
+                .lastModifiedDate(new Date())
+                .participants(Arrays.asList(new Participant(userA, null, Blocked.UNBLOCK),
+                    new Participant(userB, null, Blocked.UNBLOCK)))
+                .createdDate(new Date())
+                .build();
+            chatRoomRepository.save(chatRoom);
+        }
+
+        @AfterEach
+        void deleteChats() {
+            chatRepository.deleteAll();
+        }
+
+        @DisplayName("채팅방을 나간 이후 채팅이 없다면 빈 리스트 가져옴")
+        @Test
+        void getEmptyChatsAfterExitChatRoom() {
+            // given
+            chatRepository.save(
+                Chat.builder()
+                    .senderId(userA.getActualUserId())
+                    .sendDate(new Date())
+                    .message("hi")
+                    .chatRoomNo(chatRoom.getChatRoomNo())
+                    .build());
+
+            chatRepository.save(
+                Chat.builder()
+                    .senderId(userB.getActualUserId())
+                    .sendDate(new Date())
+                    .message("bye")
+                    .chatRoomNo(chatRoom.getChatRoomNo())
+                    .build());
+
+            Participant participantUserA = stompService.extractParticipant(userA,
+                chatRoom.getParticipants(), true);
+            participantUserA.setExitDate(new Date());
+            chatRoomRepository.update(chatRoom);
+
+            // when
+            List<ChatDto> chats = stompService.getChatList(userA, chatRoom);
+
+            // then
+            assertThat(chats).isEmpty();
+        }
+
+        @DisplayName("채팅방을 나간 이후 채팅이 1개 이상이라면 나간 이후의 채팅 가져옴")
+        @Test
+        void getSomeChatsAfterExitChatRoom() {
+            // given
+            chatRepository.save(
+                Chat.builder()
+                    .senderId(userA.getActualUserId())
+                    .sendDate(new Date())
+                    .message("hi")
+                    .chatRoomNo(chatRoom.getChatRoomNo())
+                    .build());
+
+            chatRepository.save(
+                Chat.builder()
+                    .senderId(userB.getActualUserId())
+                    .sendDate(new Date())
+                    .message("bye")
+                    .chatRoomNo(chatRoom.getChatRoomNo())
+                    .build());
+
+            Participant participantUserA = stompService.extractParticipant(userA,
+                chatRoom.getParticipants(), true);
+            participantUserA.setExitDate(new Date());
+            chatRoomRepository.update(chatRoom);
+
+            chatRepository.save(
+                Chat.builder()
+                    .senderId(userB.getActualUserId())
+                    .sendDate(new Date())
+                    .message("bye2")
+                    .chatRoomNo(chatRoom.getChatRoomNo())
+                    .build());
+
+            // when
+            List<ChatDto> chats = stompService.getChatList(userA, chatRoom);
+
+            // then
+            assertThat(chats.size()).isEqualTo(1);
+            assertThat(chats.get(0).getMessage()).isEqualTo("bye2");
+        }
+
+        @DisplayName("채팅이 없다면 빈 List<ChatDto> 가져옴")
+        @Test
+        void getEmptyChats() {
+            // given
+            //      X
+
+            // when
+            List<ChatDto> chats = stompService.getChatList(userA, chatRoom);
+
+            // then
+            assertThat(chats).isEmpty();
+        }
+
+        @DisplayName("채팅이 있다면 모든 채팅을 가져옴")
+        @Test
+        void getAllChats() {
+            // given
+            chatRepository.save(
+                Chat.builder()
+                    .senderId(userA.getActualUserId())
+                    .sendDate(new Date())
+                    .message("hi")
+                    .chatRoomNo(chatRoom.getChatRoomNo())
+                    .build());
+
+            chatRepository.save(
+                Chat.builder()
+                    .senderId(userB.getActualUserId())
+                    .sendDate(new Date())
+                    .message("bye")
+                    .chatRoomNo(chatRoom.getChatRoomNo())
+                    .build());
+
+            // when
+            List<ChatDto> chats = stompService.getChatList(userA, chatRoom);
+
+
+            // then
+            assertThat(chats.size()).isEqualTo(2);
         }
     }
 
