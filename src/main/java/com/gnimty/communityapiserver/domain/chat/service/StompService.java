@@ -19,6 +19,7 @@ import com.gnimty.communityapiserver.global.constant.MessageResponseType;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
+import com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage;
 import com.mongodb.bulk.BulkWriteResult;
 import java.util.Date;
 import java.util.List;
@@ -55,8 +56,17 @@ public class StompService {
     // TODO solomon: 채팅방 생성 또는 조회
     // 이미 차단정보 확인된 상황
     public ChatRoomDto getOrCreateChatRoomDto(UserWithBlockDto me, UserWithBlockDto other) {
+
+        if (me.getStatus() == Blocked.BLOCK && other.getStatus() == Blocked.BLOCK) {
+            throw new BaseException(ErrorCode.NOT_ALLOWED_CREATE_CHAT_ROOM);
+        }
+
         ChatRoom chatRoom = chatRoomService.findChatRoom(me.getUser(), other.getUser())
             .orElseGet(() -> chatRoomService.save(me, other));
+
+        // TODO: 회의 때
+        // 만약 채팅방의 차단 정보와 UserWithBlockDto로 들어온 차단 정보가 다르다면?
+        //  차단 정보가 일치하는지 확인해야하는가??
 
         return ChatRoomDto.builder()
             .chatRoom(chatRoom)
@@ -89,7 +99,8 @@ public class StompService {
     public void exitChatRoom(User me, ChatRoom chatRoom) {
         Participant other = extractParticipant(me, chatRoom.getParticipants(), false);
         Participant mine = extractParticipant(me, chatRoom.getParticipants(), true);
-
+        log.info("mine: {}", mine);
+        log.info("other: {}", other);
         // chatRoom lastModifiedDate, 상대방의 exitDate 비교
 
         // (상대방이 채팅방 나간 상황) lastModifiedDate가 상대의 exitDate 이전일 때 : flush
@@ -103,7 +114,10 @@ public class StompService {
         // (상대방이 채팅방 나가지 않은 상황) lastModifiedDate가 상대의 exitDate 이후일 때 : exitDate update
         //      -> chatRoomRepository.updateExitDate(me);
         else {
+
             mine.setExitDate(new Date());
+            log.info("mine: {}", mine);
+            log.info("other: {}", other);
             chatRoomService.update(chatRoom);
         }
     }
@@ -293,7 +307,7 @@ public class StompService {
         }
 
         //2. 만약 내 유저 정보가 없다면 오류 반환
-        if (stdUserFoundedCnt != 2) {
+        if (stdUserFoundedCnt != 1) {
             throw new BaseException(ErrorCode.INTERNAL_SERVER_ERROR, "Participants가 유효하지 않습니다.");
         }
 

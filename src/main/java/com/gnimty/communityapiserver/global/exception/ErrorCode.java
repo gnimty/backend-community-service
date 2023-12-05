@@ -57,6 +57,7 @@ public enum ErrorCode {
 	PARENT_COMMENTS_DEPTH_MUST_BE_ONE(BAD_REQUEST, ErrorMessage.PARENT_COMMENTS_DEPTH_MUST_BE_ONE),
 	CHATROOM_ALREADY_EXISTS(BAD_REQUEST, ErrorMessage.CHATROOM_ALREADY_EXISTS),
 	NOT_FOUND_CHAT_USER(BAD_REQUEST, ErrorMessage.NOT_FOUND_CHAT_USER),
+	NOT_ALLOWED_CREATE_CHAT_ROOM(BAD_REQUEST, ErrorMessage.NOT_ALLOWED_CREATE_CHAT_ROOM),
 	INVALID_CHAT_DATE(BAD_REQUEST, ErrorMessage.INVALID_INPUT_VALUE),
 	NOT_FOUND_CHAT_ROOM(BAD_REQUEST, ErrorMessage.NOT_FOUND_CHAT_ROOM),
 	COMMENTS_ID_AND_CHAMPION_ID_INVALID(BAD_REQUEST,
@@ -127,6 +128,7 @@ public enum ErrorCode {
 		public static final String NOT_FOUND_CHAT_ROOM = "%d번 채팅방 정보가 존재하지 않습니다.";
 
 		public static final String NOT_FOUND_CHAT_ROOM_BY_USERS = "두 유저가 존재하는 채팅방이 존재하지 않습니다.";
+		public static final String NOT_ALLOWED_CREATE_CHAT_ROOM = "서로 차단한 사용자들의 채팅방은 생성할 수 없습니다.";
 		public static final String INVALID_PASSWORD = "현재 비밀번호가 일치하지 않습니다.";
 		public static final String INVALID_UUID = "올바르지 않은 uuid입니다.";
 	}

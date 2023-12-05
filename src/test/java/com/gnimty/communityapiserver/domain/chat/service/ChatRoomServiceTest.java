@@ -191,8 +191,8 @@ class ChatRoomServiceTest {
             ChatRoom chatRoom = ChatRoom.builder()
                 .chatRoomNo(1L)
                 .lastModifiedDate(new Date())
-                .participants(Arrays.asList(new Participant(userA, new Date(), Blocked.UNBLOCK),
-                    new Participant(userB, new Date(), Blocked.UNBLOCK)))
+                .participants(Arrays.asList(new Participant(userA, null, Blocked.UNBLOCK),
+                    new Participant(userB, null, Blocked.UNBLOCK)))
                 .createdDate(new Date())
                 .build();
             chatRoomRepository.save(chatRoom);
@@ -266,8 +266,8 @@ class ChatRoomServiceTest {
             ChatRoom chatRoom = ChatRoom.builder()
                 .chatRoomNo(Long.valueOf(1L))
                 .lastModifiedDate(new Date())
-                .participants(Arrays.asList(new Participant(userA, new Date(), Blocked.UNBLOCK),
-                    new Participant(userB, new Date(), Blocked.UNBLOCK)))
+                .participants(Arrays.asList(new Participant(userA, null, Blocked.UNBLOCK),
+                    new Participant(userB, null, Blocked.UNBLOCK)))
                 .createdDate(new Date())
                 .build();
             chatRoomRepository.save(chatRoom);
@@ -370,8 +370,8 @@ class ChatRoomServiceTest {
             ChatRoom chatRoom = ChatRoom.builder()
                 .chatRoomNo(Long.valueOf(1L))
                 .lastModifiedDate(new Date())
-                .participants(Arrays.asList(new Participant(userA, new Date(), Blocked.UNBLOCK),
-                    new Participant(userB, new Date(), Blocked.UNBLOCK)))
+                .participants(Arrays.asList(new Participant(userA, null, Blocked.UNBLOCK),
+                    new Participant(userB, null, Blocked.UNBLOCK)))
                 .createdDate(new Date())
                 .build();
             chatRoomRepository.save(chatRoom);
@@ -418,8 +418,8 @@ class ChatRoomServiceTest {
             ChatRoom chatRoom = ChatRoom.builder()
                 .chatRoomNo(Long.valueOf(1L))
                 .lastModifiedDate(new Date())
-                .participants(Arrays.asList(new Participant(userA, new Date(), Blocked.UNBLOCK),
-                    new Participant(userB, new Date(), Blocked.UNBLOCK)))
+                .participants(Arrays.asList(new Participant(userA, null, Blocked.UNBLOCK),
+                    new Participant(userB, null, Blocked.UNBLOCK)))
                 .createdDate(new Date())
                 .build();
             chatRoomRepository.save(chatRoom);
@@ -459,8 +459,8 @@ class ChatRoomServiceTest {
             ChatRoom chatRoom = ChatRoom.builder()
                 .chatRoomNo(Long.valueOf(1L))
                 .lastModifiedDate(new Date())
-                .participants(Arrays.asList(new Participant(userA, new Date(), Blocked.UNBLOCK),
-                    new Participant(userB, new Date(), Blocked.UNBLOCK)))
+                .participants(Arrays.asList(new Participant(userA, null, Blocked.UNBLOCK),
+                    new Participant(userB, null, Blocked.UNBLOCK)))
                 .createdDate(new Date())
                 .build();
             chatRoomRepository.save(chatRoom);
@@ -497,7 +497,7 @@ class ChatRoomServiceTest {
             ChatRoom chatRoom = ChatRoom.builder()
                 .chatRoomNo(Long.valueOf(1L))
                 .lastModifiedDate(new Date())
-                .participants(Arrays.asList(new Participant(user, new Date(), Blocked.UNBLOCK)))
+                .participants(Arrays.asList(new Participant(user, null, Blocked.UNBLOCK)))
                 .createdDate(new Date())
                 .build();
             chatRoomRepository.save(chatRoom);
