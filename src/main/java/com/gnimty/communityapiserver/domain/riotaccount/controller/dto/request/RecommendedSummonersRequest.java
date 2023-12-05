@@ -19,7 +19,9 @@ import lombok.Getter;
 	lastSummonerMmr = "lastSummonerMmr", lastSummonerUpCount = "lastSummonerUpCount")
 public class RecommendedSummonersRequest {
 
+	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
 	private GameMode gameMode;
+	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
 	private Status status;
 	private List<Long> preferChampionIds;
 	private Boolean duoable;
