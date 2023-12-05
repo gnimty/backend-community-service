@@ -33,8 +33,20 @@ public class RiotAccount extends BaseEntity {
 	private Long id;
 
 	@NotNull
-	@Column(name = "summoner_name", columnDefinition = "VARCHAR(100)", unique = true)
-	private String summonerName;
+	@Column(name = "internal_name", columnDefinition = "VARCHAR(100)")
+	private String internalName;
+
+	@NotNull
+	@Column(name = "name", columnDefinition = "VARCHAR(100)")
+	private String name;
+
+	@NotNull
+	@Column(name = "internal_tag_name", columnDefinition = "VARCHAR(100)", unique = true)
+	private String internalTagName;
+
+	@NotNull
+	@Column(name = "tag_line", columnDefinition = "VARCHAR(100)")
+	private String tagLine;
 
 	@NotNull
 	@Column(name = "is_main", columnDefinition = "TINYINT")
@@ -82,13 +94,50 @@ public class RiotAccount extends BaseEntity {
 	@Column(name = "icon_id", columnDefinition = "BIGINT")
 	private Long iconId;
 
+	@NotNull
+	@Column(name = "queue_flex", columnDefinition = "VARCHAR(20)")
+	@Enumerated(EnumType.STRING)
+	private Tier queueFlex;
+
+	@NotNull
+	@Column(name = "lp_flex", columnDefinition = "BIGINT")
+	private Long lpFlex;
+
+	@NotNull
+	@Column(name = "division_flex", columnDefinition = "TINYINT")
+	private Integer divisionFlex;
+
+	@NotNull
+	@Column(name = "mmr_flex", columnDefinition = "BIGINT")
+	private Long mmrFlex;
+
+	@Enumerated(EnumType.STRING)
+	@Column(name = "frequent_lane_1_flex", columnDefinition = "VARCHAR(10)")
+	private Lane frequentLane1Flex;
+
+	@Enumerated(EnumType.STRING)
+	@Column(name = "frequent_lane_2_flex", columnDefinition = "VARCHAR(10)")
+	private Lane frequentLane2Flex;
+
+	@Column(name = "frequent_champion_id_1_flex", columnDefinition = "BIGINT")
+	private Long frequentChampionId1Flex;
+
+	@Column(name = "frequent_champion_id_2_flex", columnDefinition = "BIGINT")
+	private Long frequentChampionId2Flex;
+
+	@Column(name = "frequent_champion_id_3_flex", columnDefinition = "BIGINT")
+	private Long frequentChampionId3Flex;
+
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "member_id", nullable = false)
 	private Member member;
 
 	@Builder
 	public RiotAccount(
-		String summonerName,
+		String internalName,
+		String name,
+		String internalTagName,
+		String tagLine,
 		Boolean isMain,
 		Tier queue,
 		Long lp,
@@ -101,9 +150,21 @@ public class RiotAccount extends BaseEntity {
 		Long frequentChampionId3,
 		String puuid,
 		Long iconId,
+		Tier queueFlex,
+		Long lpFlex,
+		Integer divisionFlex,
+		Long mmrFlex,
+		Lane frequentLane1Flex,
+		Lane frequentLane2Flex,
+		Long frequentChampionId1Flex,
+		Long frequentChampionId2Flex,
+		Long frequentChampionId3Flex,
 		Member member
 	) {
-		this.summonerName = summonerName;
+		this.internalName = internalName;
+		this.name = name;
+		this.internalTagName = internalTagName;
+		this.tagLine = tagLine;
 		this.isMain = isMain;
 		this.queue = queue;
 		this.lp = lp;
@@ -116,6 +177,15 @@ public class RiotAccount extends BaseEntity {
 		this.frequentChampionId3 = frequentChampionId3;
 		this.puuid = puuid;
 		this.iconId = iconId;
+		this.queueFlex = queueFlex;
+		this.lpFlex = lpFlex;
+		this.divisionFlex = divisionFlex;
+		this.mmrFlex = mmrFlex;
+		this.frequentLane1Flex = frequentLane1Flex;
+		this.frequentLane2Flex = frequentLane2Flex;
+		this.frequentChampionId1Flex = frequentChampionId1Flex;
+		this.frequentChampionId2Flex = frequentChampionId2Flex;
+		this.frequentChampionId3Flex = frequentChampionId3Flex;
 		this.member = member;
 	}
 
