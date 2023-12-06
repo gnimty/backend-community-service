@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,12 +17,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "chatRoom")
 @Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
 @Builder
+@EqualsAndHashCode
 public class ChatRoom {
+
 	// AutoIncrementSequence에서 ChatRoom을 위한 독립적인 SEQUENCE SCOPE로 작동
 	@Transient
 	public static final String SEQUENCE_NAME = "chatroom_sequence";
@@ -29,7 +31,7 @@ public class ChatRoom {
 	@Id
 	private String id;
 
-	@Indexed(unique=true)
+	@Indexed(unique = true)
 	private Long chatRoomNo;
 	private List<Participant> participants;
 	private Date createdDate;
@@ -39,7 +41,9 @@ public class ChatRoom {
 	@AllArgsConstructor
 	@ToString
 	@Builder
-	public static class Participant{
+	@EqualsAndHashCode
+	public static class Participant {
+
 		@DBRef
 		private User user;
 		private Date exitDate;
@@ -48,7 +52,11 @@ public class ChatRoom {
 
 	private Date lastModifiedDate;
 
-	private void refreshModifiedDate(){
-		this.lastModifiedDate = new Date();
+	public void refreshModifiedDate(Date date) {
+		this.lastModifiedDate = date;
+	}
+
+	public void updateParticipants(List<Participant> participants) {
+		this.participants = participants;
 	}
 }

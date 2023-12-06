@@ -41,5 +41,4 @@ public class StompHandler implements ChannelInterceptor {
 	}
 
 
-
 }

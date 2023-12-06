@@ -21,7 +21,10 @@ public @interface ValidateCursor {
 	Class<? extends Payload>[] payload() default {};
 
 	String sortBy();
+
 	String lastName();
+
 	String lastSummonerMmr();
+
 	String lastSummonerUpCount();
 }

@@ -2,7 +2,7 @@ package com.gnimty.communityapiserver.domain.championcomments.repository;
 
 import static com.gnimty.communityapiserver.domain.block.entity.QBlock.block;
 import static com.gnimty.communityapiserver.domain.championcomments.entity.QChampionComments.championComments;
-import static com.gnimty.communityapiserver.domain.championcommentslike.entity.QChampionCommentsLike.*;
+import static com.gnimty.communityapiserver.domain.championcommentslike.entity.QChampionCommentsLike.championCommentsLike;
 import static com.gnimty.communityapiserver.domain.member.entity.QMember.member;
 import static com.gnimty.communityapiserver.domain.riotaccount.entity.QRiotAccount.riotAccount;
 
@@ -32,7 +32,8 @@ public class ChampionCommentsQueryRepository {
 			.join(championComments.member, member)
 			.leftJoin(block).on(block.blocked.eq(championComments.member))
 			.join(riotAccount).on(riotAccount.member.eq(member))
-			.leftJoin(championCommentsLike).on(championCommentsLike.championComments.id.eq(championComments.id)
+			.leftJoin(championCommentsLike)
+			.on(championCommentsLike.championComments.id.eq(championComments.id)
 				.and(championCommentsLike.member.id.eq(me.getId())))
 			.where(championComments.championId.eq(championId))
 			.orderBy(championComments.upCount.desc(), championComments.downCount.asc())

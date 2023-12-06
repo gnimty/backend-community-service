@@ -18,39 +18,51 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 public class UserService {
-    private final UserRepository userRepository;
 
-    public List<User> findUser(){
-        return userRepository.findAll();
-    }
+	private final UserRepository userRepository;
 
-    public Optional<User> findUser(Long actualUserId){
-        return userRepository.findByActualUserId(actualUserId);
-    }
+	public List<User> findAllUser() {
+		return userRepository.findAll();
+	}
 
-    public User getUser(Long actualUserId) {
-        return findUser(actualUserId)
-            .orElseThrow(()-> new BaseException(ErrorCode.NOT_FOUND_CHAT_USER));
-    }
+	public Optional<User> findAllUser(Long actualUserId) {
+		return userRepository.findByActualUserId(actualUserId);
+	}
 
-    public User getUserByMember(Member member) {
-        return findUser(member.getId())
-            .orElseThrow(()-> new BaseException(ErrorCode.NOT_FOUND_CHAT_USER));
-    }
+	public User getUser(Long actualUserId) {
+		return findAllUser(actualUserId)
+			.orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_USER));
+	}
 
-    public User save(RiotAccount riotAccount){
-        return userRepository.save(User.toUser(riotAccount));
-    }
+	public User getUserByMember(Member member) {
+		return findAllUser(member.getId())
+			.orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_USER));
+	}
 
-    public User save(User user){
-        return userRepository.save(user);
-    }
+	public User save(RiotAccount riotAccount) {
+		return userRepository.findByActualUserId(riotAccount.getMember().getId())
+			.map(user -> {
+				user.updateByRiotAccount(riotAccount);
+				return userRepository.save(user);
+			})
+			.orElseGet(() -> userRepository.save(User.toUser(riotAccount)));
+	}
 
-    public BulkWriteResult updateMany(List<User> users) {
-        return userRepository.bulkUpdate(users);
-    }
 
-    public void delete(User user) {
-        userRepository.delete(user);
-    }
+	public User save(User user) {
+		return userRepository.findByActualUserId(user.getActualUserId())
+			.map(existingUser -> {
+				existingUser.updateByUser(user);
+				return userRepository.save(existingUser);
+			})
+			.orElseGet(() -> userRepository.save(user));
+	}
+
+	public BulkWriteResult updateMany(List<User> users) {
+		return userRepository.bulkUpdate(users);
+	}
+
+	public void delete(User user) {
+		userRepository.delete(user);
+	}
 }

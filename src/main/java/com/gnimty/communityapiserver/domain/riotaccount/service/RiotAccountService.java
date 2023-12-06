@@ -81,7 +81,8 @@ public class RiotAccountService {
 			.toList();
 	}
 
-	private List<RecentlySummonersEntry> createMatchingRecentlySummoners(RecentMemberInfo recentMemberInfo,
+	private List<RecentlySummonersEntry> createMatchingRecentlySummoners(
+		RecentMemberInfo recentMemberInfo,
 		Map<String, RiotAccount> riotAccountMap) {
 		return recentMemberInfo.getRecentMembers()
 			.stream()
