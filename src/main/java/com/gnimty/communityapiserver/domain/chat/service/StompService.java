@@ -1,9 +1,6 @@
 package com.gnimty.communityapiserver.domain.chat.service;
 
-import static com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage.NOT_FOUND_CHAT_ROOM_BY_USERS;
-
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatRoomDto;
-import com.gnimty.communityapiserver.domain.chat.controller.dto.MessageRequest;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.MessageResponse;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.UserConnStatusDto;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.UserDto;
@@ -19,7 +16,6 @@ import com.gnimty.communityapiserver.global.constant.MessageResponseType;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
-import com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage;
 import com.mongodb.bulk.BulkWriteResult;
 import java.util.Date;
 import java.util.List;
@@ -199,7 +195,7 @@ public class StompService {
 
 
     // TODO janguni: 채팅 저장
-    public ChatDto sendChat(User user, ChatRoom chatRoom, String message) {
+    public ChatDto saveChat(User user, ChatRoom chatRoom, String message) {
         Date now = new Date();
 
         Chat savedChat = chatService.save(user, chatRoom, message, now);

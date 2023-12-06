@@ -76,13 +76,8 @@ public class StompServiceTest {
         @Test
         void successUpdateConnectStatus() {
             // given
-            User user = User.builder()
-                .actualUserId(1L)
-                .tier(Tier.gold)
-                .division(3)
-                .summonerName("uni")
-                .status(Status.ONLINE)
-                .lp(3L).build();
+            User user = User.builder().actualUserId(1L).tier(Tier.gold).division(3)
+                .summonerName("uni").status(Status.ONLINE).lp(3L).build();
             userRepository.save(user);
 
             // when
@@ -103,22 +98,12 @@ public class StompServiceTest {
 
         @BeforeEach
         void saveTwoUser() {
-            userA = User.builder()
-                .actualUserId(1L)
-                .tier(Tier.gold)
-                .division(3)
-                .summonerName("uni")
-                .status(Status.ONLINE)
-                .lp(3L).build();
+            userA = User.builder().actualUserId(1L).tier(Tier.gold).division(3).summonerName("uni")
+                .status(Status.ONLINE).lp(3L).build();
             userRepository.save(userA);
 
-            userB = User.builder()
-                .actualUserId(2L)
-                .tier(Tier.gold)
-                .division(3)
-                .summonerName("inu")
-                .status(Status.ONLINE)
-                .lp(3L).build();
+            userB = User.builder().actualUserId(2L).tier(Tier.gold).division(3).summonerName("inu")
+                .status(Status.ONLINE).lp(3L).build();
             userRepository.save(userB);
         }
 
@@ -126,12 +111,9 @@ public class StompServiceTest {
         @Test
         void successGetExistingChatRoom() {
             // given
-            ChatRoom chatRoom = ChatRoom.builder()
-                .chatRoomNo(1L)
-                .lastModifiedDate(new Date())
+            ChatRoom chatRoom = ChatRoom.builder().chatRoomNo(1L).lastModifiedDate(new Date())
                 .participants(Arrays.asList(new Participant(userA, new Date(), Blocked.UNBLOCK),
-                    new Participant(userB, new Date(), Blocked.UNBLOCK)))
-                .createdDate(new Date())
+                    new Participant(userB, new Date(), Blocked.UNBLOCK))).createdDate(new Date())
                 .build();
             chatRoomRepository.save(chatRoom);
 
@@ -143,8 +125,8 @@ public class StompServiceTest {
                 userBWithBlock);
 
             // then
-            ChatRoom findChatRoom = chatRoomRepository.findByChatRoomNo(
-                chatRoomDto.getChatRoomNo()).get();
+            ChatRoom findChatRoom = chatRoomRepository.findByChatRoomNo(chatRoomDto.getChatRoomNo())
+                .get();
 
             assertThat(findChatRoom).isEqualTo(chatRoom);
         }
@@ -195,14 +177,11 @@ public class StompServiceTest {
             UserWithBlockDto userBWithBlock = new UserWithBlockDto(userB, Blocked.BLOCK);
 
             // when & then
-            assertThatThrownBy(
-                () -> stompService.getOrCreateChatRoomDto(userAWithBlock, userBWithBlock))
-                .isInstanceOf(BaseException.class)
-                .satisfies(exception -> {
-                    assertThat(((BaseException) exception).getErrorCode()).isEqualTo(
-                        ErrorCode.NOT_ALLOWED_CREATE_CHAT_ROOM);
-                })
-                .hasMessageContaining(ErrorMessage.NOT_ALLOWED_CREATE_CHAT_ROOM);
+            assertThatThrownBy(() -> stompService.getOrCreateChatRoomDto(userAWithBlock,
+                userBWithBlock)).isInstanceOf(BaseException.class).satisfies(exception -> {
+                assertThat(((BaseException) exception).getErrorCode()).isEqualTo(
+                    ErrorCode.NOT_ALLOWED_CREATE_CHAT_ROOM);
+            }).hasMessageContaining(ErrorMessage.NOT_ALLOWED_CREATE_CHAT_ROOM);
         }
 
     }
@@ -217,31 +196,17 @@ public class StompServiceTest {
 
         @BeforeEach
         void saveUserAndChatRoom() {
-            userA = User.builder()
-                .actualUserId(1L)
-                .tier(Tier.gold)
-                .division(3)
-                .summonerName("uni")
-                .status(Status.ONLINE)
-                .lp(3L).build();
+            userA = User.builder().actualUserId(1L).tier(Tier.gold).division(3).summonerName("uni")
+                .status(Status.ONLINE).lp(3L).build();
             userRepository.save(userA);
 
-            userB = User.builder()
-                .actualUserId(2L)
-                .tier(Tier.gold)
-                .division(3)
-                .summonerName("inu")
-                .status(Status.ONLINE)
-                .lp(3L).build();
+            userB = User.builder().actualUserId(2L).tier(Tier.gold).division(3).summonerName("inu")
+                .status(Status.ONLINE).lp(3L).build();
             userRepository.save(userB);
 
-            chatRoom = ChatRoom.builder()
-                .chatRoomNo(1L)
-                .lastModifiedDate(new Date())
-                .participants(Arrays.asList(new Participant(userA, null, Blocked.UNBLOCK),
-                    new Participant(userB, null, Blocked.UNBLOCK)))
-                .createdDate(new Date())
-                .build();
+            chatRoom = ChatRoom.builder().chatRoomNo(1L).lastModifiedDate(new Date()).participants(
+                Arrays.asList(new Participant(userA, null, Blocked.UNBLOCK),
+                    new Participant(userB, null, Blocked.UNBLOCK))).createdDate(new Date()).build();
             chatRoomRepository.save(chatRoom);
         }
 
@@ -259,8 +224,7 @@ public class StompServiceTest {
                 chatRoom.getChatRoomNo());
             assertThat(findChatRoom).isPresent();
             Optional<Participant> participantA = findChatRoom.get().getParticipants().stream()
-                .filter(participant -> participant.getUser().equals(userA))
-                .findAny();
+                .filter(participant -> participant.getUser().equals(userA)).findAny();
             assertThat(participantA).isPresent();
         }
 
@@ -290,40 +254,20 @@ public class StompServiceTest {
 
         @BeforeEach
         void saveUser() {
-            userA = User.builder()
-                .actualUserId(1L)
-                .tier(Tier.gold)
-                .division(3)
-                .summonerName("uni")
-                .status(Status.ONLINE)
-                .lp(3L).build();
+            userA = User.builder().actualUserId(1L).tier(Tier.gold).division(3).summonerName("uni")
+                .status(Status.ONLINE).lp(3L).build();
             userRepository.save(userA);
 
-            userB = User.builder()
-                .actualUserId(2L)
-                .tier(Tier.gold)
-                .division(3)
-                .summonerName("uin")
-                .status(Status.ONLINE)
-                .lp(3L).build();
+            userB = User.builder().actualUserId(2L).tier(Tier.gold).division(3).summonerName("uin")
+                .status(Status.ONLINE).lp(3L).build();
             userRepository.save(userB);
 
-            userC = User.builder()
-                .actualUserId(3L)
-                .tier(Tier.gold)
-                .division(3)
-                .summonerName("inu")
-                .status(Status.ONLINE)
-                .lp(3L).build();
+            userC = User.builder().actualUserId(3L).tier(Tier.gold).division(3).summonerName("inu")
+                .status(Status.ONLINE).lp(3L).build();
             userRepository.save(userC);
 
-            userD = User.builder()
-                .actualUserId(4L)
-                .tier(Tier.gold)
-                .division(3)
-                .summonerName("iun")
-                .status(Status.ONLINE)
-                .lp(3L).build();
+            userD = User.builder().actualUserId(4L).tier(Tier.gold).division(3).summonerName("iun")
+                .status(Status.ONLINE).lp(3L).build();
             userRepository.save(userD);
         }
 
@@ -331,19 +275,15 @@ public class StompServiceTest {
         @Test
         void successToGetAllChatRoom() {
             // given
-            saveChatRoomWithBlocked(1L, userA, userB, Blocked.UNBLOCK,
-                Blocked.BLOCK);
-            saveChatRoomWithBlocked(2L, userA, userC, Blocked.UNBLOCK,
-                Blocked.UNBLOCK);
-            saveChatRoomWithBlocked(3L, userA, userD, Blocked.UNBLOCK,
-                Blocked.BLOCK);
+            saveChatRoomWithBlocked(1L, userA, userB, Blocked.UNBLOCK, Blocked.BLOCK);
+            saveChatRoomWithBlocked(2L, userA, userC, Blocked.UNBLOCK, Blocked.UNBLOCK);
+            saveChatRoomWithBlocked(3L, userA, userD, Blocked.UNBLOCK, Blocked.BLOCK);
 
             // when
             List<ChatRoomDto> chatRoomsJoined = stompService.getChatRoomsJoined(userA);
 
             // then
-            List<Long> chatRoomIds = chatRoomsJoined.stream()
-                .map(ChatRoomDto::getChatRoomNo)
+            List<Long> chatRoomIds = chatRoomsJoined.stream().map(ChatRoomDto::getChatRoomNo)
                 .toList();
 
             assertThat(chatRoomIds.size()).isEqualTo(3);
@@ -356,19 +296,15 @@ public class StompServiceTest {
         @Test
         void successToGetNonBlockChatRoom() {
             // given
-            saveChatRoomWithBlocked(1L, userA, userB, Blocked.UNBLOCK,
-                Blocked.BLOCK);
-            saveChatRoomWithBlocked(2L, userA, userC, Blocked.BLOCK,
-                Blocked.UNBLOCK);
-            saveChatRoomWithBlocked(3L, userA, userD, Blocked.UNBLOCK,
-                Blocked.BLOCK);
+            saveChatRoomWithBlocked(1L, userA, userB, Blocked.UNBLOCK, Blocked.BLOCK);
+            saveChatRoomWithBlocked(2L, userA, userC, Blocked.BLOCK, Blocked.UNBLOCK);
+            saveChatRoomWithBlocked(3L, userA, userD, Blocked.UNBLOCK, Blocked.BLOCK);
 
             // when
             List<ChatRoomDto> chatRoomsJoined = stompService.getChatRoomsJoined(userA);
 
             // then
-            List<Long> chatRoomIds = chatRoomsJoined.stream()
-                .map(ChatRoomDto::getChatRoomNo)
+            List<Long> chatRoomIds = chatRoomsJoined.stream().map(ChatRoomDto::getChatRoomNo)
                 .toList();
 
             assertThat(chatRoomIds.size()).isEqualTo(2);
@@ -380,12 +316,9 @@ public class StompServiceTest {
         @Test
         void getEmptyChatRooms() {
             // given
-            saveChatRoomWithBlocked(1L, userA, userB, Blocked.BLOCK,
-                Blocked.UNBLOCK);
-            saveChatRoomWithBlocked(2L, userA, userC, Blocked.BLOCK,
-                Blocked.UNBLOCK);
-            saveChatRoomWithBlocked(3L, userA, userD, Blocked.BLOCK,
-                Blocked.UNBLOCK);
+            saveChatRoomWithBlocked(1L, userA, userB, Blocked.BLOCK, Blocked.UNBLOCK);
+            saveChatRoomWithBlocked(2L, userA, userC, Blocked.BLOCK, Blocked.UNBLOCK);
+            saveChatRoomWithBlocked(3L, userA, userD, Blocked.BLOCK, Blocked.UNBLOCK);
 
             // when
             List<ChatRoomDto> chatRoomsJoined = stompService.getChatRoomsJoined(userA);
@@ -405,31 +338,17 @@ public class StompServiceTest {
 
         @BeforeEach
         void saveUserAndChatRoom() {
-            userA = User.builder()
-                .actualUserId(1L)
-                .tier(Tier.gold)
-                .division(3)
-                .summonerName("uni")
-                .status(Status.ONLINE)
-                .lp(3L).build();
+            userA = User.builder().actualUserId(1L).tier(Tier.gold).division(3).summonerName("uni")
+                .status(Status.ONLINE).lp(3L).build();
             userRepository.save(userA);
 
-            userB = User.builder()
-                .actualUserId(2L)
-                .tier(Tier.gold)
-                .division(3)
-                .summonerName("inu")
-                .status(Status.ONLINE)
-                .lp(3L).build();
+            userB = User.builder().actualUserId(2L).tier(Tier.gold).division(3).summonerName("inu")
+                .status(Status.ONLINE).lp(3L).build();
             userRepository.save(userB);
 
-            chatRoom = ChatRoom.builder()
-                .chatRoomNo(1L)
-                .lastModifiedDate(new Date())
-                .participants(Arrays.asList(new Participant(userA, null, Blocked.UNBLOCK),
-                    new Participant(userB, null, Blocked.UNBLOCK)))
-                .createdDate(new Date())
-                .build();
+            chatRoom = ChatRoom.builder().chatRoomNo(1L).lastModifiedDate(new Date()).participants(
+                Arrays.asList(new Participant(userA, null, Blocked.UNBLOCK),
+                    new Participant(userB, null, Blocked.UNBLOCK))).createdDate(new Date()).build();
             chatRoomRepository.save(chatRoom);
         }
 
@@ -443,20 +362,12 @@ public class StompServiceTest {
         void getEmptyChatsAfterExitChatRoom() {
             // given
             chatRepository.save(
-                Chat.builder()
-                    .senderId(userA.getActualUserId())
-                    .sendDate(new Date())
-                    .message("hi")
-                    .chatRoomNo(chatRoom.getChatRoomNo())
-                    .build());
+                Chat.builder().senderId(userA.getActualUserId()).sendDate(new Date()).message("hi")
+                    .chatRoomNo(chatRoom.getChatRoomNo()).build());
 
             chatRepository.save(
-                Chat.builder()
-                    .senderId(userB.getActualUserId())
-                    .sendDate(new Date())
-                    .message("bye")
-                    .chatRoomNo(chatRoom.getChatRoomNo())
-                    .build());
+                Chat.builder().senderId(userB.getActualUserId()).sendDate(new Date()).message("bye")
+                    .chatRoomNo(chatRoom.getChatRoomNo()).build());
 
             Participant participantUserA = stompService.extractParticipant(userA,
                 chatRoom.getParticipants(), true);
@@ -475,20 +386,12 @@ public class StompServiceTest {
         void getSomeChatsAfterExitChatRoom() {
             // given
             chatRepository.save(
-                Chat.builder()
-                    .senderId(userA.getActualUserId())
-                    .sendDate(new Date())
-                    .message("hi")
-                    .chatRoomNo(chatRoom.getChatRoomNo())
-                    .build());
+                Chat.builder().senderId(userA.getActualUserId()).sendDate(new Date()).message("hi")
+                    .chatRoomNo(chatRoom.getChatRoomNo()).build());
 
             chatRepository.save(
-                Chat.builder()
-                    .senderId(userB.getActualUserId())
-                    .sendDate(new Date())
-                    .message("bye")
-                    .chatRoomNo(chatRoom.getChatRoomNo())
-                    .build());
+                Chat.builder().senderId(userB.getActualUserId()).sendDate(new Date()).message("bye")
+                    .chatRoomNo(chatRoom.getChatRoomNo()).build());
 
             Participant participantUserA = stompService.extractParticipant(userA,
                 chatRoom.getParticipants(), true);
@@ -496,12 +399,8 @@ public class StompServiceTest {
             chatRoomRepository.update(chatRoom);
 
             chatRepository.save(
-                Chat.builder()
-                    .senderId(userB.getActualUserId())
-                    .sendDate(new Date())
-                    .message("bye2")
-                    .chatRoomNo(chatRoom.getChatRoomNo())
-                    .build());
+                Chat.builder().senderId(userB.getActualUserId()).sendDate(new Date())
+                    .message("bye2").chatRoomNo(chatRoom.getChatRoomNo()).build());
 
             // when
             List<ChatDto> chats = stompService.getChatList(userA, chatRoom);
@@ -529,24 +428,15 @@ public class StompServiceTest {
         void getAllChats() {
             // given
             chatRepository.save(
-                Chat.builder()
-                    .senderId(userA.getActualUserId())
-                    .sendDate(new Date())
-                    .message("hi")
-                    .chatRoomNo(chatRoom.getChatRoomNo())
-                    .build());
+                Chat.builder().senderId(userA.getActualUserId()).sendDate(new Date()).message("hi")
+                    .chatRoomNo(chatRoom.getChatRoomNo()).build());
 
             chatRepository.save(
-                Chat.builder()
-                    .senderId(userB.getActualUserId())
-                    .sendDate(new Date())
-                    .message("bye")
-                    .chatRoomNo(chatRoom.getChatRoomNo())
-                    .build());
+                Chat.builder().senderId(userB.getActualUserId()).sendDate(new Date()).message("bye")
+                    .chatRoomNo(chatRoom.getChatRoomNo()).build());
 
             // when
             List<ChatDto> chats = stompService.getChatList(userA, chatRoom);
-
 
             // then
             assertThat(chats.size()).isEqualTo(2);
@@ -555,17 +445,112 @@ public class StompServiceTest {
 
     private void saveChatRoomWithBlocked(Long chatRoomNo, User user1, User user2,
         Blocked user1Blocked, Blocked user2Blocked) {
-        ChatRoom chatRoom = ChatRoom.builder()
-            .chatRoomNo(chatRoomNo)
-            .lastModifiedDate(new Date())
+        ChatRoom chatRoom = ChatRoom.builder().chatRoomNo(chatRoomNo).lastModifiedDate(new Date())
             .participants(Arrays.asList(new Participant(user1, null, user1Blocked),
-                new Participant(user2, null, user2Blocked)))
-            .createdDate(new Date())
-            .build();
+                new Participant(user2, null, user2Blocked))).createdDate(new Date()).build();
         chatRoomRepository.save(chatRoom);
     }
 
+    @DisplayName("채팅 보낼 시")
+    @Nested
+    class saveChat {
 
+        @DisplayName("채팅이 저장되고 해당 채팅방의 마지막 수정일자가 수정됨")
+        @Test
+        void saveChatAndUpdateChatRoom() {
+            // given
+            User userA = User.builder().actualUserId(1L).tier(Tier.gold).division(3)
+                .summonerName("uni").status(Status.ONLINE).lp(3L).build();
+            userRepository.save(userA);
+
+            User userB = User.builder().actualUserId(2L).tier(Tier.gold).division(3)
+                .summonerName("inu").status(Status.ONLINE).lp(3L).build();
+            userRepository.save(userB);
+
+            ChatRoom chatRoom = ChatRoom.builder().chatRoomNo(1L).lastModifiedDate(new Date())
+                .participants(Arrays.asList(new Participant(userA, null, Blocked.UNBLOCK),
+                    new Participant(userB, null, Blocked.UNBLOCK))).createdDate(new Date()).build();
+            chatRoomRepository.save(chatRoom);
+
+            // when
+            ChatDto chatDto = stompService.saveChat(userA, chatRoom, "hi");
+
+            // then
+            List<Chat> chats = chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo());
+            assertThat(chats).isNotEmpty();
+            assertThat(chats.get(0).getMessage()).isEqualTo("hi");
+            ChatRoom findChatRoom = chatRoomRepository.findByChatRoomNo(chatRoom.getChatRoomNo())
+                .get();
+            assertThat(findChatRoom.getLastModifiedDate()).isEqualTo(chatDto.getSendDate());
+        }
+    }
+
+    @DisplayName("채팅 읽을 시")
+    @Nested
+    class readChats {
+
+        private User userA;
+        private User userB;
+        private ChatRoom chatRoom;
+
+        @BeforeEach
+        void saveUserAndChatRoom() {
+            userA = User.builder().actualUserId(1L).tier(Tier.gold).division(3).summonerName("uni")
+                .status(Status.ONLINE).lp(3L).build();
+            userRepository.save(userA);
+
+            userB = User.builder().actualUserId(2L).tier(Tier.gold).division(3).summonerName("inu")
+                .status(Status.ONLINE).lp(3L).build();
+            userRepository.save(userB);
+
+            chatRoom = ChatRoom.builder().chatRoomNo(1L).lastModifiedDate(new Date()).participants(
+                Arrays.asList(new Participant(userA, null, Blocked.UNBLOCK),
+                    new Participant(userB, null, Blocked.UNBLOCK))).createdDate(new Date()).build();
+            chatRoomRepository.save(chatRoom);
+
+            for (int i = 0; i < 5; i++) {
+                chatRepository.save(
+                    Chat.builder().chatRoomNo(chatRoom.getChatRoomNo()).message("hi")
+                        .sendDate(new Date()).senderId(userA.getActualUserId()).build());
+            }
+        }
+
+        @AfterEach
+        void deleteChats() {
+            chatRepository.deleteAll();
+        }
+
+        @DisplayName("읽지 않은 메시지가 있었다면 해당 채팅방에서 상대방이 보낸 채팅의 readCount가 모두 0이 됨")
+        @Test
+        void hasUnReadMessages() {
+            // given
+            for (int i = 0; i < 5; i++) {
+                chatRepository.save(
+                    Chat.builder().chatRoomNo(chatRoom.getChatRoomNo()).message("hi")
+                        .sendDate(new Date()).senderId(userB.getActualUserId()).build());
+            }
+
+            // when
+            stompService.readOtherChats(userA, chatRoom);
+
+            // then
+            List<Chat> otherChats = chatRepository.findBySenderIdAndChatRoomNo(
+                userB.getActualUserId(), chatRoom.getChatRoomNo());
+            otherChats.stream().map(Chat::getReadCnt)
+                .forEach(readCount -> assertThat(readCount).isEqualTo(0));
+        }
+
+        @DisplayName("상대방이 보낸 채팅이 없어도 아무일도 일어나지 않음")
+        @Test
+        void hasNoOtherChats() {
+            // given
+            //      X
+
+            // when & then
+            assertThatCode(() -> stompService.readOtherChats(userA, chatRoom))
+                .doesNotThrowAnyException();
+        }
+    }
 }
 
 

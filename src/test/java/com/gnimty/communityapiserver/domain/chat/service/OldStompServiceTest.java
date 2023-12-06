@@ -180,7 +180,7 @@ class OldStompServiceTest {
 
         // when
         sleep(3000);
-        stompService.sendChat(user, chatRoom, request.getData());
+        stompService.saveChat(user, chatRoom, request.getData());
 
 
         // then
