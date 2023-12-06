@@ -35,8 +35,7 @@ public class CommonResponse<T> {
 	}
 
 	public static CommonResponse<Void> fail(ErrorCode errorCode) {
-		return new CommonResponse<>(
-			new ApiStatus(errorCode.getMessage(), errorCode.getStatus().value()), null);
+		return new CommonResponse<>(new ApiStatus(errorCode.getMessage(), errorCode.getStatus().value()), null);
 	}
 
 	public static CommonResponse<Void> fail(ErrorCode errorCode, String message) {
@@ -44,14 +43,12 @@ public class CommonResponse<T> {
 	}
 
 	public static CommonResponse<Void> fail(ErrorCode errorCode, String message, String field) {
-		return new CommonResponse<>(new ApiStatus(message, errorCode.getStatus().value(), field),
-			null);
+		return new CommonResponse<>(new ApiStatus(message, errorCode.getStatus().value(), field), null);
 	}
 
 	public static <T extends CustomFieldError> CommonResponse<T> fail(ErrorCode errorCode, T data) {
 		return CommonResponse.<T>builder()
-			.status(
-				new ApiStatus(data.getMessage(), errorCode.getStatus().value(), data.getField()))
+			.status(new ApiStatus(data.getMessage(), errorCode.getStatus().value(), data.getField()))
 			.build();
 	}
 

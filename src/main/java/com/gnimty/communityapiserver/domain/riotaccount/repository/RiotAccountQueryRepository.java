@@ -122,8 +122,7 @@ public class RiotAccountQueryRepository {
 			.fetch();
 	}
 
-	private List<RecommendedSummonersEntry> notLinkedSummonersQuery(
-		JPAQuery<RecommendedSummonersEntry> query) {
+	private List<RecommendedSummonersEntry> notLinkedSummonersQuery(JPAQuery<RecommendedSummonersEntry> query) {
 		return query
 			.orderBy(Expressions.numberTemplate(Double.class, "function('rand')").asc())
 			.limit(5)
@@ -215,12 +214,7 @@ public class RiotAccountQueryRepository {
 		return riotAccount.mmr.lt(getMmrByTier(Tier.master));
 	}
 
-	private BooleanExpression duoable(
-		Tier tier,
-		Integer division,
-		Boolean duoable,
-		GameMode gameMode
-	) {
+	private BooleanExpression duoable(Tier tier, Integer division, Boolean duoable, GameMode gameMode) {
 		if (duoable == null || !duoable) {
 			return null;
 		}

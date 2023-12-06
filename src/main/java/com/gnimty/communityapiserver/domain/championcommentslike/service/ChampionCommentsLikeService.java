@@ -23,11 +23,7 @@ public class ChampionCommentsLikeService {
 	private final ChampionCommentsLikeReadService championCommentsLikeReadService;
 	private final ChampionCommentsReadService championCommentsReadService;
 
-	public void doChampionCommentsLike(
-		Long championId,
-		Long commentsId,
-		ChampionCommentsLikeServiceRequest request
-	) {
+	public void doChampionCommentsLike(Long championId, Long commentsId, ChampionCommentsLikeServiceRequest request) {
 		Member member = MemberThreadLocal.get();
 		ChampionComments championComments = championCommentsReadService.findById(commentsId);
 		checkValidation(championId, championComments);
@@ -50,12 +46,10 @@ public class ChampionCommentsLikeService {
 		Member member,
 		ChampionComments championComments
 	) {
-		if (championCommentsLikeReadService.existsByMemberAndChampionComments(member,
-			championComments)) {
+		if (championCommentsLikeReadService.existsByMemberAndChampionComments(member, championComments)) {
 			throw new BaseException(ErrorCode.ALREADY_CHAMPION_COMMENTS_LIKE);
 		}
-		championCommentsLikeRepository.save(
-			createChampionCommentsLike(request, member, championComments));
+		championCommentsLikeRepository.save(createChampionCommentsLike(request, member, championComments));
 		updateReactionCount(request.getLikeOrNot(), championComments);
 	}
 

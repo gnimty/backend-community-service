@@ -265,8 +265,7 @@ public class StompService {
 
 
 	/**
-	 * isMe==true이면 Participant List에서 내 Participant 정보를 추출 isMe==false이면 other user에 해당하는
-	 * Participant 정보를 추출
+	 * isMe==true이면 Participant List에서 내 Participant 정보를 추출 isMe==false이면 other user에 해당하는 Participant 정보를 추출
 	 *
 	 * @param me           자신의 유저정보
 	 * @param participants 추출할 대상이 되는 Participant

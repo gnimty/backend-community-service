@@ -109,7 +109,6 @@ public class AuthService {
 	}
 
 	public void sendEmailAuthCode(EmailAuthServiceRequest request) {
-
 		String code = RandomCodeGenerator.generateCodeByLength(6);
 		mailSenderUtil.sendEmail(Auth.EMAIL_SUBJECT.getContent(), request.getEmail(), code,
 			"signup-mail", "static/images/banner-pengu.png");
@@ -146,8 +145,7 @@ public class AuthService {
 
 	private void throwIfInvalidToken(String refreshToken, Long idByToken) {
 		ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
-		String savedToken = valueOperations.get(
-			getRedisKey(KeyPrefix.REFRESH, String.valueOf(idByToken)));
+		String savedToken = valueOperations.get(getRedisKey(KeyPrefix.REFRESH, String.valueOf(idByToken)));
 
 		if (savedToken == null || !savedToken.equals(refreshToken)) {
 			throw new BaseException(ErrorCode.TOKEN_INVALID);
@@ -202,11 +200,7 @@ public class AuthService {
 		ValueOperations<String, String> stringValueOperations = redisTemplate.opsForValue();
 
 		stringValueOperations.set(key, value);
-		redisTemplate.expire(
-			key,
-			timeout,
-			TimeUnit.MILLISECONDS
-		);
+		redisTemplate.expire(key, timeout, TimeUnit.MILLISECONDS);
 	}
 
 	private String getRedisKey(KeyPrefix prefix, String key) {
