@@ -6,26 +6,21 @@ import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCC
 import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_LOGOUT;
 import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_SEND_EMAIL_AUTH_CODE;
 import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_SUMMONER_LINK;
-import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_UPDATE_INTRODUCTION;
 import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_UPDATE_PASSWORD;
-import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_UPDATE_PREFER_GAME_MODE;
 import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_UPDATE_PROFILE;
-import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_UPDATE_STATUS;
 import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_WITHDRAWAL;
 import static org.springframework.http.HttpStatus.ACCEPTED;
 import static org.springframework.http.HttpStatus.OK;
 
 import com.gnimty.communityapiserver.domain.chat.service.StompService;
 import com.gnimty.communityapiserver.domain.chat.service.UserService;
-import com.gnimty.communityapiserver.domain.member.controller.dto.request.IntroductionUpdateRequest;
+import com.gnimty.communityapiserver.domain.member.controller.dto.request.MyProfileMainUpdateRequest;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.MyProfileUpdateRequest;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.OauthLoginRequest;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.PasswordEmailVerifyRequest;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.PasswordResetRequest;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.PasswordUpdateRequest;
-import com.gnimty.communityapiserver.domain.member.controller.dto.request.PreferGameModeUpdateRequest;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.SendEmailRequest;
-import com.gnimty.communityapiserver.domain.member.controller.dto.request.StatusUpdateRequest;
 import com.gnimty.communityapiserver.domain.member.controller.dto.response.MyProfileResponse;
 import com.gnimty.communityapiserver.domain.member.controller.dto.response.OtherProfileResponse;
 import com.gnimty.communityapiserver.domain.member.controller.dto.response.PasswordEmailVerifyResponse;
@@ -63,26 +58,20 @@ public class MemberController {
 
 
 	@PostMapping("/me/rso")
-	public CommonResponse<Void> summonerAccountLink(
-		@RequestBody @Valid OauthLoginRequest request
-	) {
+	public CommonResponse<Void> summonerAccountLink(@RequestBody @Valid OauthLoginRequest request) {
 		RiotAccount riotAccount = memberService.summonerAccountLink(request.toServiceRequest());
 		stompService.createOrUpdateUser(riotAccount);
 		return CommonResponse.success(SUCCESS_SUMMONER_LINK, OK);
 	}
 
 	@PostMapping("/me/oauth/kakao")
-	public CommonResponse<Void> kakaoAdditionalLink(
-		@RequestBody @Valid OauthLoginRequest request
-	) {
+	public CommonResponse<Void> kakaoAdditionalLink(@RequestBody @Valid OauthLoginRequest request) {
 		memberService.oauthAdditionalLink(Provider.KAKAO, request.toServiceRequest());
 		return CommonResponse.success(SUCCESS_KAKAO_LINK, OK);
 	}
 
 	@PostMapping("/me/oauth/google")
-	public CommonResponse<Void> googleAdditionalLink(
-		@RequestBody @Valid OauthLoginRequest request
-	) {
+	public CommonResponse<Void> googleAdditionalLink(@RequestBody @Valid OauthLoginRequest request) {
 		memberService.oauthAdditionalLink(Provider.GOOGLE, request.toServiceRequest());
 		return CommonResponse.success(SUCCESS_GOOGLE_LINK, OK);
 	}
@@ -93,11 +82,9 @@ public class MemberController {
 		return CommonResponse.success(MyProfileResponse.from(response));
 	}
 
-	@PatchMapping("/me")
-	public CommonResponse<Void> updateMyProfile(
-		@RequestBody @Valid MyProfileUpdateRequest request
-	) {
-		RiotAccount riotAccount = memberService.updateMyProfile(request.toServiceRequest());
+	@PatchMapping("/me/main")
+	public CommonResponse<Void> updateMyProfileMain(@RequestBody @Valid MyProfileMainUpdateRequest request) {
+		RiotAccount riotAccount = memberService.updateMyProfileMain(request.toServiceRequest());
 		if (request.getStatus() != null) {
 			stompService.updateConnStatus(userService.getUser(MemberThreadLocal.get().getId()),
 				request.getStatus());
@@ -136,28 +123,11 @@ public class MemberController {
 		return CommonResponse.success(SUCCESS_UPDATE_PASSWORD, OK);
 	}
 
-	@PatchMapping("/me/status")
-	public CommonResponse<Void> updateStatus(@RequestBody @Valid StatusUpdateRequest request) {
-		memberService.updateStatus(request.toServiceRequest());
-		stompService.updateConnStatus(userService.getUser(MemberThreadLocal.get().getId()),
-			request.getStatus());
-		return CommonResponse.success(SUCCESS_UPDATE_STATUS, OK);
-	}
-
-	@PatchMapping("/me/introductions")
-	public CommonResponse<Void> updateIntroduction(
-		@RequestBody @Valid IntroductionUpdateRequest request
-	) {
-		memberService.updateIntroduction(request.toServiceRequest());
-		return CommonResponse.success(SUCCESS_UPDATE_INTRODUCTION, OK);
-	}
-
-	@PatchMapping("/me/prefer-game-mode")
-	public CommonResponse<Void> updatePreferGameMode(
-		@RequestBody @Valid PreferGameModeUpdateRequest request
-	) {
-		memberService.updatePreferGameMode(request.toServiceRequest());
-		return CommonResponse.success(SUCCESS_UPDATE_PREFER_GAME_MODE, OK);
+	@PatchMapping("/me")
+	public CommonResponse<Void> updateMyProfile(@RequestBody @Valid MyProfileUpdateRequest request) {
+		memberService.updateMyProfile(request.toServiceRequest());
+		stompService.updateConnStatus(userService.getUser(MemberThreadLocal.get().getId()), request.getStatus());
+		return CommonResponse.success(SUCCESS_UPDATE_PROFILE, OK);
 	}
 
 	@DeleteMapping("/me/oauth")
@@ -179,9 +149,7 @@ public class MemberController {
 	}
 
 	@GetMapping("/{member_id}")
-	public CommonResponse<OtherProfileResponse> getOtherProfile(
-		@PathVariable("member_id") Long memberId
-	) {
+	public CommonResponse<OtherProfileResponse> getOtherProfile(@PathVariable("member_id") Long memberId) {
 		OtherProfileServiceResponse response = memberReadService.findOtherById(memberId);
 		return CommonResponse.success(OtherProfileResponse.from(response));
 	}
