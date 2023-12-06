@@ -8,6 +8,6 @@ import lombok.Data;
 @AllArgsConstructor
 public class UserConnStatusDto {
 
-    private Long userId;
-    private Status connStatus;
+	private Long userId;
+	private Status connStatus;
 }

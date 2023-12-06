@@ -1,17 +1,17 @@
 package com.gnimty.communityapiserver.domain.chat.service;
 
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.gnimty.communityapiserver.domain.chat.entity.User;
+import com.gnimty.communityapiserver.domain.chat.repository.User.UserRepository;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.domain.member.repository.MemberRepository;
 import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
 import com.gnimty.communityapiserver.global.constant.Lane;
-import com.gnimty.communityapiserver.global.constant.Tier;
-
-import com.gnimty.communityapiserver.domain.chat.entity.User;
-import com.gnimty.communityapiserver.domain.chat.repository.User.UserRepository;
 import com.gnimty.communityapiserver.global.constant.Status;
+import com.gnimty.communityapiserver.global.constant.Tier;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
 import com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage;
@@ -33,278 +33,285 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles(value = "local")
 class UserServiceTest {
 
-    @Autowired
-    private UserRepository userRepository;
+	@Autowired
+	private UserRepository userRepository;
 
-    @Autowired
-    private MemberRepository memberRepository;
-
-
-    @Autowired
-    private UserService userService;
+	@Autowired
+	private MemberRepository memberRepository;
 
 
-    @AfterEach
-    void deleteAll() {
-        userRepository.deleteAll();
-        memberRepository.deleteAll();
-    }
+	@Autowired
+	private UserService userService;
 
 
-    @DisplayName("member로 user 조회")
-    @Nested
-    class getUserByMember {
-
-        @DisplayName("member id와 동일한 actualUserId가 존재 시 user 조회 성공")
-        @Test
-        void successGetUserByMember() {
-            // given
-            Member member = new Member(true, "aaa@naver.com", "asdD12!", 1L, "uni", Status.OFFLINE,
-                3L);
-            memberRepository.save(member);
-
-            User user = User.builder()
-                .actualUserId(member.getId())
-                .tier(Tier.gold)
-                .division(3)
-                .summonerName("uni")
-                .status(Status.ONLINE)
-                .lp(3L).build();
-            userRepository.save(user);
-
-            // when
-            User findUser = userService.getUserByMember(member);
-
-            // then
-            assertThat(findUser).isEqualTo(user);
-        }
+	@AfterEach
+	void deleteAll() {
+		userRepository.deleteAll();
+		memberRepository.deleteAll();
+	}
 
 
-        @DisplayName("member id와 동일한 actualUserId가 없을 시 실패")
-        @Test
-        void failGetUserByMember() {
-            // given
-            Member member = new Member(true, "aaa@naver.com", "asdD12!", 1L, "uni2", Status.OFFLINE,
-                3L);
-            memberRepository.save(member);
+	@DisplayName("member로 user 조회")
+	@Nested
+	class getUserByMember {
 
-            // when & then
-            assertThatThrownBy(() -> userService.getUserByMember(member))
-                .isInstanceOf(BaseException.class)
-                .satisfies(exception -> {
-                    assertThat(((BaseException) exception).getErrorCode()).isEqualTo(
-                        ErrorCode.NOT_FOUND_CHAT_USER);
-                })
-                .hasMessageContaining(ErrorMessage.NOT_FOUND_CHAT_USER);
+		@DisplayName("member id와 동일한 actualUserId가 존재 시 user 조회 성공")
+		@Test
+		void successGetUserByMember() {
+			// given
+			Member member = new Member(true, "aaa@naver.com", "asdD12!", 1L, "uni", Status.OFFLINE,
+				3L);
+			memberRepository.save(member);
 
-        }
-    }
+			User user = User.builder()
+				.actualUserId(member.getId())
+				.tier(Tier.gold)
+				.division(3)
+				.name("uni")
+				.tagLine("tag")
+				.status(Status.ONLINE)
+				.lp(3L).build();
+			userRepository.save(user);
 
+			// when
+			User findUser = userService.getUserByMember(member);
 
-    @DisplayName("member id로 user 조회")
-    @Nested
-    class getUserByMemberId {
-
-        @DisplayName("member id와 동일한 actualUserId가 존재 시 user 조회 성공")
-        @Test
-        void successGetUserByMember() {
-            // given
-            Member member = new Member(true, "aaa@naver.com", "asdD12!", 1L, "uni", Status.OFFLINE,
-                3L);
-            memberRepository.save(member);
-
-            User user = User.builder()
-                .actualUserId(member.getId())
-                .tier(Tier.gold)
-                .division(3)
-                .summonerName("uni")
-                .status(Status.ONLINE)
-                .lp(3L).build();
-            userRepository.save(user);
-
-            // when
-            User findUser = userService.getUser(member.getId());
-
-            // then
-            assertThat(findUser).isEqualTo(user);
-        }
-
-        @DisplayName("member id와 동일한 actualUserId가 없을 시 실패")
-        @Test
-        void failGetUserByMember() {
-            // given
-            Member member = new Member(true, "aaa@naver.com", "asdD12!", 1L, "uni2", Status.OFFLINE,
-                3L);
-            memberRepository.save(member);
-
-            // when & then
-            assertThatThrownBy(() -> userService.getUser(member.getId()))
-                .isInstanceOf(BaseException.class)
-                .satisfies(exception -> {
-                    assertThat(((BaseException) exception).getErrorCode()).isEqualTo(
-                        ErrorCode.NOT_FOUND_CHAT_USER);
-                })
-                .hasMessageContaining(ErrorMessage.NOT_FOUND_CHAT_USER);
-        }
-    }
+			// then
+			assertThat(findUser).isEqualTo(user);
+		}
 
 
-    @DisplayName("모든 user 조회")
-    @Nested
-    class findAllUsers {
+		@DisplayName("member id와 동일한 actualUserId가 없을 시 실패")
+		@Test
+		void failGetUserByMember() {
+			// given
+			Member member = new Member(true, "aaa@naver.com", "asdD12!", 1L, "uni2", Status.OFFLINE,
+				3L);
+			memberRepository.save(member);
 
-        @DisplayName("저장한 모든 user 조회 성공")
-        @Test
-        void getAllUser() {
-            // given
-            List<User> users = new ArrayList<>();
-            for (Integer i = 1; i <= 6; i++) {
-                User user = User.builder()
-                    .actualUserId(i.longValue())
-                    .tier(Tier.diamond)
-                    .lp(1L)
-                    .status(Status.ONLINE)
-                    .summonerName("name" + i)
-                    .profileIconId(1L)
-                    .division(3)
-                    .build();
-                users.add(user);
-                userRepository.save(user);
-            }
+			// when & then
+			assertThatThrownBy(() -> userService.getUserByMember(member))
+				.isInstanceOf(BaseException.class)
+				.satisfies(exception -> {
+					assertThat(((BaseException) exception).getErrorCode()).isEqualTo(
+						ErrorCode.NOT_FOUND_CHAT_USER);
+				})
+				.hasMessageContaining(ErrorMessage.NOT_FOUND_CHAT_USER);
 
-            // when
-            List<User> findUsers = userService.findAllUser();
-
-            // then
-            assertThat(users).isEqualTo(findUsers);
-        }
-    }
+		}
+	}
 
 
-    @DisplayName("user 저장")
-    @Nested
-    class saveUser {
+	@DisplayName("member id로 user 조회")
+	@Nested
+	class getUserByMemberId {
 
-        @DisplayName("user가 이미 있는 상태에서 riotAccount를 저장하면 기존의 데이터 덮어쓰기")
-        @Test
-        void updateByRiotAccount() {
-            // given
-            Member member = new Member(true, "uni@naver.com", "afD23!", 1L, "uni", Status.ONLINE,
-                1L);
-            memberRepository.save(member);
+		@DisplayName("member id와 동일한 actualUserId가 존재 시 user 조회 성공")
+		@Test
+		void successGetUserByMember() {
+			// given
+			Member member = new Member(true, "aaa@naver.com", "asdD12!", 1L, "uni", Status.OFFLINE,
+				3L);
+			memberRepository.save(member);
 
-            userRepository.save(User.builder()
-                .actualUserId(member.getId())
-                .tier(Tier.diamond)
-                .lp(1L)
-                .status(Status.ONLINE)
-                .summonerName("uni")
-                .profileIconId(1L)
-                .division(3)
-                .build());
+			User user = User.builder()
+				.actualUserId(member.getId())
+				.tier(Tier.gold)
+				.division(3)
+				.name("uni")
+				.tagLine("tag")
+				.status(Status.ONLINE)
+				.lp(3L).build();
+			userRepository.save(user);
 
-            // when
-            RiotAccount riotAccount = RiotAccount.builder()
-                .member(member)
-                .frequentChampionId1(1L)
-                .frequentChampionId2(2L)
-                .frequentChampionId3(3L)
-                .frequentLane1(Lane.BOTTOM)
-                .frequentLane2(Lane.JUNGLE)
-                .build();
-            User savedUser = userService.save(riotAccount);
+			// when
+			User findUser = userService.getUser(member.getId());
 
-            // then
-            ArrayList<Lane> lanes = new ArrayList<>(Arrays.asList(Lane.BOTTOM, Lane.JUNGLE));
+			// then
+			assertThat(findUser).isEqualTo(user);
+		}
 
-            assertThat(savedUser.getMostLanes()).containsAll(lanes);
-            assertThat(savedUser.getActualUserId()).isEqualTo(member.getId());
-            assertThat(savedUser.getStatus()).isEqualTo(Status.ONLINE);
-        }
+		@DisplayName("member id와 동일한 actualUserId가 없을 시 실패")
+		@Test
+		void failGetUserByMember() {
+			// given
+			Member member = new Member(true, "aaa@naver.com", "asdD12!", 1L, "uni2", Status.OFFLINE,
+				3L);
+			memberRepository.save(member);
 
-
-        @DisplayName("user가 이미 있는 상태에서 user를 저장하면 기존의 데이터 덮어쓰기")
-        @Test
-        void updateUser() {
-            // given
-            userRepository.save(User.builder()
-                .actualUserId(1L)
-                .tier(Tier.diamond)
-                .lp(1L)
-                .status(Status.ONLINE)
-                .summonerName("uni")
-                .profileIconId(1L)
-                .division(3)
-                .build());
-
-            User changedUser = User.builder()
-                .actualUserId(1L)
-                .tier(Tier.gold)
-                .status(Status.AWAY)
-                .build();
-
-            // when
-            userService.save(changedUser);
-
-            // then
-            User findUser = userRepository.findByActualUserId(1L).get();
-            assertThat(findUser.getTier()).isEqualTo(Tier.gold);
-            assertThat(findUser.getSummonerName()).isEqualTo("uni");
-        }
+			// when & then
+			assertThatThrownBy(() -> userService.getUser(member.getId()))
+				.isInstanceOf(BaseException.class)
+				.satisfies(exception -> {
+					assertThat(((BaseException) exception).getErrorCode()).isEqualTo(
+						ErrorCode.NOT_FOUND_CHAT_USER);
+				})
+				.hasMessageContaining(ErrorMessage.NOT_FOUND_CHAT_USER);
+		}
+	}
 
 
-        @DisplayName("User로 새로 생성")
-        @Test
-        void createUserByUser() {
-            // given
-            User user = User.builder()
-                .actualUserId(2L)
-                .tier(Tier.diamond)
-                .lp(1L)
-                .status(Status.ONLINE)
-                .summonerName("uni")
-                .profileIconId(1L)
-                .division(3)
-                .build();
+	@DisplayName("모든 user 조회")
+	@Nested
+	class findAllUsers {
 
-            // when
-            userService.save(user);
+		@DisplayName("저장한 모든 user 조회 성공")
+		@Test
+		void getAllUser() {
+			// given
+			List<User> users = new ArrayList<>();
+			for (Integer i = 1; i <= 6; i++) {
+				User user = User.builder()
+					.actualUserId(i.longValue())
+					.tier(Tier.diamond)
+					.lp(1L)
+					.status(Status.ONLINE)
+					.name("name" + i)
+					.tagLine("tag")
+					.profileIconId(1L)
+					.division(3)
+					.build();
+				users.add(user);
+				userRepository.save(user);
+			}
 
-            // then
-            Optional<User> optionalUser = userRepository.findByActualUserId(2L);
-            assertThat(optionalUser).isPresent()
-                .satisfies(findUser -> assertThat(findUser.get()).isEqualTo(user));
-        }
+			// when
+			List<User> findUsers = userService.findAllUser();
+
+			// then
+			assertThat(users).isEqualTo(findUsers);
+		}
+	}
 
 
-        @DisplayName("RiotAccount로 새로 생성")
-        @Test
-        void createUserByRiotAccount() {
-            // given
-            Member member = new Member(true, "uni@naver.com", "afD23!", 1L, "uni", Status.ONLINE,
-                1L);
-            memberRepository.save(member);
+	@DisplayName("user 저장")
+	@Nested
+	class saveUser {
 
-            User user = User.builder()
-                .actualUserId(member.getId())
-                .tier(Tier.diamond)
-                .lp(1L)
-                .status(Status.ONLINE)
-                .summonerName("uni")
-                .profileIconId(1L)
-                .division(3)
-                .build();
+		@DisplayName("user가 이미 있는 상태에서 riotAccount를 저장하면 기존의 데이터 덮어쓰기")
+		@Test
+		void updateByRiotAccount() {
+			// given
+			Member member = new Member(true, "uni@naver.com", "afD23!", 1L, "uni", Status.ONLINE,
+				1L);
+			memberRepository.save(member);
 
-            // when
-            userService.save(user);
+			userRepository.save(User.builder()
+				.actualUserId(member.getId())
+				.tier(Tier.diamond)
+				.lp(1L)
+				.status(Status.ONLINE)
+				.name("uni")
+				.tagLine("tag")
+				.profileIconId(1L)
+				.division(3)
+				.build());
 
-            // then
-            Optional<User> optionalUser = userRepository.findByActualUserId(member.getId());
-            assertThat(optionalUser)
-                .isPresent()
-                .satisfies(findUser -> assertThat(findUser.get()).isEqualTo(user));
-        }
-    }
+			// when
+			RiotAccount riotAccount = RiotAccount.builder()
+				.member(member)
+				.frequentChampionId1(1L)
+				.frequentChampionId2(2L)
+				.frequentChampionId3(3L)
+				.frequentLane1(Lane.BOTTOM)
+				.frequentLane2(Lane.JUNGLE)
+				.build();
+			User savedUser = userService.save(riotAccount);
+
+			// then
+			ArrayList<Lane> lanes = new ArrayList<>(Arrays.asList(Lane.BOTTOM, Lane.JUNGLE));
+
+			assertThat(savedUser.getMostLanes()).containsAll(lanes);
+			assertThat(savedUser.getActualUserId()).isEqualTo(member.getId());
+			assertThat(savedUser.getStatus()).isEqualTo(Status.ONLINE);
+		}
+
+
+		@DisplayName("user가 이미 있는 상태에서 user를 저장하면 기존의 데이터 덮어쓰기")
+		@Test
+		void updateUser() {
+			// given
+			userRepository.save(User.builder()
+				.actualUserId(1L)
+				.tier(Tier.diamond)
+				.lp(1L)
+				.status(Status.ONLINE)
+				.name("uni")
+				.tagLine("tag")
+				.profileIconId(1L)
+				.division(3)
+				.build());
+
+			User changedUser = User.builder()
+				.actualUserId(1L)
+				.tier(Tier.gold)
+				.status(Status.AWAY)
+				.build();
+
+			// when
+			userService.save(changedUser);
+
+			// then
+			User findUser = userRepository.findByActualUserId(1L).get();
+			assertThat(findUser.getTier()).isEqualTo(Tier.gold);
+			assertThat(findUser.getName()).isEqualTo("uni");
+		}
+
+
+		@DisplayName("User로 새로 생성")
+		@Test
+		void createUserByUser() {
+			// given
+			User user = User.builder()
+				.actualUserId(2L)
+				.tier(Tier.diamond)
+				.lp(1L)
+				.status(Status.ONLINE)
+				.name("uni")
+				.tagLine("tag")
+				.profileIconId(1L)
+				.division(3)
+				.build();
+
+			// when
+			userService.save(user);
+
+			// then
+			Optional<User> optionalUser = userRepository.findByActualUserId(2L);
+			assertThat(optionalUser).isPresent()
+				.satisfies(findUser -> assertThat(findUser.get()).isEqualTo(user));
+		}
+
+
+		@DisplayName("RiotAccount로 새로 생성")
+		@Test
+		void createUserByRiotAccount() {
+			// given
+			Member member = new Member(true, "uni@naver.com", "afD23!", 1L, "uni", Status.ONLINE,
+				1L);
+			memberRepository.save(member);
+
+			User user = User.builder()
+				.actualUserId(member.getId())
+				.tier(Tier.diamond)
+				.lp(1L)
+				.status(Status.ONLINE)
+				.name("uni")
+				.tagLine("tag")
+				.profileIconId(1L)
+				.division(3)
+				.build();
+
+			// when
+			userService.save(user);
+
+			// then
+			Optional<User> optionalUser = userRepository.findByActualUserId(member.getId());
+			assertThat(optionalUser)
+				.isPresent()
+				.satisfies(findUser -> assertThat(findUser.get()).isEqualTo(user));
+		}
+	}
 
 
 }

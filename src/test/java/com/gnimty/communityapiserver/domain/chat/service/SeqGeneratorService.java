@@ -15,14 +15,15 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class SeqGeneratorService {
-    private final MongoOperations mongoOperations;
 
-    public Long generateSequence(String seqName){
-        AutoIncrementSequence counter = mongoOperations.findAndModify(
-            query(where("_id").is(seqName)), new Update().inc("seq", 1),
-            options().returnNew(true).upsert(true),
-            AutoIncrementSequence.class);
+	private final MongoOperations mongoOperations;
 
-        return !Objects.isNull(counter) ? counter.getSeq() : 1;
-    }
+	public Long generateSequence(String seqName) {
+		AutoIncrementSequence counter = mongoOperations.findAndModify(
+			query(where("_id").is(seqName)), new Update().inc("seq", 1),
+			options().returnNew(true).upsert(true),
+			AutoIncrementSequence.class);
+
+		return !Objects.isNull(counter) ? counter.getSeq() : 1;
+	}
 }

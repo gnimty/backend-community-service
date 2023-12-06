@@ -105,7 +105,7 @@ public class MemberService {
 		Boolean existsMain = riotAccountReadService.existsByMemberId(member);
 
 		RiotAccount riotAccount = riotAccountRepository.save(RiotAccount.builder()
-			.summonerName("summonerName")
+			.tagLine("summonerName")
 			.isMain(!existsMain)
 			.queue(Tier.bronze)
 			.lp(100L)

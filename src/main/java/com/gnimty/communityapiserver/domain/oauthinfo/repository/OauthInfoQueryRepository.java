@@ -1,6 +1,6 @@
 package com.gnimty.communityapiserver.domain.oauthinfo.repository;
 
-import static com.gnimty.communityapiserver.domain.oauthinfo.entity.QOauthInfo.*;
+import static com.gnimty.communityapiserver.domain.oauthinfo.entity.QOauthInfo.oauthInfo;
 
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.global.constant.Provider;

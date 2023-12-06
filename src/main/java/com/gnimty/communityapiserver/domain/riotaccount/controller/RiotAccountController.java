@@ -68,7 +68,8 @@ public class RiotAccountController {
 	@GetMapping("/recently")
 	public CommonResponse<RecentlySummonersResponse> getRecentlySummoners() {
 		Member member = MemberThreadLocal.get();
-		List<Long> chattedMemberIds = stompService.getChattedMemberIds(userService.getUser(member.getId()));
+		List<Long> chattedMemberIds = stompService.getChattedMemberIds(
+			userService.getUser(member.getId()));
 		RecentlySummonersServiceResponse response = riotAccountService
 			.getRecentlySummoners(member, chattedMemberIds);
 		return CommonResponse.success(RecentlySummonersResponse.from(response));

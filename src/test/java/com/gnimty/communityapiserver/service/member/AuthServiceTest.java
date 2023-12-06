@@ -1,9 +1,10 @@
 package com.gnimty.communityapiserver.service.member;
 
 import static com.gnimty.communityapiserver.global.constant.Auth.BEARER;
-import static com.gnimty.communityapiserver.global.exception.ErrorCode.*;
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.ALREADY_REGISTERED_EMAIL;
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.INVALID_EMAIL_AUTH_CODE;
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.INVALID_LOGIN;
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.TOKEN_INVALID;
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.UNAUTHORIZED_EMAIL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -544,9 +545,9 @@ public class AuthServiceTest extends ServiceTestSupport {
 			given(jwtProvider.generateToken(any(Long.class), any(Long.class), any(String.class)))
 				.willReturn("token");
 
-			 assertThatThrownBy(() -> authService.tokenRefresh(refreshToken))
-				 .isInstanceOf(exception.getClass())
-				 .hasMessage(exception.getMessage());
+			assertThatThrownBy(() -> authService.tokenRefresh(refreshToken))
+				.isInstanceOf(exception.getClass())
+				.hasMessage(exception.getMessage());
 		}
 	}
 }

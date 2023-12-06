@@ -17,6 +17,7 @@ import static com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMess
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.Mockito.mockStatic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -35,6 +36,7 @@ import com.gnimty.communityapiserver.domain.member.controller.dto.request.Passwo
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.PreferGameModeUpdateRequest;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.SendEmailRequest;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.StatusUpdateRequest;
+import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.IntroductionUpdateServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.MyProfileUpdateServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.OauthLoginServiceRequest;
@@ -54,6 +56,7 @@ import com.gnimty.communityapiserver.domain.member.service.dto.response.RiotAcco
 import com.gnimty.communityapiserver.domain.member.service.dto.response.RiotDependentInfo;
 import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
 import com.gnimty.communityapiserver.domain.schedule.controller.dto.request.ScheduleEntry;
+import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
 import com.gnimty.communityapiserver.global.constant.DayOfWeek;
 import com.gnimty.communityapiserver.global.constant.GameMode;
 import com.gnimty.communityapiserver.global.constant.Provider;
@@ -71,12 +74,13 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.MockedStatic;
 import org.springframework.http.MediaType;
 
 public class MemberControllerTest extends ControllerTestSupport {
 
 	@BeforeEach
-	void setUp() throws Exception {
+	void setUp() {
 		given(tokenAuthInterceptor.preHandle(
 			any(HttpServletRequest.class),
 			any(HttpServletResponse.class),
@@ -253,7 +257,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.status(Status.ONLINE)
 				.riotAccounts(List.of(
 					RiotAccountEntry.builder()
-						.summonerName("소환사이름")
+						.name("소환사이름")
 						.build()))
 				.build();
 			OauthInfoEntry oauthInfoEntry = OauthInfoEntry.builder()
@@ -284,9 +288,12 @@ public class MemberControllerTest extends ControllerTestSupport {
 						.value(response.getRiotDependentInfo().getIsLinked()),
 					jsonPath("$.data.riotDependentInfo.status")
 						.value(response.getRiotDependentInfo().getStatus().toString()),
-					jsonPath("$.data.riotDependentInfo.riotAccounts[0].summonerName")
+					jsonPath("$.data.riotDependentInfo.riotAccounts[0].name")
 						.value(response.getRiotDependentInfo().getRiotAccounts().get(0)
-							.getSummonerName()),
+							.getName()),
+					jsonPath("$.data.riotDependentInfo.riotAccounts[0].tagLine")
+						.value(response.getRiotDependentInfo().getRiotAccounts().get(0)
+							.getTagLine()),
 					jsonPath("$.data.oauthInfos[0].email")
 						.value(response.getOauthInfos().get(0).getEmail())
 				);
@@ -313,14 +320,18 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.given(stompService)
 				.createOrUpdateUser(any(RiotAccount.class));
 
-			mockMvc.perform(patch(REQUEST_URL)
-					.content(om.writeValueAsString(request))
-					.contentType(MediaType.APPLICATION_JSON)
-					.characterEncoding(StandardCharsets.UTF_8))
-				.andExpectAll(
-					status().isOk(),
-					jsonPath("$.status.message")
-						.value(SUCCESS_UPDATE_PROFILE.getMessage()));
+			try (MockedStatic<MemberThreadLocal> ignored = mockStatic(MemberThreadLocal.class)) {
+				given(MemberThreadLocal.get())
+					.willReturn(Member.builder().build());
+				mockMvc.perform(patch(REQUEST_URL)
+						.content(om.writeValueAsString(request))
+						.contentType(MediaType.APPLICATION_JSON)
+						.characterEncoding(StandardCharsets.UTF_8))
+					.andExpectAll(
+						status().isOk(),
+						jsonPath("$.status.message")
+							.value(SUCCESS_UPDATE_PROFILE.getMessage()));
+			}
 		}
 
 		@DisplayName("content 또는 isMain이 null이면 실패한다.")
@@ -681,14 +692,18 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.given(stompService)
 				.updateConnStatus(any(User.class), any(Status.class));
 
-			mockMvc.perform(patch(REQUEST_URL)
-					.content(om.writeValueAsString(request))
-					.contentType(MediaType.APPLICATION_JSON)
-					.characterEncoding(StandardCharsets.UTF_8))
-				.andExpectAll(
-					status().isOk(),
-					jsonPath("$.status.message").value(SUCCESS_UPDATE_STATUS.getMessage())
-				);
+			try (MockedStatic<MemberThreadLocal> ignored = mockStatic(MemberThreadLocal.class)) {
+				given(MemberThreadLocal.get())
+					.willReturn(Member.builder().build());
+				mockMvc.perform(patch(REQUEST_URL)
+						.content(om.writeValueAsString(request))
+						.contentType(MediaType.APPLICATION_JSON)
+						.characterEncoding(StandardCharsets.UTF_8))
+					.andExpectAll(
+						status().isOk(),
+						jsonPath("$.status.message").value(SUCCESS_UPDATE_STATUS.getMessage())
+					);
+			}
 		}
 
 		@DisplayName("status가 null이면 실패한다.")
