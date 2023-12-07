@@ -99,11 +99,9 @@ public class StompService {
 
         // (상대방이 채팅방 나간 상황) lastModifiedDate가 상대의 exitDate 이전일 때 : flush
         //      -> flushAllChats() + chatRoomRepository.deleteByChatRoomNo()
-        if (other.getExitDate() != null
-            && chatRoom.getLastModifiedDate().before(other.getExitDate())) {
-
-            chatRoomService.delete(chatRoom);
-            chatService.delete(chatRoom);
+        if ((other.getExitDate() != null && chatRoom.getLastModifiedDate().before(other.getExitDate()))
+            || other.getBlockedStatus()==Blocked.BLOCK) {
+            destroyChatRoomAndChat(chatRoom);
         }
         // (상대방이 채팅방 나가지 않은 상황) lastModifiedDate가 상대의 exitDate 이후일 때 : exitDate update
         //      -> chatRoomRepository.updateExitDate(me);
@@ -133,11 +131,15 @@ public class StompService {
 
         chatRoomService.findChatRoom(user)
             .forEach(chatRoom -> {
-                chatRoomService.delete(chatRoom);
-                chatService.delete(chatRoom);
+                destroyChatRoomAndChat(chatRoom);
                 sendToChatRoomSubscribers(chatRoom.getChatRoomNo(),
                     new MessageResponse(MessageResponseType.DELETED_CHATROOM, chatRoom.getId()));
             });
+    }
+
+    private void destroyChatRoomAndChat(ChatRoom chatRoom) {
+        chatRoomService.delete(chatRoom);
+        chatService.delete(chatRoom);
     }
 
 

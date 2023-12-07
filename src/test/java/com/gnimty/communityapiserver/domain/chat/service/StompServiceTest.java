@@ -551,6 +551,133 @@ public class StompServiceTest {
                 .doesNotThrowAnyException();
         }
     }
+
+    @DisplayName("사용자의 접속 상태가 변동될 시")
+    @Nested
+    class changeUserConnectStatus {
+
+        @DisplayName("변동된 접속상태로 변경")
+        @Test
+        void updateUser() {
+            // given
+            User userA = User.builder().actualUserId(1L).tier(Tier.gold).division(3)
+                .summonerName("uni")
+                .status(Status.ONLINE).lp(3L).build();
+            userRepository.save(userA);
+
+            // when
+            stompService.updateConnStatus(userA, Status.AWAY);
+
+            // then
+            User findUserA = userRepository.findByActualUserId(userA.getActualUserId()).get();
+            assertThat(findUserA.getStatus()).isEqualTo(Status.AWAY);
+        }
+    }
+
+    @DisplayName("상대방 차단 시")
+    @Nested
+    class blockOtherUser {
+
+        private User userA;
+        private User userB;
+
+        @BeforeEach
+        void saveUsers() {
+            userA = User.builder().actualUserId(1L).tier(Tier.gold).division(3).summonerName("uni")
+                .status(Status.ONLINE).lp(3L).build();
+            userRepository.save(userA);
+
+            userB = User.builder().actualUserId(2L).tier(Tier.gold).division(3).summonerName("inu")
+                .status(Status.ONLINE).lp(3L).build();
+            userRepository.save(userB);
+        }
+
+        @AfterEach
+        void deleteChatRoomAndChats() {
+            chatRepository.deleteAll();
+            chatRoomRepository.deleteAll();
+        }
+
+        @DisplayName("상대방이 채팅방을 나가지 않았다면, 채팅방의 차단 정보가 수정 됨")
+        @Test
+        void updateChatRoomBlock() {
+            // given
+            ChatRoom chatRoom = ChatRoom.builder().chatRoomNo(1L).lastModifiedDate(new Date())
+                .participants(
+                    Arrays.asList(new Participant(userA, null, Blocked.UNBLOCK),
+                        new Participant(userB, null, Blocked.UNBLOCK))).createdDate(new Date())
+                .build();
+            chatRoomRepository.save(chatRoom);
+
+            // when
+            stompService.updateBlockStatus(userA, userB, Blocked.BLOCK);
+
+            // then
+            Optional<ChatRoom> findChatRoom = chatRoomRepository.findByChatRoomNo(
+                chatRoom.getChatRoomNo());
+            assertThat(findChatRoom).isPresent();
+
+            Optional<Participant> userAParticipant = findChatRoom.get().getParticipants().stream()
+                .filter(participant -> participant.getUser().equals(userA))
+                .findFirst();
+            assertThat(userAParticipant).isPresent();
+
+            assertThat(userAParticipant.get().getBlockedStatus()).isEqualTo(Blocked.BLOCK);
+        }
+
+        @DisplayName("상대방이 채팅방을 나갔고 이후의 채팅이 있을 때, 채팅방의 차단 정보가 수정 됨")
+        @Test
+        void() {
+            // given
+
+            // when
+
+            // then
+
+        }
+
+        @DisplayName("상대방이 채팅방을 나갔고 이후의 채팅이 없을 때, 채팅방과 해당 채팅방의 채팅이 모두 삭제됨")
+        @Test
+        void() {
+            // given
+
+            // when
+
+            // then
+
+        }
+
+        @DisplayName("상대방과의 채팅방이 있고 상대방도 나를 차단했을 때, 채팅방과 해당 채팅방의 채팅이 모두 삭제됨")
+        @Test
+        void deleteChatRoomAndChatsWhenUpdatingBlock() {
+            // given
+            ChatRoom chatRoom = ChatRoom.builder().chatRoomNo(1L).lastModifiedDate(new Date())
+                .participants(
+                    Arrays.asList(new Participant(userA, null, Blocked.UNBLOCK),
+                        new Participant(userB, null, Blocked.BLOCK))).createdDate(new Date())
+                .build();
+            chatRoomRepository.save(chatRoom);
+
+            // when
+            stompService.updateBlockStatus(userA, userB, Blocked.BLOCK);
+
+            // then
+            assertThat(chatRoomRepository.findByUsers(userA, userB)).isEmpty();
+            assertThat(chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo())).isEmpty();
+        }
+
+
+        @DisplayName("상대방과의 채팅방이 없다면, 아무일도 일어나지 않음")
+        @Test
+        void() {
+            // given
+
+            // when
+
+            // then
+
+        }
+    }
 }
 
 
