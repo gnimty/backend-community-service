@@ -45,7 +45,8 @@ public class BlockController {
 	public CommonResponse<Void> doBlock(@RequestBody @Valid BlockRequest request) {
 		Member member = MemberThreadLocal.get();
 		blockService.doBlock(member, request.toServiceRequest());
-		stompService.updateBlockStatus(userService.getUser(member.getId()), userService.getUser(request.getId()), Blocked.BLOCK);
+		stompService.updateBlockStatus(userService.getUser(member.getId()),
+			userService.getUser(request.getId()), Blocked.BLOCK);
 		return CommonResponse.success(SUCCESS_BLOCK, OK);
 	}
 
@@ -53,7 +54,8 @@ public class BlockController {
 	public CommonResponse<Void> clearBlock(@RequestBody @Valid BlockClearRequest request) {
 		Member member = MemberThreadLocal.get();
 		blockService.clearBlock(member, request.toServiceRequest());
-		stompService.updateBlockStatus(userService.getUser(member.getId()), userService.getUser(request.getId()), Blocked.UNBLOCK);
+		stompService.updateBlockStatus(userService.getUser(member.getId()),
+			userService.getUser(request.getId()), Blocked.UNBLOCK);
 		return CommonResponse.success(SUCCESS_CLEAR_BLOCK, OK);
 	}
 }

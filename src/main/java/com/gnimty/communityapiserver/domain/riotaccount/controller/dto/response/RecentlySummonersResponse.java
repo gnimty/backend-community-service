@@ -17,8 +17,8 @@ public class RecentlySummonersResponse {
 
 	public static RecentlySummonersResponse from(RecentlySummonersServiceResponse response) {
 		return RecentlySummonersResponse.builder()
-				.recentlySummoners(response.getRecentlySummoners())
-				.build();
+			.recentlySummoners(response.getRecentlySummoners())
+			.build();
 	}
 
 }

@@ -80,6 +80,6 @@ public class RiotAccountReadService {
 
 	public RiotAccount findMainAccountByMemberId(Long memberId) {
 		return riotAccountRepository.findByMemberIdAndIsMain(memberId, true)
-				.orElseThrow(() -> new BaseException(ErrorCode.NOT_LINKED_RSO));
+			.orElseThrow(() -> new BaseException(ErrorCode.NOT_LINKED_RSO));
 	}
 }

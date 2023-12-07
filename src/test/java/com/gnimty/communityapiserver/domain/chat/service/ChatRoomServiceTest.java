@@ -1,13 +1,12 @@
 package com.gnimty.communityapiserver.domain.chat.service;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.gnimty.communityapiserver.domain.chat.entity.Blocked;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom.Participant;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
-import com.gnimty.communityapiserver.domain.chat.repository.Chat.ChatRepository;
 import com.gnimty.communityapiserver.domain.chat.repository.ChatRoom.ChatRoomRepository;
 import com.gnimty.communityapiserver.domain.chat.repository.User.UserRepository;
 import com.gnimty.communityapiserver.domain.chat.service.dto.UserWithBlockDto;
@@ -59,13 +58,7 @@ class ChatRoomServiceTest {
         @Test
         void successToGetChatRoomListIncludingUser() {
             // given
-            User user = User.builder()
-                .actualUserId(1L)
-                .tier(Tier.gold)
-                .division(3)
-                .summonerName("uni")
-                .status(Status.ONLINE)
-                .lp(3L).build();
+            User user = createUser("uni", 1L);
             userRepository.save(user);
 
             for (Integer i = 0; i < 5; i++) {
@@ -88,14 +81,7 @@ class ChatRoomServiceTest {
         @Test
         void successToGetEmptyChatRoomList() {
             // given
-            User user = User.builder()
-                .actualUserId(1L)
-                .tier(Tier.gold)
-                .division(3)
-                .summonerName("uni")
-                .status(Status.ONLINE)
-                .lp(3L).build();
-            userRepository.save(user);
+            User user = createUser("uni", 1L);
 
             // when
             List<ChatRoom> chatRoom = chatRoomService.findChatRoom(user);
@@ -114,17 +100,11 @@ class ChatRoomServiceTest {
         @Test
         void successGetChatRoomByChatRoomNo() {
             // given
-            User user = User.builder()
-                .actualUserId(1L)
-                .tier(Tier.gold)
-                .division(3)
-                .summonerName("uni")
-                .status(Status.ONLINE)
-                .lp(3L).build();
+            User user = createUser("uni", 1L);
             userRepository.save(user);
 
             ChatRoom chatRoom = ChatRoom.builder()
-                .chatRoomNo(Long.valueOf(1L))
+                .chatRoomNo(1L)
                 .lastModifiedDate(new Date())
                 .participants(Arrays.asList(new Participant(user, new Date(), Blocked.UNBLOCK)))
                 .createdDate(new Date())
@@ -143,13 +123,7 @@ class ChatRoomServiceTest {
         @Test
         void failGetChatRoomByChatRoomNo() {
             // given
-            User user = User.builder()
-                .actualUserId(1L)
-                .tier(Tier.gold)
-                .division(3)
-                .summonerName("uni")
-                .status(Status.ONLINE)
-                .lp(3L).build();
+            User user = createUser("uni", 1L);
             userRepository.save(user);
 
             // when & then
@@ -170,22 +144,10 @@ class ChatRoomServiceTest {
         @Test
         void successToGetChatRoom() {
             // given
-            User userA = User.builder()
-                .actualUserId(1L)
-                .tier(Tier.gold)
-                .division(3)
-                .summonerName("uni")
-                .status(Status.ONLINE)
-                .lp(3L).build();
+            User userA = createUser("uni", 1L);
             userRepository.save(userA);
 
-            User userB = User.builder()
-                .actualUserId(2L)
-                .tier(Tier.gold)
-                .division(3)
-                .summonerName("inu")
-                .status(Status.ONLINE)
-                .lp(3L).build();
+            User userB = createUser("inu", 2L);
             userRepository.save(userB);
 
             ChatRoom chatRoom = ChatRoom.builder()
@@ -208,22 +170,9 @@ class ChatRoomServiceTest {
         @Test
         void failToGetChatRoom() {
             // given
-            User userA = User.builder()
-                .actualUserId(1L)
-                .tier(Tier.gold)
-                .division(3)
-                .summonerName("uni")
-                .status(Status.ONLINE)
-                .lp(3L).build();
-            userRepository.save(userA);
+            User userA = createUser("uni", 1L);
 
-            User userB = User.builder()
-                .actualUserId(2L)
-                .tier(Tier.gold)
-                .division(3)
-                .summonerName("inu")
-                .status(Status.ONLINE)
-                .lp(3L).build();
+            User userB = createUser("inu", 2L);
             userRepository.save(userB);
 
             // when & then
@@ -245,26 +194,14 @@ class ChatRoomServiceTest {
         @Test
         void successToGetOptionalChatRoom() {
             // given
-            User userA = User.builder()
-                .actualUserId(1L)
-                .tier(Tier.gold)
-                .division(3)
-                .summonerName("uni")
-                .status(Status.ONLINE)
-                .lp(3L).build();
+            User userA = createUser("uni", 1L);
             userRepository.save(userA);
 
-            User userB = User.builder()
-                .actualUserId(2L)
-                .tier(Tier.gold)
-                .division(3)
-                .summonerName("inu")
-                .status(Status.ONLINE)
-                .lp(3L).build();
+            User userB = createUser("inu", 2L);
             userRepository.save(userB);
 
             ChatRoom chatRoom = ChatRoom.builder()
-                .chatRoomNo(Long.valueOf(1L))
+                .chatRoomNo(1L)
                 .lastModifiedDate(new Date())
                 .participants(Arrays.asList(new Participant(userA, null, Blocked.UNBLOCK),
                     new Participant(userB, null, Blocked.UNBLOCK)))
@@ -285,22 +222,10 @@ class ChatRoomServiceTest {
         @Test
         void successToFindEmptyChatRoom() {
             // given
-            User userA = User.builder()
-                .actualUserId(1L)
-                .tier(Tier.gold)
-                .division(3)
-                .summonerName("uni")
-                .status(Status.ONLINE)
-                .lp(3L).build();
+            User userA = createUser("uni", 1L);
             userRepository.save(userA);
 
-            User userB = User.builder()
-                .actualUserId(2L)
-                .tier(Tier.gold)
-                .division(3)
-                .summonerName("inu")
-                .status(Status.ONLINE)
-                .lp(3L).build();
+            User userB = createUser("inu", 2L);
             userRepository.save(userB);
 
             // when
@@ -319,22 +244,10 @@ class ChatRoomServiceTest {
         @Test
         void successToSaveChatRoom() {
             // given
-            User userA = User.builder()
-                .actualUserId(1L)
-                .tier(Tier.gold)
-                .division(3)
-                .summonerName("uni")
-                .status(Status.ONLINE)
-                .lp(3L).build();
+            User userA = createUser("uni", 1L);
             userRepository.save(userA);
 
-            User userB = User.builder()
-                .actualUserId(2L)
-                .tier(Tier.gold)
-                .division(3)
-                .summonerName("inu")
-                .status(Status.ONLINE)
-                .lp(3L).build();
+            User userB = createUser("inu", 2L);
             userRepository.save(userB);
 
             // when
@@ -349,26 +262,14 @@ class ChatRoomServiceTest {
         @Test
         void failToSaveChatRoom() {
             // given
-            User userA = User.builder()
-                .actualUserId(1L)
-                .tier(Tier.gold)
-                .division(3)
-                .summonerName("uni")
-                .status(Status.ONLINE)
-                .lp(3L).build();
+            User userA = createUser("uni", 1L);
             userRepository.save(userA);
 
-            User userB = User.builder()
-                .actualUserId(2L)
-                .tier(Tier.gold)
-                .division(3)
-                .summonerName("inu")
-                .status(Status.ONLINE)
-                .lp(3L).build();
+            User userB = createUser("inu", 2L);
             userRepository.save(userB);
 
             ChatRoom chatRoom = ChatRoom.builder()
-                .chatRoomNo(Long.valueOf(1L))
+                .chatRoomNo(1L)
                 .lastModifiedDate(new Date())
                 .participants(Arrays.asList(new Participant(userA, null, Blocked.UNBLOCK),
                     new Participant(userB, null, Blocked.UNBLOCK)))
@@ -397,26 +298,14 @@ class ChatRoomServiceTest {
         @Test
         void successToUpdateLastModifiedDate() {
             // given
-            User userA = User.builder()
-                .actualUserId(1L)
-                .tier(Tier.gold)
-                .division(3)
-                .summonerName("uni")
-                .status(Status.ONLINE)
-                .lp(3L).build();
+            User userA = createUser("uni", 1L);
             userRepository.save(userA);
 
-            User userB = User.builder()
-                .actualUserId(2L)
-                .tier(Tier.gold)
-                .division(3)
-                .summonerName("inu")
-                .status(Status.ONLINE)
-                .lp(3L).build();
+            User userB = createUser("inu", 2L);
             userRepository.save(userB);
 
             ChatRoom chatRoom = ChatRoom.builder()
-                .chatRoomNo(Long.valueOf(1L))
+                .chatRoomNo(1L)
                 .lastModifiedDate(new Date())
                 .participants(Arrays.asList(new Participant(userA, null, Blocked.UNBLOCK),
                     new Participant(userB, null, Blocked.UNBLOCK)))
@@ -438,26 +327,14 @@ class ChatRoomServiceTest {
         @Test
         void successToUpdateBlockInfo() {
             // given
-            User userA = User.builder()
-                .actualUserId(1L)
-                .tier(Tier.gold)
-                .division(3)
-                .summonerName("uni")
-                .status(Status.ONLINE)
-                .lp(3L).build();
+            User userA = createUser("uni", 1L);
             userRepository.save(userA);
 
-            User userB = User.builder()
-                .actualUserId(2L)
-                .tier(Tier.gold)
-                .division(3)
-                .summonerName("inu")
-                .status(Status.ONLINE)
-                .lp(3L).build();
+            User userB = createUser("inu", 2L);
             userRepository.save(userB);
 
             ChatRoom chatRoom = ChatRoom.builder()
-                .chatRoomNo(Long.valueOf(1L))
+                .chatRoomNo(1L)
                 .lastModifiedDate(new Date())
                 .participants(Arrays.asList(new Participant(userA, null, Blocked.UNBLOCK),
                     new Participant(userB, null, Blocked.UNBLOCK)))
@@ -485,17 +362,11 @@ class ChatRoomServiceTest {
         @Test
         void successToDeleteChatRoom() {
             // given
-            User user = User.builder()
-                .actualUserId(1L)
-                .tier(Tier.gold)
-                .division(3)
-                .summonerName("uni")
-                .status(Status.ONLINE)
-                .lp(3L).build();
+            User user = createUser("uni", 1L);
             userRepository.save(user);
 
             ChatRoom chatRoom = ChatRoom.builder()
-                .chatRoomNo(Long.valueOf(1L))
+                .chatRoomNo(1L)
                 .lastModifiedDate(new Date())
                 .participants(Arrays.asList(new Participant(user, null, Blocked.UNBLOCK)))
                 .createdDate(new Date())
@@ -509,4 +380,16 @@ class ChatRoomServiceTest {
             assertThat(chatRoomRepository.findByChatRoomNo(1L)).isEmpty();
         }
     }
+
+    public User createUser(String name, Long actualUserId) {
+        return User.builder()
+            .actualUserId(1L)
+            .tier(Tier.gold)
+            .division(3)
+            .name(name)
+            .tagLine("tagLine")
+            .status(Status.ONLINE).lp(3L)
+            .build();
+    }
+
 }

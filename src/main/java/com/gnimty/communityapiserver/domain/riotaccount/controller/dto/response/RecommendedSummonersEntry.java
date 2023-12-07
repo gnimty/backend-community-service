@@ -9,7 +9,8 @@ import lombok.Data;
 public class RecommendedSummonersEntry {
 
 	private Long id;
-	private String summonerName;
+	private String name;
+	private String tagLine;
 	private Status status;
 	private Boolean isMain;
 	private String puuid;

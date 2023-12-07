@@ -1,6 +1,6 @@
 package com.gnimty.communityapiserver.domain.championcommentslike.repository;
 
-import static com.gnimty.communityapiserver.domain.championcommentslike.entity.QChampionCommentsLike.*;
+import static com.gnimty.communityapiserver.domain.championcommentslike.entity.QChampionCommentsLike.championCommentsLike;
 
 import com.gnimty.communityapiserver.domain.championcomments.entity.ChampionComments;
 import com.gnimty.communityapiserver.domain.member.entity.Member;

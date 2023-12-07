@@ -138,7 +138,7 @@ public class AuthService {
 		AuthToken authToken = generateTokenPair(idByToken);
 		saveInRedis(
 			getRedisKey(KeyPrefix.REFRESH, String.valueOf(idByToken)),
-			authToken.getRefreshToken(),
+			authToken.getRefreshToken().replaceAll(Auth.BEARER.getContent(), ""),
 			Auth.REFRESH_TOKEN_EXPIRATION.getExpiration()
 		);
 		return authToken;

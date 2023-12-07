@@ -1,15 +1,12 @@
 package com.gnimty.communityapiserver.domain.chat.service;
 
 
-import com.gnimty.communityapiserver.domain.chat.controller.dto.MessageRequest;
 import com.gnimty.communityapiserver.domain.chat.entity.Chat;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
 import com.gnimty.communityapiserver.domain.chat.repository.Chat.ChatRepository;
-import com.gnimty.communityapiserver.global.constant.MessageRequestType;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,29 +17,29 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class ChatService {
 
-    private final ChatRepository chatRepository;
+	private final ChatRepository chatRepository;
 
-    public List<Chat> findChats(ChatRoom chatRoom) {
-        return chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo());
-    }
+	public List<Chat> findChats(ChatRoom chatRoom) {
+		return chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo());
+	}
 
-    public Chat save(Chat chat) {
-        return chatRepository.save(chat);
-    }
+	public Chat save(Chat chat) {
+		return chatRepository.save(chat);
+	}
 
-    public Chat save(User user, ChatRoom chatRoom, String message, Date sendDate) {
-        Chat chat = Chat.builder()
-            .senderId(user.getActualUserId())
-            .chatRoomNo(chatRoom.getChatRoomNo())
-            .message(message)
-            .sendDate(sendDate)
-            .build();
+	public Chat save(User user, ChatRoom chatRoom, String message, Date sendDate) {
+		Chat chat = Chat.builder()
+			.senderId(user.getActualUserId())
+			.chatRoomNo(chatRoom.getChatRoomNo())
+			.message(message)
+			.sendDate(sendDate)
+			.build();
 
-        return chatRepository.save(chat);
-    }
+		return chatRepository.save(chat);
+	}
 
-    public void delete(ChatRoom chatRoom) {
-        chatRepository.deleteByChatRoomNo(chatRoom.getChatRoomNo());
-    }
+	public void delete(ChatRoom chatRoom) {
+		chatRepository.deleteByChatRoomNo(chatRoom.getChatRoomNo());
+	}
 
 }

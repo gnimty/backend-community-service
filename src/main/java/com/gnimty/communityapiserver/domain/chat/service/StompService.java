@@ -1,5 +1,6 @@
 package com.gnimty.communityapiserver.domain.chat.service;
 
+import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatDto;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatRoomDto;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.MessageResponse;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.UserConnStatusDto;
@@ -9,7 +10,6 @@ import com.gnimty.communityapiserver.domain.chat.entity.Chat;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom.Participant;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
-import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatDto;
 import com.gnimty.communityapiserver.domain.chat.service.dto.UserWithBlockDto;
 import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
 import com.gnimty.communityapiserver.global.constant.MessageResponseType;
@@ -71,6 +71,7 @@ public class StompService {
             .build();
     }
 
+
     // TODO solomon: 채팅방 목록 불러오기
     // blocked==UNBLOCK인 도큐먼트만 조회
     public List<ChatRoomDto> getChatRoomsJoined(User me) {
@@ -90,6 +91,7 @@ public class StompService {
                 .build()
         ).toList();
     }
+
 
     // TODO solomon: 채팅방 나가기 (채팅방에 기록된 내 나간시간 기록 update)
     // 양쪽 다 채팅방을 나간 상황이면, 모든 채팅 기록 삭제
@@ -148,7 +150,7 @@ public class StompService {
 
 
     public void createOrUpdateUser(List<RiotAccount> accounts) {
-        List<User> users = accounts.stream().map(account -> User.toUser(account)).toList();
+        List<User> users = accounts.stream().map(User::toUser).toList();
         BulkWriteResult bulkWriteResult = userService.updateMany(users);
     }
 
@@ -159,13 +161,10 @@ public class StompService {
         List<ChatRoom> chatRooms = chatRoomService.findChatRoom(user);
 
         // 2. chatRoom에 속해 있는 모든 other participants 정보 검색하여 Id 추출
-        List<Long> memberIds = chatRooms.stream().map(chatRoom ->
-            getOther(user, chatRoom).getActualUserId()).toList();
-
         // 3. return
-        return memberIds;
+        return chatRooms.stream().map(chatRoom ->
+            getOther(user, chatRoom).getActualUserId()).toList();
     }
-
 
     public void updateBlockStatus(User me, User other, Blocked status) {
         Optional<ChatRoom> findChatRoom = chatRoomService.findChatRoom(me, other);
@@ -259,8 +258,7 @@ public class StompService {
     private User getOther(User me, ChatRoom chatRoom) {
         List<Participant> participants = chatRoom.getParticipants();
         Participant participant = extractParticipant(me, participants, false);
-        User other = participant.getUser();
-        return other;
+        return participant.getUser();
     }
 
 

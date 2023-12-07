@@ -32,7 +32,7 @@ public class ChampionCommentsLikeReadService {
 		ChampionComments championComments
 	) {
 		return championCommentsLikeRepository.findByMemberAndChampionComments(
-			member, championComments)
+				member, championComments)
 			.orElseThrow(() -> new BaseException(ErrorCode.CHAMPION_COMMENTS_LIKE_NOT_FOUND));
 	}
 }

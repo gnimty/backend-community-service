@@ -23,6 +23,7 @@ public class ChampionCommentsEntry {
 	private Boolean deleted;
 	private Boolean blocked;
 	private Long memberId;
-	private String summonerName;
+	private String name;
+	private String tagLine;
 	private Boolean like;
 }

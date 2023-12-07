@@ -63,7 +63,7 @@ public class RiotAccountService {
 		List<Long> chattedMemberIds
 	) {
 		RiotAccount riotAccount = riotAccountReadService.findMainAccountByMember(member);
-		RecentMemberInfo recentMemberInfo = getRecentMemberInfo(riotAccount.getSummonerName());
+		RecentMemberInfo recentMemberInfo = getRecentMemberInfo(riotAccount.getInternalTagName());
 		List<RiotAccount> chattedRiotAccounts = getChattedRiotAccounts(chattedMemberIds);
 
 		Map<String, RiotAccount> riotAccountMap = createRiotAccountMap(member, chattedRiotAccounts);
@@ -81,7 +81,8 @@ public class RiotAccountService {
 			.toList();
 	}
 
-	private List<RecentlySummonersEntry> createMatchingRecentlySummoners(RecentMemberInfo recentMemberInfo,
+	private List<RecentlySummonersEntry> createMatchingRecentlySummoners(
+		RecentMemberInfo recentMemberInfo,
 		Map<String, RiotAccount> riotAccountMap) {
 		return recentMemberInfo.getRecentMembers()
 			.stream()
@@ -90,10 +91,10 @@ public class RiotAccountService {
 			.collect(Collectors.toList());
 	}
 
-	private RecentMemberInfo getRecentMemberInfo(String summonerName) {
+	private RecentMemberInfo getRecentMemberInfo(String internalTagName) {
 		return WebClient.create("https://gnimty.kro.kr")
 			.get()
-			.uri("/statistics/summoners/together/" + summonerName)
+			.uri("/statistics/summoners/together/" + internalTagName)
 			.retrieve()
 			.bodyToMono(RecentMemberInfo.class)
 			.block();

@@ -375,7 +375,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 			RiotAccountEntry riotAccountEntry = response.getRiotDependentInfo()
 				.getRiotAccounts().get(0);
 			assertThat(riotAccountEntry.getId()).isEqualTo(riotAccount.getId());
-			assertThat(riotAccountEntry.getSummonerName()).isEqualTo(riotAccount.getSummonerName());
+			assertThat(riotAccountEntry.getName()).isEqualTo(riotAccount.getName());
 			assertThat(riotAccountEntry.getLp()).isEqualTo(riotAccount.getLp());
 			assertThat(riotAccountEntry.getDivision()).isEqualTo(riotAccount.getDivision());
 			assertThat(riotAccountEntry.getMmr()).isEqualTo(riotAccount.getMmr());
@@ -1279,7 +1279,10 @@ public class MemberServiceTest extends ServiceTestSupport {
 	public RiotAccount createRiotAccount(Member member, String summonerName, String puuid,
 		Boolean isMain) {
 		return RiotAccount.builder()
-			.summonerName(summonerName)
+			.name(summonerName)
+			.tagLine("tagLine")
+			.internalName(summonerName.toLowerCase().intern())
+			.internalTagName((summonerName + "#tagLine").toLowerCase().intern())
 			.isMain(isMain)
 			.queue(Tier.diamond)
 			.lp(1000L)
@@ -1292,6 +1295,10 @@ public class MemberServiceTest extends ServiceTestSupport {
 			.frequentChampionId3(3L)
 			.puuid(puuid)
 			.iconId(1L)
+			.queueFlex(Tier.diamond)
+			.lpFlex(1000L)
+			.divisionFlex(1)
+			.mmrFlex(10000L)
 			.member(member)
 			.build();
 	}

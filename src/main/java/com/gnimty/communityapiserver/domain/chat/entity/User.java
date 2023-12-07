@@ -22,6 +22,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "user")
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
@@ -29,79 +30,76 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Builder
 public class User {
 
-    @Id
-    private String id;
-    @Indexed(unique = true)
-    private Long actualUserId;
-    private Long profileIconId;
-    private Tier tier;
-    private Integer division;
-    private Long lp;
-    private String summonerName;
-    private Status status;
-    private List<Lane> mostLanes;
-    private List<Long> mostChampions;
+	@Id
+	private String id;
+	@Indexed(unique = true)
+	private Long actualUserId;
+	private Long profileIconId;
+	private Tier tier;
+	private Integer division;
+	private Long lp;
+	private String name;
+	private String tagLine;
+	private Status status;
+	private List<Lane> mostLanes;
+	private List<Long> mostChampions;
 
-    public static User toUser(RiotAccount riotAccount) {
-        return User.builder()
-            .actualUserId(riotAccount.getMember().getId())
-            .profileIconId(riotAccount.getIconId())
-            .tier(riotAccount.getQueue())
-            .division(riotAccount.getDivision())
-            .summonerName(riotAccount.getSummonerName())
-            .mostLanes(getMostLanes(riotAccount))
-            .mostChampions(getMostChampions(riotAccount))
-            .lp(riotAccount.getLp())
-            .build();
-    }
+	public static User toUser(RiotAccount riotAccount) {
+		return User.builder()
+			.actualUserId(riotAccount.getMember().getId())
+			.profileIconId(riotAccount.getIconId())
+			.tier(riotAccount.getQueue())
+			.division(riotAccount.getDivision())
+			.name(riotAccount.getName())
+			.tagLine(riotAccount.getTagLine())
+			.mostLanes(getMostLanes(riotAccount))
+			.mostChampions(getMostChampions(riotAccount))
+			.lp(riotAccount.getLp())
+			.build();
+	}
 
+	public void updateByRiotAccount(RiotAccount riotAccount) {
+		this.actualUserId = riotAccount.getMember().getId();
+		this.profileIconId = riotAccount.getIconId();
+		this.tier = riotAccount.getQueue();
+		this.name = riotAccount.getName();
+		this.tagLine = riotAccount.getTagLine();
+		this.lp = riotAccount.getLp();
+		this.division = riotAccount.getDivision();
+		this.mostChampions = getMostChampions();
+		this.mostLanes = getMostLanes();
+	}
 
-    public void updateByRiotAccount(RiotAccount riotAccount) {
-        this.actualUserId = riotAccount.getMember().getId();
-        this.profileIconId = riotAccount.getIconId();
-        this.tier = riotAccount.getQueue();
-        this.summonerName = riotAccount.getSummonerName();
-        this.lp = riotAccount.getLp();
-        this.division = riotAccount.getDivision();
-        this.mostChampions = getMostChampions();
-        this.mostLanes = getMostLanes();
-    }
+	public void updateByUser(User updatedUser) {
+		this.profileIconId = Optional.ofNullable(updatedUser.getProfileIconId())
+			.orElse(this.profileIconId);
+		this.tier = Optional.ofNullable(updatedUser.getTier()).orElse(this.tier);
+		this.name = Optional.ofNullable(updatedUser.getName()).orElse(this.name);
+		this.tagLine = Optional.ofNullable(updatedUser.getTagLine()).orElse(this.tagLine);
+		this.lp = Optional.ofNullable(updatedUser.getLp()).orElse(this.lp);
+		this.division = Optional.ofNullable(updatedUser.getDivision()).orElse(this.division);
+		this.status = Optional.ofNullable(updatedUser.getStatus()).orElse(this.status);
+	}
 
+	public void updateStatus(Status status) {
+		this.status = status;
+	}
 
-    public void updateByUser(User updatedUser) {
-        this.profileIconId = Optional.ofNullable(updatedUser.getProfileIconId())
-            .orElse(this.profileIconId);
-        this.tier = Optional.ofNullable(updatedUser.getTier()).orElse(this.tier);
-        this.summonerName = Optional.ofNullable(updatedUser.getSummonerName())
-            .orElse(this.summonerName);
-        this.lp = Optional.ofNullable(updatedUser.getLp()).orElse(this.lp);
-        this.division = Optional.ofNullable(updatedUser.getDivision()).orElse(this.division);
-        this.status = Optional.ofNullable(updatedUser.getStatus()).orElse(this.status);
-    }
+	private static List<Long> getMostChampions(RiotAccount riotAccount) {
+		List<Long> mostChampions = new ArrayList<>(List.of(
+			riotAccount.getFrequentChampionId1(),
+			riotAccount.getFrequentChampionId2(),
+			riotAccount.getFrequentChampionId3()));
 
+		mostChampions.removeIf(Objects::isNull);
+		return mostChampions;
+	}
 
-    public void updateStatus(Status status) {
-        this.status = status;
-    }
+	private static List<Lane> getMostLanes(RiotAccount riotAccount) {
+		List<Lane> mostLanes = new ArrayList<>(List.of(
+			riotAccount.getFrequentLane1(), riotAccount.getFrequentLane2()));
 
-
-    private static List<Long> getMostChampions(RiotAccount riotAccount) {
-        List<Long> mostChampions = new ArrayList<>(List.of(
-            riotAccount.getFrequentChampionId1(),
-            riotAccount.getFrequentChampionId2(),
-            riotAccount.getFrequentChampionId3()));
-
-        mostChampions.removeIf(champion -> champion == null);
-        return mostChampions;
-    }
-
-
-    private static List<Lane> getMostLanes(RiotAccount riotAccount) {
-        List<Lane> mostLanes = new ArrayList<>(List.of(
-            riotAccount.getFrequentLane1(), riotAccount.getFrequentLane2()));
-
-        mostLanes.removeIf(lane -> lane == null);
-        return mostLanes;
-    }
-
+		mostLanes.removeIf(Objects::isNull);
+		return mostLanes;
+	}
 }

@@ -64,12 +64,12 @@ public class RiotAccountQueryRepository {
 		OrderSpecifier<?>[] orderSpecifier = createOrderSpecifier(request.getSortBy());
 
 		JPAQuery<RecommendedSummonersEntry> query = queryFactory.select(
-				getProjectionBean())
+				getProjectionBean(request.getGameMode()))
 			.from(riotAccount)
 			.join(riotAccount.member, member)
-			.join(preferGameMode).on(preferGameMode.member.eq(member))
-			.join(introduction).on(introduction.member.eq(member))
-			.join(schedule).on(schedule.member.eq(member))
+			.leftJoin(preferGameMode).on(preferGameMode.member.eq(member))
+			.leftJoin(introduction).on(introduction.member.eq(member))
+			.leftJoin(schedule).on(schedule.member.eq(me))
 			.where(
 				cursorGt(request)
 					.and(isMainRiotAccount())
@@ -80,7 +80,7 @@ public class RiotAccountQueryRepository {
 					.and(laneEq(request.getLanes()))
 					.and(frequentChampionIdEq(request.getPreferChampionIds()))
 					.and(duoable(mainRiotAccount.getQueue(), mainRiotAccount.getDivision(),
-						request.getDuoable()))
+						request.getDuoable(), request.getGameMode()))
 					.and(timeMatch(schedules, request.getTimeMatch()))
 					.and(riotAccount.member.id.ne(me.getId())))
 			.orderBy(orderSpecifier)
@@ -97,7 +97,7 @@ public class RiotAccountQueryRepository {
 
 	public List<RecommendedSummonersEntry> findMainSummonersByMember(Member me, GameMode gameMode) {
 		JPAQuery<RecommendedSummonersEntry> query = queryFactory.select(
-				getProjectionBean())
+				getProjectionBean(gameMode))
 			.from(riotAccount)
 			.join(riotAccount.member, member)
 			.join(preferGameMode).on(preferGameMode.member.eq(member))
@@ -116,7 +116,7 @@ public class RiotAccountQueryRepository {
 			.where(riotAccount.member.id.eq(me.getId()))
 			.fetchFirst();
 		return query
-			.where(duoable(account.getQueue(), account.getDivision(), true))
+			.where(duoable(account.getQueue(), account.getDivision(), true, gameMode))
 			.orderBy(Expressions.numberTemplate(Double.class, "function('rand')").asc())
 			.limit(5)
 			.fetch();
@@ -137,11 +137,19 @@ public class RiotAccountQueryRepository {
 		return riotAccount.member.id.ne(me.getId());
 	}
 
-	private QBean<RecommendedSummonersEntry> getProjectionBean() {
+	private QBean<RecommendedSummonersEntry> getProjectionBean(GameMode gameMode) {
+		if (gameMode.equals(GameMode.RANK_FLEX)) {
+			return getRankFlexProjectionBean();
+		}
+		return getRankSoloProjectionBean();
+	}
+
+	private QBean<RecommendedSummonersEntry> getRankSoloProjectionBean() {
 		return Projections.bean(
 			RecommendedSummonersEntry.class,
 			riotAccount.id.as("id"),
-			riotAccount.summonerName.as("summonerName"),
+			riotAccount.name.as("name"),
+			riotAccount.tagLine.as("tagLine"),
 			member.status.as("status"),
 			riotAccount.isMain.as("isMain"),
 			riotAccount.puuid.as("puuid"),
@@ -154,6 +162,30 @@ public class RiotAccountQueryRepository {
 			riotAccount.frequentChampionId1.as("frequentChampionId1"),
 			riotAccount.frequentChampionId2.as("frequentChampionId2"),
 			riotAccount.frequentChampionId3.as("frequentChampionId3"),
+			introduction.content.as("introduction"),
+			member.upCount.as("upCount"),
+			riotAccount.iconId.as("iconId")
+		);
+	}
+
+	private QBean<RecommendedSummonersEntry> getRankFlexProjectionBean() {
+		return Projections.bean(
+			RecommendedSummonersEntry.class,
+			riotAccount.id.as("id"),
+			riotAccount.name.as("name"),
+			riotAccount.tagLine.as("tagLine"),
+			member.status.as("status"),
+			riotAccount.isMain.as("isMain"),
+			riotAccount.puuid.as("puuid"),
+			riotAccount.queueFlex.as("queue"),
+			riotAccount.lpFlex.as("lp"),
+			riotAccount.divisionFlex.as("division"),
+			riotAccount.mmrFlex.as("mmr"),
+			riotAccount.frequentLane1Flex.as("frequentLane1"),
+			riotAccount.frequentLane2Flex.as("frequentLane2"),
+			riotAccount.frequentChampionId1Flex.as("frequentChampionId1"),
+			riotAccount.frequentChampionId2Flex.as("frequentChampionId2"),
+			riotAccount.frequentChampionId3Flex.as("frequentChampionId3"),
 			introduction.content.as("introduction"),
 			member.upCount.as("upCount"),
 			riotAccount.iconId.as("iconId")
@@ -186,12 +218,30 @@ public class RiotAccountQueryRepository {
 	private BooleanExpression duoable(
 		Tier tier,
 		Integer division,
-		Boolean duoable
+		Boolean duoable,
+		GameMode gameMode
 	) {
 		if (duoable == null || !duoable) {
 			return null;
 		}
-		if (tier.equals(Tier.iron) || tier.equals(Tier.bronze)) {
+		if (gameMode.equals(GameMode.RANK_SOLO)) {
+			return getSoloRankDuoable(tier, division);
+		}
+		if (gameMode.equals(GameMode.RANK_FLEX)) {
+			return getFlexRankDuoable(tier);
+		}
+		return null;
+	}
+
+	private BooleanExpression getFlexRankDuoable(Tier tier) {
+		if (tier.getWeight() >= Tier.emerald.getWeight()) {
+			return null;
+		}
+		return riotAccount.mmr.lt(getMmrByTier(Tier.master));
+	}
+
+	private BooleanExpression getSoloRankDuoable(Tier tier, Integer division) {
+		if (tier.getWeight() <= Tier.bronze.getWeight()) {
 			return riotAccount.mmr.lt(getMmrByTier(Tier.gold));
 		}
 		if (tier.equals(Tier.silver)) {
@@ -267,10 +317,9 @@ public class RiotAccountQueryRepository {
 			return riotAccount.id.gt(request.getLastSummonerId());
 		}
 		if (sortBy.equals(SortBy.ATOZ)) {
-			return riotAccount.summonerName.lower().goe(request.getLastSummonerName().toLowerCase())
-				.and(
-					riotAccount.summonerName.lower().gt(request.getLastSummonerName().toLowerCase())
-						.or(riotAccount.id.gt(request.getLastSummonerId())));
+			return riotAccount.internalName.goe(request.getLastName().toLowerCase().intern())
+				.and(riotAccount.internalName.gt(request.getLastName().toLowerCase().intern())
+					.or(riotAccount.id.gt(request.getLastSummonerId())));
 		} else if (sortBy.equals(SortBy.TIER)) {
 			return riotAccount.mmr.goe(request.getLastSummonerMmr())
 				.and(riotAccount.mmr.gt(request.getLastSummonerMmr())
@@ -282,7 +331,7 @@ public class RiotAccountQueryRepository {
 	}
 
 	private OrderSpecifier<?>[] createOrderSpecifier(SortBy sortBy) {
-		OrderSpecifier<String> summonerNameAsc = riotAccount.summonerName.toLowerCase().asc();
+		OrderSpecifier<String> nameAsc = riotAccount.name.toLowerCase().asc();
 		OrderSpecifier<Long> mmrDesc = riotAccount.mmr.desc();
 		OrderSpecifier<Long> upCountDesc = member.upCount.desc();
 		OrderSpecifier<Long> idAsc = riotAccount.id.asc();
@@ -291,7 +340,7 @@ public class RiotAccountQueryRepository {
 			return new OrderSpecifier[]{idAsc};
 		}
 		if (sortBy.equals(SortBy.ATOZ)) {
-			return new OrderSpecifier[]{summonerNameAsc, idAsc};
+			return new OrderSpecifier[]{nameAsc, idAsc};
 		} else if (sortBy.equals(SortBy.TIER)) {
 			return new OrderSpecifier[]{mmrDesc, idAsc};
 		} else {
@@ -300,15 +349,10 @@ public class RiotAccountQueryRepository {
 	}
 
 	/**
-	 * 			IV		III		II		I
-	 * 아이언		LP+0	LP+100	LP+200	LP+300
-	 * 브론즈		LP+400	LP+500	LP+600	LP+700
-	 * 실버		LP+800	LP+900	LP+1000	LP+1100
-	 * 골드		LP+1200	LP+1300	LP+1400	LP+1500
-	 * 플레티넘	LP+1600	LP+1700	LP+1800	LP+1900
-	 * 에메랄드	LP+2000	LP+2100	LP+2200	LP+2300
-	 * 다이아몬드	LP+2400	LP+2500	LP+2600	LP+2700
-	 * 마스터 /그랜드마스터 / 챌린저	LP+2800
+	 * IV		III		II		I 아이언		LP+0	LP+100	LP+200	LP+300 브론즈		LP+400	LP+500	LP+600	LP+700
+	 * 실버		LP+800	LP+900	LP+1000	LP+1100 골드		LP+1200	LP+1300	LP+1400	LP+1500
+	 * 플레티넘	LP+1600	LP+1700	LP+1800	LP+1900 에메랄드	LP+2000	LP+2100	LP+2200	LP+2300
+	 * 다이아몬드	LP+2400	LP+2500	LP+2600	LP+2700 마스터 /그랜드마스터 / 챌린저	LP+2800
 	 */
 	private Long getMmrByTierAndDivision(Tier tier, Integer division) {
 		if (tier.getWeight() >= Tier.master.getWeight()) {

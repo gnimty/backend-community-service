@@ -1,9 +1,8 @@
 package com.gnimty.communityapiserver.domain.chat.service;
 
 
-import static org.assertj.core.api.Assertions.*;
 
-import com.github.dockerjava.zerodep.shaded.org.apache.hc.client5.http.auth.AuthStateCacheable;
+import static org.assertj.core.api.Assertions.*;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatDto;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatRoomDto;
 import com.gnimty.communityapiserver.domain.chat.entity.Blocked;
@@ -15,7 +14,6 @@ import com.gnimty.communityapiserver.domain.chat.repository.Chat.ChatRepository;
 import com.gnimty.communityapiserver.domain.chat.repository.ChatRoom.ChatRoomRepository;
 import com.gnimty.communityapiserver.domain.chat.repository.User.UserRepository;
 import com.gnimty.communityapiserver.domain.chat.service.dto.UserWithBlockDto;
-import com.gnimty.communityapiserver.domain.member.repository.MemberRepository;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.constant.Tier;
 import com.gnimty.communityapiserver.global.exception.BaseException;
@@ -25,10 +23,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -65,6 +60,7 @@ public class StompServiceTest {
     void deleteAll() {
         userRepository.deleteAll();
         chatRoomRepository.deleteAll();
+        chatRepository.deleteAll();
     }
 
 
@@ -76,8 +72,7 @@ public class StompServiceTest {
         @Test
         void successUpdateConnectStatus() {
             // given
-            User user = User.builder().actualUserId(1L).tier(Tier.gold).division(3)
-                .summonerName("uni").status(Status.ONLINE).lp(3L).build();
+            User user = createUser("uni", 1L);
             userRepository.save(user);
 
             // when
@@ -98,12 +93,10 @@ public class StompServiceTest {
 
         @BeforeEach
         void saveTwoUser() {
-            userA = User.builder().actualUserId(1L).tier(Tier.gold).division(3).summonerName("uni")
-                .status(Status.ONLINE).lp(3L).build();
+            userA = createUser("uni", 1L);
             userRepository.save(userA);
 
-            userB = User.builder().actualUserId(2L).tier(Tier.gold).division(3).summonerName("inu")
-                .status(Status.ONLINE).lp(3L).build();
+            userB = createUser("inu", 2L);
             userRepository.save(userB);
         }
 
@@ -196,13 +189,10 @@ public class StompServiceTest {
 
         @BeforeEach
         void saveUserAndChatRoom() {
-            userA = User.builder().actualUserId(1L).tier(Tier.gold).division(3).summonerName("uni")
-                .status(Status.ONLINE).lp(3L).build();
+            userA = createUser("uni", 1L);
             userRepository.save(userA);
 
-            userB = User.builder().actualUserId(2L).tier(Tier.gold).division(3).summonerName("inu")
-                .status(Status.ONLINE).lp(3L).build();
-            userRepository.save(userB);
+            userB = createUser("inu", 2L);
 
             chatRoom = ChatRoom.builder().chatRoomNo(1L).lastModifiedDate(new Date()).participants(
                 Arrays.asList(new Participant(userA, null, Blocked.UNBLOCK),
@@ -262,20 +252,16 @@ public class StompServiceTest {
 
         @BeforeEach
         void saveUser() {
-            userA = User.builder().actualUserId(1L).tier(Tier.gold).division(3).summonerName("uni")
-                .status(Status.ONLINE).lp(3L).build();
+            userA = createUser("uniA", 1L);
             userRepository.save(userA);
 
-            userB = User.builder().actualUserId(2L).tier(Tier.gold).division(3).summonerName("uin")
-                .status(Status.ONLINE).lp(3L).build();
+            userB = createUser("uniB", 2L);
             userRepository.save(userB);
 
-            userC = User.builder().actualUserId(3L).tier(Tier.gold).division(3).summonerName("inu")
-                .status(Status.ONLINE).lp(3L).build();
+            userC = createUser("uniC", 3L);
             userRepository.save(userC);
 
-            userD = User.builder().actualUserId(4L).tier(Tier.gold).division(3).summonerName("iun")
-                .status(Status.ONLINE).lp(3L).build();
+            userD = createUser("uniD", 4L);
             userRepository.save(userD);
         }
 
@@ -346,12 +332,10 @@ public class StompServiceTest {
 
         @BeforeEach
         void saveUserAndChatRoom() {
-            userA = User.builder().actualUserId(1L).tier(Tier.gold).division(3).summonerName("uni")
-                .status(Status.ONLINE).lp(3L).build();
+            userA = createUser("uni", 1L);
             userRepository.save(userA);
 
-            userB = User.builder().actualUserId(2L).tier(Tier.gold).division(3).summonerName("inu")
-                .status(Status.ONLINE).lp(3L).build();
+            userB = createUser("inu", 2L);
             userRepository.save(userB);
 
             chatRoom = ChatRoom.builder().chatRoomNo(1L).lastModifiedDate(new Date()).participants(
@@ -467,12 +451,10 @@ public class StompServiceTest {
         @Test
         void saveChatAndUpdateChatRoom() {
             // given
-            User userA = User.builder().actualUserId(1L).tier(Tier.gold).division(3)
-                .summonerName("uni").status(Status.ONLINE).lp(3L).build();
+            User userA = createUser("uni", 1L);
             userRepository.save(userA);
 
-            User userB = User.builder().actualUserId(2L).tier(Tier.gold).division(3)
-                .summonerName("inu").status(Status.ONLINE).lp(3L).build();
+            User userB = createUser("inu", 2L);
             userRepository.save(userB);
 
             ChatRoom chatRoom = ChatRoom.builder().chatRoomNo(1L).lastModifiedDate(new Date())
@@ -502,13 +484,11 @@ public class StompServiceTest {
         private ChatRoom chatRoom;
 
         @BeforeEach
-        void saveUserAndChatRoom() {
-            userA = User.builder().actualUserId(1L).tier(Tier.gold).division(3).summonerName("uni")
-                .status(Status.ONLINE).lp(3L).build();
+        void saveUsersAndChatRoom() {
+            userA = createUser("uni", 1L);
             userRepository.save(userA);
 
-            userB = User.builder().actualUserId(2L).tier(Tier.gold).division(3).summonerName("inu")
-                .status(Status.ONLINE).lp(3L).build();
+            userB = createUser("inu", 2L);
             userRepository.save(userB);
 
             chatRoom = ChatRoom.builder().chatRoomNo(1L).lastModifiedDate(new Date()).participants(
@@ -568,9 +548,7 @@ public class StompServiceTest {
         @Test
         void updateUser() {
             // given
-            User userA = User.builder().actualUserId(1L).tier(Tier.gold).division(3)
-                .summonerName("uni")
-                .status(Status.ONLINE).lp(3L).build();
+            User userA = createUser("uni", 1L);
             userRepository.save(userA);
 
             // when
@@ -593,12 +571,9 @@ public class StompServiceTest {
 
         @BeforeEach
         void saveUsersAndChatRoom() {
-            userA = User.builder().actualUserId(1L).tier(Tier.gold).division(3).summonerName("uni")
-                .status(Status.ONLINE).lp(3L).build();
-            userRepository.save(userA);
+            userA = createUser("uni", 1L);
 
-            userB = User.builder().actualUserId(2L).tier(Tier.gold).division(3).summonerName("inu")
-                .status(Status.ONLINE).lp(3L).build();
+            userB = createUser("inu", 2L);
             userRepository.save(userB);
 
             chatRoom = ChatRoom.builder().chatRoomNo(1L).lastModifiedDate(new Date())
@@ -733,12 +708,10 @@ public class StompServiceTest {
 
         @BeforeEach
         void saveUsersAndChatRoom() {
-            userA = User.builder().actualUserId(1L).tier(Tier.gold).division(3).summonerName("uni")
-                .status(Status.ONLINE).lp(3L).build();
+            userA = createUser("uni", 1L);
             userRepository.save(userA);
 
-            userB = User.builder().actualUserId(2L).tier(Tier.gold).division(3).summonerName("inu")
-                .status(Status.ONLINE).lp(3L).build();
+            userB = createUser("inu", 2L);
             userRepository.save(userB);
 
             chatRoom = ChatRoom.builder().chatRoomNo(1L).lastModifiedDate(new Date())
@@ -798,12 +771,10 @@ public class StompServiceTest {
 
         @BeforeEach
         void saveUsers() {
-            userA = User.builder().actualUserId(1L).tier(Tier.gold).division(3).summonerName("uni")
-                .status(Status.ONLINE).lp(3L).build();
+            userA = createUser("uni", 1L);
             userRepository.save(userA);
 
-            userB = User.builder().actualUserId(2L).tier(Tier.gold).division(3).summonerName("inu")
-                .status(Status.ONLINE).lp(3L).build();
+            userB = createUser("inu", 2L);
             userRepository.save(userB);
         }
 
@@ -863,13 +834,12 @@ public class StompServiceTest {
         void deleteAllDate() {
             // given
             User userA = User.builder().actualUserId(1L).tier(Tier.gold).division(3)
-                .summonerName("uni")
+                .name("uni")
+                .tagLine("tagLine")
                 .status(Status.ONLINE).lp(3L).build();
             userRepository.save(userA);
 
-            User userB = User.builder().actualUserId(2L).tier(Tier.gold).division(3)
-                .summonerName("inu")
-                .status(Status.ONLINE).lp(3L).build();
+            User userB = createUser("inu", 2L);
             userRepository.save(userB);
 
             ChatRoom chatRoom = ChatRoom.builder().chatRoomNo(1L).lastModifiedDate(new Date())
@@ -893,7 +863,7 @@ public class StompServiceTest {
 
             // then
             assertThat(userRepository.findByActualUserId(userA.getActualUserId())).isEmpty();
-            assertThat(chatRoomRepository.findByUser(userA)).isEmpty();;
+            assertThat(chatRoomRepository.findByUser(userA)).isEmpty();
             assertThat(chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo())).isEmpty();
         }
 
@@ -909,7 +879,17 @@ public class StompServiceTest {
         }
     }
 
+    public User createUser(String name, Long actualUserId) {
+        return User.builder()
+            .actualUserId(1L)
+            .tier(Tier.gold)
+            .division(3)
+            .name(name)
+            .tagLine("tagLine")
+            .status(Status.ONLINE).lp(3L)
+            .build();
+    }
+
 
 }
-
 

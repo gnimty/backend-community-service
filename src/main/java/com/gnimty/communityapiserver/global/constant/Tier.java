@@ -19,7 +19,7 @@ public enum Tier {
 	silver("silver", 2),
 	bronze("bronze", 1),
 	iron("iron", 0),
-	unranked("null", -1);
+	unknown("null", -1);
 
 	private final String tier;
 	private final Integer weight;
