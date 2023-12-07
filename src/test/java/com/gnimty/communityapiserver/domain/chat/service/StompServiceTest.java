@@ -1,8 +1,8 @@
 package com.gnimty.communityapiserver.domain.chat.service;
 
 
-
 import static org.assertj.core.api.Assertions.*;
+
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatDto;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatRoomDto;
 import com.gnimty.communityapiserver.domain.chat.entity.Blocked;
@@ -14,6 +14,7 @@ import com.gnimty.communityapiserver.domain.chat.repository.Chat.ChatRepository;
 import com.gnimty.communityapiserver.domain.chat.repository.ChatRoom.ChatRoomRepository;
 import com.gnimty.communityapiserver.domain.chat.repository.User.UserRepository;
 import com.gnimty.communityapiserver.domain.chat.service.dto.UserWithBlockDto;
+import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.constant.Tier;
 import com.gnimty.communityapiserver.global.exception.BaseException;
@@ -92,7 +93,7 @@ public class StompServiceTest {
         private User userB;
 
         @BeforeEach
-        void saveTwoUser() {
+        void saveUsers() {
             userA = createUser("uni", 1L);
             userRepository.save(userA);
 
@@ -193,6 +194,7 @@ public class StompServiceTest {
             userRepository.save(userA);
 
             userB = createUser("inu", 2L);
+            userRepository.save(userB);
 
             chatRoom = ChatRoom.builder().chatRoomNo(1L).lastModifiedDate(new Date()).participants(
                 Arrays.asList(new Participant(userA, null, Blocked.UNBLOCK),
@@ -566,12 +568,12 @@ public class StompServiceTest {
 
         private User userA;
         private User userB;
-
         private ChatRoom chatRoom;
 
         @BeforeEach
         void saveUsersAndChatRoom() {
             userA = createUser("uni", 1L);
+            userRepository.save(userA);
 
             userB = createUser("inu", 2L);
             userRepository.save(userB);
@@ -833,10 +835,7 @@ public class StompServiceTest {
         @Test
         void deleteAllDate() {
             // given
-            User userA = User.builder().actualUserId(1L).tier(Tier.gold).division(3)
-                .name("uni")
-                .tagLine("tagLine")
-                .status(Status.ONLINE).lp(3L).build();
+            User userA = createUser("uni", 1L);
             userRepository.save(userA);
 
             User userB = createUser("inu", 2L);
@@ -881,7 +880,7 @@ public class StompServiceTest {
 
     public User createUser(String name, Long actualUserId) {
         return User.builder()
-            .actualUserId(1L)
+            .actualUserId(actualUserId)
             .tier(Tier.gold)
             .division(3)
             .name(name)
@@ -889,7 +888,5 @@ public class StompServiceTest {
             .status(Status.ONLINE).lp(3L)
             .build();
     }
-
-
 }
 

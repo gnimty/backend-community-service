@@ -82,6 +82,7 @@ class ChatRoomServiceTest {
         void successToGetEmptyChatRoomList() {
             // given
             User user = createUser("uni", 1L);
+            userRepository.save(user);
 
             // when
             List<ChatRoom> chatRoom = chatRoomService.findChatRoom(user);
@@ -171,6 +172,7 @@ class ChatRoomServiceTest {
         void failToGetChatRoom() {
             // given
             User userA = createUser("uni", 1L);
+            userRepository.save(userA);
 
             User userB = createUser("inu", 2L);
             userRepository.save(userB);
@@ -383,7 +385,7 @@ class ChatRoomServiceTest {
 
     public User createUser(String name, Long actualUserId) {
         return User.builder()
-            .actualUserId(1L)
+            .actualUserId(actualUserId)
             .tier(Tier.gold)
             .division(3)
             .name(name)
