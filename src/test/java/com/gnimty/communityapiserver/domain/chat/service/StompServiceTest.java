@@ -210,6 +210,11 @@ public class StompServiceTest {
             chatRoomRepository.save(chatRoom);
         }
 
+        @AfterEach
+        void deleteChatRoom() {
+            chatRoomRepository.deleteAll();
+        }
+
         @DisplayName("아무도 채팅방을 나가지 않은 상태라면 exitDate 변경 성공")
         @Test
         void exitChatRoomWhenNoBodyExit() {
@@ -228,11 +233,14 @@ public class StompServiceTest {
             assertThat(participantA).isPresent();
         }
 
-        @DisplayName("상대방이 채팅방을 나갔다면 채팅방과 채팅내역 모두 삭제")
+        @DisplayName("상대방이 이미 채팅방을 나갔다면 채팅방과 채팅내역 모두 삭제")
         @Test
         void exitChatRoomWhenOtherExit() {
             // given
-            stompService.exitChatRoom(userB, chatRoom);
+            chatRoom.getParticipants().stream()
+                .filter(participant -> participant.getUser().equals(userB))
+                .forEach(participant -> participant.setExitDate(new Date()));
+            chatRoomRepository.save(chatRoom);
 
             // when
             stompService.exitChatRoom(userA, chatRoom);
@@ -581,8 +589,10 @@ public class StompServiceTest {
         private User userA;
         private User userB;
 
+        private ChatRoom chatRoom;
+
         @BeforeEach
-        void saveUsers() {
+        void saveUsersAndChatRoom() {
             userA = User.builder().actualUserId(1L).tier(Tier.gold).division(3).summonerName("uni")
                 .status(Status.ONLINE).lp(3L).build();
             userRepository.save(userA);
@@ -590,6 +600,13 @@ public class StompServiceTest {
             userB = User.builder().actualUserId(2L).tier(Tier.gold).division(3).summonerName("inu")
                 .status(Status.ONLINE).lp(3L).build();
             userRepository.save(userB);
+
+            chatRoom = ChatRoom.builder().chatRoomNo(1L).lastModifiedDate(new Date())
+                .participants(
+                    Arrays.asList(new Participant(userA, null, Blocked.UNBLOCK),
+                        new Participant(userB, null, Blocked.UNBLOCK))).createdDate(new Date())
+                .build();
+            chatRoomRepository.save(chatRoom);
         }
 
         @AfterEach
@@ -600,14 +617,9 @@ public class StompServiceTest {
 
         @DisplayName("상대방이 채팅방을 나가지 않았다면, 채팅방의 차단 정보가 수정 됨")
         @Test
-        void updateChatRoomBlock() {
+        void updateChatRoomBlockWhenOtherNoExit() {
             // given
-            ChatRoom chatRoom = ChatRoom.builder().chatRoomNo(1L).lastModifiedDate(new Date())
-                .participants(
-                    Arrays.asList(new Participant(userA, null, Blocked.UNBLOCK),
-                        new Participant(userB, null, Blocked.UNBLOCK))).createdDate(new Date())
-                .build();
-            chatRoomRepository.save(chatRoom);
+            //      X
 
             // when
             stompService.updateBlockStatus(userA, userB, Blocked.BLOCK);
@@ -627,35 +639,66 @@ public class StompServiceTest {
 
         @DisplayName("상대방이 채팅방을 나갔고 이후의 채팅이 있을 때, 채팅방의 차단 정보가 수정 됨")
         @Test
-        void() {
+        void updateChatRoomBlockWhenOtherExitBeforeSomeChats() {
             // given
+            chatRoom.getParticipants().stream()
+                .filter(participant -> participant.getUser().equals(userB))
+                .forEach(participant -> participant.setExitDate(new Date()));
+            chatRoomRepository.save(chatRoom);
+
+            Date sendDate = new Date();
+            chatRepository.save(Chat.builder()
+                .senderId(userA.getActualUserId())
+                .message("hi")
+                .sendDate(sendDate)
+                .chatRoomNo(chatRoom.getChatRoomNo())
+                .build());
+            chatRoom.refreshModifiedDate(sendDate);
+            chatRoomRepository.save(chatRoom);
 
             // when
+            stompService.updateBlockStatus(userA, userB, Blocked.BLOCK);
 
             // then
+            Optional<ChatRoom> findChatRoom = chatRoomRepository.findByChatRoomNo(
+                chatRoom.getChatRoomNo());
+            assertThat(findChatRoom).isPresent();
 
+            Optional<Participant> userAParticipant = findChatRoom.get().getParticipants().stream()
+                .filter(participant -> participant.getUser().equals(userA))
+                .findFirst();
+            assertThat(userAParticipant).isPresent();
+
+            assertThat(userAParticipant.get().getBlockedStatus()).isEqualTo(Blocked.BLOCK);
         }
 
         @DisplayName("상대방이 채팅방을 나갔고 이후의 채팅이 없을 때, 채팅방과 해당 채팅방의 채팅이 모두 삭제됨")
         @Test
-        void() {
+        void deleteChatDataWhenOtherExit() {
             // given
+            Date now = new Date();
+            long oneSecondLater = now.getTime() + 1000;
+
+            chatRoom.getParticipants().stream()
+                .filter(participant -> participant.getUser().equals(userB))
+                .forEach(participant -> participant.setExitDate(new Date(oneSecondLater)));
+            chatRoomRepository.save(chatRoom);
 
             // when
+            stompService.updateBlockStatus(userA, userB, Blocked.BLOCK);
 
             // then
-
+            assertThat(chatRoomRepository.findByUsers(userA, userB)).isEmpty();
+            assertThat(chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo())).isEmpty();
         }
 
         @DisplayName("상대방과의 채팅방이 있고 상대방도 나를 차단했을 때, 채팅방과 해당 채팅방의 채팅이 모두 삭제됨")
         @Test
         void deleteChatRoomAndChatsWhenUpdatingBlock() {
             // given
-            ChatRoom chatRoom = ChatRoom.builder().chatRoomNo(1L).lastModifiedDate(new Date())
-                .participants(
-                    Arrays.asList(new Participant(userA, null, Blocked.UNBLOCK),
-                        new Participant(userB, null, Blocked.BLOCK))).createdDate(new Date())
-                .build();
+            chatRoom.getParticipants().stream()
+                .filter(participant -> participant.getUser().equals(userB))
+                .forEach(participant -> participant.setBlockedStatus(Blocked.BLOCK));
             chatRoomRepository.save(chatRoom);
 
             // when
@@ -669,15 +712,204 @@ public class StompServiceTest {
 
         @DisplayName("상대방과의 채팅방이 없다면, 아무일도 일어나지 않음")
         @Test
-        void() {
+        void hasNoChatRoom() {
             // given
+            chatRoomRepository.delete(chatRoom);
 
-            // when
-
-            // then
-
+            // when & then
+            assertThatCode(() -> stompService.updateBlockStatus(userA, userB, Blocked.BLOCK))
+                .doesNotThrowAnyException();
         }
     }
+
+    @DisplayName("상대방 차단 해제 시")
+    @Nested
+    class unBlockOtherUser {
+
+        private User userA;
+        private User userB;
+
+        private ChatRoom chatRoom;
+
+        @BeforeEach
+        void saveUsersAndChatRoom() {
+            userA = User.builder().actualUserId(1L).tier(Tier.gold).division(3).summonerName("uni")
+                .status(Status.ONLINE).lp(3L).build();
+            userRepository.save(userA);
+
+            userB = User.builder().actualUserId(2L).tier(Tier.gold).division(3).summonerName("inu")
+                .status(Status.ONLINE).lp(3L).build();
+            userRepository.save(userB);
+
+            chatRoom = ChatRoom.builder().chatRoomNo(1L).lastModifiedDate(new Date())
+                .participants(
+                    Arrays.asList(new Participant(userA, null, Blocked.BLOCK),
+                        new Participant(userB, null, Blocked.UNBLOCK))).createdDate(new Date())
+                .build();
+            chatRoomRepository.save(chatRoom);
+        }
+
+        @AfterEach
+        void deleteChatRoomAndChats() {
+            chatRepository.deleteAll();
+            chatRoomRepository.deleteAll();
+        }
+
+        @DisplayName("상대방과의 채팅방이 존재한다면 채팅방의 차단정보가 수정됨")
+        @Test
+        void updateChatRoomBlock() {
+            // given
+            //      X
+
+            // when
+            stompService.updateBlockStatus(userA, userB, Blocked.UNBLOCK);
+
+            // then
+            Optional<ChatRoom> findChatRoom = chatRoomRepository.findByChatRoomNo(
+                chatRoom.getChatRoomNo());
+            assertThat(findChatRoom).isPresent();
+
+            Optional<Participant> userAParticipant = findChatRoom.get().getParticipants().stream()
+                .filter(participant -> participant.getUser().equals(userA))
+                .findFirst();
+            assertThat(userAParticipant).isPresent();
+            assertThat(userAParticipant.get().getBlockedStatus()).isEqualTo(Blocked.UNBLOCK);
+        }
+
+        @DisplayName("상대방과의 채팅방이 없다면, 아무일도 일어나지 않음")
+        @Test
+        void hasNoChatRoom() {
+            // given
+            chatRoomRepository.delete(chatRoom);
+
+            // when & then
+            assertThatCode(() -> stompService.updateBlockStatus(userA, userB, Blocked.UNBLOCK))
+                .doesNotThrowAnyException();
+        }
+    }
+
+    @DisplayName("상대방 차단여부 확인")
+    @Nested
+    class checkBlockStatus {
+
+        private User userA;
+        private User userB;
+        private ChatRoom chatRoom;
+
+        @BeforeEach
+        void saveUsers() {
+            userA = User.builder().actualUserId(1L).tier(Tier.gold).division(3).summonerName("uni")
+                .status(Status.ONLINE).lp(3L).build();
+            userRepository.save(userA);
+
+            userB = User.builder().actualUserId(2L).tier(Tier.gold).division(3).summonerName("inu")
+                .status(Status.ONLINE).lp(3L).build();
+            userRepository.save(userB);
+        }
+
+        @AfterEach
+        void deleteChatRoom() {
+            chatRoomRepository.deleteAll();
+        }
+
+        @DisplayName("상대방이 나를 차단했을 경우 true")
+        @Test
+        void checkBlock() {
+            // given
+            chatRoom = ChatRoom.builder().chatRoomNo(1L).lastModifiedDate(new Date())
+                .participants(
+                    Arrays.asList(new Participant(userA, null, Blocked.UNBLOCK),
+                        new Participant(userB, null, Blocked.BLOCK))).createdDate(new Date())
+                .build();
+            chatRoomRepository.save(chatRoom);
+
+            // when
+            boolean blockStatus = stompService.isBlockParticipant(chatRoom, userB);
+
+            // then
+            assertThat(blockStatus).isTrue();
+        }
+
+        @DisplayName("상대방이 나를 차단하지 않았을 경우 false")
+        @Test
+        void checkUnBlock() {
+            // given
+            chatRoom = ChatRoom.builder().chatRoomNo(1L).lastModifiedDate(new Date())
+                .participants(
+                    Arrays.asList(new Participant(userA, null, Blocked.UNBLOCK),
+                        new Participant(userB, null, Blocked.UNBLOCK))).createdDate(new Date())
+                .build();
+            chatRoomRepository.save(chatRoom);
+
+            // when
+            boolean blockStatus = stompService.isBlockParticipant(chatRoom, userB);
+
+            // then
+            assertThat(blockStatus).isFalse();
+        }
+    }
+
+    @DisplayName("탈퇴 시")
+    @Nested
+    class Withdrawal {
+
+        @AfterEach
+        void deleteUsers() {
+            userRepository.deleteAll();
+        }
+
+        @DisplayName("탈퇴한 사용자와 관련한 모든 데이터 삭제")
+        @Test
+        void deleteAllDate() {
+            // given
+            User userA = User.builder().actualUserId(1L).tier(Tier.gold).division(3)
+                .summonerName("uni")
+                .status(Status.ONLINE).lp(3L).build();
+            userRepository.save(userA);
+
+            User userB = User.builder().actualUserId(2L).tier(Tier.gold).division(3)
+                .summonerName("inu")
+                .status(Status.ONLINE).lp(3L).build();
+            userRepository.save(userB);
+
+            ChatRoom chatRoom = ChatRoom.builder().chatRoomNo(1L).lastModifiedDate(new Date())
+                .participants(
+                    Arrays.asList(new Participant(userA, null, Blocked.BLOCK),
+                        new Participant(userB, null, Blocked.UNBLOCK))).createdDate(new Date())
+                .build();
+            chatRoomRepository.save(chatRoom);
+
+            for (int i = 0; i < 5; i++) {
+                chatRepository.save(Chat.builder()
+                    .senderId(userA.getActualUserId())
+                    .message("hi")
+                    .sendDate(new Date())
+                    .chatRoomNo(chatRoom.getChatRoomNo())
+                    .build());
+            }
+
+            // when
+            stompService.withdrawal(userA.getActualUserId());
+
+            // then
+            assertThat(userRepository.findByActualUserId(userA.getActualUserId())).isEmpty();
+            assertThat(chatRoomRepository.findByUser(userA)).isEmpty();;
+            assertThat(chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo())).isEmpty();
+        }
+
+        @DisplayName("유효하지 않은 userId여도 아무일도 일어나지 않음")
+        @Test
+        void hasNoUser() {
+            // given
+            //      X
+
+            // when & then
+            assertThatCode(() -> stompService.withdrawal(1L))
+                .doesNotThrowAnyException();
+        }
+    }
+
+
 }
 
 

@@ -19,6 +19,7 @@ import com.gnimty.communityapiserver.global.exception.ErrorCode;
 import com.mongodb.bulk.BulkWriteResult;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -99,8 +100,9 @@ public class StompService {
 
         // (상대방이 채팅방 나간 상황) lastModifiedDate가 상대의 exitDate 이전일 때 : flush
         //      -> flushAllChats() + chatRoomRepository.deleteByChatRoomNo()
-        if ((other.getExitDate() != null && chatRoom.getLastModifiedDate().before(other.getExitDate()))
-            || other.getBlockedStatus()==Blocked.BLOCK) {
+        if ((other.getExitDate() != null && chatRoom.getLastModifiedDate()
+            .before(other.getExitDate()))
+            || other.getBlockedStatus() == Blocked.BLOCK) {
             destroyChatRoomAndChat(chatRoom);
         }
         // (상대방이 채팅방 나가지 않은 상황) lastModifiedDate가 상대의 exitDate 이후일 때 : exitDate update
@@ -125,16 +127,18 @@ public class StompService {
     }
 
 
-    public void destroyWithdrawnUserData(Long actualUserId) {
-        User user = userService.getUser(actualUserId);
-        userService.delete(user);
-
-        chatRoomService.findChatRoom(user)
-            .forEach(chatRoom -> {
-                destroyChatRoomAndChat(chatRoom);
-                sendToChatRoomSubscribers(chatRoom.getChatRoomNo(),
-                    new MessageResponse(MessageResponseType.DELETED_CHATROOM, chatRoom.getId()));
-            });
+    public void withdrawal(Long actualUserId) {
+        Optional<User> findUser = userService.findUser(actualUserId);
+        if (findUser.isPresent()) {
+            userService.delete(findUser.get());
+            chatRoomService.findChatRoom(findUser.get())
+                .forEach(chatRoom -> {
+                    destroyChatRoomAndChat(chatRoom);
+                    sendToChatRoomSubscribers(chatRoom.getChatRoomNo(),
+                        new MessageResponse(MessageResponseType.DELETED_CHATROOM,
+                            chatRoom.getId()));
+                });
+        }
     }
 
     private void destroyChatRoomAndChat(ChatRoom chatRoom) {
@@ -164,15 +168,14 @@ public class StompService {
 
 
     public void updateBlockStatus(User me, User other, Blocked status) {
-
-        ChatRoom chatRoom = chatRoomService.getChatRoom(me, other);
-
-        extractParticipant(me, chatRoom.getParticipants(), true).setBlockedStatus(status);
-
-        chatRoomService.update(chatRoom);
-
-        if (status == Blocked.BLOCK) {
-            exitChatRoom(me, chatRoom);
+        Optional<ChatRoom> findChatRoom = chatRoomService.findChatRoom(me, other);
+        if (findChatRoom.isPresent()) {
+            extractParticipant(me, findChatRoom.get().getParticipants(), true).setBlockedStatus(
+                status);
+            chatRoomService.update(findChatRoom.get());
+            if (status == Blocked.BLOCK) {
+                exitChatRoom(me, findChatRoom.get());
+            }
         }
     }
 
