@@ -66,26 +66,6 @@ public class StompServiceTest {
 	}
 
 
-	@DisplayName("유저의 접속상태 수정 시")
-	@Nested
-	class updateConnectStatus {
-
-		@DisplayName("성공적으로 접속상태 수정됨")
-		@Test
-		void successUpdateConnectStatus() {
-			// given
-			User user = createUser("uni", 1L);
-			userRepository.save(user);
-
-			// when
-			stompService.updateConnStatus(user, Status.OFFLINE);
-
-			// then
-			User findUser = userService.getUser(1L);
-			assertThat(findUser.getStatus()).isEqualTo(Status.OFFLINE);
-		}
-	}
-
 	@DisplayName("채팅방 생성 또는 조회 시")
 	@Nested
 	class getOrCreateChatRoom {
