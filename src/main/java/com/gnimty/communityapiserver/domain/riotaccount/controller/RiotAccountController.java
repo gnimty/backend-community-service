@@ -43,7 +43,9 @@ public class RiotAccountController {
 	) {
 		List<RiotAccount> riotAccounts = riotAccountService.updateSummoners(
 			request.toServiceRequest());
-		stompService.createOrUpdateUser(riotAccounts);
+		if (!riotAccounts.isEmpty()) {
+			stompService.createOrUpdateUser(riotAccounts);
+		}
 		return CommonResponse.success(SUCCESS_UPDATE_SUMMONERS, OK);
 	}
 
