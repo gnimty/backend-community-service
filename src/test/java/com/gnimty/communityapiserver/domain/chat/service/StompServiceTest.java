@@ -217,6 +217,7 @@ public class StompServiceTest {
             // when
             stompService.exitChatRoom(userA, chatRoom);
 
+
             // then
             Optional<ChatRoom> findChatRoom = chatRoomRepository.findByChatRoomNo(
                 chatRoom.getChatRoomNo());
