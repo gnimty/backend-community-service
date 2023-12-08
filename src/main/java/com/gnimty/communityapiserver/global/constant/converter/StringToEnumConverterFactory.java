@@ -13,6 +13,7 @@ public class StringToEnumConverterFactory implements ConverterFactory<String, En
 	}
 
 	private record StringToEnumsConverter<T extends Enum<?>>(Class<T> enumType) implements Converter<String, T> {
+
 		@Override
 		public T convert(String source) {
 			if (source.isEmpty()) {
