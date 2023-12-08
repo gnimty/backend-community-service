@@ -40,7 +40,9 @@ public class RiotAccountController {
 	@PatchMapping
 	public CommonResponse<Void> updateSummoners(@RequestBody @Valid SummonerUpdateRequest request) {
 		List<RiotAccount> riotAccounts = riotAccountService.updateSummoners(request.toServiceRequest());
-		stompService.createOrUpdateUser(riotAccounts);
+		if (!riotAccounts.isEmpty()) {
+			stompService.createOrUpdateUser(riotAccounts);
+		}
 		return CommonResponse.success(SUCCESS_UPDATE_SUMMONERS, OK);
 	}
 
