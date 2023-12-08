@@ -61,10 +61,6 @@ public class StompService {
 		ChatRoom chatRoom = chatRoomService.findChatRoom(me.getUser(), other.getUser())
 			.orElseGet(() -> chatRoomService.save(me, other));
 
-		// TODO: 회의 때
-		// 만약 채팅방의 차단 정보와 UserWithBlockDto로 들어온 차단 정보가 다르다면?
-		//  차단 정보가 일치하는지 확인해야하는가??
-
 		return ChatRoomDto.builder()
 			.chatRoom(chatRoom)
 			.other(new UserDto(other.getUser()))
