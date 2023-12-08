@@ -15,21 +15,21 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Getter
 public abstract class BaseEntity {
 
-	@NotNull
-	@Column(name = "deleted", columnDefinition = "TINYINT default 0")
-	protected Boolean deleted = false;
+    @NotNull
+    @Column(name = "deleted", columnDefinition = "TINYINT default 0")
+    protected Boolean deleted = false;
 
-	@NotNull
-	@CreatedDate
-	@Column(name = "created_at", columnDefinition = "DATETIME", updatable = false)
-	protected LocalDateTime createdAt;
+    @NotNull
+    @CreatedDate
+    @Column(name = "created_at", columnDefinition = "DATETIME", updatable = false)
+    protected LocalDateTime createdAt;
 
-	@NotNull
-	@LastModifiedDate
-	@Column(name = "updated_at", columnDefinition = "DATETIME")
-	protected LocalDateTime updatedAt;
+    @NotNull
+    @LastModifiedDate
+    @Column(name = "updated_at", columnDefinition = "DATETIME")
+    protected LocalDateTime updatedAt;
 
-	public void delete() {
-		deleted = true;
-	}
+    public void delete() {
+        deleted = true;
+    }
 }

@@ -17,29 +17,29 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class ChatService {
 
-	private final ChatRepository chatRepository;
+    private final ChatRepository chatRepository;
 
-	public List<Chat> findChats(ChatRoom chatRoom) {
-		return chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo());
-	}
+    public List<Chat> findChats(ChatRoom chatRoom) {
+        return chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo());
+    }
 
-	public Chat save(Chat chat) {
-		return chatRepository.save(chat);
-	}
+    public Chat save(Chat chat) {
+        return chatRepository.save(chat);
+    }
 
-	public Chat save(User user, ChatRoom chatRoom, String message, Date sendDate) {
-		Chat chat = Chat.builder()
-			.senderId(user.getActualUserId())
-			.chatRoomNo(chatRoom.getChatRoomNo())
-			.message(message)
-			.sendDate(sendDate)
-			.build();
+    public Chat save(User user, ChatRoom chatRoom, String message, Date sendDate) {
+        Chat chat = Chat.builder()
+            .senderId(user.getActualUserId())
+            .chatRoomNo(chatRoom.getChatRoomNo())
+            .message(message)
+            .sendDate(sendDate)
+            .build();
 
-		return chatRepository.save(chat);
-	}
+        return chatRepository.save(chat);
+    }
 
-	public void delete(ChatRoom chatRoom) {
-		chatRepository.deleteByChatRoomNo(chatRoom.getChatRoomNo());
-	}
+    public void delete(ChatRoom chatRoom) {
+        chatRepository.deleteByChatRoomNo(chatRoom.getChatRoomNo());
+    }
 
 }

@@ -16,16 +16,16 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class MyProfileUpdateRequest {
 
-	private Long mainRiotAccountId;
-	private Status status;
-	@Valid
-	private List<IntroductionEntry> introductions;
+    private Long mainRiotAccountId;
+    private Status status;
+    @Valid
+    private List<IntroductionEntry> introductions;
 
-	public MyProfileUpdateServiceRequest toServiceRequest() {
-		return MyProfileUpdateServiceRequest.builder()
-			.mainRiotAccountId(mainRiotAccountId)
-			.status(status)
-			.introductions(introductions)
-			.build();
-	}
+    public MyProfileUpdateServiceRequest toServiceRequest() {
+        return MyProfileUpdateServiceRequest.builder()
+            .mainRiotAccountId(mainRiotAccountId)
+            .status(status)
+            .introductions(introductions)
+            .build();
+    }
 }

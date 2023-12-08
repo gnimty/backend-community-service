@@ -8,5 +8,5 @@ import lombok.Getter;
 @Getter
 public class ChampionCommentsServiceResponse {
 
-	List<ChampionCommentsEntry> championComments;
+    List<ChampionCommentsEntry> championComments;
 }

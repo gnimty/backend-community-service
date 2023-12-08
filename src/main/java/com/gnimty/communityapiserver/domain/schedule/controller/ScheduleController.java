@@ -18,11 +18,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/members/me/schedules")
 public class ScheduleController {
 
-	private final ScheduleService scheduleService;
+    private final ScheduleService scheduleService;
 
-	@PatchMapping
-	public CommonResponse<Void> updateSchedules(@RequestBody @Valid ScheduleRequest request) {
-		scheduleService.updateSchedules(request.toServiceRequest());
-		return CommonResponse.success(ResponseMessage.SUCCESS_UPDATE_SCHEDULES, OK);
-	}
+    @PatchMapping
+    public CommonResponse<Void> updateSchedules(@RequestBody @Valid ScheduleRequest request) {
+        scheduleService.updateSchedules(request.toServiceRequest());
+        return CommonResponse.success(ResponseMessage.SUCCESS_UPDATE_SCHEDULES, OK);
+    }
 }

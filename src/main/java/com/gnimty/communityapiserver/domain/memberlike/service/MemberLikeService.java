@@ -18,38 +18,38 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class MemberLikeService {
 
-	private final MemberLikeRepository memberLikeRepository;
-	private final MemberLikeReadService memberLikeReadService;
-	private final MemberReadService memberReadService;
+    private final MemberLikeRepository memberLikeRepository;
+    private final MemberLikeReadService memberLikeReadService;
+    private final MemberReadService memberReadService;
 
-	public void doMemberLike(MemberLikeServiceRequest request) {
-		Member source = MemberThreadLocal.get();
-		Member target = memberReadService.findById(request.getTargetMemberId());
+    public void doMemberLike(MemberLikeServiceRequest request) {
+        Member source = MemberThreadLocal.get();
+        Member target = memberReadService.findById(request.getTargetMemberId());
 
-		if (request.getCancel()) {
-			cancelMemberLike(source, target);
-		} else {
-			memberLike(source, target);
-		}
-	}
+        if (request.getCancel()) {
+            cancelMemberLike(source, target);
+        } else {
+            memberLike(source, target);
+        }
+    }
 
-	private void memberLike(Member source, Member target) {
-		if (Objects.equals(source.getId(), target.getId())) {
-			throw new BaseException(ErrorCode.NOT_ALLOWED_SELF_LIKE);
-		}
-		if (memberLikeReadService.existsBySourceAndTarget(source, target)) {
-			throw new BaseException(ErrorCode.ALREADY_MEMBER_LIKE);
-		}
-		target.increaseUpCount();
-		memberLikeRepository.save(MemberLike.builder()
-			.sourceMember(source)
-			.targetMember(target)
-			.build()
-		);
-	}
+    private void memberLike(Member source, Member target) {
+        if (Objects.equals(source.getId(), target.getId())) {
+            throw new BaseException(ErrorCode.NOT_ALLOWED_SELF_LIKE);
+        }
+        if (memberLikeReadService.existsBySourceAndTarget(source, target)) {
+            throw new BaseException(ErrorCode.ALREADY_MEMBER_LIKE);
+        }
+        target.increaseUpCount();
+        memberLikeRepository.save(MemberLike.builder()
+            .sourceMember(source)
+            .targetMember(target)
+            .build()
+        );
+    }
 
-	private void cancelMemberLike(Member source, Member target) {
-		MemberLike memberLike = memberLikeReadService.findBySourceAndTarget(source, target);
-		memberLikeRepository.delete(memberLike);
-	}
+    private void cancelMemberLike(Member source, Member target) {
+        MemberLike memberLike = memberLikeReadService.findBySourceAndTarget(source, target);
+        memberLikeRepository.delete(memberLike);
+    }
 }

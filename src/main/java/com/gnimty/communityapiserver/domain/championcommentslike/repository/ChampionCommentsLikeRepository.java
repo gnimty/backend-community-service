@@ -8,6 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ChampionCommentsLikeRepository extends JpaRepository<ChampionCommentsLike, Long> {
 
-	Optional<ChampionCommentsLike> findByMemberAndChampionComments(Member member,
-		ChampionComments championComments);
+    Optional<ChampionCommentsLike> findByMemberAndChampionComments(Member member,
+        ChampionComments championComments);
 }

@@ -9,7 +9,7 @@ import lombok.Getter;
 @Getter
 public class OtherProfileServiceResponse {
 
-	private List<ScheduleEntry> schedules;
-	private String mainIntroduction;
-	private List<PreferGameModeEntry> preferGameModes;
+    private List<ScheduleEntry> schedules;
+    private String mainIntroduction;
+    private List<PreferGameModeEntry> preferGameModes;
 }

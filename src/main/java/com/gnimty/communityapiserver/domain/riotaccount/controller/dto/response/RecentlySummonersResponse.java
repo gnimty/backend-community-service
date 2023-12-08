@@ -13,12 +13,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RecentlySummonersResponse {
 
-	private List<RecentlySummonersEntry> recentlySummoners;
+    private List<RecentlySummonersEntry> recentlySummoners;
 
-	public static RecentlySummonersResponse from(RecentlySummonersServiceResponse response) {
-		return RecentlySummonersResponse.builder()
-			.recentlySummoners(response.getRecentlySummoners())
-			.build();
-	}
+    public static RecentlySummonersResponse from(RecentlySummonersServiceResponse response) {
+        return RecentlySummonersResponse.builder()
+            .recentlySummoners(response.getRecentlySummoners())
+            .build();
+    }
 
 }

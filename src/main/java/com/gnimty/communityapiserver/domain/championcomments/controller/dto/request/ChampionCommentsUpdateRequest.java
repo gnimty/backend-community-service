@@ -12,22 +12,22 @@ import lombok.Getter;
 @Getter
 public class ChampionCommentsUpdateRequest {
 
-	private Lane lane;
-	private Long opponentChampionId;
-	private Long mentionedMemberId;
-	@NotNull
-	@Size(max = 1000)
-	private String contents;
-	@NotNull(message = INVALID_INPUT_VALUE)
-	private CommentsType commentsType;
+    private Lane lane;
+    private Long opponentChampionId;
+    private Long mentionedMemberId;
+    @NotNull
+    @Size(max = 1000)
+    private String contents;
+    @NotNull(message = INVALID_INPUT_VALUE)
+    private CommentsType commentsType;
 
-	public ChampionCommentsUpdateServiceRequest toServiceRequest() {
-		return ChampionCommentsUpdateServiceRequest.builder()
-			.lane(lane)
-			.opponentChampionId(opponentChampionId)
-			.mentionedMemberId(mentionedMemberId)
-			.contents(contents)
-			.commentsType(commentsType)
-			.build();
-	}
+    public ChampionCommentsUpdateServiceRequest toServiceRequest() {
+        return ChampionCommentsUpdateServiceRequest.builder()
+            .lane(lane)
+            .opponentChampionId(opponentChampionId)
+            .mentionedMemberId(mentionedMemberId)
+            .contents(contents)
+            .commentsType(commentsType)
+            .build();
+    }
 }

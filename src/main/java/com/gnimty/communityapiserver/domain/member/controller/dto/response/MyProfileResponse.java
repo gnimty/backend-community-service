@@ -11,23 +11,23 @@ import lombok.Getter;
 @Getter
 public class MyProfileResponse {
 
-	private Long id;
-	private String email;
-	private String nickname;
-	private Long favoriteChampionId;
-	private Long upCount;
-	private RiotDependentInfo riotDependentInfo;
-	private List<OauthInfoEntry> oauthInfos;
+    private Long id;
+    private String email;
+    private String nickname;
+    private Long favoriteChampionId;
+    private Long upCount;
+    private RiotDependentInfo riotDependentInfo;
+    private List<OauthInfoEntry> oauthInfos;
 
-	public static MyProfileResponse from(MyProfileServiceResponse response) {
-		return MyProfileResponse.builder()
-			.id(response.getId())
-			.email(response.getEmail())
-			.nickname(response.getNickname())
-			.favoriteChampionId(response.getFavoriteChampionId())
-			.upCount(response.getUpCount())
-			.riotDependentInfo(response.getRiotDependentInfo())
-			.oauthInfos(response.getOauthInfos())
-			.build();
-	}
+    public static MyProfileResponse from(MyProfileServiceResponse response) {
+        return MyProfileResponse.builder()
+            .id(response.getId())
+            .email(response.getEmail())
+            .nickname(response.getNickname())
+            .favoriteChampionId(response.getFavoriteChampionId())
+            .upCount(response.getUpCount())
+            .riotDependentInfo(response.getRiotDependentInfo())
+            .oauthInfos(response.getOauthInfos())
+            .build();
+    }
 }

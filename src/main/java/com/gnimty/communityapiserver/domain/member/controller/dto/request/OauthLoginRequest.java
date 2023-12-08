@@ -14,12 +14,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class OauthLoginRequest {
 
-	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
-	private String authCode;
+    @NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+    private String authCode;
 
-	public OauthLoginServiceRequest toServiceRequest() {
-		return OauthLoginServiceRequest.builder()
-			.authCode(authCode)
-			.build();
-	}
+    public OauthLoginServiceRequest toServiceRequest() {
+        return OauthLoginServiceRequest.builder()
+            .authCode(authCode)
+            .build();
+    }
 }

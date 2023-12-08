@@ -14,12 +14,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PreferGameModeEntry {
 
-	@NotNull
-	private GameMode gameMode;
+    @NotNull
+    private GameMode gameMode;
 
-	public static PreferGameModeEntry from(PreferGameMode preferGameMode) {
-		return PreferGameModeEntry.builder()
-			.gameMode(preferGameMode.getGameMode())
-			.build();
-	}
+    public static PreferGameModeEntry from(PreferGameMode preferGameMode) {
+        return PreferGameModeEntry.builder()
+            .gameMode(preferGameMode.getGameMode())
+            .build();
+    }
 }

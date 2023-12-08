@@ -19,16 +19,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/champions/{champion_id}/comments/{comments_id}/like")
 public class ChampionCommentsLikeController {
 
-	private final ChampionCommentsLikeService championCommentsLikeService;
+    private final ChampionCommentsLikeService championCommentsLikeService;
 
-	@PostMapping
-	public CommonResponse<Void> doChampionCommentsLike(
-		@PathVariable("champion_id") Long championId,
-		@PathVariable("comments_id") Long commentsId,
-		@RequestBody @Valid ChampionCommentsLikeRequest request
-	) {
-		championCommentsLikeService.doChampionCommentsLike(
-			championId, commentsId, request.toServiceRequest());
-		return CommonResponse.success(SUCCESS_CHAMPION_COMMENTS_LIKE, CREATED);
-	}
+    @PostMapping
+    public CommonResponse<Void> doChampionCommentsLike(
+        @PathVariable("champion_id") Long championId,
+        @PathVariable("comments_id") Long commentsId,
+        @RequestBody @Valid ChampionCommentsLikeRequest request
+    ) {
+        championCommentsLikeService.doChampionCommentsLike(
+            championId, commentsId, request.toServiceRequest());
+        return CommonResponse.success(SUCCESS_CHAMPION_COMMENTS_LIKE, CREATED);
+    }
 }

@@ -15,24 +15,24 @@ import lombok.Getter;
 @BeforeEndTime(startTime = "startTime", endTime = "endTime")
 public class ScheduleEntry {
 
-	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
-	private DayOfWeek dayOfWeek;
+    @NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+    private DayOfWeek dayOfWeek;
 
-	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
-	@Min(value = 0, message = ErrorMessage.INVALID_INPUT_VALUE)
-	@Max(value = 24, message = ErrorMessage.INVALID_INPUT_VALUE)
-	private Integer startTime;
+    @NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+    @Min(value = 0, message = ErrorMessage.INVALID_INPUT_VALUE)
+    @Max(value = 24, message = ErrorMessage.INVALID_INPUT_VALUE)
+    private Integer startTime;
 
-	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
-	@Min(value = 0, message = ErrorMessage.INVALID_INPUT_VALUE)
-	@Max(value = 24, message = ErrorMessage.INVALID_INPUT_VALUE)
-	private Integer endTime;
+    @NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+    @Min(value = 0, message = ErrorMessage.INVALID_INPUT_VALUE)
+    @Max(value = 24, message = ErrorMessage.INVALID_INPUT_VALUE)
+    private Integer endTime;
 
-	public static ScheduleEntry from(Schedule schedule) {
-		return ScheduleEntry.builder()
-			.dayOfWeek(schedule.getDayOfWeek())
-			.startTime(schedule.getStartTime())
-			.endTime(schedule.getEndTime())
-			.build();
-	}
+    public static ScheduleEntry from(Schedule schedule) {
+        return ScheduleEntry.builder()
+            .dayOfWeek(schedule.getDayOfWeek())
+            .startTime(schedule.getStartTime())
+            .endTime(schedule.getEndTime())
+            .build();
+    }
 }

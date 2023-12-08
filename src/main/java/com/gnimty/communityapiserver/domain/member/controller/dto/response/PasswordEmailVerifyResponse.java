@@ -8,11 +8,11 @@ import lombok.Getter;
 @Getter
 public class PasswordEmailVerifyResponse {
 
-	private String uuid;
+    private String uuid;
 
-	public static PasswordEmailVerifyResponse from(PasswordEmailVerifyServiceResponse response) {
-		return PasswordEmailVerifyResponse.builder()
-			.uuid(response.getUuid())
-			.build();
-	}
+    public static PasswordEmailVerifyResponse from(PasswordEmailVerifyServiceResponse response) {
+        return PasswordEmailVerifyResponse.builder()
+            .uuid(response.getUuid())
+            .build();
+    }
 }

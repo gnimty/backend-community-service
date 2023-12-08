@@ -9,5 +9,5 @@ import lombok.Getter;
 @Getter
 public class BlockReadServiceResponse {
 
-	private List<BlockEntry> blocks;
+    private List<BlockEntry> blocks;
 }

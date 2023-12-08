@@ -7,5 +7,5 @@ import lombok.Getter;
 @Builder
 public class OauthLoginServiceRequest {
 
-	private String authCode;
+    private String authCode;
 }

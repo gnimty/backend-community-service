@@ -8,12 +8,12 @@ import lombok.Getter;
 @Getter
 public class SummonerUpdateRequest {
 
-	@Valid
-	private List<SummonerUpdateEntry> summonerUpdates;
+    @Valid
+    private List<SummonerUpdateEntry> summonerUpdates;
 
-	public SummonerUpdateServiceRequest toServiceRequest() {
-		return SummonerUpdateServiceRequest.builder()
-			.summonerUpdates(summonerUpdates)
-			.build();
-	}
+    public SummonerUpdateServiceRequest toServiceRequest() {
+        return SummonerUpdateServiceRequest.builder()
+            .summonerUpdates(summonerUpdates)
+            .build();
+    }
 }

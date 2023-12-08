@@ -40,128 +40,128 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtProvider {
 
-	@Value("${jwt.secret}")
-	private String secret;
-	private final MemberReadService memberReadService;
-	private final StringRedisTemplate redisTemplate;
+    @Value("${jwt.secret}")
+    private String secret;
+    private final MemberReadService memberReadService;
+    private final StringRedisTemplate redisTemplate;
 
-	public Member findMemberByToken(String token) {
-		return memberReadService.findById(getIdByToken(token));
-	}
+    public Member findMemberByToken(String token) {
+        return memberReadService.findById(getIdByToken(token));
+    }
 
-	public String generateToken(Long id, Long expiration, String subject) {
-		Date issueDate = new Date();
-		Date expireDate = new Date();
-		expireDate.setTime(issueDate.getTime() + expiration);
-		return Jwts.builder()
-			.setHeaderParam("typ", "JWT")
-			.setClaims(generateClaims(id))
-			.setIssuedAt(issueDate)
-			.setSubject(subject)
-			.setExpiration(expireDate)
-			.signWith(SignatureAlgorithm.HS256, generateKey())
-			.compact();
-	}
+    public String generateToken(Long id, Long expiration, String subject) {
+        Date issueDate = new Date();
+        Date expireDate = new Date();
+        expireDate.setTime(issueDate.getTime() + expiration);
+        return Jwts.builder()
+            .setHeaderParam("typ", "JWT")
+            .setClaims(generateClaims(id))
+            .setIssuedAt(issueDate)
+            .setSubject(subject)
+            .setExpiration(expireDate)
+            .signWith(SignatureAlgorithm.HS256, generateKey())
+            .compact();
+    }
 
-	public AuthToken generateTokenByRefreshToken(String refreshToken) {
-		Member member = findMemberByToken(refreshToken);
+    public AuthToken generateTokenByRefreshToken(String refreshToken) {
+        Member member = findMemberByToken(refreshToken);
 
-		if (!checkRefreshTokenEquals(member, refreshToken)) {
-			throw new BaseException(TOKEN_INVALID);
-		}
+        if (!checkRefreshTokenEquals(member, refreshToken)) {
+            throw new BaseException(TOKEN_INVALID);
+        }
 
-		String newAccessToken = BEARER.getContent() + generateToken(
-			member.getId(),
-			ACCESS_TOKEN_EXPIRATION.getExpiration(),
-			SUBJECT_ACCESS_TOKEN.getContent()
-		);
+        String newAccessToken = BEARER.getContent() + generateToken(
+            member.getId(),
+            ACCESS_TOKEN_EXPIRATION.getExpiration(),
+            SUBJECT_ACCESS_TOKEN.getContent()
+        );
 
-		String newRefreshToken = BEARER.getContent() + generateToken(
-			member.getId(),
-			REFRESH_TOKEN_EXPIRATION.getExpiration(),
-			SUBJECT_REFRESH_TOKEN.getContent()
-		);
+        String newRefreshToken = BEARER.getContent() + generateToken(
+            member.getId(),
+            REFRESH_TOKEN_EXPIRATION.getExpiration(),
+            SUBJECT_REFRESH_TOKEN.getContent()
+        );
 
-		return AuthToken.builder()
-			.accessToken(newAccessToken)
-			.refreshToken(newRefreshToken)
-			.build();
-	}
+        return AuthToken.builder()
+            .accessToken(newAccessToken)
+            .refreshToken(newRefreshToken)
+            .build();
+    }
 
-	public String getEmailByToken(String token) {
-		String[] chunks = token.split("\\.");
-		Base64.Decoder decoder = Base64.getUrlDecoder();
-		String payload = new String(decoder.decode(chunks[1]));
-		ObjectMapper objectMapper = new ObjectMapper();
+    public String getEmailByToken(String token) {
+        String[] chunks = token.split("\\.");
+        Base64.Decoder decoder = Base64.getUrlDecoder();
+        String payload = new String(decoder.decode(chunks[1]));
+        ObjectMapper objectMapper = new ObjectMapper();
 
-		try {
-			Map<String, Object> payloadMap = objectMapper.readValue(payload, Map.class);
-			return (String) payloadMap.get("email");
-		} catch (IOException e) {
-			throw new BaseException(TOKEN_INVALID);
-		}
-	}
+        try {
+            Map<String, Object> payloadMap = objectMapper.readValue(payload, Map.class);
+            return (String) payloadMap.get("email");
+        } catch (IOException e) {
+            throw new BaseException(TOKEN_INVALID);
+        }
+    }
 
-	public void checkValidation(String token) {
-		try {
-			Jwts.parser()
-				.setSigningKey(generateKey())
-				.parseClaimsJws(token);
-		} catch (ExpiredJwtException e) {
-			throw new BaseException(TOKEN_EXPIRED);
-		} catch (MalformedJwtException | SignatureException | IllegalArgumentException e) {
-			throw new BaseException(TOKEN_INVALID);
-		}
-	}
+    public void checkValidation(String token) {
+        try {
+            Jwts.parser()
+                .setSigningKey(generateKey())
+                .parseClaimsJws(token);
+        } catch (ExpiredJwtException e) {
+            throw new BaseException(TOKEN_EXPIRED);
+        } catch (MalformedJwtException | SignatureException | IllegalArgumentException e) {
+            throw new BaseException(TOKEN_INVALID);
+        }
+    }
 
-	public Optional<String> resolveToken(HttpServletRequest request) {
-		return Optional.ofNullable(request.getHeader(AUTHORIZATION.getContent()));
-	}
+    public Optional<String> resolveToken(HttpServletRequest request) {
+        return Optional.ofNullable(request.getHeader(AUTHORIZATION.getContent()));
+    }
 
-	public Long getIdByToken(String token) {
-		try {
-			return Long.parseLong(String.valueOf(Jwts.parser()
-				.setSigningKey(generateKey())
-				.parseClaimsJws(token)
-				.getBody()
-				.get("id")));
-		} catch (ExpiredJwtException e) {
-			throw new BaseException(TOKEN_EXPIRED);
-		} catch (MalformedJwtException | SignatureException | IllegalArgumentException e) {
-			throw new BaseException(TOKEN_INVALID);
-		}
-	}
+    public Long getIdByToken(String token) {
+        try {
+            return Long.parseLong(String.valueOf(Jwts.parser()
+                .setSigningKey(generateKey())
+                .parseClaimsJws(token)
+                .getBody()
+                .get("id")));
+        } catch (ExpiredJwtException e) {
+            throw new BaseException(TOKEN_EXPIRED);
+        } catch (MalformedJwtException | SignatureException | IllegalArgumentException e) {
+            throw new BaseException(TOKEN_INVALID);
+        }
+    }
 
-	private boolean checkRefreshTokenEquals(Member member, String refreshToken) {
-		ValueOperations<String, String> stringValueOperations = redisTemplate.opsForValue();
+    private boolean checkRefreshTokenEquals(Member member, String refreshToken) {
+        ValueOperations<String, String> stringValueOperations = redisTemplate.opsForValue();
 
-		String key = getRefreshKey(member);
-		String value = stringValueOperations.get(key);
+        String key = getRefreshKey(member);
+        String value = stringValueOperations.get(key);
 
-		if (value == null || !value.equals(refreshToken)) {
-			redisTemplate.delete(key);
-			return false;
-		}
+        if (value == null || !value.equals(refreshToken)) {
+            redisTemplate.delete(key);
+            return false;
+        }
 
-		stringValueOperations.set(key, value);
-		return true;
-	}
+        stringValueOperations.set(key, value);
+        return true;
+    }
 
-	private String getRefreshKey(Member member) {
-		return KeyPrefix.REFRESH.getPrefix() + member.getId();
-	}
+    private String getRefreshKey(Member member) {
+        return KeyPrefix.REFRESH.getPrefix() + member.getId();
+    }
 
-	private Claims generateClaims(Long id) {
-		Claims claims = Jwts.claims();
-		claims.put("id", id);
-		return claims;
-	}
+    private Claims generateClaims(Long id) {
+        Claims claims = Jwts.claims();
+        claims.put("id", id);
+        return claims;
+    }
 
-	private byte[] generateKey() {
-		return secret.getBytes(StandardCharsets.UTF_8);
-	}
+    private byte[] generateKey() {
+        return secret.getBytes(StandardCharsets.UTF_8);
+    }
 
-	public String extractJwt(final StompHeaderAccessor accessor) {
-		return accessor.getFirstNativeHeader(AUTHORIZATION.getContent());
-	}
+    public String extractJwt(final StompHeaderAccessor accessor) {
+        return accessor.getFirstNativeHeader(AUTHORIZATION.getContent());
+    }
 }

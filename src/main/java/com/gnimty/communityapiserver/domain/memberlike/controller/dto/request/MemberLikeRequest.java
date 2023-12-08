@@ -8,16 +8,16 @@ import lombok.Getter;
 @Getter
 public class MemberLikeRequest {
 
-	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
-	private Long targetMemberId;
+    @NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+    private Long targetMemberId;
 
-	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
-	private Boolean cancel;
+    @NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+    private Boolean cancel;
 
-	public MemberLikeServiceRequest toServiceRequest() {
-		return MemberLikeServiceRequest.builder()
-			.targetMemberId(targetMemberId)
-			.cancel(cancel)
-			.build();
-	}
+    public MemberLikeServiceRequest toServiceRequest() {
+        return MemberLikeServiceRequest.builder()
+            .targetMemberId(targetMemberId)
+            .cancel(cancel)
+            .build();
+    }
 }

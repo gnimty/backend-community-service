@@ -141,6 +141,7 @@ class ChatRoomServiceTest {
     @DisplayName("채팅방 사용자들로부터 ChatRoom 조회")
     @Nested
     class getChatRoomsByParticipant {
+
         @DisplayName("채팅방이 존재할 경우 성공")
         @Test
         void successToGetChatRoom() {

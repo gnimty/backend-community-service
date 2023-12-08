@@ -8,11 +8,11 @@ import lombok.Getter;
 @Getter
 public class MyProfileServiceResponse {
 
-	private Long id;
-	private String email;
-	private String nickname;
-	private Long favoriteChampionId;
-	private Long upCount;
-	private RiotDependentInfo riotDependentInfo;
-	private List<OauthInfoEntry> oauthInfos;
+    private Long id;
+    private String email;
+    private String nickname;
+    private Long favoriteChampionId;
+    private Long upCount;
+    private RiotDependentInfo riotDependentInfo;
+    private List<OauthInfoEntry> oauthInfos;
 }

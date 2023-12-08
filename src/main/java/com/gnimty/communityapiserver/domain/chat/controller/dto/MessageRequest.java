@@ -10,15 +10,15 @@ import lombok.Getter;
 @Builder
 public class MessageRequest {
 
-	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
-	private MessageRequestType type;
+    @NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+    private MessageRequestType type;
 
-	private String data;
+    private String data;
 
-	public MessageRequest toServiceRequest() {
-		return MessageRequest.builder()
-			.type(type)
-			.data(data)
-			.build();
-	}
+    public MessageRequest toServiceRequest() {
+        return MessageRequest.builder()
+            .type(type)
+            .data(data)
+            .build();
+    }
 }

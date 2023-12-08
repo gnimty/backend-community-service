@@ -15,23 +15,23 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ScheduleService {
 
-	private final ScheduleRepository scheduleRepository;
+    private final ScheduleRepository scheduleRepository;
 
-	public void updateSchedules(ScheduleServiceRequest request) {
-		Member member = MemberThreadLocal.get();
-		scheduleRepository.deleteByMember(member);
+    public void updateSchedules(ScheduleServiceRequest request) {
+        Member member = MemberThreadLocal.get();
+        scheduleRepository.deleteByMember(member);
 
-		request.getSchedules().stream()
-			.map(entry -> createSchedule(entry, member))
-			.forEach(scheduleRepository::save);
-	}
+        request.getSchedules().stream()
+            .map(entry -> createSchedule(entry, member))
+            .forEach(scheduleRepository::save);
+    }
 
-	public Schedule createSchedule(ScheduleEntry entry, Member member) {
-		return Schedule.builder()
-			.dayOfWeek(entry.getDayOfWeek())
-			.startTime(entry.getStartTime())
-			.endTime(entry.getEndTime())
-			.member(member)
-			.build();
-	}
+    public Schedule createSchedule(ScheduleEntry entry, Member member) {
+        return Schedule.builder()
+            .dayOfWeek(entry.getDayOfWeek())
+            .startTime(entry.getStartTime())
+            .endTime(entry.getEndTime())
+            .member(member)
+            .build();
+    }
 }

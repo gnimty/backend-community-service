@@ -25,125 +25,125 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 @Transactional
 public class ChampionCommentsService {
 
-	private final ChampionCommentsReadService championCommentsReadService;
-	private final MemberReadService memberReadService;
-	private final ChampionCommentsRepository championCommentsRepository;
+    private final ChampionCommentsReadService championCommentsReadService;
+    private final MemberReadService memberReadService;
+    private final ChampionCommentsRepository championCommentsRepository;
 
-	public void addComments(Long championId, ChampionCommentsServiceRequest request) {
-		Member member = MemberThreadLocal.get();
+    public void addComments(Long championId, ChampionCommentsServiceRequest request) {
+        Member member = MemberThreadLocal.get();
 
-		// 해당하는 championId, opponentChampionId가 올바른지 validation
+        // 해당하는 championId, opponentChampionId가 올바른지 validation
 
-		throwIfNotFoundMentionedMember(request);
-		ChampionComments parentComments = throwIfInvalidParentComments(request);
-		VersionInfo versionInfo = getVersion();
-		championCommentsRepository.save(
-			buildChampionComments(championId, request, member, parentComments, versionInfo));
-	}
+        throwIfNotFoundMentionedMember(request);
+        ChampionComments parentComments = throwIfInvalidParentComments(request);
+        VersionInfo versionInfo = getVersion();
+        championCommentsRepository.save(
+            buildChampionComments(championId, request, member, parentComments, versionInfo));
+    }
 
-	private ChampionComments buildChampionComments(
-		Long championId,
-		ChampionCommentsServiceRequest request,
-		Member member,
-		ChampionComments parentComments,
-		VersionInfo versionInfo
-	) {
-		return ChampionComments.builder()
-			.lane(request.getLane())
-			.championId(championId)
-			.opponentChampionId(request.getOpponentChampionId())
-			.depth(request.getDepth())
-			.mentionedMemberId(request.getMentionedMemberId())
-			.contents(request.getContents())
-			.commentsType(request.getCommentsType())
-			.upCount(0L)
-			.downCount(0L)
-			.version(versionInfo.getData().getVersion())
-			.member(member)
-			.parentChampionComments(parentComments)
-			.build();
-	}
+    private ChampionComments buildChampionComments(
+        Long championId,
+        ChampionCommentsServiceRequest request,
+        Member member,
+        ChampionComments parentComments,
+        VersionInfo versionInfo
+    ) {
+        return ChampionComments.builder()
+            .lane(request.getLane())
+            .championId(championId)
+            .opponentChampionId(request.getOpponentChampionId())
+            .depth(request.getDepth())
+            .mentionedMemberId(request.getMentionedMemberId())
+            .contents(request.getContents())
+            .commentsType(request.getCommentsType())
+            .upCount(0L)
+            .downCount(0L)
+            .version(versionInfo.getData().getVersion())
+            .member(member)
+            .parentChampionComments(parentComments)
+            .build();
+    }
 
-	private VersionInfo getVersion() {
-		VersionInfo versionInfo;
-		try {
-			versionInfo = getVersionInfo();
-		} catch (WebClientResponseException e) {
-			throw new BaseException(ErrorCode.SERVICE_UNAVAILABLE);
-		}
-		return versionInfo;
-	}
+    private VersionInfo getVersion() {
+        VersionInfo versionInfo;
+        try {
+            versionInfo = getVersionInfo();
+        } catch (WebClientResponseException e) {
+            throw new BaseException(ErrorCode.SERVICE_UNAVAILABLE);
+        }
+        return versionInfo;
+    }
 
-	private ChampionComments throwIfInvalidParentComments(ChampionCommentsServiceRequest request) {
-		ChampionComments parentComments = null;
-		if (request.getParentChampionCommentsId() != null) {
-			parentComments = championCommentsReadService.findById(
-				request.getParentChampionCommentsId());
-			if (parentComments.getDepth() != 0) {
-				throw new BaseException(ErrorCode.PARENT_COMMENTS_DEPTH_MUST_BE_ONE);
-			}
-		}
-		return parentComments;
-	}
+    private ChampionComments throwIfInvalidParentComments(ChampionCommentsServiceRequest request) {
+        ChampionComments parentComments = null;
+        if (request.getParentChampionCommentsId() != null) {
+            parentComments = championCommentsReadService.findById(
+                request.getParentChampionCommentsId());
+            if (parentComments.getDepth() != 0) {
+                throw new BaseException(ErrorCode.PARENT_COMMENTS_DEPTH_MUST_BE_ONE);
+            }
+        }
+        return parentComments;
+    }
 
-	private void throwIfNotFoundMentionedMember(ChampionCommentsServiceRequest request) {
-		if (request.getMentionedMemberId() != null
-			&& !memberReadService.existsById(request.getMentionedMemberId())) {
-			throw new BaseException(ErrorCode.MEMBER_NOT_FOUND);
-		}
-	}
+    private void throwIfNotFoundMentionedMember(ChampionCommentsServiceRequest request) {
+        if (request.getMentionedMemberId() != null
+            && !memberReadService.existsById(request.getMentionedMemberId())) {
+            throw new BaseException(ErrorCode.MEMBER_NOT_FOUND);
+        }
+    }
 
-	private VersionInfo getVersionInfo() {
-		return WebClient.create("https://gnimty.kro.kr")
-			.get()
-			.uri("/asset/version")
-			.retrieve()
-			.bodyToMono(VersionInfo.class)
-			.block();
-	}
+    private VersionInfo getVersionInfo() {
+        return WebClient.create("https://gnimty.kro.kr")
+            .get()
+            .uri("/asset/version")
+            .retrieve()
+            .bodyToMono(VersionInfo.class)
+            .block();
+    }
 
-	public void updateComments(
-		Long championId,
-		Long commentsId,
-		ChampionCommentsUpdateServiceRequest request
-	) {
-		Member member = MemberThreadLocal.get();
-		ChampionComments championComments = championCommentsReadService.findById(commentsId);
-		if (!Objects.equals(championComments.getMember().getId(), member.getId())) {
-			throw new BaseException(NO_PERMISSION);
-		}
-		if (!Objects.equals(championComments.getChampionId(), championId)) {
-			throw new BaseException(COMMENTS_ID_AND_CHAMPION_ID_INVALID);
-		}
+    public void updateComments(
+        Long championId,
+        Long commentsId,
+        ChampionCommentsUpdateServiceRequest request
+    ) {
+        Member member = MemberThreadLocal.get();
+        ChampionComments championComments = championCommentsReadService.findById(commentsId);
+        if (!Objects.equals(championComments.getMember().getId(), member.getId())) {
+            throw new BaseException(NO_PERMISSION);
+        }
+        if (!Objects.equals(championComments.getChampionId(), championId)) {
+            throw new BaseException(COMMENTS_ID_AND_CHAMPION_ID_INVALID);
+        }
 
-		championComments.updateLane(request.getLane());
-		championComments.updateOpponentChampionId(request.getOpponentChampionId());
-		championComments.updateMentionedMemberId(request.getMentionedMemberId());
-		championComments.updateContents(request.getContents());
-		championComments.updateCommentsType(request.getCommentsType());
-	}
+        championComments.updateLane(request.getLane());
+        championComments.updateOpponentChampionId(request.getOpponentChampionId());
+        championComments.updateMentionedMemberId(request.getMentionedMemberId());
+        championComments.updateContents(request.getContents());
+        championComments.updateCommentsType(request.getCommentsType());
+    }
 
-	public void deleteComments(Long championId, Long commentsId) {
-		Member member = MemberThreadLocal.get();
-		ChampionComments championComments = championCommentsReadService.findById(commentsId);
-		if (!Objects.equals(championComments.getMember().getId(), member.getId())) {
-			throw new BaseException(NO_PERMISSION);
-		}
-		if (!Objects.equals(championComments.getChampionId(), championId)) {
-			throw new BaseException(COMMENTS_ID_AND_CHAMPION_ID_INVALID);
-		}
-		championComments.delete();
-	}
+    public void deleteComments(Long championId, Long commentsId) {
+        Member member = MemberThreadLocal.get();
+        ChampionComments championComments = championCommentsReadService.findById(commentsId);
+        if (!Objects.equals(championComments.getMember().getId(), member.getId())) {
+            throw new BaseException(NO_PERMISSION);
+        }
+        if (!Objects.equals(championComments.getChampionId(), championId)) {
+            throw new BaseException(COMMENTS_ID_AND_CHAMPION_ID_INVALID);
+        }
+        championComments.delete();
+    }
 
-	@Getter
-	public static class VersionInfo {
+    @Getter
+    public static class VersionInfo {
 
-		private VersionData data;
-	}
+        private VersionData data;
+    }
 
-	@Getter
-	public static class VersionData {
+    @Getter
+    public static class VersionData {
 
-		private String version;
-	}
+        private String version;
+    }
 }

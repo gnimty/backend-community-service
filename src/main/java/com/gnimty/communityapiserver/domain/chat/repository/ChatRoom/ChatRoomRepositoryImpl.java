@@ -23,64 +23,64 @@ import org.springframework.data.mongodb.core.query.Update;
 @RequiredArgsConstructor
 public class ChatRoomRepositoryImpl implements ChatRoomRepositoryCustom {
 
-	@Autowired
-	private final MongoTemplate mongoTemplate;
+    @Autowired
+    private final MongoTemplate mongoTemplate;
 
-	private final String COL = "chatRoom";
+    private final String COL = "chatRoom";
 
-	@Override
-	public List<ChatRoom> findByUser(User user) {
-		Query query = new Query(Criteria.where("participants.user").is(user));
-		List<ChatRoom> chatRooms = mongoTemplate.find(query, ChatRoom.class);
-		return chatRooms;
-	}
+    @Override
+    public List<ChatRoom> findByUser(User user) {
+        Query query = new Query(Criteria.where("participants.user").is(user));
+        List<ChatRoom> chatRooms = mongoTemplate.find(query, ChatRoom.class);
+        return chatRooms;
+    }
 
-	@Override
-	public Optional<ChatRoom> findByUsers(User me, User other) {
-		Query query = new Query()
-			.addCriteria(new Criteria().andOperator(
-				Criteria.where("participants").elemMatch(
-					Criteria.where("user").is(me)
-				),
-				Criteria.where("participants").elemMatch(
-					Criteria.where("user").is(other)
-				)
-			));
+    @Override
+    public Optional<ChatRoom> findByUsers(User me, User other) {
+        Query query = new Query()
+            .addCriteria(new Criteria().andOperator(
+                Criteria.where("participants").elemMatch(
+                    Criteria.where("user").is(me)
+                ),
+                Criteria.where("participants").elemMatch(
+                    Criteria.where("user").is(other)
+                )
+            ));
 
-		ChatRoom chatRoom = mongoTemplate.findOne(query, ChatRoom.class);
-		return Optional.ofNullable(chatRoom);
-	}
+        ChatRoom chatRoom = mongoTemplate.findOne(query, ChatRoom.class);
+        return Optional.ofNullable(chatRoom);
+    }
 
-	@Override
-	public ChatRoom save(List<Participant> participants) {
-		// 3. 저장하고 리턴
-		return mongoTemplate.save(ChatRoom.builder()
-			.chatRoomNo(generateSequence())
-			.createdDate(new Date())
-			.lastModifiedDate(new Date())
-			.participants(participants)
-			.build());
-	}
+    @Override
+    public ChatRoom save(List<Participant> participants) {
+        // 3. 저장하고 리턴
+        return mongoTemplate.save(ChatRoom.builder()
+            .chatRoomNo(generateSequence())
+            .createdDate(new Date())
+            .lastModifiedDate(new Date())
+            .participants(participants)
+            .build());
+    }
 
-	@Override
-	public UpdateResult update(ChatRoom chatRoom) {
-		Query query = new Query(Criteria.where("chatRoomNo").is(chatRoom.getChatRoomNo()));
-		Update update = new Update()
-			.set("participants", chatRoom.getParticipants())
-			.set("lastModifiedDate", chatRoom.getLastModifiedDate());
+    @Override
+    public UpdateResult update(ChatRoom chatRoom) {
+        Query query = new Query(Criteria.where("chatRoomNo").is(chatRoom.getChatRoomNo()));
+        Update update = new Update()
+            .set("participants", chatRoom.getParticipants())
+            .set("lastModifiedDate", chatRoom.getLastModifiedDate());
 
-		UpdateResult updateResult = mongoTemplate.updateFirst(query, update, ChatRoom.class);
+        UpdateResult updateResult = mongoTemplate.updateFirst(query, update, ChatRoom.class);
 
-		return updateResult;
-	}
+        return updateResult;
+    }
 
-	public Long generateSequence() {
-		AutoIncrementSequence counter = mongoTemplate.findAndModify(
-			query(where("_id").is(COL)), new Update().inc("seq", 1),
-			options().returnNew(true).upsert(true),
-			AutoIncrementSequence.class);
+    public Long generateSequence() {
+        AutoIncrementSequence counter = mongoTemplate.findAndModify(
+            query(where("_id").is(COL)), new Update().inc("seq", 1),
+            options().returnNew(true).upsert(true),
+            AutoIncrementSequence.class);
 
-		return !Objects.isNull(counter) ? counter.getSeq() : 1;
-	}
+        return !Objects.isNull(counter) ? counter.getSeq() : 1;
+    }
 
 }

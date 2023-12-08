@@ -9,19 +9,19 @@ import lombok.Getter;
 @Getter
 public enum DayOfWeek {
 
-	SUNDAY,
-	MONDAY,
-	TUESDAY,
-	WEDNESDAY,
-	THURSDAY,
-	FRIDAY,
-	SATURDAY;
+    SUNDAY,
+    MONDAY,
+    TUESDAY,
+    WEDNESDAY,
+    THURSDAY,
+    FRIDAY,
+    SATURDAY;
 
-	@JsonCreator(mode = JsonCreator.Mode.DELEGATING)
-	public static DayOfWeek findByInput(String input) {
-		return Stream.of(DayOfWeek.values())
-			.filter(c -> c.name().equals(input))
-			.findFirst()
-			.orElseThrow(() -> new BaseException(ErrorCode.INVALID_ENUM_VALUE));
-	}
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+    public static DayOfWeek findByInput(String input) {
+        return Stream.of(DayOfWeek.values())
+            .filter(c -> c.name().equals(input))
+            .findFirst()
+            .orElseThrow(() -> new BaseException(ErrorCode.INVALID_ENUM_VALUE));
+    }
 }

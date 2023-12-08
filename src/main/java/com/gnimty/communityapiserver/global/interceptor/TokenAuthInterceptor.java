@@ -19,45 +19,45 @@ import org.springframework.web.servlet.ModelAndView;
 @Component
 public class TokenAuthInterceptor implements HandlerInterceptor {
 
-	private final JwtProvider jwtProvider;
+    private final JwtProvider jwtProvider;
 
-	@Override
-	public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
-		Object handler) {
-		if (request.getServletPath().equals("/summoners")
-			&& request.getMethod().equals(HttpMethod.PATCH.toString())) {
-			return true;
-		}
-		Optional<String> tokenByHeader = jwtProvider.resolveToken(request);
-		if (tokenByHeader.isEmpty()) {
-			if (request.getServletPath().contains("champions")
-				&& request.getMethod().equals(HttpMethod.GET.toString())) {
-				return true;
-			}
-			if (request.getServletPath().equals("/summoners/main")
-				&& request.getMethod().equals(HttpMethod.GET.toString())) {
-				return true;
-			}
-			throw new BaseException(ErrorCode.TOKEN_NOT_FOUND);
-		}
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
+        Object handler) {
+        if (request.getServletPath().equals("/summoners")
+            && request.getMethod().equals(HttpMethod.PATCH.toString())) {
+            return true;
+        }
+        Optional<String> tokenByHeader = jwtProvider.resolveToken(request);
+        if (tokenByHeader.isEmpty()) {
+            if (request.getServletPath().contains("champions")
+                && request.getMethod().equals(HttpMethod.GET.toString())) {
+                return true;
+            }
+            if (request.getServletPath().equals("/summoners/main")
+                && request.getMethod().equals(HttpMethod.GET.toString())) {
+                return true;
+            }
+            throw new BaseException(ErrorCode.TOKEN_NOT_FOUND);
+        }
 
-		String token = tokenByHeader.get().replaceFirst(Auth.BEARER.getContent(), "");
-		jwtProvider.checkValidation(token);
-		Member member = jwtProvider.findMemberByToken(token);
-		MemberThreadLocal.set(member);
+        String token = tokenByHeader.get().replaceFirst(Auth.BEARER.getContent(), "");
+        jwtProvider.checkValidation(token);
+        Member member = jwtProvider.findMemberByToken(token);
+        MemberThreadLocal.set(member);
 
-		return true;
-	}
+        return true;
+    }
 
-	@Override
-	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
-		ModelAndView modelAndView) throws Exception {
-		Member member = MemberThreadLocal.get();
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
+        ModelAndView modelAndView) throws Exception {
+        Member member = MemberThreadLocal.get();
 
-		if (member == null) {
-			return;
-		}
+        if (member == null) {
+            return;
+        }
 
-		MemberThreadLocal.remove();
-	}
+        MemberThreadLocal.remove();
+    }
 }

@@ -8,22 +8,22 @@ import lombok.Data;
 @Data
 public class ChampionCommentsEntry {
 
-	private Long id;
-	private Lane lane;
-	private Long opponentChampionId;
-	private Integer depth;
-	private Long mentionedMemberId;
-	private String contents;
-	private CommentsType commentsType;
-	private Long upCount;
-	private Long downCount;
-	private String version;
-	private LocalDateTime createdAt;
-	private LocalDateTime updatedAt;
-	private Boolean deleted;
-	private Boolean blocked;
-	private Long memberId;
-	private String name;
-	private String tagLine;
-	private Boolean like;
+    private Long id;
+    private Lane lane;
+    private Long opponentChampionId;
+    private Integer depth;
+    private Long mentionedMemberId;
+    private String contents;
+    private CommentsType commentsType;
+    private Long upCount;
+    private Long downCount;
+    private String version;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private Boolean deleted;
+    private Boolean blocked;
+    private Long memberId;
+    private String name;
+    private String tagLine;
+    private Boolean like;
 }

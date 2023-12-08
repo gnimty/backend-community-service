@@ -25,30 +25,30 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OauthInfo extends BaseEntity {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "oauth_info_id", columnDefinition = "BIGINT", updatable = false, unique = true)
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "oauth_info_id", columnDefinition = "BIGINT", updatable = false, unique = true)
+    private Long id;
 
-	@Enumerated(EnumType.STRING)
-	@Column(name = "provider", columnDefinition = "VARCHAR(10)")
-	private Provider provider;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "provider", columnDefinition = "VARCHAR(10)")
+    private Provider provider;
 
-	@Column(name = "email", columnDefinition = "VARCHAR(100)")
-	private String email;
+    @Column(name = "email", columnDefinition = "VARCHAR(100)")
+    private String email;
 
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(name = "member_id", nullable = false)
-	private Member member;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
-	@Builder
-	public OauthInfo(
-		Provider provider,
-		String email,
-		Member member
-	) {
-		this.provider = provider;
-		this.email = email;
-		this.member = member;
-	}
+    @Builder
+    public OauthInfo(
+        Provider provider,
+        String email,
+        Member member
+    ) {
+        this.provider = provider;
+        this.email = email;
+        this.member = member;
+    }
 }

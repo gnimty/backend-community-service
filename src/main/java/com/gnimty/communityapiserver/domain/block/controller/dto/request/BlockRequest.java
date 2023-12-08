@@ -15,16 +15,16 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class BlockRequest {
 
-	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
-	private Long id;
+    @NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+    private Long id;
 
-	@Size(max = 100)
-	private String memo;
+    @Size(max = 100)
+    private String memo;
 
-	public BlockServiceRequest toServiceRequest() {
-		return BlockServiceRequest.builder()
-			.id(id)
-			.memo(memo)
-			.build();
-	}
+    public BlockServiceRequest toServiceRequest() {
+        return BlockServiceRequest.builder()
+            .id(id)
+            .memo(memo)
+            .build();
+    }
 }

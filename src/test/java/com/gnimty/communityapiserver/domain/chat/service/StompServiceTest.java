@@ -14,6 +14,7 @@ import com.gnimty.communityapiserver.domain.chat.repository.Chat.ChatRepository;
 import com.gnimty.communityapiserver.domain.chat.repository.ChatRoom.ChatRoomRepository;
 import com.gnimty.communityapiserver.domain.chat.repository.User.UserRepository;
 import com.gnimty.communityapiserver.domain.chat.service.dto.UserWithBlockDto;
+import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.constant.Tier;
@@ -69,7 +70,7 @@ public class StompServiceTest {
     @Nested
     class updateConnectStatus {
 
-        @DisplayName("수정 성공")
+        @DisplayName("성공적으로 접속상태 수정됨")
         @Test
         void successUpdateConnectStatus() {
             // given
@@ -85,7 +86,7 @@ public class StompServiceTest {
         }
     }
 
-    @DisplayName("채팅방 생성 또는 조회")
+    @DisplayName("채팅방 생성 또는 조회 시")
     @Nested
     class getOrCreateChatRoom {
 
@@ -101,7 +102,7 @@ public class StompServiceTest {
             userRepository.save(userB);
         }
 
-        @DisplayName("두 유저의 채팅방이 존재한 경우, 기존의 채팅방 조회 성공")
+        @DisplayName("두 유저의 채팅방이 존재한다면, 기존 채팅방 조회")
         @Test
         void successGetExistingChatRoom() {
             // given
@@ -125,7 +126,7 @@ public class StompServiceTest {
             assertThat(findChatRoom).isEqualTo(chatRoom);
         }
 
-        @DisplayName("두 유저의 채팅방이 존재하지 않을 시, 서로 차단하지 않은 경우 올바른 차단정보가 담긴 채팅방 생성 성공")
+        @DisplayName("두 유저의 채팅방이 존재하지 않다면, 서로 차단하지 않은 경우 올바른 차단정보가 담긴 채팅방 생성")
         @Test
         void successCreateChatRoomWhenNoBlock() {
             // given
@@ -144,7 +145,7 @@ public class StompServiceTest {
                 participant -> participant.getBlockedStatus() == Blocked.UNBLOCK);
         }
 
-        @DisplayName("두 유저의 채팅방이 존재하지 않을 시, 한쪽만 차단한 경우 올바른 차단정보가 담긴 채팅방 생성 성공")
+        @DisplayName("두 유저의 채팅방이 존재하지 않다면, 한쪽만 차단한 경우 올바른 차단정보가 담긴 채팅방 생성")
         @Test
         void successCreateChatRoomWhenOneBlock() {
             UserWithBlockDto userAWithBlock = new UserWithBlockDto(userA, Blocked.UNBLOCK);
@@ -163,7 +164,7 @@ public class StompServiceTest {
                 .contains(new Participant(userB, null, Blocked.BLOCK));
         }
 
-        @DisplayName("두 유저의 채팅방이 존재하지 않을 시, 둘 다 차단한 경우 채팅방 생성 실패")
+        @DisplayName("두 유저의 채팅방이 존재하지 않다면, 둘 다 차단한 경우 채팅방 생성 실패")
         @Test
         void failCreateChatRoom() {
             // given
@@ -180,7 +181,7 @@ public class StompServiceTest {
 
     }
 
-    @DisplayName("채팅방 나갈 때")
+    @DisplayName("채팅방 나갈 시")
     @Nested
     class exitChatRoom {
 
@@ -207,7 +208,7 @@ public class StompServiceTest {
             chatRoomRepository.deleteAll();
         }
 
-        @DisplayName("아무도 채팅방을 나가지 않은 상태라면 exitDate 변경 성공")
+        @DisplayName("아무도 채팅방을 나가지 않은 상태라면, exitDate 변경됨")
         @Test
         void exitChatRoomWhenNoBodyExit() {
             // given
@@ -225,13 +226,30 @@ public class StompServiceTest {
             assertThat(participantA).isPresent();
         }
 
-        @DisplayName("상대방이 이미 채팅방을 나갔다면 채팅방과 채팅내역 모두 삭제")
+        @DisplayName("상대방이 이미 채팅방을 나갔다면, 채팅방과 채팅내역 모두 삭제됨")
         @Test
         void exitChatRoomWhenOtherExit() {
             // given
             chatRoom.getParticipants().stream()
                 .filter(participant -> participant.getUser().equals(userB))
                 .forEach(participant -> participant.setExitDate(new Date()));
+            chatRoomRepository.save(chatRoom);
+
+            // when
+            stompService.exitChatRoom(userA, chatRoom);
+
+            // then
+            assertThat(chatRoomRepository.findByChatRoomNo(chatRoom.getChatRoomNo())).isEmpty();
+            assertThat(chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo())).isEmpty();
+        }
+
+        @DisplayName("상대방이 나를 차단했다면, 채팅방과 채팅내역 모두 삭제됨")
+        @Test
+        void exitChatRoomWhenBlocked() {
+            // given
+            chatRoom.getParticipants().stream()
+                .filter(participant -> participant.getUser().equals(userB))
+                .forEach(participant -> participant.setBlockedStatus(Blocked.BLOCK));
             chatRoomRepository.save(chatRoom);
 
             // when
@@ -267,7 +285,23 @@ public class StompServiceTest {
             userRepository.save(userD);
         }
 
-        @DisplayName("모든 채팅 상대를 차단하지 않았을 경우 내가 속한 모든 채팅방 조회 성공")
+        @DisplayName("모든 채팅 상대를 차단했다면, 빈 채팅방 리스트 가져옴")
+        @Test
+        void getEmptyChatRooms() {
+
+            // given
+            saveChatRoomWithBlocked(1L, userA, userB, Blocked.BLOCK, Blocked.UNBLOCK);
+            saveChatRoomWithBlocked(2L, userA, userC, Blocked.BLOCK, Blocked.UNBLOCK);
+            saveChatRoomWithBlocked(3L, userA, userD, Blocked.BLOCK, Blocked.UNBLOCK);
+
+            // when
+            List<ChatRoomDto> chatRoomsJoined = stompService.getChatRoomsJoined(userA);
+
+            // then
+            assertThat(chatRoomsJoined).isEmpty();
+        }
+
+        @DisplayName("모든 채팅 상대를 차단하지 않았다면, 내가 속한 모든 채팅방 조회")
         @Test
         void successToGetAllChatRoom() {
             // given
@@ -288,7 +322,7 @@ public class StompServiceTest {
             assertThat(chatRoomIds).contains(3L);
         }
 
-        @DisplayName("채팅 상대를 차단하지 않은 채팅방만 조회 성공 ")
+        @DisplayName("채팅 상대를 차단하지 않은 채팅방만 조회")
         @Test
         void successToGetNonBlockChatRoom() {
             // given
@@ -308,23 +342,10 @@ public class StompServiceTest {
             assertThat(chatRoomIds).contains(3L);
         }
 
-        @DisplayName("모든 채팅 상대를 차단한 경우 빈 채팅방 리스트 가져옴")
-        @Test
-        void getEmptyChatRooms() {
-            // given
-            saveChatRoomWithBlocked(1L, userA, userB, Blocked.BLOCK, Blocked.UNBLOCK);
-            saveChatRoomWithBlocked(2L, userA, userC, Blocked.BLOCK, Blocked.UNBLOCK);
-            saveChatRoomWithBlocked(3L, userA, userD, Blocked.BLOCK, Blocked.UNBLOCK);
 
-            // when
-            List<ChatRoomDto> chatRoomsJoined = stompService.getChatRoomsJoined(userA);
-
-            // then
-            assertThat(chatRoomsJoined).isEmpty();
-        }
     }
 
-    @DisplayName("채팅 리스트 조회 시")
+    @DisplayName("채팅 내역 조회 시")
     @Nested
     class getChats {
 
@@ -351,7 +372,7 @@ public class StompServiceTest {
             chatRepository.deleteAll();
         }
 
-        @DisplayName("채팅방을 나간 이후 채팅이 없다면 빈 리스트 가져옴")
+        @DisplayName("채팅방을 나간 이후 채팅이 없다면, 빈 리스트 가져옴")
         @Test
         void getEmptyChatsAfterExitChatRoom() {
             // given
@@ -375,7 +396,7 @@ public class StompServiceTest {
             assertThat(chats).isEmpty();
         }
 
-        @DisplayName("채팅방을 나간 이후 채팅이 1개 이상이라면 나간 이후의 채팅 가져옴")
+        @DisplayName("채팅방을 나간 이후 채팅이 있다면, 나간 이후의 채팅들만 가져옴")
         @Test
         void getSomeChatsAfterExitChatRoom() {
             // given
@@ -404,20 +425,7 @@ public class StompServiceTest {
             assertThat(chats.get(0).getMessage()).isEqualTo("bye2");
         }
 
-        @DisplayName("채팅이 없다면 빈 List<ChatDto> 가져옴")
-        @Test
-        void getEmptyChats() {
-            // given
-            //      X
-
-            // when
-            List<ChatDto> chats = stompService.getChatList(userA, chatRoom);
-
-            // then
-            assertThat(chats).isEmpty();
-        }
-
-        @DisplayName("채팅이 있다면 모든 채팅을 가져옴")
+        @DisplayName("채팅방을 나가지 않고 채팅이 존재한다면, 모든 채팅을 가져옴")
         @Test
         void getAllChats() {
             // given
@@ -435,6 +443,20 @@ public class StompServiceTest {
             // then
             assertThat(chats.size()).isEqualTo(2);
         }
+
+        @DisplayName("채팅이 없다면, 빈 List<ChatDto> 가져옴")
+        @Test
+        void getEmptyChats() {
+            // given
+            //      X
+
+            // when
+            List<ChatDto> chats = stompService.getChatList(userA, chatRoom);
+
+            // then
+            assertThat(chats).isEmpty();
+        }
+
     }
 
     private void saveChatRoomWithBlocked(Long chatRoomNo, User user1, User user2,
@@ -510,7 +532,7 @@ public class StompServiceTest {
             chatRepository.deleteAll();
         }
 
-        @DisplayName("읽지 않은 메시지가 있었다면 해당 채팅방에서 상대방이 보낸 채팅의 readCount가 모두 0이 됨")
+        @DisplayName("읽지 않은 메시지가 있다면, 해당 채팅방에서 상대방이 보낸 채팅의 readCount가 모두 0이 됨")
         @Test
         void hasUnReadMessages() {
             // given
@@ -530,7 +552,7 @@ public class StompServiceTest {
                 .forEach(readCount -> assertThat(readCount).isEqualTo(0));
         }
 
-        @DisplayName("상대방이 보낸 채팅이 없어도 아무일도 일어나지 않음")
+        @DisplayName("상대방이 보낸 채팅이 없을 시 아무일도 일어나지 않음")
         @Test
         void hasNoOtherChats() {
             // given
@@ -546,7 +568,7 @@ public class StompServiceTest {
     @Nested
     class changeUserConnectStatus {
 
-        @DisplayName("변동된 접속상태로 변경")
+        @DisplayName("성공적으로 접속상태가 변경됨")
         @Test
         void updateUser() {
             // given
@@ -614,7 +636,7 @@ public class StompServiceTest {
             assertThat(userAParticipant.get().getBlockedStatus()).isEqualTo(Blocked.BLOCK);
         }
 
-        @DisplayName("상대방이 채팅방을 나갔고 이후의 채팅이 있을 때, 채팅방의 차단 정보가 수정 됨")
+        @DisplayName("상대방이 채팅방을 나갔고 이후의 채팅이 있다면, 채팅방의 차단 정보가 수정 됨")
         @Test
         void updateChatRoomBlockWhenOtherExitBeforeSomeChats() {
             // given
@@ -649,7 +671,7 @@ public class StompServiceTest {
             assertThat(userAParticipant.get().getBlockedStatus()).isEqualTo(Blocked.BLOCK);
         }
 
-        @DisplayName("상대방이 채팅방을 나갔고 이후의 채팅이 없을 때, 채팅방과 해당 채팅방의 채팅이 모두 삭제됨")
+        @DisplayName("상대방이 채팅방을 나갔고 이후의 채팅이 없다면, 채팅방과 해당 채팅방의 채팅이 모두 삭제됨")
         @Test
         void deleteChatDataWhenOtherExit() {
             // given
@@ -669,7 +691,7 @@ public class StompServiceTest {
             assertThat(chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo())).isEmpty();
         }
 
-        @DisplayName("상대방과의 채팅방이 있고 상대방도 나를 차단했을 때, 채팅방과 해당 채팅방의 채팅이 모두 삭제됨")
+        @DisplayName("상대방과의 채팅방이 있고 상대방도 나를 차단했다면, 채팅방과 해당 채팅방의 채팅이 모두 삭제됨")
         @Test
         void deleteChatRoomAndChatsWhenUpdatingBlock() {
             // given
@@ -730,7 +752,7 @@ public class StompServiceTest {
             chatRoomRepository.deleteAll();
         }
 
-        @DisplayName("상대방과의 채팅방이 존재한다면 채팅방의 차단정보가 수정됨")
+        @DisplayName("상대방과의 채팅방이 존재한다면, 채팅방의 차단정보가 수정됨")
         @Test
         void updateChatRoomBlock() {
             // given
@@ -763,7 +785,7 @@ public class StompServiceTest {
         }
     }
 
-    @DisplayName("상대방 차단여부 확인")
+    @DisplayName("상대방 차단여부 확인 시")
     @Nested
     class checkBlockStatus {
 
@@ -785,7 +807,7 @@ public class StompServiceTest {
             chatRoomRepository.deleteAll();
         }
 
-        @DisplayName("상대방이 나를 차단했을 경우 true")
+        @DisplayName("상대방이 나를 차단했을 경우 true 반환")
         @Test
         void checkBlock() {
             // given
@@ -803,7 +825,7 @@ public class StompServiceTest {
             assertThat(blockStatus).isTrue();
         }
 
-        @DisplayName("상대방이 나를 차단하지 않았을 경우 false")
+        @DisplayName("상대방이 나를 차단하지 않았을 경우 false 반환")
         @Test
         void checkUnBlock() {
             // given
@@ -831,7 +853,7 @@ public class StompServiceTest {
             userRepository.deleteAll();
         }
 
-        @DisplayName("탈퇴한 사용자와 관련한 모든 데이터 삭제")
+        @DisplayName("사용자와 관련한 모든 데이터 삭제")
         @Test
         void deleteAllDate() {
             // given

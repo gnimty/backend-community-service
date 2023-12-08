@@ -16,44 +16,44 @@ import lombok.Getter;
 @Getter
 @Builder
 @ValidateCursor(sortBy = "sortBy", lastName = "lastName",
-	lastSummonerMmr = "lastSummonerMmr", lastSummonerUpCount = "lastSummonerUpCount")
+    lastSummonerMmr = "lastSummonerMmr", lastSummonerUpCount = "lastSummonerUpCount")
 public class RecommendedSummonersRequest {
 
-	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
-	private GameMode gameMode;
-	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
-	private Status status;
-	private List<Long> preferChampionIds;
-	private Boolean duoable;
-	private Tier tier;
-	private List<Lane> lanes;
+    @NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+    private GameMode gameMode;
+    @NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+    private Status status;
+    private List<Long> preferChampionIds;
+    private Boolean duoable;
+    private Tier tier;
+    private List<Lane> lanes;
 
-	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
-	private SortBy sortBy;
-	private Boolean timeMatch;
-	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
-	private Long lastSummonerId;
-	private String lastName;
-	private Long lastSummonerMmr;
-	private Long lastSummonerUpCount;
-	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
-	private Integer pageSize;
+    @NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+    private SortBy sortBy;
+    private Boolean timeMatch;
+    @NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+    private Long lastSummonerId;
+    private String lastName;
+    private Long lastSummonerMmr;
+    private Long lastSummonerUpCount;
+    @NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+    private Integer pageSize;
 
-	public RecommendedSummonersServiceRequest toServiceRequest() {
-		return RecommendedSummonersServiceRequest.builder()
-			.gameMode(gameMode)
-			.status(status)
-			.preferChampionIds(preferChampionIds)
-			.duoable(duoable)
-			.tier(tier)
-			.lanes(lanes)
-			.sortBy(sortBy)
-			.timeMatch(timeMatch)
-			.lastSummonerId(lastSummonerId)
-			.lastName(lastName)
-			.lastSummonerMmr(lastSummonerMmr)
-			.lastSummonerUpCount(lastSummonerUpCount)
-			.pageSize(pageSize)
-			.build();
-	}
+    public RecommendedSummonersServiceRequest toServiceRequest() {
+        return RecommendedSummonersServiceRequest.builder()
+            .gameMode(gameMode)
+            .status(status)
+            .preferChampionIds(preferChampionIds)
+            .duoable(duoable)
+            .tier(tier)
+            .lanes(lanes)
+            .sortBy(sortBy)
+            .timeMatch(timeMatch)
+            .lastSummonerId(lastSummonerId)
+            .lastName(lastName)
+            .lastSummonerMmr(lastSummonerMmr)
+            .lastSummonerUpCount(lastSummonerUpCount)
+            .pageSize(pageSize)
+            .build();
+    }
 }

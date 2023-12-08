@@ -19,23 +19,23 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SignupRequest {
 
-	@NotNull(message = INVALID_INPUT_VALUE)
-	@Pattern(regexp = RequestPattern.EMAIL_PATTERN, message = INVALID_INPUT_VALUE)
-	private String email;
+    @NotNull(message = INVALID_INPUT_VALUE)
+    @Pattern(regexp = RequestPattern.EMAIL_PATTERN, message = INVALID_INPUT_VALUE)
+    private String email;
 
-	@NotNull(message = INVALID_INPUT_VALUE)
-	@Pattern(regexp = RequestPattern.PASSWORD_PATTERN, message = INVALID_INPUT_VALUE)
-	private String password;
+    @NotNull(message = INVALID_INPUT_VALUE)
+    @Pattern(regexp = RequestPattern.PASSWORD_PATTERN, message = INVALID_INPUT_VALUE)
+    private String password;
 
-	@NotNull(message = INVALID_INPUT_VALUE)
-	@AssertTrue(message = AGREE_TERMS_MUST_BE_TRUE)
-	private Boolean agreeTerms;
+    @NotNull(message = INVALID_INPUT_VALUE)
+    @AssertTrue(message = AGREE_TERMS_MUST_BE_TRUE)
+    private Boolean agreeTerms;
 
-	public SignupServiceRequest toServiceRequest() {
-		return SignupServiceRequest.builder()
-			.email(email)
-			.password(password)
-			.agreeTerms(agreeTerms)
-			.build();
-	}
+    public SignupServiceRequest toServiceRequest() {
+        return SignupServiceRequest.builder()
+            .email(email)
+            .password(password)
+            .agreeTerms(agreeTerms)
+            .build();
+    }
 }

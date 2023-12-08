@@ -15,12 +15,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class IntroductionUpdateRequest {
 
-	@Valid
-	private List<IntroductionEntry> introductions;
+    @Valid
+    private List<IntroductionEntry> introductions;
 
-	public IntroductionUpdateServiceRequest toServiceRequest() {
-		return IntroductionUpdateServiceRequest.builder()
-			.introductions(introductions)
-			.build();
-	}
+    public IntroductionUpdateServiceRequest toServiceRequest() {
+        return IntroductionUpdateServiceRequest.builder()
+            .introductions(introductions)
+            .build();
+    }
 }

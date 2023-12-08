@@ -17,13 +17,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class EmailAuthRequest {
 
-	@NotNull(message = INVALID_INPUT_VALUE)
-	@Pattern(regexp = RequestPattern.EMAIL_PATTERN, message = INVALID_INPUT_VALUE)
-	private String email;
+    @NotNull(message = INVALID_INPUT_VALUE)
+    @Pattern(regexp = RequestPattern.EMAIL_PATTERN, message = INVALID_INPUT_VALUE)
+    private String email;
 
-	public EmailAuthServiceRequest toServiceRequest() {
-		return EmailAuthServiceRequest.builder()
-			.email(email)
-			.build();
-	}
+    public EmailAuthServiceRequest toServiceRequest() {
+        return EmailAuthServiceRequest.builder()
+            .email(email)
+            .build();
+    }
 }

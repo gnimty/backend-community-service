@@ -10,11 +10,11 @@ import org.springframework.data.repository.query.Param;
 
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
 
-	List<Schedule> findByMember(Member member);
+    List<Schedule> findByMember(Member member);
 
-	void deleteByMember(Member member);
+    void deleteByMember(Member member);
 
-	@Query("delete from Schedule s where s.member.id = :id")
-	@Modifying
-	void deleteAllFromMember(@Param("id") Long id);
+    @Query("delete from Schedule s where s.member.id = :id")
+    @Modifying
+    void deleteAllFromMember(@Param("id") Long id);
 }

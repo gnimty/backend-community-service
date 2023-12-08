@@ -8,5 +8,5 @@ import lombok.Getter;
 @Getter
 public class StatusUpdateServiceRequest {
 
-	private Status status;
+    private Status status;
 }

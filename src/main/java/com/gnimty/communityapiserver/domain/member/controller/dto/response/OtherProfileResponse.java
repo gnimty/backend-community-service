@@ -11,15 +11,15 @@ import lombok.Getter;
 @Getter
 public class OtherProfileResponse {
 
-	private List<ScheduleEntry> schedules;
-	private String mainIntroduction;
-	private List<PreferGameModeEntry> preferGameModes;
+    private List<ScheduleEntry> schedules;
+    private String mainIntroduction;
+    private List<PreferGameModeEntry> preferGameModes;
 
-	public static OtherProfileResponse from(OtherProfileServiceResponse response) {
-		return OtherProfileResponse.builder()
-			.schedules(response.getSchedules())
-			.mainIntroduction(response.getMainIntroduction())
-			.preferGameModes(response.getPreferGameModes())
-			.build();
-	}
+    public static OtherProfileResponse from(OtherProfileServiceResponse response) {
+        return OtherProfileResponse.builder()
+            .schedules(response.getSchedules())
+            .mainIntroduction(response.getMainIntroduction())
+            .preferGameModes(response.getPreferGameModes())
+            .build();
+    }
 }

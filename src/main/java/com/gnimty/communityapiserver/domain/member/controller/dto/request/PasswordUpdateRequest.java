@@ -16,18 +16,18 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PasswordUpdateRequest {
 
-	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
-	@Pattern(regexp = RequestPattern.PASSWORD_PATTERN, message = ErrorMessage.INVALID_INPUT_VALUE)
-	private String currentPassword;
+    @NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+    @Pattern(regexp = RequestPattern.PASSWORD_PATTERN, message = ErrorMessage.INVALID_INPUT_VALUE)
+    private String currentPassword;
 
-	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
-	@Pattern(regexp = RequestPattern.PASSWORD_PATTERN, message = ErrorMessage.INVALID_INPUT_VALUE)
-	private String newPassword;
+    @NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+    @Pattern(regexp = RequestPattern.PASSWORD_PATTERN, message = ErrorMessage.INVALID_INPUT_VALUE)
+    private String newPassword;
 
-	public PasswordUpdateServiceRequest toServiceRequest() {
-		return PasswordUpdateServiceRequest.builder()
-			.currentPassword(currentPassword)
-			.newPassword(newPassword)
-			.build();
-	}
+    public PasswordUpdateServiceRequest toServiceRequest() {
+        return PasswordUpdateServiceRequest.builder()
+            .currentPassword(currentPassword)
+            .newPassword(newPassword)
+            .build();
+    }
 }

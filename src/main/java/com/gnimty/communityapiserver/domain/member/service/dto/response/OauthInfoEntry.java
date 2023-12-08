@@ -9,13 +9,13 @@ import lombok.Getter;
 @Getter
 public class OauthInfoEntry {
 
-	private String email;
-	private Provider provider;
+    private String email;
+    private Provider provider;
 
-	public static OauthInfoEntry from(OauthInfo oauthInfo) {
-		return OauthInfoEntry.builder()
-			.email(oauthInfo.getEmail())
-			.provider(oauthInfo.getProvider())
-			.build();
-	}
+    public static OauthInfoEntry from(OauthInfo oauthInfo) {
+        return OauthInfoEntry.builder()
+            .email(oauthInfo.getEmail())
+            .provider(oauthInfo.getProvider())
+            .build();
+    }
 }

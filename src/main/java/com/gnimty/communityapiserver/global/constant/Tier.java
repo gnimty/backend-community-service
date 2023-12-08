@@ -9,31 +9,31 @@ import lombok.Getter;
 @Getter
 public enum Tier {
 
-	challenger("challenger", 9),
-	grandmaster("grandmaster", 8),
-	master("master", 7),
-	diamond("diamond", 6),
-	emerald("emerald", 5),
-	platinum("platinum", 4),
-	gold("gold", 3),
-	silver("silver", 2),
-	bronze("bronze", 1),
-	iron("iron", 0),
-	unknown("null", -1);
+    challenger("challenger", 9),
+    grandmaster("grandmaster", 8),
+    master("master", 7),
+    diamond("diamond", 6),
+    emerald("emerald", 5),
+    platinum("platinum", 4),
+    gold("gold", 3),
+    silver("silver", 2),
+    bronze("bronze", 1),
+    iron("iron", 0),
+    unknown("null", -1);
 
-	private final String tier;
-	private final Integer weight;
+    private final String tier;
+    private final Integer weight;
 
-	Tier(String tier, Integer weight) {
-		this.tier = tier;
-		this.weight = weight;
-	}
+    Tier(String tier, Integer weight) {
+        this.tier = tier;
+        this.weight = weight;
+    }
 
-	@JsonCreator(mode = JsonCreator.Mode.DELEGATING)
-	public static Tier findByInput(String input) {
-		return Stream.of(Tier.values())
-			.filter(c -> c.name().equals(input))
-			.findFirst()
-			.orElseThrow(() -> new BaseException(ErrorCode.INVALID_ENUM_VALUE));
-	}
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+    public static Tier findByInput(String input) {
+        return Stream.of(Tier.values())
+            .filter(c -> c.name().equals(input))
+            .findFirst()
+            .orElseThrow(() -> new BaseException(ErrorCode.INVALID_ENUM_VALUE));
+    }
 }
