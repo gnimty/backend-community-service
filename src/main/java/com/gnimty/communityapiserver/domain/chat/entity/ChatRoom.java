@@ -24,39 +24,39 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @EqualsAndHashCode
 public class ChatRoom {
 
-    // AutoIncrementSequence에서 ChatRoom을 위한 독립적인 SEQUENCE SCOPE로 작동
-    @Transient
-    public static final String SEQUENCE_NAME = "chatroom_sequence";
+	// AutoIncrementSequence에서 ChatRoom을 위한 독립적인 SEQUENCE SCOPE로 작동
+	@Transient
+	public static final String SEQUENCE_NAME = "chatroom_sequence";
 
-    @Id
-    private String id;
+	@Id
+	private String id;
 
-    @Indexed(unique = true)
-    private Long chatRoomNo;
-    private List<Participant> participants;
-    private Date createdDate;
+	@Indexed(unique = true)
+	private Long chatRoomNo;
+	private List<Participant> participants;
+	private Date createdDate;
 
-    @Getter
-    @Setter
-    @AllArgsConstructor
-    @ToString
-    @Builder
-    @EqualsAndHashCode
-    public static class Participant {
+	@Getter
+	@Setter
+	@AllArgsConstructor
+	@ToString
+	@Builder
+	@EqualsAndHashCode
+	public static class Participant {
 
-        @DBRef
-        private User user;
-        private Date exitDate;
-        private Blocked blockedStatus;
-    }
+		@DBRef
+		private User user;
+		private Date exitDate;
+		private Blocked blockedStatus;
+	}
 
-    private Date lastModifiedDate;
+	private Date lastModifiedDate;
 
-    public void refreshModifiedDate(Date date) {
-        this.lastModifiedDate = date;
-    }
+	public void refreshModifiedDate(Date date) {
+		this.lastModifiedDate = date;
+	}
 
-    public void updateParticipants(List<Participant> participants) {
-        this.participants = participants;
-    }
+	public void updateParticipants(List<Participant> participants) {
+		this.participants = participants;
+	}
 }

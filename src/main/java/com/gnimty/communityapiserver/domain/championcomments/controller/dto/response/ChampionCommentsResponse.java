@@ -14,11 +14,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ChampionCommentsResponse {
 
-    List<ChampionCommentsEntry> championComments;
+	List<ChampionCommentsEntry> championComments;
 
-    public static ChampionCommentsResponse of(ChampionCommentsServiceResponse response) {
-        return ChampionCommentsResponse.builder()
-            .championComments(response.getChampionComments())
-            .build();
-    }
+	public static ChampionCommentsResponse of(ChampionCommentsServiceResponse response) {
+		return ChampionCommentsResponse.builder()
+			.championComments(response.getChampionComments())
+			.build();
+	}
 }

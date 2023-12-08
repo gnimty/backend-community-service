@@ -16,22 +16,22 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PasswordResetRequest {
 
-    @NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
-    @Pattern(regexp = RequestPattern.EMAIL_PATTERN, message = ErrorMessage.INVALID_INPUT_VALUE)
-    private String email;
+	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+	@Pattern(regexp = RequestPattern.EMAIL_PATTERN, message = ErrorMessage.INVALID_INPUT_VALUE)
+	private String email;
 
-    @NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
-    @Pattern(regexp = RequestPattern.PASSWORD_PATTERN, message = ErrorMessage.INVALID_INPUT_VALUE)
-    private String password;
+	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+	@Pattern(regexp = RequestPattern.PASSWORD_PATTERN, message = ErrorMessage.INVALID_INPUT_VALUE)
+	private String password;
 
-    @NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
-    private String uuid;
+	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+	private String uuid;
 
-    public PasswordResetServiceRequest toServiceRequest() {
-        return PasswordResetServiceRequest.builder()
-            .email(email)
-            .password(password)
-            .uuid(uuid)
-            .build();
-    }
+	public PasswordResetServiceRequest toServiceRequest() {
+		return PasswordResetServiceRequest.builder()
+			.email(email)
+			.password(password)
+			.uuid(uuid)
+			.build();
+	}
 }

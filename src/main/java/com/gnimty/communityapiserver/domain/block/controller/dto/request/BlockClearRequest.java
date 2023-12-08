@@ -14,12 +14,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class BlockClearRequest {
 
-    @NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
-    private Long id;
+	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+	private Long id;
 
-    public BlockClearServiceRequest toServiceRequest() {
-        return BlockClearServiceRequest.builder()
-            .id(id)
-            .build();
-    }
+	public BlockClearServiceRequest toServiceRequest() {
+		return BlockClearServiceRequest.builder()
+			.id(id)
+			.build();
+	}
 }

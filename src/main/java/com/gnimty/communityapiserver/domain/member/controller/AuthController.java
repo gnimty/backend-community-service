@@ -29,50 +29,50 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final AuthService authService;
+	private final AuthService authService;
 
-    @ResponseStatus(CREATED)
-    @PostMapping("/auth/signup")
-    public CommonResponse<Void> signup(@RequestBody @Valid SignupRequest request) {
-        authService.signup(request.toServiceRequest());
-        return CommonResponse.success(SUCCESS_SIGN_UP, CREATED);
-    }
+	@ResponseStatus(CREATED)
+	@PostMapping("/auth/signup")
+	public CommonResponse<Void> signup(@RequestBody @Valid SignupRequest request) {
+		authService.signup(request.toServiceRequest());
+		return CommonResponse.success(SUCCESS_SIGN_UP, CREATED);
+	}
 
-    @PostMapping("/auth/login")
-    public CommonResponse<AuthToken> login(@RequestBody @Valid LoginRequest request) {
-        return CommonResponse.success(authService.login(request.toServiceRequest()));
-    }
+	@PostMapping("/auth/login")
+	public CommonResponse<AuthToken> login(@RequestBody @Valid LoginRequest request) {
+		return CommonResponse.success(authService.login(request.toServiceRequest()));
+	}
 
-    @PostMapping("/oauth/kakao")
-    public CommonResponse<AuthToken> kakaoLogin(@RequestBody @Valid OauthLoginRequest request) {
-        return CommonResponse.success(authService.kakaoLogin(request.toServiceRequest()));
-    }
+	@PostMapping("/oauth/kakao")
+	public CommonResponse<AuthToken> kakaoLogin(@RequestBody @Valid OauthLoginRequest request) {
+		return CommonResponse.success(authService.kakaoLogin(request.toServiceRequest()));
+	}
 
-    @PostMapping("/oauth/google")
-    public CommonResponse<AuthToken> googleLogin(@RequestBody @Valid OauthLoginRequest request) {
-        return CommonResponse.success(authService.googleLogin(request.toServiceRequest()));
-    }
+	@PostMapping("/oauth/google")
+	public CommonResponse<AuthToken> googleLogin(@RequestBody @Valid OauthLoginRequest request) {
+		return CommonResponse.success(authService.googleLogin(request.toServiceRequest()));
+	}
 
-    @ResponseStatus(ACCEPTED)
-    @PostMapping("/auth/email")
-    public CommonResponse<Void> sendEmailAuthCode(@RequestBody @Valid EmailAuthRequest request) {
-        authService.sendEmailAuthCode(request.toServiceRequest());
-        return CommonResponse.success(SUCCESS_SEND_EMAIL_AUTH_CODE, ACCEPTED);
-    }
+	@ResponseStatus(ACCEPTED)
+	@PostMapping("/auth/email")
+	public CommonResponse<Void> sendEmailAuthCode(@RequestBody @Valid EmailAuthRequest request) {
+		authService.sendEmailAuthCode(request.toServiceRequest());
+		return CommonResponse.success(SUCCESS_SEND_EMAIL_AUTH_CODE, ACCEPTED);
+	}
 
-    @PostMapping("/auth/email/code")
-    public CommonResponse<Void> verifyEmailAuthCode(
-        @RequestBody @Valid EmailVerifyRequest request
-    ) {
-        authService.verifyEmailAuthCode(request.toServiceRequest());
-        return CommonResponse.success(SUCCESS_VERIFY_EMAIL, OK);
-    }
+	@PostMapping("/auth/email/code")
+	public CommonResponse<Void> verifyEmailAuthCode(
+		@RequestBody @Valid EmailVerifyRequest request
+	) {
+		authService.verifyEmailAuthCode(request.toServiceRequest());
+		return CommonResponse.success(SUCCESS_VERIFY_EMAIL, OK);
+	}
 
-    @GetMapping("/auth/refresh")
-    public CommonResponse<AuthToken> tokenRefresh(
-        @RequestHeader("RefreshToken") String refreshToken
-    ) {
-        return CommonResponse.success(
-            authService.tokenRefresh(refreshToken.replaceAll(BEARER.getContent(), "")));
-    }
+	@GetMapping("/auth/refresh")
+	public CommonResponse<AuthToken> tokenRefresh(
+		@RequestHeader("RefreshToken") String refreshToken
+	) {
+		return CommonResponse.success(
+			authService.tokenRefresh(refreshToken.replaceAll(BEARER.getContent(), "")));
+	}
 }

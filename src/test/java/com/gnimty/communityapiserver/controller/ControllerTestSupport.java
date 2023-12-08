@@ -32,57 +32,57 @@ import org.springframework.test.web.servlet.MockMvc;
 @MockBean(JpaMetamodelMappingContext.class)
 public abstract class ControllerTestSupport {
 
-    @Autowired
-    protected MockMvc mockMvc;
+	@Autowired
+	protected MockMvc mockMvc;
 
-    @Autowired
-    protected ObjectMapper om;
+	@Autowired
+	protected ObjectMapper om;
 
-    @MockBean
-    protected BlockService blockService;
+	@MockBean
+	protected BlockService blockService;
 
-    @MockBean
-    protected BlockReadService blockReadService;
+	@MockBean
+	protected BlockReadService blockReadService;
 
-    @MockBean
-    protected IntroductionReadService introductionReadService;
+	@MockBean
+	protected IntroductionReadService introductionReadService;
 
-    @MockBean
-    protected MemberService memberService;
+	@MockBean
+	protected MemberService memberService;
 
-    @MockBean
-    protected MemberReadService memberReadService;
+	@MockBean
+	protected MemberReadService memberReadService;
 
-    @MockBean
-    protected AuthService authService;
+	@MockBean
+	protected AuthService authService;
 
-    @MockBean
-    protected OauthInfoReadService oauthInfoReadService;
+	@MockBean
+	protected OauthInfoReadService oauthInfoReadService;
 
-    @MockBean
-    protected PreferGameModeReadService preferGameModeReadService;
+	@MockBean
+	protected PreferGameModeReadService preferGameModeReadService;
 
-    @MockBean
-    protected RiotAccountService riotAccountService;
+	@MockBean
+	protected RiotAccountService riotAccountService;
 
-    @MockBean
-    protected RiotAccountReadService riotAccountReadService;
+	@MockBean
+	protected RiotAccountReadService riotAccountReadService;
 
-    @MockBean
-    protected ScheduleService scheduleService;
+	@MockBean
+	protected ScheduleService scheduleService;
 
-    @MockBean
-    protected ScheduleReadService scheduleReadService;
+	@MockBean
+	protected ScheduleReadService scheduleReadService;
 
-    @MockBean
-    protected JwtProvider jwtProvider;
+	@MockBean
+	protected JwtProvider jwtProvider;
 
-    @MockBean
-    protected TokenAuthInterceptor tokenAuthInterceptor;
+	@MockBean
+	protected TokenAuthInterceptor tokenAuthInterceptor;
 
-    @MockBean
-    protected StompService stompService;
+	@MockBean
+	protected StompService stompService;
 
-    @MockBean
-    protected UserService userService;
+	@MockBean
+	protected UserService userService;
 }

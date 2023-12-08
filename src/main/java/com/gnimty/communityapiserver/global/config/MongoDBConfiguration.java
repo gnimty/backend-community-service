@@ -9,11 +9,11 @@ import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 @Configuration
 public class MongoDBConfiguration {
 
-    @Bean
-    public MongoCustomConversions mongoCustomConversions() {
+	@Bean
+	public MongoCustomConversions mongoCustomConversions() {
 
-        return new MongoCustomConversions(
-            Arrays.asList());
-    }
+		return new MongoCustomConversions(
+			Arrays.asList());
+	}
 
 }

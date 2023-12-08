@@ -19,37 +19,37 @@ import org.thymeleaf.spring5.SpringTemplateEngine;
 @RequiredArgsConstructor
 public class MailSenderUtil {
 
-    private final JavaMailSender mailSender;
-    private final SpringTemplateEngine templateEngine;
+	private final JavaMailSender mailSender;
+	private final SpringTemplateEngine templateEngine;
 
-    @Async(value = "mailExecutor")
-    public void sendEmail(
-        String subject,
-        String to,
-        String code,
-        String emailTemplate,
-        String banner
-    ) {
-        try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+	@Async(value = "mailExecutor")
+	public void sendEmail(
+		String subject,
+		String to,
+		String code,
+		String emailTemplate,
+		String banner
+	) {
+		try {
+			MimeMessage message = mailSender.createMimeMessage();
+			MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            helper.setSubject(subject);
-            helper.setTo(to);
-            Map<String, String> emailValues = new HashMap<>();
-            emailValues.put("code", code);
+			helper.setSubject(subject);
+			helper.setTo(to);
+			Map<String, String> emailValues = new HashMap<>();
+			emailValues.put("code", code);
 
-            Context context = new Context();
-            emailValues.forEach(context::setVariable);
+			Context context = new Context();
+			emailValues.forEach(context::setVariable);
 
-            String html = templateEngine.process(emailTemplate, context);
-            helper.setText(html, true);
+			String html = templateEngine.process(emailTemplate, context);
+			helper.setText(html, true);
 
-            helper.addInline("banner", new ClassPathResource(banner));
-            mailSender.send(message);
+			helper.addInline("banner", new ClassPathResource(banner));
+			mailSender.send(message);
 
-        } catch (MessagingException e) {
-            throw new BaseException(ErrorCode.INTERNAL_SERVER_ERROR);
-        }
-    }
+		} catch (MessagingException e) {
+			throw new BaseException(ErrorCode.INTERNAL_SERVER_ERROR);
+		}
+	}
 }

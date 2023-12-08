@@ -9,5 +9,5 @@ import lombok.Getter;
 @Getter
 public class ScheduleServiceRequest {
 
-    private List<ScheduleEntry> schedules;
+	private List<ScheduleEntry> schedules;
 }

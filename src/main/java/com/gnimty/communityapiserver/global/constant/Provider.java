@@ -9,14 +9,14 @@ import lombok.Getter;
 @Getter
 public enum Provider {
 
-    KAKAO,
-    GOOGLE;
+	KAKAO,
+	GOOGLE;
 
-    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
-    public static Provider findByInput(String input) {
-        return Stream.of(Provider.values())
-            .filter(c -> c.name().equals(input))
-            .findFirst()
-            .orElseThrow(() -> new BaseException(ErrorCode.INVALID_ENUM_VALUE));
-    }
+	@JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+	public static Provider findByInput(String input) {
+		return Stream.of(Provider.values())
+			.filter(c -> c.name().equals(input))
+			.findFirst()
+			.orElseThrow(() -> new BaseException(ErrorCode.INVALID_ENUM_VALUE));
+	}
 }

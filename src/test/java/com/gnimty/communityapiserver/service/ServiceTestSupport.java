@@ -12,6 +12,6 @@ import org.springframework.test.context.ActiveProfiles;
 @ExtendWith(RedisTestConfig.class)
 public abstract class ServiceTestSupport {
 
-    @LocalServerPort
-    public int port;
+	@LocalServerPort
+	public int port;
 }

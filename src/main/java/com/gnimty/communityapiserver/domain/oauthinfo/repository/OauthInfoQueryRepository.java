@@ -12,23 +12,23 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class OauthInfoQueryRepository {
 
-    private final JPAQueryFactory queryFactory;
+	private final JPAQueryFactory queryFactory;
 
-    public Boolean existsByEmailAndProvider(String email, Provider provider) {
-        return queryFactory
-            .selectOne()
-            .from(oauthInfo)
-            .where(oauthInfo.email.eq(email)
-                .and(oauthInfo.provider.eq(provider)))
-            .fetchFirst() != null;
-    }
+	public Boolean existsByEmailAndProvider(String email, Provider provider) {
+		return queryFactory
+			.selectOne()
+			.from(oauthInfo)
+			.where(oauthInfo.email.eq(email)
+				.and(oauthInfo.provider.eq(provider)))
+			.fetchFirst() != null;
+	}
 
-    public Boolean existsByMemberAndProvider(Member member, Provider provider) {
-        return queryFactory
-            .selectOne()
-            .from(oauthInfo)
-            .where(oauthInfo.member.id.eq(member.getId())
-                .and(oauthInfo.provider.eq(provider)))
-            .fetchFirst() != null;
-    }
+	public Boolean existsByMemberAndProvider(Member member, Provider provider) {
+		return queryFactory
+			.selectOne()
+			.from(oauthInfo)
+			.where(oauthInfo.member.id.eq(member.getId())
+				.and(oauthInfo.provider.eq(provider)))
+			.fetchFirst() != null;
+	}
 }

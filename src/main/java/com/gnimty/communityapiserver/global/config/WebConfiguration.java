@@ -14,33 +14,33 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @RequiredArgsConstructor
 public class WebConfiguration implements WebMvcConfigurer {
 
-    private final TokenAuthInterceptor tokenAuthInterceptor;
+	private final TokenAuthInterceptor tokenAuthInterceptor;
 
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-            .allowedOrigins("http://localhost:3000", "https://localhost:3000")
-            .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE")
-            .allowCredentials(true)
-            .allowedHeaders("*");
-    }
+	@Override
+	public void addCorsMappings(CorsRegistry registry) {
+		registry.addMapping("/**")
+			.allowedOrigins("http://localhost:3000", "https://localhost:3000")
+			.allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE")
+			.allowCredentials(true)
+			.allowedHeaders("*");
+	}
 
-    @Override
-    public void addFormatters(FormatterRegistry registry) {
-        registry.addConverterFactory(new StringToEnumConverterFactory());
-    }
+	@Override
+	public void addFormatters(FormatterRegistry registry) {
+		registry.addConverterFactory(new StringToEnumConverterFactory());
+	}
 
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry
-            .addInterceptor(tokenAuthInterceptor)
-            .addPathPatterns("/**")
-            .excludePathPatterns("/auth/**")
-            .excludePathPatterns("/oauth/**")
-            .excludePathPatterns("/members/password/**")
-            .excludePathPatterns(
-                "/css/**", "/*.ico"
-                , "/error", "/error-page/**"
-            );
-    }
+	@Override
+	public void addInterceptors(InterceptorRegistry registry) {
+		registry
+			.addInterceptor(tokenAuthInterceptor)
+			.addPathPatterns("/**")
+			.excludePathPatterns("/auth/**")
+			.excludePathPatterns("/oauth/**")
+			.excludePathPatterns("/members/password/**")
+			.excludePathPatterns(
+				"/css/**", "/*.ico"
+				, "/error", "/error-page/**"
+			);
+	}
 }

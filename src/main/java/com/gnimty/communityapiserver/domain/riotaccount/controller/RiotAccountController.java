@@ -33,45 +33,45 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("summoners")
 public class RiotAccountController {
 
-    private final RiotAccountService riotAccountService;
-    private final StompService stompService;
-    private final UserService userService;
+	private final RiotAccountService riotAccountService;
+	private final StompService stompService;
+	private final UserService userService;
 
-    @PatchMapping
-    public CommonResponse<Void> updateSummoners(
-        @RequestBody @Valid SummonerUpdateRequest request
-    ) {
-        List<RiotAccount> riotAccounts = riotAccountService.updateSummoners(
-            request.toServiceRequest());
-        stompService.createOrUpdateUser(riotAccounts);
-        return CommonResponse.success(SUCCESS_UPDATE_SUMMONERS, OK);
-    }
+	@PatchMapping
+	public CommonResponse<Void> updateSummoners(
+		@RequestBody @Valid SummonerUpdateRequest request
+	) {
+		List<RiotAccount> riotAccounts = riotAccountService.updateSummoners(
+			request.toServiceRequest());
+		stompService.createOrUpdateUser(riotAccounts);
+		return CommonResponse.success(SUCCESS_UPDATE_SUMMONERS, OK);
+	}
 
-    @GetMapping
-    public CommonResponse<RecommendedSummonersResponse> getRecommendedSummoners(
-        @ModelAttribute @Valid RecommendedSummonersRequest request
-    ) {
-        RecommendedSummonersServiceResponse response = riotAccountService.getRecommendedSummoners(
-            request.toServiceRequest());
-        return CommonResponse.success(RecommendedSummonersResponse.from(response));
-    }
+	@GetMapping
+	public CommonResponse<RecommendedSummonersResponse> getRecommendedSummoners(
+		@ModelAttribute @Valid RecommendedSummonersRequest request
+	) {
+		RecommendedSummonersServiceResponse response = riotAccountService.getRecommendedSummoners(
+			request.toServiceRequest());
+		return CommonResponse.success(RecommendedSummonersResponse.from(response));
+	}
 
-    @GetMapping("/main")
-    public CommonResponse<RecommendedSummonersResponse> getMainSummoners(
-        @RequestParam("game-mode") GameMode gameMode
-    ) {
-        RecommendedSummonersServiceResponse response = riotAccountService.getMainSummoners(
-            gameMode);
-        return CommonResponse.success(RecommendedSummonersResponse.from(response));
-    }
+	@GetMapping("/main")
+	public CommonResponse<RecommendedSummonersResponse> getMainSummoners(
+		@RequestParam("game-mode") GameMode gameMode
+	) {
+		RecommendedSummonersServiceResponse response = riotAccountService.getMainSummoners(
+			gameMode);
+		return CommonResponse.success(RecommendedSummonersResponse.from(response));
+	}
 
-    @GetMapping("/recently")
-    public CommonResponse<RecentlySummonersResponse> getRecentlySummoners() {
-        Member member = MemberThreadLocal.get();
-        List<Long> chattedMemberIds = stompService.getChattedMemberIds(
-            userService.getUser(member.getId()));
-        RecentlySummonersServiceResponse response = riotAccountService
-            .getRecentlySummoners(member, chattedMemberIds);
-        return CommonResponse.success(RecentlySummonersResponse.from(response));
-    }
+	@GetMapping("/recently")
+	public CommonResponse<RecentlySummonersResponse> getRecentlySummoners() {
+		Member member = MemberThreadLocal.get();
+		List<Long> chattedMemberIds = stompService.getChattedMemberIds(
+			userService.getUser(member.getId()));
+		RecentlySummonersServiceResponse response = riotAccountService
+			.getRecentlySummoners(member, chattedMemberIds);
+		return CommonResponse.success(RecentlySummonersResponse.from(response));
+	}
 }

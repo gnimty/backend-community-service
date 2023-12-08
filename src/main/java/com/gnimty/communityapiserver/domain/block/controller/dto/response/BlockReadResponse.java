@@ -9,11 +9,11 @@ import lombok.Getter;
 @Getter
 public class BlockReadResponse {
 
-    private final List<BlockEntry> blocks;
+	private final List<BlockEntry> blocks;
 
-    public static BlockReadResponse from(BlockReadServiceResponse response) {
-        return BlockReadResponse.builder()
-            .blocks(response.getBlocks())
-            .build();
-    }
+	public static BlockReadResponse from(BlockReadServiceResponse response) {
+		return BlockReadResponse.builder()
+			.blocks(response.getBlocks())
+			.build();
+	}
 }

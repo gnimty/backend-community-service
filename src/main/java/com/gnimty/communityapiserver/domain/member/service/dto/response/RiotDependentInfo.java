@@ -10,10 +10,10 @@ import lombok.Getter;
 @Getter
 public class RiotDependentInfo {
 
-    private Boolean isLinked;
-    private Status status;
-    private List<IntroductionEntry> introductions;
-    private List<ScheduleEntry> schedules;
-    private List<PreferGameModeEntry> preferGameModes;
-    private List<RiotAccountEntry> riotAccounts;
+	private Boolean isLinked;
+	private Status status;
+	private List<IntroductionEntry> introductions;
+	private List<ScheduleEntry> schedules;
+	private List<PreferGameModeEntry> preferGameModes;
+	private List<RiotAccountEntry> riotAccounts;
 }

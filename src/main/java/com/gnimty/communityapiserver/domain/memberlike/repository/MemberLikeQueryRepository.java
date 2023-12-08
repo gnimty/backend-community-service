@@ -11,14 +11,14 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class MemberLikeQueryRepository {
 
-    private final JPAQueryFactory queryFactory;
+	private final JPAQueryFactory queryFactory;
 
-    public Boolean existsBySourceMemberAndTargetMember(Member source, Member target) {
-        return queryFactory
-            .selectOne()
-            .from(memberLike)
-            .where(memberLike.sourceMember.id.eq(source.getId())
-                .and(memberLike.targetMember.id.eq(target.getId())))
-            .fetchFirst() != null;
-    }
+	public Boolean existsBySourceMemberAndTargetMember(Member source, Member target) {
+		return queryFactory
+			.selectOne()
+			.from(memberLike)
+			.where(memberLike.sourceMember.id.eq(source.getId())
+				.and(memberLike.targetMember.id.eq(target.getId())))
+			.fetchFirst() != null;
+	}
 }

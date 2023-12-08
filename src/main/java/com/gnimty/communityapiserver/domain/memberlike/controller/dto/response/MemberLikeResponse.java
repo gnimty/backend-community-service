@@ -7,5 +7,5 @@ import lombok.Getter;
 @Builder
 public class MemberLikeResponse {
 
-    private Long upCount;
+	private Long upCount;
 }

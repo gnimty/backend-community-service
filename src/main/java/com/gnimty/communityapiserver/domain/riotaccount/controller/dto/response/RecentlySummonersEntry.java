@@ -10,40 +10,40 @@ import lombok.Data;
 @Builder
 public class RecentlySummonersEntry {
 
-    private Long memberId;
-    private Long iconId;
-    private String name;
-    private String tagLine;
-    private Tier tier;
-    private Integer division;
-    private Long lp;
-    private Integer totalPlay;
-    private Integer totalWin;
-    private Integer totalDefeat;
-    private Double winRate;
-    private Long frequentChampionId1;
-    private Long frequentChampionId2;
-    private Long frequentChampionId3;
+	private Long memberId;
+	private Long iconId;
+	private String name;
+	private String tagLine;
+	private Tier tier;
+	private Integer division;
+	private Long lp;
+	private Integer totalPlay;
+	private Integer totalWin;
+	private Integer totalDefeat;
+	private Double winRate;
+	private Long frequentChampionId1;
+	private Long frequentChampionId2;
+	private Long frequentChampionId3;
 
-    public static RecentlySummonersEntry of(
-        RecentMemberDto recentMemberDto,
-        RiotAccount matchingRiotAccount
-    ) {
-        return RecentlySummonersEntry.builder()
-            .memberId(matchingRiotAccount.getMember().getId())
-            .iconId(matchingRiotAccount.getIconId())
-            .name(matchingRiotAccount.getName())
-            .tagLine(matchingRiotAccount.getTagLine())
-            .tier(matchingRiotAccount.getQueue())
-            .division(matchingRiotAccount.getDivision())
-            .lp(matchingRiotAccount.getLp())
-            .totalPlay(recentMemberDto.getTotalPlay())
-            .totalWin(recentMemberDto.getTotalWin())
-            .totalDefeat(recentMemberDto.getTotalDefeat())
-            .winRate(recentMemberDto.getWinRate())
-            .frequentChampionId1(matchingRiotAccount.getFrequentChampionId1())
-            .frequentChampionId2(matchingRiotAccount.getFrequentChampionId2())
-            .frequentChampionId3(matchingRiotAccount.getFrequentChampionId3())
-            .build();
-    }
+	public static RecentlySummonersEntry of(
+		RecentMemberDto recentMemberDto,
+		RiotAccount matchingRiotAccount
+	) {
+		return RecentlySummonersEntry.builder()
+			.memberId(matchingRiotAccount.getMember().getId())
+			.iconId(matchingRiotAccount.getIconId())
+			.name(matchingRiotAccount.getName())
+			.tagLine(matchingRiotAccount.getTagLine())
+			.tier(matchingRiotAccount.getQueue())
+			.division(matchingRiotAccount.getDivision())
+			.lp(matchingRiotAccount.getLp())
+			.totalPlay(recentMemberDto.getTotalPlay())
+			.totalWin(recentMemberDto.getTotalWin())
+			.totalDefeat(recentMemberDto.getTotalDefeat())
+			.winRate(recentMemberDto.getWinRate())
+			.frequentChampionId1(matchingRiotAccount.getFrequentChampionId1())
+			.frequentChampionId2(matchingRiotAccount.getFrequentChampionId2())
+			.frequentChampionId3(matchingRiotAccount.getFrequentChampionId3())
+			.build();
+	}
 }

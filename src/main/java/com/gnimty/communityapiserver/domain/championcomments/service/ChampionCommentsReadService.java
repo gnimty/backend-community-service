@@ -17,20 +17,20 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class ChampionCommentsReadService {
 
-    private final ChampionCommentsRepository championCommentsRepository;
-    private final ChampionCommentsQueryRepository championCommentsQueryRepository;
+	private final ChampionCommentsRepository championCommentsRepository;
+	private final ChampionCommentsQueryRepository championCommentsQueryRepository;
 
-    public ChampionComments findById(Long id) {
-        return championCommentsRepository.findById(id)
-            .orElseThrow(() -> new BaseException(ErrorCode.CHAMPION_COMMENTS_NOT_FOUND));
-    }
+	public ChampionComments findById(Long id) {
+		return championCommentsRepository.findById(id)
+			.orElseThrow(() -> new BaseException(ErrorCode.CHAMPION_COMMENTS_NOT_FOUND));
+	}
 
-    public ChampionCommentsServiceResponse findByChampionId(Long championId) {
-        List<ChampionCommentsEntry> contents = championCommentsQueryRepository
-            .findByChampionId(championId);
-        return ChampionCommentsServiceResponse.builder()
-            .championComments(contents)
-            .build();
+	public ChampionCommentsServiceResponse findByChampionId(Long championId) {
+		List<ChampionCommentsEntry> contents = championCommentsQueryRepository
+			.findByChampionId(championId);
+		return ChampionCommentsServiceResponse.builder()
+			.championComments(contents)
+			.build();
 
-    }
+	}
 }

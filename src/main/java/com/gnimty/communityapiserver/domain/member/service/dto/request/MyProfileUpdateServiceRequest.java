@@ -10,7 +10,7 @@ import lombok.Getter;
 @Getter
 public class MyProfileUpdateServiceRequest {
 
-    private Long mainRiotAccountId;
-    private Status status;
-    private List<IntroductionEntry> introductions;
+	private Long mainRiotAccountId;
+	private Status status;
+	private List<IntroductionEntry> introductions;
 }

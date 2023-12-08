@@ -7,6 +7,6 @@ import lombok.Getter;
 @Getter
 public class MemberLikeServiceRequest {
 
-    private Long targetMemberId;
-    private Boolean cancel;
+	private Long targetMemberId;
+	private Boolean cancel;
 }

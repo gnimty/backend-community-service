@@ -11,12 +11,12 @@ import org.springframework.data.repository.query.Param;
 
 public interface MemberLikeRepository extends JpaRepository<MemberLike, Long> {
 
-    Optional<MemberLike> findBySourceMemberAndTargetMember(Member sourceMember,
-        Member targetMember);
+	Optional<MemberLike> findBySourceMemberAndTargetMember(Member sourceMember,
+		Member targetMember);
 
-    List<MemberLike> findBySourceMember(Member sourceMember);
+	List<MemberLike> findBySourceMember(Member sourceMember);
 
-    @Query("delete from MemberLike ml where ml.sourceMember.id = :id or ml.targetMember.id = :id")
-    @Modifying
-    void deleteAllFromMember(@Param("id") Long id);
+	@Query("delete from MemberLike ml where ml.sourceMember.id = :id or ml.targetMember.id = :id")
+	@Modifying
+	void deleteAllFromMember(@Param("id") Long id);
 }

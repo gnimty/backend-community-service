@@ -13,17 +13,17 @@ import lombok.Getter;
 @Getter
 public class RecommendedSummonersServiceRequest {
 
-    private GameMode gameMode;
-    private Tier tier;
-    private Status status;
-    private List<Lane> lanes;
-    private List<Long> preferChampionIds;
-    private Boolean duoable;
-    private Boolean timeMatch;
-    private SortBy sortBy;
-    private Long lastSummonerId;
-    private String lastName;
-    private Long lastSummonerMmr;
-    private Long lastSummonerUpCount;
-    private Integer pageSize;
+	private GameMode gameMode;
+	private Tier tier;
+	private Status status;
+	private List<Lane> lanes;
+	private List<Long> preferChampionIds;
+	private Boolean duoable;
+	private Boolean timeMatch;
+	private SortBy sortBy;
+	private Long lastSummonerId;
+	private String lastName;
+	private Long lastSummonerMmr;
+	private Long lastSummonerUpCount;
+	private Integer pageSize;
 }

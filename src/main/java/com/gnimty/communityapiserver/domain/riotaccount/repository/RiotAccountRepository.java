@@ -11,18 +11,18 @@ import org.springframework.data.repository.query.Param;
 
 public interface RiotAccountRepository extends JpaRepository<RiotAccount, Long> {
 
-    List<RiotAccount> findByMember(Member member);
+	List<RiotAccount> findByMember(Member member);
 
-    Optional<RiotAccount> findByMemberAndIsMain(Member member, Boolean isMain);
+	Optional<RiotAccount> findByMemberAndIsMain(Member member, Boolean isMain);
 
-    @Query("SELECT ra FROM RiotAccount ra WHERE ra.puuid IN :puuids")
-    List<RiotAccount> findByPuuids(List<String> puuids);
+	@Query("SELECT ra FROM RiotAccount ra WHERE ra.puuid IN :puuids")
+	List<RiotAccount> findByPuuids(List<String> puuids);
 
-    Optional<RiotAccount> findByPuuid(String puuid);
+	Optional<RiotAccount> findByPuuid(String puuid);
 
-    @Query("delete from RiotAccount r where r.member.id = :id")
-    @Modifying
-    void deleteAllFromMember(@Param("id") Long id);
+	@Query("delete from RiotAccount r where r.member.id = :id")
+	@Modifying
+	void deleteAllFromMember(@Param("id") Long id);
 
-    Optional<RiotAccount> findByMemberIdAndIsMain(Long memberId, Boolean isMain);
+	Optional<RiotAccount> findByMemberIdAndIsMain(Long memberId, Boolean isMain);
 }

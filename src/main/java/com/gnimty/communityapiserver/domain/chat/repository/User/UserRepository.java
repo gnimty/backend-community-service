@@ -7,8 +7,8 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface UserRepository extends MongoRepository<User, Long>, UserRepositoryCustom {
 
-    Optional<User> findByActualUserId(Long actualUserId);
+	Optional<User> findByActualUserId(Long actualUserId);
 
-    List<User> findAll();
+	List<User> findAll();
 
 }

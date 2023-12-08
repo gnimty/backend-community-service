@@ -9,6 +9,6 @@ import lombok.Data;
 @Data
 public class UserWithBlockDto {
 
-    private User user;
-    private Blocked status;
+	private User user;
+	private Blocked status;
 }

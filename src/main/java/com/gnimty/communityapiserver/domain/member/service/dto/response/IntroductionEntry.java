@@ -11,20 +11,20 @@ import lombok.Getter;
 @Getter
 public class IntroductionEntry {
 
-    private Long id;
+	private Long id;
 
-    @NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
-    @Size(max = 90, message = ErrorMessage.INVALID_INPUT_VALUE)
-    private String content;
+	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+	@Size(max = 90, message = ErrorMessage.INVALID_INPUT_VALUE)
+	private String content;
 
-    @NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
-    private Boolean isMain;
+	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+	private Boolean isMain;
 
-    public static IntroductionEntry from(Introduction introduction) {
-        return IntroductionEntry.builder()
-            .id(introduction.getId())
-            .content(introduction.getContent())
-            .isMain(introduction.getIsMain())
-            .build();
-    }
+	public static IntroductionEntry from(Introduction introduction) {
+		return IntroductionEntry.builder()
+			.id(introduction.getId())
+			.content(introduction.getContent())
+			.isMain(introduction.getIsMain())
+			.build();
+	}
 }

@@ -19,50 +19,50 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class UserService {
 
-    private final UserRepository userRepository;
+	private final UserRepository userRepository;
 
-    public List<User> findAllUser() {
-        return userRepository.findAll();
-    }
+	public List<User> findAllUser() {
+		return userRepository.findAll();
+	}
 
-    public Optional<User> findUser(Long actualUserId) {
-        return userRepository.findByActualUserId(actualUserId);
-    }
+	public Optional<User> findUser(Long actualUserId) {
+		return userRepository.findByActualUserId(actualUserId);
+	}
 
-    public User getUser(Long actualUserId) {
-        return findUser(actualUserId)
-            .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_USER));
-    }
+	public User getUser(Long actualUserId) {
+		return findUser(actualUserId)
+			.orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_USER));
+	}
 
-    public User getUserByMember(Member member) {
-        return findUser(member.getId())
-            .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_USER));
-    }
+	public User getUserByMember(Member member) {
+		return findUser(member.getId())
+			.orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_USER));
+	}
 
-    public User save(RiotAccount riotAccount) {
-        return userRepository.findByActualUserId(riotAccount.getMember().getId())
-            .map(user -> {
-                user.updateByRiotAccount(riotAccount);
-                return userRepository.save(user);
-            })
-            .orElseGet(() -> userRepository.save(User.toUser(riotAccount)));
-    }
+	public User save(RiotAccount riotAccount) {
+		return userRepository.findByActualUserId(riotAccount.getMember().getId())
+			.map(user -> {
+				user.updateByRiotAccount(riotAccount);
+				return userRepository.save(user);
+			})
+			.orElseGet(() -> userRepository.save(User.toUser(riotAccount)));
+	}
 
 
-    public User save(User user) {
-        return userRepository.findByActualUserId(user.getActualUserId())
-            .map(existingUser -> {
-                existingUser.updateByUser(user);
-                return userRepository.save(existingUser);
-            })
-            .orElseGet(() -> userRepository.save(user));
-    }
+	public User save(User user) {
+		return userRepository.findByActualUserId(user.getActualUserId())
+			.map(existingUser -> {
+				existingUser.updateByUser(user);
+				return userRepository.save(existingUser);
+			})
+			.orElseGet(() -> userRepository.save(user));
+	}
 
-    public BulkWriteResult updateMany(List<User> users) {
-        return userRepository.bulkUpdate(users);
-    }
+	public BulkWriteResult updateMany(List<User> users) {
+		return userRepository.bulkUpdate(users);
+	}
 
-    public void delete(User user) {
-        userRepository.delete(user);
-    }
+	public void delete(User user) {
+		userRepository.delete(user);
+	}
 }

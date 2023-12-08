@@ -7,15 +7,15 @@ import java.util.stream.Stream;
 
 public enum SortBy {
 
-    RECOMMEND,
-    TIER,
-    ATOZ;
+	RECOMMEND,
+	TIER,
+	ATOZ;
 
-    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
-    public static SortBy findByInput(String input) {
-        return Stream.of(SortBy.values())
-            .filter(c -> c.name().equals(input))
-            .findFirst()
-            .orElseThrow(() -> new BaseException(ErrorCode.INVALID_ENUM_VALUE));
-    }
+	@JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+	public static SortBy findByInput(String input) {
+		return Stream.of(SortBy.values())
+			.filter(c -> c.name().equals(input))
+			.findFirst()
+			.orElseThrow(() -> new BaseException(ErrorCode.INVALID_ENUM_VALUE));
+	}
 }
