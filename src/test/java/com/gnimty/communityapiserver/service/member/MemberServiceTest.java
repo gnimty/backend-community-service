@@ -22,17 +22,15 @@ import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.domain.member.repository.MemberRepository;
 import com.gnimty.communityapiserver.domain.member.service.MemberReadService;
 import com.gnimty.communityapiserver.domain.member.service.MemberService;
-import com.gnimty.communityapiserver.domain.member.service.dto.request.MyProfileUpdateServiceRequest;
+import com.gnimty.communityapiserver.domain.member.service.dto.request.MyProfileUpdateMainServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.OauthLoginServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.PasswordEmailVerifyServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.PasswordResetServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.PasswordUpdateServiceRequest;
-import com.gnimty.communityapiserver.domain.member.service.dto.request.PreferGameModeUpdateServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.SendEmailServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.IntroductionEntry;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.MyProfileServiceResponse;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.PasswordEmailVerifyServiceResponse;
-import com.gnimty.communityapiserver.domain.member.service.dto.response.PreferGameModeEntry;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.RiotAccountEntry;
 import com.gnimty.communityapiserver.domain.member.service.utils.GoogleOauthUtil;
 import com.gnimty.communityapiserver.domain.member.service.utils.KakaoOauthUtil;
@@ -398,7 +396,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 
 	@DisplayName("회원 정보 변경 시")
 	@Nested
-	class UpdateMyProfile {
+	class UpdateMyProfileMain {
 
 		private Member member;
 
@@ -428,7 +426,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 				createRiotAccount(member, "name1", "puuid1", true),
 				createRiotAccount(member, "name2", "puuid2", false)
 			));
-			MyProfileUpdateServiceRequest request = MyProfileUpdateServiceRequest.builder()
+			MyProfileUpdateMainServiceRequest request = MyProfileUpdateMainServiceRequest.builder()
 				.mainRiotAccountId(riotAccounts.get(1).getId())
 				.build();
 
@@ -439,7 +437,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 				.willReturn(riotAccounts.get(1));
 
 			// when
-			memberService.updateMyProfile(request);
+			memberService.updateMyProfileMain(request);
 
 			// then
 			assertThat(riotAccounts.get(0).getIsMain()).isFalse();
@@ -450,12 +448,12 @@ public class MemberServiceTest extends ServiceTestSupport {
 		@Test
 		void should_success_when_validStatus() {
 			// given
-			MyProfileUpdateServiceRequest request = MyProfileUpdateServiceRequest.builder()
+			MyProfileUpdateMainServiceRequest request = MyProfileUpdateMainServiceRequest.builder()
 				.status(Status.OFFLINE)
 				.build();
 
 			// when
-			memberService.updateMyProfile(request);
+			memberService.updateMyProfileMain(request);
 
 			// then
 			assertThat(member.getStatus()).isEqualTo(request.getStatus());
@@ -486,7 +484,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 					.build()
 			);
 
-			MyProfileUpdateServiceRequest request = MyProfileUpdateServiceRequest.builder()
+			MyProfileUpdateMainServiceRequest request = MyProfileUpdateMainServiceRequest.builder()
 				.introductions(introductionEntries)
 				.build();
 
@@ -500,7 +498,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 				.throwIfNotExistsOrExceedMain(any(Member.class));
 
 			// when
-			memberService.updateMyProfile(request);
+			memberService.updateMyProfileMain(request);
 
 			// then
 			Optional<Introduction> insertedIntroduction = introductionRepository.findByMember(
@@ -527,7 +525,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 			BaseException exception = new BaseException(ErrorCode.NOT_LINKED_RSO);
 
 			// when & then
-			assertThatThrownBy(() -> memberService.updateMyProfile(null))
+			assertThatThrownBy(() -> memberService.updateMyProfileMain(null))
 				.isInstanceOf(exception.getClass())
 				.hasMessage(exception.getMessage());
 		}
@@ -541,7 +539,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 			RiotAccount riotAccount = riotAccountRepository.save(
 				createRiotAccount(newMember, "name", "puuid", true));
 			RiotAccount newRiotAccount = createRiotAccount(newMember, "name2", "puuid2", true);
-			MyProfileUpdateServiceRequest request = MyProfileUpdateServiceRequest.builder()
+			MyProfileUpdateMainServiceRequest request = MyProfileUpdateMainServiceRequest.builder()
 				.mainRiotAccountId(100000000L)
 				.build();
 			BaseException exception = new BaseException(ErrorCode.NO_PERMISSION);
@@ -553,7 +551,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 				.willReturn(newRiotAccount);
 
 			// when & then
-			assertThatThrownBy(() -> memberService.updateMyProfile(request))
+			assertThatThrownBy(() -> memberService.updateMyProfileMain(request))
 				.isInstanceOf(exception.getClass())
 				.hasMessage(exception.getMessage());
 		}
@@ -562,7 +560,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 		@Test
 		void should_returnNoPermission_when_notIsMyselfIntroduction() {
 			// given
-			MyProfileUpdateServiceRequest request = MyProfileUpdateServiceRequest.builder()
+			MyProfileUpdateMainServiceRequest request = MyProfileUpdateMainServiceRequest.builder()
 				.introductions(List.of(
 					IntroductionEntry.builder()
 						.id(1000000000L)
@@ -579,7 +577,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 				.willReturn(introduction);
 
 			// when & then
-			assertThatThrownBy(() -> memberService.updateMyProfile(request))
+			assertThatThrownBy(() -> memberService.updateMyProfileMain(request))
 				.isInstanceOf(exception.getClass())
 				.hasMessage(exception.getMessage());
 		}
@@ -588,7 +586,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 		@Test
 		void should_returnNotFound_when_notExistIntroduction() {
 			// given
-			MyProfileUpdateServiceRequest request = MyProfileUpdateServiceRequest.builder()
+			MyProfileUpdateMainServiceRequest request = MyProfileUpdateMainServiceRequest.builder()
 				.introductions(List.of(
 					IntroductionEntry.builder()
 						.id(1000000000L)
@@ -602,7 +600,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 				.findById(any(Long.class));
 
 			// when & then
-			assertThatThrownBy(() -> memberService.updateMyProfile(request))
+			assertThatThrownBy(() -> memberService.updateMyProfileMain(request))
 				.isInstanceOf(exception.getClass())
 				.hasMessage(exception.getMessage());
 		}
@@ -611,7 +609,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 		@Test
 		void should_fail_when_duplicatedId() {
 			// given
-			MyProfileUpdateServiceRequest request = MyProfileUpdateServiceRequest.builder()
+			MyProfileUpdateMainServiceRequest request = MyProfileUpdateMainServiceRequest.builder()
 				.introductions(List.of(
 					IntroductionEntry.builder()
 						.id(1L)
@@ -629,7 +627,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 				.willReturn(introduction);
 
 			// when & then
-			assertThatThrownBy(() -> memberService.updateMyProfile(request))
+			assertThatThrownBy(() -> memberService.updateMyProfileMain(request))
 				.isInstanceOf(exception.getClass())
 				.hasMessage(exception.getMessage());
 		}
@@ -638,7 +636,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 		@Test
 		void should_fail_when_isMainIsMany() {
 			// given
-			MyProfileUpdateServiceRequest request = MyProfileUpdateServiceRequest.builder()
+			MyProfileUpdateMainServiceRequest request = MyProfileUpdateMainServiceRequest.builder()
 				.introductions(List.of(
 					IntroductionEntry.builder()
 						.isMain(true)
@@ -655,7 +653,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 				.willReturn(introduction);
 
 			// when & then
-			assertThatThrownBy(() -> memberService.updateMyProfile(request))
+			assertThatThrownBy(() -> memberService.updateMyProfileMain(request))
 				.isInstanceOf(exception.getClass())
 				.hasMessage(exception.getMessage());
 		}
@@ -666,7 +664,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 			// given
 			Introduction introduction = introductionRepository.save(
 				createIntroduction(member, true));
-			MyProfileUpdateServiceRequest request = MyProfileUpdateServiceRequest.builder()
+			MyProfileUpdateMainServiceRequest request = MyProfileUpdateMainServiceRequest.builder()
 				.introductions(List.of(
 					IntroductionEntry.builder()
 						.isMain(true)
@@ -683,7 +681,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 				.willReturn(mockIntroductions);
 
 			// when & then
-			assertThatThrownBy(() -> memberService.updateMyProfile(request))
+			assertThatThrownBy(() -> memberService.updateMyProfileMain(request))
 				.isInstanceOf(exception.getClass())
 				.hasMessage(exception.getMessage());
 		}
@@ -696,7 +694,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 				createIntroduction(member, true),
 				createIntroduction(member, false)
 			));
-			MyProfileUpdateServiceRequest request = MyProfileUpdateServiceRequest.builder()
+			MyProfileUpdateMainServiceRequest request = MyProfileUpdateMainServiceRequest.builder()
 				.introductions(List.of(
 					IntroductionEntry.builder()
 						.id(introductions.get(1).getId())
@@ -713,7 +711,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 				.throwIfNotExistsOrExceedMain(any(Member.class));
 
 			// when & then
-			assertThatThrownBy(() -> memberService.updateMyProfile(request))
+			assertThatThrownBy(() -> memberService.updateMyProfileMain(request))
 				.isInstanceOf(exception.getClass())
 				.hasMessage(exception.getMessage());
 		}
@@ -1039,76 +1037,6 @@ public class MemberServiceTest extends ServiceTestSupport {
 			then(passwordEncoder)
 				.should(times(1))
 				.matches(any(CharSequence.class), any(String.class));
-		}
-	}
-
-	@DisplayName("선호 게임 타입 변경 시")
-	@Nested
-	class UpdatePreferGameMode {
-
-		private Member member;
-
-		@BeforeEach
-		void setUp() {
-			member = memberRepository.save(
-				createMemberByEmailAndNickname("email@email.com", "nickname"));
-			MemberThreadLocal.set(member);
-		}
-
-		@AfterEach
-		void tearDown() {
-			preferGameModeRepository.deleteAllInBatch();
-			memberRepository.deleteAllInBatch();
-			MemberThreadLocal.remove();
-		}
-
-		@DisplayName("rso에 연동돼있으면 성공한다.")
-		@Test
-		void should_success_when_linkedRso() {
-			// given
-			preferGameModeRepository.save(createPreferGameMode(member));
-			PreferGameModeUpdateServiceRequest request = createRequest();
-
-			// when
-			memberService.updatePreferGameMode(request);
-
-			// then
-			List<PreferGameMode> findPreferGameMode = preferGameModeRepository.findByMember(member);
-			assertThat(findPreferGameMode).doesNotHaveDuplicates();
-			assertThat(findPreferGameMode).hasSize(2);
-			List<GameMode> gameModes = findPreferGameMode.stream()
-				.map(PreferGameMode::getGameMode)
-				.toList();
-			assertThat(gameModes).contains(
-				request.getPreferGameModes().get(0).getGameMode(),
-				request.getPreferGameModes().get(1).getGameMode());
-		}
-
-		@DisplayName("rso에 연동돼있지 않으면 실패한다.")
-		@Test
-		void should_fail_when_notLinkedRso() {
-
-			// given
-			PreferGameModeUpdateServiceRequest request = createRequest();
-			BaseException exception = new BaseException(ErrorCode.NOT_LINKED_RSO);
-			member.updateRsoLinked(false);
-
-			// when & then
-			assertThatThrownBy(() -> memberService.updatePreferGameMode(request))
-				.isInstanceOf(exception.getClass())
-				.hasMessage(exception.getMessage());
-		}
-
-		private PreferGameModeUpdateServiceRequest createRequest() {
-			return PreferGameModeUpdateServiceRequest.builder()
-				.preferGameModes(List.of(
-					PreferGameModeEntry.builder()
-						.gameMode(GameMode.RANK_SOLO)
-						.build(),
-					PreferGameModeEntry.builder()
-						.gameMode(GameMode.RANK_FLEX)
-						.build()))
-				.build();
 		}
 	}
 

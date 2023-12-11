@@ -34,9 +34,7 @@ public class ChampionCommentsController {
 	private final ChampionCommentsReadService championCommentsReadService;
 
 	@GetMapping
-	public CommonResponse<ChampionCommentsResponse> readChampionComments(
-		@PathVariable("champion_id") Long championId
-	) {
+	public CommonResponse<ChampionCommentsResponse> readChampionComments(@PathVariable("champion_id") Long championId) {
 		ChampionCommentsServiceResponse response = championCommentsReadService
 			.findByChampionId(championId);
 		return CommonResponse.success(ChampionCommentsResponse.of(response));

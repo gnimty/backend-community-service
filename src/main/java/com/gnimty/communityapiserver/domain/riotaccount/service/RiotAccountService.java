@@ -44,9 +44,7 @@ public class RiotAccountService {
 		return existRiotAccounts;
 	}
 
-	public RecommendedSummonersServiceResponse getRecommendedSummoners(
-		RecommendedSummonersServiceRequest request
-	) {
+	public RecommendedSummonersServiceResponse getRecommendedSummoners(RecommendedSummonersServiceRequest request) {
 		Member member = MemberThreadLocal.get();
 		RiotAccount mainRiotAccount = riotAccountReadService.findMainAccountByMember(member);
 		List<Schedule> schedules = scheduleReadService.findByMember(member);
@@ -58,10 +56,7 @@ public class RiotAccountService {
 		return riotAccountReadService.getMainSummoners(member, gameMode);
 	}
 
-	public RecentlySummonersServiceResponse getRecentlySummoners(
-		Member member,
-		List<Long> chattedMemberIds
-	) {
+	public RecentlySummonersServiceResponse getRecentlySummoners(Member member, List<Long> chattedMemberIds) {
 		RiotAccount riotAccount = riotAccountReadService.findMainAccountByMember(member);
 		RecentMemberInfo recentMemberInfo = getRecentMemberInfo(riotAccount.getInternalTagName());
 		List<RiotAccount> chattedRiotAccounts = getChattedRiotAccounts(chattedMemberIds);
@@ -83,7 +78,8 @@ public class RiotAccountService {
 
 	private List<RecentlySummonersEntry> createMatchingRecentlySummoners(
 		RecentMemberInfo recentMemberInfo,
-		Map<String, RiotAccount> riotAccountMap) {
+		Map<String, RiotAccount> riotAccountMap
+	) {
 		return recentMemberInfo.getRecentMembers()
 			.stream()
 			.filter(rm -> riotAccountMap.containsKey(rm.getPuuid()))
@@ -100,10 +96,7 @@ public class RiotAccountService {
 			.block();
 	}
 
-	private Map<String, RiotAccount> createRiotAccountMap(
-		Member member,
-		List<RiotAccount> chattedRiotAccounts
-	) {
+	private Map<String, RiotAccount> createRiotAccountMap(Member member, List<RiotAccount> chattedRiotAccounts) {
 		return chattedRiotAccounts.stream()
 			.filter(riotAccount -> !memberLikeReadService
 				.existsBySourceAndTarget(member, riotAccount.getMember()))

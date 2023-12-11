@@ -146,8 +146,10 @@ public class StompService {
 
 
 	public void createOrUpdateUser(List<RiotAccount> accounts) {
-		List<User> users = accounts.stream().map(User::toUser).toList();
-		BulkWriteResult bulkWriteResult = userService.updateMany(users);
+		if (!accounts.isEmpty()) {
+			List<User> users = accounts.stream().map(User::toUser).toList();
+			BulkWriteResult bulkWriteResult = userService.updateMany(users);
+		}
 	}
 
 	// TODO so1omon : 특정 유저와 채팅을 나눈 member id list 넘기기

@@ -10,15 +10,13 @@ import com.gnimty.communityapiserver.domain.introduction.repository.Introduction
 import com.gnimty.communityapiserver.domain.introduction.service.IntroductionReadService;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.domain.member.repository.MemberRepository;
-import com.gnimty.communityapiserver.domain.member.service.dto.request.IntroductionUpdateServiceRequest;
+import com.gnimty.communityapiserver.domain.member.service.dto.request.MyProfileUpdateMainServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.MyProfileUpdateServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.OauthLoginServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.PasswordEmailVerifyServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.PasswordResetServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.PasswordUpdateServiceRequest;
-import com.gnimty.communityapiserver.domain.member.service.dto.request.PreferGameModeUpdateServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.SendEmailServiceRequest;
-import com.gnimty.communityapiserver.domain.member.service.dto.request.StatusUpdateServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.IntroductionEntry;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.MyProfileServiceResponse;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.OauthInfoEntry;
@@ -150,25 +148,16 @@ public class MemberService {
 			.map(OauthInfoEntry::from)
 			.toList();
 
-		return MyProfileServiceResponse.builder()
-			.id(member.getId())
-			.email(member.getEmail())
-			.nickname(member.getNickname())
-			.favoriteChampionId(member.getFavoriteChampionID())
-			.upCount(member.getUpCount())
-			.riotDependentInfo(riotDependentInfo)
-			.oauthInfos(oauthInfoEntries)
-			.build();
+		return getMyProfileServiceResponse(member, riotDependentInfo, oauthInfoEntries);
 	}
 
-	public RiotAccount updateMyProfile(MyProfileUpdateServiceRequest request) {
+	public RiotAccount updateMyProfileMain(MyProfileUpdateMainServiceRequest request) {
 		Member member = MemberThreadLocal.get();
 		if (!member.getRsoLinked()) {
 			throw new BaseException(ErrorCode.NOT_LINKED_RSO);
 		}
-
 		RiotAccount riotAccount = updateMainRiotAccount(request, member);
-		updateStatus(request.getStatus(), member);
+		updateStatus(request.getStatus());
 		updateIntroductions(request.getIntroductions(), member);
 		memberRepository.save(member);
 		return riotAccount;
@@ -188,13 +177,10 @@ public class MemberService {
 		saveInRedis(key, code, Auth.EMAIL_CODE_EXPIRATION.getExpiration());
 	}
 
-	public PasswordEmailVerifyServiceResponse verifyEmailAuthCode(
-		PasswordEmailVerifyServiceRequest request) {
+	public PasswordEmailVerifyServiceResponse verifyEmailAuthCode(PasswordEmailVerifyServiceRequest request) {
 		ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
-
 		String emailAuthKey = getRedisKey(PASSWORD, request.getEmail());
 		String savedCode = valueOperations.get(emailAuthKey);
-
 		if (!request.getCode().equals(savedCode)) {
 			throw new BaseException(ErrorCode.INVALID_EMAIL_AUTH_CODE);
 		}
@@ -233,30 +219,30 @@ public class MemberService {
 		memberRepository.save(member);
 	}
 
-	public void updateStatus(StatusUpdateServiceRequest request) {
+	public void updateMyProfile(MyProfileUpdateServiceRequest request) {
 		Member member = MemberThreadLocal.get();
 		if (!member.getRsoLinked()) {
 			throw new BaseException(ErrorCode.NOT_LINKED_RSO);
 		}
-		updateStatus(request.getStatus(), member);
+		updateStatus(request.getStatus());
+		updateIntroductions(request.getIntroductions(), member);
+		updatePreferGameMode(request.getPreferGameModes());
+		updateSchedules(request.getSchedules());
+	}
+
+	public void updateStatus(Status status) {
+		Member member = MemberThreadLocal.get();
+		member.updateStatus(status);
 		memberRepository.save(member);
 	}
 
-	public void updateIntroduction(IntroductionUpdateServiceRequest request) {
-		Member member = MemberThreadLocal.get();
-		if (!member.getRsoLinked()) {
-			throw new BaseException(ErrorCode.NOT_LINKED_RSO);
+	private void updatePreferGameMode(List<PreferGameModeEntry> preferGameModes) {
+		if (preferGameModes == null) {
+			return;
 		}
-		updateIntroductions(request.getIntroductions(), member);
-	}
-
-	public void updatePreferGameMode(PreferGameModeUpdateServiceRequest request) {
 		Member member = MemberThreadLocal.get();
-		if (!member.getRsoLinked()) {
-			throw new BaseException(ErrorCode.NOT_LINKED_RSO);
-		}
 		preferGameModeRepository.deleteByMember(member);
-		request.getPreferGameModes().stream()
+		preferGameModes.stream()
 			.map(entry -> createPreferGameMode(entry, member))
 			.forEach(preferGameModeRepository::save);
 	}
@@ -359,19 +345,31 @@ public class MemberService {
 		}
 	}
 
-	private void updateStatus(Status status, Member member) {
-		if (status != null) {
-			member.updateStatus(status);
+	private void updateSchedules(List<ScheduleEntry> schedules) {
+		if (schedules == null) {
+			return;
 		}
+		Member member = MemberThreadLocal.get();
+		scheduleRepository.deleteByMember(member);
+
+		schedules.stream()
+			.map(entry -> createSchedule(entry, member))
+			.forEach(scheduleRepository::save);
 	}
 
-	private RiotAccount updateMainRiotAccount(MyProfileUpdateServiceRequest request,
-		Member member) {
+	private Schedule createSchedule(ScheduleEntry entry, Member member) {
+		return Schedule.builder()
+			.dayOfWeek(entry.getDayOfWeek())
+			.startTime(entry.getStartTime())
+			.endTime(entry.getEndTime())
+			.member(member)
+			.build();
+	}
+
+	private RiotAccount updateMainRiotAccount(MyProfileUpdateMainServiceRequest request, Member member) {
 		if (request.getMainRiotAccountId() != null) {
-			RiotAccount prevMainAccount = riotAccountReadService.findMainAccountByMember(
-				member);
-			RiotAccount postMainAccount = riotAccountReadService.findById(
-				request.getMainRiotAccountId());
+			RiotAccount prevMainAccount = riotAccountReadService.findMainAccountByMember(member);
+			RiotAccount postMainAccount = riotAccountReadService.findById(request.getMainRiotAccountId());
 			if (!Objects.equals(postMainAccount.getMember().getId(), member.getId())) {
 				throw new BaseException(ErrorCode.NO_PERMISSION);
 			}
@@ -405,6 +403,22 @@ public class MemberService {
 			.build());
 	}
 
+	private MyProfileServiceResponse getMyProfileServiceResponse(
+		Member member,
+		RiotDependentInfo riotDependentInfo,
+		List<OauthInfoEntry> oauthInfoEntries
+	) {
+		return MyProfileServiceResponse.builder()
+			.id(member.getId())
+			.email(member.getEmail())
+			.nickname(member.getNickname())
+			.favoriteChampionId(member.getFavoriteChampionID())
+			.upCount(member.getUpCount())
+			.riotDependentInfo(riotDependentInfo)
+			.oauthInfos(oauthInfoEntries)
+			.build();
+	}
+
 	private String getRedisKey(KeyPrefix prefix, String key) {
 		return prefix.getPrefix() + key;
 	}
@@ -413,11 +427,7 @@ public class MemberService {
 		ValueOperations<String, String> stringValueOperations = redisTemplate.opsForValue();
 
 		stringValueOperations.set(key, value);
-		redisTemplate.expire(
-			key,
-			timeout,
-			TimeUnit.MILLISECONDS
-		);
+		redisTemplate.expire(key, timeout, TimeUnit.MILLISECONDS);
 	}
 
 	private void throwIfAlreadyLinkedProvider(Member member, Provider provider) {

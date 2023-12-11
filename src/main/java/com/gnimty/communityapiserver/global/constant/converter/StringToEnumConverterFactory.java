@@ -12,8 +12,7 @@ public class StringToEnumConverterFactory implements ConverterFactory<String, En
 		return new StringToEnumsConverter<>(targetType);
 	}
 
-	private record StringToEnumsConverter<T extends Enum<?>>(Class<T> enumType) implements
-		Converter<String, T> {
+	private record StringToEnumsConverter<T extends Enum<?>>(Class<T> enumType) implements Converter<String, T> {
 
 		@Override
 		public T convert(String source) {

@@ -25,10 +25,7 @@ public class RecentlySummonersEntry {
 	private Long frequentChampionId2;
 	private Long frequentChampionId3;
 
-	public static RecentlySummonersEntry of(
-		RecentMemberDto recentMemberDto,
-		RiotAccount matchingRiotAccount
-	) {
+	public static RecentlySummonersEntry of(RecentMemberDto recentMemberDto, RiotAccount matchingRiotAccount) {
 		return RecentlySummonersEntry.builder()
 			.memberId(matchingRiotAccount.getMember().getId())
 			.iconId(matchingRiotAccount.getIconId())

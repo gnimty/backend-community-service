@@ -22,10 +22,8 @@ public class TokenAuthInterceptor implements HandlerInterceptor {
 	private final JwtProvider jwtProvider;
 
 	@Override
-	public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
-		Object handler) {
-		if (request.getServletPath().equals("/summoners")
-			&& request.getMethod().equals(HttpMethod.PATCH.toString())) {
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+		if (request.getServletPath().equals("/summoners") && request.getMethod().equals(HttpMethod.PATCH.toString())) {
 			return true;
 		}
 		Optional<String> tokenByHeader = jwtProvider.resolveToken(request);
