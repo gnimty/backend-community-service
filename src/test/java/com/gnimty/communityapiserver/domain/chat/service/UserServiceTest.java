@@ -188,6 +188,33 @@ class UserServiceTest {
 	@Nested
 	class saveUser {
 
+		@DisplayName("RiotAccount로 새로 생성")
+		@Test
+		void createUserByRiotAccount() {
+			// given
+			Member member = new Member(true, "uni@naver.com", "afD23!", 1L, "uni", Status.ONLINE,
+				1L);
+			memberRepository.save(member);
+
+			RiotAccount riotAccount = RiotAccount.builder()
+				.member(member)
+				.name("uni")
+				.internalName("uniInternal")
+				.tagLine("tagLine")
+				.internalTagName("uniInternalTagLine")
+				.puuid("puuid")
+				.build();
+
+			// when
+			userService.save(riotAccount);
+
+			// then
+			Optional<User> optionalUser = userRepository.findByActualUserId(member.getId());
+			assertThat(optionalUser)
+				.isPresent()
+				.satisfies(findUser -> assertThat(findUser.get().getName()).isEqualTo(riotAccount.getName()));
+		}
+
 		@DisplayName("user가 이미 있는 상태에서 riotAccount를 저장하면 기존의 데이터 덮어쓰기")
 		@Test
 		void updateByRiotAccount() {
@@ -229,9 +256,9 @@ class UserServiceTest {
 
 		@DisplayName("user가 이미 있는 상태에서 user를 저장하면 기존의 데이터 덮어쓰기")
 		@Test
-		void updateUser() {
+		void successUpdateUser() {
 			// given
-			userRepository.save(User.builder()
+			User user = User.builder()
 				.actualUserId(1L)
 				.tier(Tier.diamond)
 				.lp(1L)
@@ -240,30 +267,27 @@ class UserServiceTest {
 				.tagLine("tag")
 				.profileIconId(1L)
 				.division(3)
-				.build());
-
-			User changedUser = User.builder()
-				.actualUserId(1L)
-				.tier(Tier.gold)
-				.status(Status.AWAY)
 				.build();
+			userRepository.save(user);
+
+			user.updateStatus(Status.AWAY);
 
 			// when
-			userService.save(changedUser);
+			userService.save(user);
 
 			// then
 			User findUser = userRepository.findByActualUserId(1L).get();
-			assertThat(findUser.getTier()).isEqualTo(Tier.gold);
+			assertThat(findUser.getTier()).isEqualTo(Tier.diamond);
 			assertThat(findUser.getName()).isEqualTo("uni");
+			assertThat(findUser.getStatus()).isEqualTo(Status.AWAY);
 		}
 
-
-		@DisplayName("User로 새로 생성")
+		@DisplayName("user가 없는 상태에서 user를 저장하면 실패")
 		@Test
-		void createUserByUser() {
+		void failUpdateUser() {
 			// given
 			User user = User.builder()
-				.actualUserId(2L)
+				.actualUserId(1L)
 				.tier(Tier.diamond)
 				.lp(1L)
 				.status(Status.ONLINE)
@@ -273,43 +297,14 @@ class UserServiceTest {
 				.division(3)
 				.build();
 
-			// when
-			userService.save(user);
-
-			// then
-			Optional<User> optionalUser = userRepository.findByActualUserId(2L);
-			assertThat(optionalUser).isPresent()
-				.satisfies(findUser -> assertThat(findUser.get()).isEqualTo(user));
-		}
-
-
-		@DisplayName("RiotAccount로 새로 생성")
-		@Test
-		void createUserByRiotAccount() {
-			// given
-			Member member = new Member(true, "uni@naver.com", "afD23!", 1L, "uni", Status.ONLINE,
-				1L);
-			memberRepository.save(member);
-
-			User user = User.builder()
-				.actualUserId(member.getId())
-				.tier(Tier.diamond)
-				.lp(1L)
-				.status(Status.ONLINE)
-				.name("uni")
-				.tagLine("tag")
-				.profileIconId(1L)
-				.division(3)
-				.build();
-
-			// when
-			userService.save(user);
-
-			// then
-			Optional<User> optionalUser = userRepository.findByActualUserId(member.getId());
-			assertThat(optionalUser)
-				.isPresent()
-				.satisfies(findUser -> assertThat(findUser.get()).isEqualTo(user));
+			// when & then
+			assertThatThrownBy(() -> userService.save(user))
+				.isInstanceOf(BaseException.class)
+				.satisfies(exception -> {
+					assertThat(((BaseException) exception).getErrorCode()).isEqualTo(
+						ErrorCode.NOT_FOUND_CHAT_USER);
+				})
+				.hasMessageContaining(ErrorMessage.NOT_FOUND_CHAT_USER);
 		}
 	}
 

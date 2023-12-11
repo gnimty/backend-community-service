@@ -26,14 +26,27 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 		for (User user : users) {
 			Query query = new Query(Criteria.where("actualUserId").is(user.getActualUserId()));
 			Update update = new Update()
+				.set("name", user.getName())
+				.set("internalName", user.getInternalName())
+				.set("tagLine", user.getTagLine())
+				.set("internalTagName", user.getInternalTagName())
+				.set("status", user.getStatus())
 				.set("profileIconId", user.getProfileIconId())
+				.set("puuid", user.getPuuid())
+				// 솔로 랭크
 				.set("tier", user.getTier())
 				.set("division", user.getDivision())
 				.set("lp", user.getLp())
-				.set("name", user.getName())
-				.set("tagLine", user.getTagLine())
+				.set("mmr", user.getMmr())
 				.set("mostLanes", user.getMostLanes())
-				.set("mostChampions", user.getMostChampions());
+				.set("mostChampions", user.getMostChampions())
+				// 자유 랭크
+				.set("tier", user.getTierFlex())
+				.set("division", user.getDivisionFlex())
+				.set("lp", user.getLpFlex())
+				.set("mmr", user.getMmrFlex())
+				.set("mostLanes", user.getMostLanesFlex())
+				.set("mostChampions", user.getMostChampionsFlex());
 
 			bulkOperations.updateOne(query, update);
 		}
