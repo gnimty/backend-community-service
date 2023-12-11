@@ -34,7 +34,6 @@ public class User {
 	private Long actualUserId;
 
 	private String name;
-	private String internalName;
 	private String tagLine;
 	private String internalTagName;
 	private Status status;
@@ -62,7 +61,6 @@ public class User {
 		return User.builder()
 			.actualUserId(riotAccount.getMember().getId())
 			.name(riotAccount.getName())
-			.internalName(riotAccount.getInternalName())
 			.tagLine(riotAccount.getTagLine())
 			.internalTagName(riotAccount.getInternalTagName())
 			.profileIconId(riotAccount.getIconId())
@@ -91,7 +89,6 @@ public class User {
 	public void updateByRiotAccount(RiotAccount riotAccount) {
 		this.actualUserId = riotAccount.getMember().getId();
 		this.name = riotAccount.getName();
-		this.internalName = riotAccount.getInternalName();
 		this.tagLine = riotAccount.getTagLine();
 		this.internalTagName = riotAccount.getInternalTagName();
 		this.profileIconId = riotAccount.getIconId();

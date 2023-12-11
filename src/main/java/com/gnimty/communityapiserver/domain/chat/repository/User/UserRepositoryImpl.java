@@ -27,7 +27,6 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 			Query query = new Query(Criteria.where("actualUserId").is(user.getActualUserId()));
 			Update update = new Update()
 				.set("name", user.getName())
-				.set("internalName", user.getInternalName())
 				.set("tagLine", user.getTagLine())
 				.set("internalTagName", user.getInternalTagName())
 				.set("status", user.getStatus())
