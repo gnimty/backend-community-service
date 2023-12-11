@@ -58,15 +58,20 @@ public class RiotAccountService {
 
 	public RecentlySummonersServiceResponse getRecentlySummoners(Member member, List<Long> chattedMemberIds) {
 		RiotAccount riotAccount = riotAccountReadService.findMainAccountByMember(member);
-		RecentMemberInfo recentMemberInfo = getRecentMemberInfo(riotAccount.getInternalTagName());
+		RecentMemberInfo recentMemberInfo = getRecentMemberInfo(riotAccount.getInternalTagName(), GameMode.RANK_SOLO);
+		RecentMemberInfo recentMemberInfoFlex = getRecentMemberInfo(riotAccount.getInternalTagName(),
+			GameMode.RANK_FLEX);
 		List<RiotAccount> chattedRiotAccounts = getChattedRiotAccounts(chattedMemberIds);
 
 		Map<String, RiotAccount> riotAccountMap = createRiotAccountMap(member, chattedRiotAccounts);
 		List<RecentlySummonersEntry> recentlySummoners = createMatchingRecentlySummoners(
 			recentMemberInfo, riotAccountMap);
+		List<RecentlySummonersEntry> recentlySummonersFlex = createMatchingRecentlySummoners(
+			recentMemberInfoFlex, riotAccountMap);
 
 		return RecentlySummonersServiceResponse.builder()
 			.recentlySummoners(recentlySummoners)
+			.recentlySummonersFlex(recentlySummonersFlex)
 			.build();
 	}
 
@@ -87,10 +92,10 @@ public class RiotAccountService {
 			.collect(Collectors.toList());
 	}
 
-	private RecentMemberInfo getRecentMemberInfo(String internalTagName) {
+	private RecentMemberInfo getRecentMemberInfo(String internalTagName, GameMode gameMode) {
 		return WebClient.create("https://gnimty.kro.kr")
 			.get()
-			.uri("/statistics/summoners/together/" + internalTagName)
+			.uri("/statistics/summoners/together/" + internalTagName + "?queue_type=" + gameMode.name())
 			.retrieve()
 			.bodyToMono(RecentMemberInfo.class)
 			.block();

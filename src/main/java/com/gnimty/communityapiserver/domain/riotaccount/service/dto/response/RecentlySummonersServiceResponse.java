@@ -14,4 +14,5 @@ import lombok.NoArgsConstructor;
 public class RecentlySummonersServiceResponse {
 
 	private List<RecentlySummonersEntry> recentlySummoners;
+	private List<RecentlySummonersEntry> recentlySummonersFlex;
 }
