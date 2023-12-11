@@ -38,11 +38,8 @@ public class RiotAccountController {
 	private final UserService userService;
 
 	@PatchMapping
-	public CommonResponse<Void> updateSummoners(
-		@RequestBody @Valid SummonerUpdateRequest request
-	) {
-		List<RiotAccount> riotAccounts = riotAccountService.updateSummoners(
-			request.toServiceRequest());
+	public CommonResponse<Void> updateSummoners(@RequestBody @Valid SummonerUpdateRequest request) {
+		List<RiotAccount> riotAccounts = riotAccountService.updateSummoners(request.toServiceRequest());
 		if (!riotAccounts.isEmpty()) {
 			stompService.createOrUpdateUser(riotAccounts);
 		}
@@ -59,21 +56,16 @@ public class RiotAccountController {
 	}
 
 	@GetMapping("/main")
-	public CommonResponse<RecommendedSummonersResponse> getMainSummoners(
-		@RequestParam("game-mode") GameMode gameMode
-	) {
-		RecommendedSummonersServiceResponse response = riotAccountService.getMainSummoners(
-			gameMode);
+	public CommonResponse<RecommendedSummonersResponse> getMainSummoners(@RequestParam("game-mode") GameMode gameMode) {
+		RecommendedSummonersServiceResponse response = riotAccountService.getMainSummoners(gameMode);
 		return CommonResponse.success(RecommendedSummonersResponse.from(response));
 	}
 
 	@GetMapping("/recently")
 	public CommonResponse<RecentlySummonersResponse> getRecentlySummoners() {
 		Member member = MemberThreadLocal.get();
-		List<Long> chattedMemberIds = stompService.getChattedMemberIds(
-			userService.getUser(member.getId()));
-		RecentlySummonersServiceResponse response = riotAccountService
-			.getRecentlySummoners(member, chattedMemberIds);
+		List<Long> chattedMemberIds = stompService.getChattedMemberIds(userService.getUser(member.getId()));
+		RecentlySummonersServiceResponse response = riotAccountService.getRecentlySummoners(member, chattedMemberIds);
 		return CommonResponse.success(RecentlySummonersResponse.from(response));
 	}
 }

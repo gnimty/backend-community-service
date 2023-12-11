@@ -17,7 +17,6 @@ import com.gnimty.communityapiserver.domain.prefergamemode.service.PreferGameMod
 import com.gnimty.communityapiserver.domain.riotaccount.service.RiotAccountReadService;
 import com.gnimty.communityapiserver.domain.riotaccount.service.RiotAccountService;
 import com.gnimty.communityapiserver.domain.schedule.service.ScheduleReadService;
-import com.gnimty.communityapiserver.domain.schedule.service.ScheduleService;
 import com.gnimty.communityapiserver.global.auth.JwtProvider;
 import com.gnimty.communityapiserver.global.interceptor.TokenAuthInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,9 +66,6 @@ public abstract class ControllerTestSupport {
 
 	@MockBean
 	protected RiotAccountReadService riotAccountReadService;
-
-	@MockBean
-	protected ScheduleService scheduleService;
 
 	@MockBean
 	protected ScheduleReadService scheduleReadService;

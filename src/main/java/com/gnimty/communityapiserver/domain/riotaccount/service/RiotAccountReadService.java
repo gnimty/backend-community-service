@@ -62,8 +62,8 @@ public class RiotAccountReadService {
 		RiotAccount mainRiotAccount,
 		List<Schedule> schedules
 	) {
-		List<RecommendedSummonersEntry> content = riotAccountQueryRepository.findSummonersByConditions(
-				Pageable.ofSize(request.getPageSize()), request, mainRiotAccount, schedules)
+		List<RecommendedSummonersEntry> content = riotAccountQueryRepository
+			.findSummonersByConditions(Pageable.ofSize(request.getPageSize()), request, mainRiotAccount, schedules)
 			.getContent();
 		return RecommendedSummonersServiceResponse.builder()
 			.recommendedSummoners(content)
@@ -71,8 +71,7 @@ public class RiotAccountReadService {
 	}
 
 	public RecommendedSummonersServiceResponse getMainSummoners(Member member, GameMode gameMode) {
-		List<RecommendedSummonersEntry> result = riotAccountQueryRepository.findMainSummonersByMember(
-			member, gameMode);
+		List<RecommendedSummonersEntry> result = riotAccountQueryRepository.findMainSummonersByMember(member, gameMode);
 		return RecommendedSummonersServiceResponse.builder()
 			.recommendedSummoners(result)
 			.build();

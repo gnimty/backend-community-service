@@ -14,10 +14,7 @@ public class ChampionCommentsLikeQueryRepository {
 
 	private final JPAQueryFactory queryFactory;
 
-	public Boolean existsByMemberAndChampionComments(
-		Member member,
-		ChampionComments championComments
-	) {
+	public Boolean existsByMemberAndChampionComments(Member member, ChampionComments championComments) {
 		return queryFactory
 			.selectOne()
 			.from(championCommentsLike)

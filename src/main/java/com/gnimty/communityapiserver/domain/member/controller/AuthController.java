@@ -61,17 +61,13 @@ public class AuthController {
 	}
 
 	@PostMapping("/auth/email/code")
-	public CommonResponse<Void> verifyEmailAuthCode(
-		@RequestBody @Valid EmailVerifyRequest request
-	) {
+	public CommonResponse<Void> verifyEmailAuthCode(@RequestBody @Valid EmailVerifyRequest request) {
 		authService.verifyEmailAuthCode(request.toServiceRequest());
 		return CommonResponse.success(SUCCESS_VERIFY_EMAIL, OK);
 	}
 
 	@GetMapping("/auth/refresh")
-	public CommonResponse<AuthToken> tokenRefresh(
-		@RequestHeader("RefreshToken") String refreshToken
-	) {
+	public CommonResponse<AuthToken> tokenRefresh(@RequestHeader("RefreshToken") String refreshToken) {
 		return CommonResponse.success(
 			authService.tokenRefresh(refreshToken.replaceAll(BEARER.getContent(), "")));
 	}

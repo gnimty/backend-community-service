@@ -6,11 +6,8 @@ import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCC
 import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_LOGOUT;
 import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_SEND_EMAIL_AUTH_CODE;
 import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_SUMMONER_LINK;
-import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_UPDATE_INTRODUCTION;
 import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_UPDATE_PASSWORD;
-import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_UPDATE_PREFER_GAME_MODE;
 import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_UPDATE_PROFILE;
-import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_UPDATE_STATUS;
 import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_WITHDRAWAL;
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage.INVALID_INPUT_VALUE;
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage.MISSING_REQUEST_PARAMETER;
@@ -27,25 +24,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.gnimty.communityapiserver.controller.ControllerTestSupport;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
-import com.gnimty.communityapiserver.domain.member.controller.dto.request.IntroductionUpdateRequest;
+import com.gnimty.communityapiserver.domain.member.controller.dto.request.MyProfileMainUpdateRequest;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.MyProfileUpdateRequest;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.OauthLoginRequest;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.PasswordEmailVerifyRequest;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.PasswordResetRequest;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.PasswordUpdateRequest;
-import com.gnimty.communityapiserver.domain.member.controller.dto.request.PreferGameModeUpdateRequest;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.SendEmailRequest;
-import com.gnimty.communityapiserver.domain.member.controller.dto.request.StatusUpdateRequest;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
-import com.gnimty.communityapiserver.domain.member.service.dto.request.IntroductionUpdateServiceRequest;
+import com.gnimty.communityapiserver.domain.member.service.dto.request.MyProfileUpdateMainServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.MyProfileUpdateServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.OauthLoginServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.PasswordEmailVerifyServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.PasswordResetServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.PasswordUpdateServiceRequest;
-import com.gnimty.communityapiserver.domain.member.service.dto.request.PreferGameModeUpdateServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.SendEmailServiceRequest;
-import com.gnimty.communityapiserver.domain.member.service.dto.request.StatusUpdateServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.IntroductionEntry;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.MyProfileServiceResponse;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.OauthInfoEntry;
@@ -300,18 +293,18 @@ public class MemberControllerTest extends ControllerTestSupport {
 		}
 	}
 
-	@DisplayName("내 프로필 수정 시")
+	@DisplayName("내 프로필 수정 시(메인)")
 	@Nested
-	class UpdateMyProfile {
+	class UpdateMyProfileMain {
 
 		private static final String REQUEST_URL = "/members/me";
 
 		@DisplayName("올바른 요청을 하면 성공한다.")
 		@Test
 		void should_success_when_validRequest() throws Exception {
-			MyProfileUpdateRequest request = createRequest(true, "content");
+			MyProfileMainUpdateRequest request = createRequest(true, "content");
 
-			given(memberService.updateMyProfile(any(MyProfileUpdateServiceRequest.class)))
+			given(memberService.updateMyProfileMain(any(MyProfileUpdateMainServiceRequest.class)))
 				.willReturn(null);
 			willDoNothing()
 				.given(stompService)
@@ -337,9 +330,9 @@ public class MemberControllerTest extends ControllerTestSupport {
 		@DisplayName("content 또는 isMain이 null이면 실패한다.")
 		@Test
 		void should_fail_when_contentOrIsMainIsNull() throws Exception {
-			MyProfileUpdateRequest request = createRequest(null, null);
+			MyProfileMainUpdateRequest request = createRequest(null, null);
 
-			given(memberService.updateMyProfile(any(MyProfileUpdateServiceRequest.class)))
+			given(memberService.updateMyProfileMain(any(MyProfileUpdateMainServiceRequest.class)))
 				.willReturn(null);
 			willDoNothing()
 				.given(stompService)
@@ -361,9 +354,9 @@ public class MemberControllerTest extends ControllerTestSupport {
 		@DisplayName("content가 90가 초과이면 실패한다.")
 		@Test
 		void should_fail_when_contentLengthExceed90() throws Exception {
-			MyProfileUpdateRequest request = createRequest(true, "a".repeat(91));
+			MyProfileMainUpdateRequest request = createRequest(true, "a".repeat(91));
 
-			given(memberService.updateMyProfile(any(MyProfileUpdateServiceRequest.class)))
+			given(memberService.updateMyProfileMain(any(MyProfileUpdateMainServiceRequest.class)))
 				.willReturn(null);
 			willDoNothing()
 				.given(stompService)
@@ -382,8 +375,8 @@ public class MemberControllerTest extends ControllerTestSupport {
 				);
 		}
 
-		private MyProfileUpdateRequest createRequest(Boolean isMain, String content) {
-			return MyProfileUpdateRequest.builder()
+		private MyProfileMainUpdateRequest createRequest(Boolean isMain, String content) {
+			return MyProfileMainUpdateRequest.builder()
 				.mainRiotAccountId(1L)
 				.status(Status.AWAY)
 				.introductions(List.of(IntroductionEntry.builder()
@@ -673,35 +666,34 @@ public class MemberControllerTest extends ControllerTestSupport {
 		}
 	}
 
-	@DisplayName("status 변경 시")
+	@DisplayName("내 프로필 변경 시")
 	@Nested
-	class UpdateStatus {
+	class UpdateMyProfile {
 
-		private static final String REQUEST_URL = "/members/me/status";
+		private static final String REQUEST_URL = "/members/me";
 
-		@DisplayName("올바른 요청이면 성공한다.")
+		@DisplayName("올바른 요청을 하면 성공한다.")
 		@Test
 		void should_success_when_validRequest() throws Exception {
-
-			StatusUpdateRequest request = createRequest(Status.AWAY);
-
-			willDoNothing()
-				.given(memberService)
-				.updateStatus(any(StatusUpdateServiceRequest.class));
-			willDoNothing()
-				.given(stompService)
-				.updateConnStatus(any(User.class), any(Status.class));
+			MyProfileUpdateRequest request = createRequest(Status.ONLINE, List.of(), List.of(), List.of());
 
 			try (MockedStatic<MemberThreadLocal> ignored = mockStatic(MemberThreadLocal.class)) {
 				given(MemberThreadLocal.get())
 					.willReturn(Member.builder().build());
+				willDoNothing()
+					.given(memberService)
+					.updateMyProfile(any(MyProfileUpdateServiceRequest.class));
+				willDoNothing()
+					.given(stompService)
+					.updateConnStatus(any(User.class), any(Status.class));
+
 				mockMvc.perform(patch(REQUEST_URL)
 						.content(om.writeValueAsString(request))
 						.contentType(MediaType.APPLICATION_JSON)
 						.characterEncoding(StandardCharsets.UTF_8))
 					.andExpectAll(
 						status().isOk(),
-						jsonPath("$.status.message").value(SUCCESS_UPDATE_STATUS.getMessage())
+						jsonPath("$.status.message").value(SUCCESS_UPDATE_PROFILE.getMessage())
 					);
 			}
 		}
@@ -709,12 +701,11 @@ public class MemberControllerTest extends ControllerTestSupport {
 		@DisplayName("status가 null이면 실패한다.")
 		@Test
 		void should_fail_when_statusIsNull() throws Exception {
-
-			StatusUpdateRequest request = createRequest(null);
+			MyProfileUpdateRequest request = createRequest(null, List.of(), List.of(), List.of());
 
 			willDoNothing()
 				.given(memberService)
-				.updateStatus(any(StatusUpdateServiceRequest.class));
+				.updateMyProfile(any(MyProfileUpdateServiceRequest.class));
 			willDoNothing()
 				.given(stompService)
 				.updateConnStatus(any(User.class), any(Status.class));
@@ -729,145 +720,186 @@ public class MemberControllerTest extends ControllerTestSupport {
 				);
 		}
 
-		private StatusUpdateRequest createRequest(Status status) {
-			return StatusUpdateRequest.builder()
+		@DisplayName("content가 null이면 실패한다.")
+		@Test
+		void should_fail_when_contentIsNull() throws Exception {
+			MyProfileUpdateRequest request = createRequest(Status.ONLINE,
+				List.of(IntroductionEntry.builder().isMain(true).build()), List.of(), List.of());
+
+			willDoNothing()
+				.given(memberService)
+				.updateMyProfile(any(MyProfileUpdateServiceRequest.class));
+			willDoNothing()
+				.given(stompService)
+				.updateConnStatus(any(User.class), any(Status.class));
+
+			mockMvc.perform(patch(REQUEST_URL)
+					.content(om.writeValueAsString(request))
+					.contentType(MediaType.APPLICATION_JSON)
+					.characterEncoding(StandardCharsets.UTF_8))
+				.andExpectAll(
+					status().isBadRequest(),
+					jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
+				);
+		}
+
+		@DisplayName("content의 길이가 90초과이면 실패한다.")
+		@Test
+		void should_fail_when_contentLenghExceed90() throws Exception {
+			MyProfileUpdateRequest request = createRequest(
+				Status.ONLINE,
+				List.of(IntroductionEntry.builder().content("1".repeat(91)).isMain(true).build()),
+				List.of(),
+				List.of());
+
+			willDoNothing()
+				.given(memberService)
+				.updateMyProfile(any(MyProfileUpdateServiceRequest.class));
+			willDoNothing()
+				.given(stompService)
+				.updateConnStatus(any(User.class), any(Status.class));
+
+			mockMvc.perform(patch(REQUEST_URL)
+					.content(om.writeValueAsString(request))
+					.contentType(MediaType.APPLICATION_JSON)
+					.characterEncoding(StandardCharsets.UTF_8))
+				.andExpectAll(
+					status().isBadRequest(),
+					jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
+				);
+		}
+
+		@DisplayName("isMain이 null이면 실패한다.")
+		@Test
+		void should_fail_when_isMainIsNull() throws Exception {
+			MyProfileUpdateRequest request = createRequest(
+				Status.ONLINE,
+				List.of(IntroductionEntry.builder().content("1".repeat(91)).build()),
+				List.of(),
+				List.of());
+
+			willDoNothing()
+				.given(memberService)
+				.updateMyProfile(any(MyProfileUpdateServiceRequest.class));
+			willDoNothing()
+				.given(stompService)
+				.updateConnStatus(any(User.class), any(Status.class));
+
+			mockMvc.perform(patch(REQUEST_URL)
+					.content(om.writeValueAsString(request))
+					.contentType(MediaType.APPLICATION_JSON)
+					.characterEncoding(StandardCharsets.UTF_8))
+				.andExpectAll(
+					status().isBadRequest(),
+					jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
+				);
+		}
+
+		@DisplayName("preferGameModes가 null이면 실패한다.")
+		@Test
+		void should_fail_when_preferGameModesIsNull() throws Exception {
+			MyProfileUpdateRequest request = createRequest(Status.ONLINE, List.of(),
+				List.of(PreferGameModeEntry.builder().build()), List.of());
+
+			willDoNothing()
+				.given(memberService)
+				.updateMyProfile(any(MyProfileUpdateServiceRequest.class));
+			willDoNothing()
+				.given(stompService)
+				.updateConnStatus(any(User.class), any(Status.class));
+
+			mockMvc.perform(patch(REQUEST_URL)
+					.content(om.writeValueAsString(request))
+					.contentType(MediaType.APPLICATION_JSON)
+					.characterEncoding(StandardCharsets.UTF_8))
+				.andExpectAll(
+					status().isBadRequest(),
+					jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
+				);
+		}
+
+		@DisplayName("dayOfWeek가 null이면 실패한다.")
+		@Test
+		void should_fail_when_dayOfWeekIsNull() throws Exception {
+			MyProfileUpdateRequest request = createRequest(Status.ONLINE, List.of(), List.of(),
+				List.of(ScheduleEntry.builder().startTime(1).endTime(2).build()));
+
+			willDoNothing()
+				.given(memberService)
+				.updateMyProfile(any(MyProfileUpdateServiceRequest.class));
+			willDoNothing()
+				.given(stompService)
+				.updateConnStatus(any(User.class), any(Status.class));
+
+			mockMvc.perform(patch(REQUEST_URL)
+					.content(om.writeValueAsString(request))
+					.contentType(MediaType.APPLICATION_JSON)
+					.characterEncoding(StandardCharsets.UTF_8))
+				.andExpectAll(
+					status().isBadRequest(),
+					jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
+				);
+		}
+
+		@DisplayName("startTime이 올바르지 않으면 실패한다.")
+		@ParameterizedTest
+		@NullSource
+		@ValueSource(ints = {-1, 25})
+		void should_fail_when_startTimeIsInvalid(Integer startTime) throws Exception {
+			MyProfileUpdateRequest request = createRequest(Status.ONLINE, List.of(), List.of(),
+				List.of(ScheduleEntry.builder().startTime(startTime).endTime(2).build()));
+
+			willDoNothing()
+				.given(memberService)
+				.updateMyProfile(any(MyProfileUpdateServiceRequest.class));
+			willDoNothing()
+				.given(stompService)
+				.updateConnStatus(any(User.class), any(Status.class));
+
+			mockMvc.perform(patch(REQUEST_URL)
+					.content(om.writeValueAsString(request))
+					.contentType(MediaType.APPLICATION_JSON)
+					.characterEncoding(StandardCharsets.UTF_8))
+				.andExpectAll(
+					status().isBadRequest(),
+					jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
+				);
+		}
+
+		@DisplayName("startTime이 endTime보다 늦으면 실패한다.")
+		@Test
+		void should_fail_when_invalidTimeRange() throws Exception {
+			MyProfileUpdateRequest request = createRequest(Status.ONLINE, List.of(), List.of(),
+				List.of(ScheduleEntry.builder().startTime(3).endTime(2).build()));
+
+			willDoNothing()
+				.given(memberService)
+				.updateMyProfile(any(MyProfileUpdateServiceRequest.class));
+			willDoNothing()
+				.given(stompService)
+				.updateConnStatus(any(User.class), any(Status.class));
+
+			mockMvc.perform(patch(REQUEST_URL)
+					.content(om.writeValueAsString(request))
+					.contentType(MediaType.APPLICATION_JSON)
+					.characterEncoding(StandardCharsets.UTF_8))
+				.andExpectAll(
+					status().isBadRequest(),
+					jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
+				);
+		}
+
+		private MyProfileUpdateRequest createRequest(
+			Status status,
+			List<IntroductionEntry> introductions,
+			List<PreferGameModeEntry> preferGameModes,
+			List<ScheduleEntry> schedules
+		) {
+			return MyProfileUpdateRequest.builder()
 				.status(status)
-				.build();
-		}
-	}
-
-	@DisplayName("introduction 변경 시")
-	@Nested
-	class UpdateIntroduction {
-
-		private static final String REQUEST_URL = "/members/me/introductions";
-
-		@DisplayName("올바른 요청이면 성공한다.")
-		@Test
-		void should_success_when_validRequest() throws Exception {
-
-			IntroductionUpdateRequest request = createRequest(true, "content");
-
-			willDoNothing()
-				.given(memberService)
-				.updateIntroduction(any(IntroductionUpdateServiceRequest.class));
-
-			mockMvc.perform(patch(REQUEST_URL)
-					.content(om.writeValueAsString(request))
-					.contentType(MediaType.APPLICATION_JSON)
-					.characterEncoding(StandardCharsets.UTF_8))
-				.andExpectAll(
-					status().isOk(),
-					jsonPath("$.status.message").value(
-						SUCCESS_UPDATE_INTRODUCTION.getMessage())
-				);
-		}
-
-		@DisplayName("content또는 isMain이 null이면 실패한다.")
-		@Test
-		void should_fail_when_contentOrIsMainIsNull() throws Exception {
-
-			IntroductionUpdateRequest request = createRequest(null, null);
-
-			willDoNothing()
-				.given(memberService)
-				.updateIntroduction(any(IntroductionUpdateServiceRequest.class));
-
-			mockMvc.perform(patch(REQUEST_URL)
-					.content(om.writeValueAsString(request))
-					.contentType(MediaType.APPLICATION_JSON)
-					.characterEncoding(StandardCharsets.UTF_8))
-				.andExpectAll(
-					status().isBadRequest(),
-					jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
-				);
-		}
-
-		@DisplayName("content가 90자 초과이면 실패한다.")
-		@Test
-		void should_fail_when_contentLengthExceed90() throws Exception {
-
-			IntroductionUpdateRequest request = createRequest(true, "a".repeat(91));
-
-			willDoNothing()
-				.given(memberService)
-				.updateIntroduction(any(IntroductionUpdateServiceRequest.class));
-
-			mockMvc.perform(patch(REQUEST_URL)
-					.content(om.writeValueAsString(request))
-					.contentType(MediaType.APPLICATION_JSON)
-					.characterEncoding(StandardCharsets.UTF_8))
-				.andExpectAll(
-					status().isBadRequest(),
-					jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
-				);
-		}
-
-		private IntroductionUpdateRequest createRequest(Boolean isMain, String content) {
-			return IntroductionUpdateRequest.builder()
-				.introductions(List.of(IntroductionEntry.builder()
-					.id(1L)
-					.isMain(isMain)
-					.content(content)
-					.build()))
-				.build();
-		}
-	}
-
-	@DisplayName("preferGameMode 변경 시")
-	@Nested
-	class UpdatePreferGameMode {
-
-		private static final String REQUEST_URL = "/members/me/prefer-game-mode";
-
-		@DisplayName("올바른 요청이면 성공한다.")
-		@Test
-		void should_success_when_validRequest() throws Exception {
-
-			PreferGameModeUpdateRequest request = createRequest(GameMode.RANK_SOLO);
-
-			willDoNothing()
-				.given(memberService)
-				.updatePreferGameMode(any(PreferGameModeUpdateServiceRequest.class));
-
-			mockMvc.perform(patch(REQUEST_URL)
-					.content(om.writeValueAsString(request))
-					.contentType(MediaType.APPLICATION_JSON)
-					.characterEncoding(StandardCharsets.UTF_8))
-				.andExpectAll(
-					status().isOk(),
-					jsonPath("$.status.message").value(
-						SUCCESS_UPDATE_PREFER_GAME_MODE.getMessage())
-				);
-		}
-
-		@DisplayName("preferGameMode가 null이면 실패한다.")
-		@Test
-		void should_fail_when_preferGameModeIsNull() throws Exception {
-
-			PreferGameModeUpdateRequest request = createRequest(null);
-
-			willDoNothing()
-				.given(memberService)
-				.updatePreferGameMode(any(PreferGameModeUpdateServiceRequest.class));
-
-			mockMvc.perform(patch(REQUEST_URL)
-					.content(om.writeValueAsString(request))
-					.contentType(MediaType.APPLICATION_JSON)
-					.characterEncoding(StandardCharsets.UTF_8))
-				.andExpectAll(
-					status().isBadRequest(),
-					jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
-				);
-		}
-
-		private PreferGameModeUpdateRequest createRequest(GameMode gameMode) {
-			return PreferGameModeUpdateRequest.builder()
-				.preferGameModes(List.of(
-					PreferGameModeEntry.builder()
-						.gameMode(gameMode)
-						.build()
-				))
+				.introductions(introductions)
+				.preferGameModes(preferGameModes)
+				.schedules(schedules)
 				.build();
 		}
 	}

@@ -45,12 +45,9 @@ public class GlobalExceptionHandler {
 	}
 
 	@ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-	public ResponseEntity<CommonResponse<Void>> methodNotAllowedException(
-		HttpRequestMethodNotSupportedException e) {
-
+	public ResponseEntity<CommonResponse<Void>> methodNotAllowedException(HttpRequestMethodNotSupportedException e) {
 		ErrorCode errorCode = METHOD_NOT_ALLOWED;
-		String message = String.format(errorCode.getMessage(), e.getMethod(),
-			Arrays.toString(e.getSupportedMethods()));
+		String message = String.format(errorCode.getMessage(), e.getMethod(), Arrays.toString(e.getSupportedMethods()));
 
 		CommonResponse<Void> response = CommonResponse.fail(errorCode, message);
 
@@ -62,8 +59,7 @@ public class GlobalExceptionHandler {
 		HttpMediaTypeNotSupportedException e) {
 
 		ErrorCode errorCode = MEDIA_TYPE_NOT_SUPPORTED;
-		String message = String.format(errorCode.getMessage(), e.getContentType(),
-			e.getSupportedMediaTypes());
+		String message = String.format(errorCode.getMessage(), e.getContentType(), e.getSupportedMediaTypes());
 
 		CommonResponse<Void> response = CommonResponse.fail(errorCode, message);
 
@@ -113,8 +109,7 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(MissingServletRequestParameterException.class)
 	public ResponseEntity<CommonResponse<Void>> missingRequestParameterExceptionHandler(
 		MissingServletRequestParameterException ex) {
-		String message = String.format(ErrorMessage.MISSING_REQUEST_PARAMETER,
-			ex.getParameterName());
+		String message = String.format(ErrorMessage.MISSING_REQUEST_PARAMETER, ex.getParameterName());
 		ErrorCode errorCode = MISSING_REQUEST_PARAMETER;
 		CommonResponse<Void> response = CommonResponse.fail(errorCode, message);
 

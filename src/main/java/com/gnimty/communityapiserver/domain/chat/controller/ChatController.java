@@ -14,7 +14,6 @@ import com.gnimty.communityapiserver.domain.chat.service.StompService;
 import com.gnimty.communityapiserver.domain.chat.service.UserService;
 import com.gnimty.communityapiserver.domain.chat.service.dto.UserWithBlockDto;
 import com.gnimty.communityapiserver.domain.member.service.MemberService;
-import com.gnimty.communityapiserver.domain.member.service.dto.request.StatusUpdateServiceRequest;
 import com.gnimty.communityapiserver.global.connect.WebSocketSessionManager;
 import com.gnimty.communityapiserver.global.constant.MessageRequestType;
 import com.gnimty.communityapiserver.global.constant.MessageResponseType;
@@ -114,8 +113,7 @@ public class ChatController {
 		User user = getUserBySessionId(event.getSessionId());
 		if (!isMultipleUser(user.getActualUserId())) {
 			stompService.updateConnStatus(user, Status.OFFLINE);
-			memberService.updateStatus(
-				StatusUpdateServiceRequest.builder().status(Status.OFFLINE).build());
+			memberService.updateStatus(Status.OFFLINE);
 		}
 		webSocketSessionManager.deleteSession(event.getSessionId());
 	}
@@ -126,8 +124,7 @@ public class ChatController {
 		User user = getUserBySessionId(sessionId);
 		if (!isMultipleUser(user.getActualUserId())) {
 			stompService.updateConnStatus(user, Status.ONLINE);
-			memberService.updateStatus(
-				StatusUpdateServiceRequest.builder().status(Status.ONLINE).build());
+			memberService.updateStatus(Status.ONLINE);
 		}
 	}
 

@@ -19,20 +19,12 @@ public class ChampionCommentsLikeReadService {
 	private final ChampionCommentsLikeQueryRepository championCommentsLikeQueryRepository;
 	private final ChampionCommentsLikeRepository championCommentsLikeRepository;
 
-	public Boolean existsByMemberAndChampionComments(
-		Member member,
-		ChampionComments championComments
-	) {
-		return championCommentsLikeQueryRepository.existsByMemberAndChampionComments(
-			member, championComments);
+	public Boolean existsByMemberAndChampionComments(Member member, ChampionComments championComments) {
+		return championCommentsLikeQueryRepository.existsByMemberAndChampionComments(member, championComments);
 	}
 
-	public ChampionCommentsLike findByMemberAndChampionComments(
-		Member member,
-		ChampionComments championComments
-	) {
-		return championCommentsLikeRepository.findByMemberAndChampionComments(
-				member, championComments)
+	public ChampionCommentsLike findByMemberAndChampionComments(Member member, ChampionComments championComments) {
+		return championCommentsLikeRepository.findByMemberAndChampionComments(member, championComments)
 			.orElseThrow(() -> new BaseException(ErrorCode.CHAMPION_COMMENTS_LIKE_NOT_FOUND));
 	}
 }

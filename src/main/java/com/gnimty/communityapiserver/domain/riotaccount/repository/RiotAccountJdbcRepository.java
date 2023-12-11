@@ -16,8 +16,7 @@ public class RiotAccountJdbcRepository {
 
 	private final JdbcTemplate jdbcTemplate;
 
-	public void processBatchUpdate(List<RiotAccount> riotAccounts,
-		List<SummonerUpdateEntry> summonerUpdates) {
+	public void processBatchUpdate(List<RiotAccount> riotAccounts, List<SummonerUpdateEntry> summonerUpdates) {
 		String sql =
 			"update riot_account r "
 				+ "set r.internalName=?, "

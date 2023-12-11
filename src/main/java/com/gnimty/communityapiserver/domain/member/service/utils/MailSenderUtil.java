@@ -23,13 +23,7 @@ public class MailSenderUtil {
 	private final SpringTemplateEngine templateEngine;
 
 	@Async(value = "mailExecutor")
-	public void sendEmail(
-		String subject,
-		String to,
-		String code,
-		String emailTemplate,
-		String banner
-	) {
+	public void sendEmail(String subject, String to, String code, String emailTemplate, String banner) {
 		try {
 			MimeMessage message = mailSender.createMimeMessage();
 			MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
