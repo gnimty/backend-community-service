@@ -33,10 +33,6 @@ public class RiotAccount extends BaseEntity {
 	private Long id;
 
 	@NotNull
-	@Column(name = "internal_name", columnDefinition = "VARCHAR(100)")
-	private String internalName;
-
-	@NotNull
 	@Column(name = "name", columnDefinition = "VARCHAR(100)")
 	private String name;
 
@@ -134,7 +130,6 @@ public class RiotAccount extends BaseEntity {
 
 	@Builder
 	public RiotAccount(
-		String internalName,
 		String name,
 		String internalTagName,
 		String tagLine,
@@ -161,7 +156,6 @@ public class RiotAccount extends BaseEntity {
 		Long frequentChampionId3Flex,
 		Member member
 	) {
-		this.internalName = internalName;
 		this.name = name;
 		this.internalTagName = internalTagName;
 		this.tagLine = tagLine;

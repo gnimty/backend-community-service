@@ -11,8 +11,6 @@ import lombok.Getter;
 public class SummonerUpdateEntry {
 
 	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
-	private String internalName;
-	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
 	private String name;
 	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
 	private String internalTagName;

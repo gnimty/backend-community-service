@@ -311,8 +311,8 @@ public class RiotAccountQueryRepository {
 			return riotAccount.id.gt(request.getLastSummonerId());
 		}
 		if (sortBy.equals(SortBy.ATOZ)) {
-			return riotAccount.internalName.goe(request.getLastName().toLowerCase().intern())
-				.and(riotAccount.internalName.gt(request.getLastName().toLowerCase().intern())
+			return riotAccount.name.toLowerCase().trim().goe(request.getLastName().toLowerCase().trim())
+				.and(riotAccount.name.toLowerCase().trim().gt(request.getLastName().toLowerCase().trim())
 					.or(riotAccount.id.gt(request.getLastSummonerId())));
 		} else if (sortBy.equals(SortBy.TIER)) {
 			return riotAccount.mmr.goe(request.getLastSummonerMmr())
