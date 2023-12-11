@@ -25,17 +25,17 @@ public class UserService {
 		return userRepository.findAll();
 	}
 
-	public Optional<User> findAllUser(Long actualUserId) {
+	public Optional<User> findUser(Long actualUserId) {
 		return userRepository.findByActualUserId(actualUserId);
 	}
 
 	public User getUser(Long actualUserId) {
-		return findAllUser(actualUserId)
+		return findUser(actualUserId)
 			.orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_USER));
 	}
 
 	public User getUserByMember(Member member) {
-		return findAllUser(member.getId())
+		return findUser(member.getId())
 			.orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_USER));
 	}
 

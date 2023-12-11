@@ -24,6 +24,7 @@ import com.gnimty.communityapiserver.domain.member.controller.dto.request.SendEm
 import com.gnimty.communityapiserver.domain.member.controller.dto.response.MyProfileResponse;
 import com.gnimty.communityapiserver.domain.member.controller.dto.response.OtherProfileResponse;
 import com.gnimty.communityapiserver.domain.member.controller.dto.response.PasswordEmailVerifyResponse;
+import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.domain.member.service.MemberReadService;
 import com.gnimty.communityapiserver.domain.member.service.MemberService;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.MyProfileServiceResponse;
@@ -144,7 +145,9 @@ public class MemberController {
 
 	@DeleteMapping("/me")
 	public CommonResponse<Void> withdrawal() {
+		Member member = MemberThreadLocal.get();
 		memberService.withdrawal();
+		stompService.withdrawal(member.getId());
 		return CommonResponse.success(SUCCESS_WITHDRAWAL, OK);
 	}
 

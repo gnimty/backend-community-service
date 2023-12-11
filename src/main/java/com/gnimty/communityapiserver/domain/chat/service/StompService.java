@@ -19,6 +19,7 @@ import com.gnimty.communityapiserver.global.exception.ErrorCode;
 import com.mongodb.bulk.BulkWriteResult;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -52,6 +53,11 @@ public class StompService {
 	// TODO solomon: 채팅방 생성 또는 조회
 	// 이미 차단정보 확인된 상황
 	public ChatRoomDto getOrCreateChatRoomDto(UserWithBlockDto me, UserWithBlockDto other) {
+
+		if (me.getStatus() == Blocked.BLOCK && other.getStatus() == Blocked.BLOCK) {
+			throw new BaseException(ErrorCode.NOT_ALLOWED_CREATE_CHAT_ROOM);
+		}
+
 		ChatRoom chatRoom = chatRoomService.findChatRoom(me.getUser(), other.getUser())
 			.orElseGet(() -> chatRoomService.save(me, other));
 
@@ -60,6 +66,7 @@ public class StompService {
 			.other(new UserDto(other.getUser()))
 			.build();
 	}
+
 
 	// TODO solomon: 채팅방 목록 불러오기
 	// blocked==UNBLOCK인 도큐먼트만 조회
@@ -81,21 +88,20 @@ public class StompService {
 		).toList();
 	}
 
+
 	// TODO solomon: 채팅방 나가기 (채팅방에 기록된 내 나간시간 기록 update)
 	// 양쪽 다 채팅방을 나간 상황이면, 모든 채팅 기록 삭제
 	public void exitChatRoom(User me, ChatRoom chatRoom) {
 		Participant other = extractParticipant(me, chatRoom.getParticipants(), false);
 		Participant mine = extractParticipant(me, chatRoom.getParticipants(), true);
-
 		// chatRoom lastModifiedDate, 상대방의 exitDate 비교
 
 		// (상대방이 채팅방 나간 상황) lastModifiedDate가 상대의 exitDate 이전일 때 : flush
 		//      -> flushAllChats() + chatRoomRepository.deleteByChatRoomNo()
-		if (other.getExitDate() != null
-			&& chatRoom.getLastModifiedDate().before(other.getExitDate())) {
-
-			chatRoomService.delete(chatRoom);
-			chatService.delete(chatRoom);
+		if ((other.getExitDate() != null && chatRoom.getLastModifiedDate()
+			.before(other.getExitDate()))
+			|| other.getBlockedStatus() == Blocked.BLOCK) {
+			destroyChatRoomAndChat(chatRoom);
 		}
 		// (상대방이 채팅방 나가지 않은 상황) lastModifiedDate가 상대의 exitDate 이후일 때 : exitDate update
 		//      -> chatRoomRepository.updateExitDate(me);
@@ -119,17 +125,23 @@ public class StompService {
 	}
 
 
-	public void destroyWithdrawnUserData(Long actualUserId) {
-		User user = userService.getUser(actualUserId);
-		userService.delete(user);
+	public void withdrawal(Long actualUserId) {
+		Optional<User> findUser = userService.findUser(actualUserId);
+		if (findUser.isPresent()) {
+			userService.delete(findUser.get());
+			chatRoomService.findChatRoom(findUser.get())
+				.forEach(chatRoom -> {
+					destroyChatRoomAndChat(chatRoom);
+					sendToChatRoomSubscribers(chatRoom.getChatRoomNo(),
+						new MessageResponse(MessageResponseType.DELETED_CHATROOM,
+							chatRoom.getId()));
+				});
+		}
+	}
 
-		chatRoomService.findChatRoom(user)
-			.forEach(chatRoom -> {
-				chatRoomService.delete(chatRoom);
-				chatService.delete(chatRoom);
-				sendToChatRoomSubscribers(chatRoom.getChatRoomNo(),
-					new MessageResponse(MessageResponseType.DELETED_CHATROOM, chatRoom.getId()));
-			});
+	private void destroyChatRoomAndChat(ChatRoom chatRoom) {
+		chatRoomService.delete(chatRoom);
+		chatService.delete(chatRoom);
 	}
 
 
@@ -152,17 +164,15 @@ public class StompService {
 			getOther(user, chatRoom).getActualUserId()).toList();
 	}
 
-
 	public void updateBlockStatus(User me, User other, Blocked status) {
-
-		ChatRoom chatRoom = chatRoomService.getChatRoom(me, other);
-
-		extractParticipant(me, chatRoom.getParticipants(), true).setBlockedStatus(status);
-
-		chatRoomService.update(chatRoom);
-
-		if (status == Blocked.BLOCK) {
-			exitChatRoom(me, chatRoom);
+		Optional<ChatRoom> findChatRoom = chatRoomService.findChatRoom(me, other);
+		if (findChatRoom.isPresent()) {
+			extractParticipant(me, findChatRoom.get().getParticipants(), true).setBlockedStatus(
+				status);
+			chatRoomService.update(findChatRoom.get());
+			if (status == Blocked.BLOCK) {
+				exitChatRoom(me, findChatRoom.get());
+			}
 		}
 	}
 
@@ -187,7 +197,7 @@ public class StompService {
 
 
 	// TODO janguni: 채팅 저장
-	public ChatDto sendChat(User user, ChatRoom chatRoom, String message) {
+	public ChatDto saveChat(User user, ChatRoom chatRoom, String message) {
 		Date now = new Date();
 
 		Chat savedChat = chatService.save(user, chatRoom, message, now);
@@ -288,7 +298,7 @@ public class StompService {
 		}
 
 		//2. 만약 내 유저 정보가 없다면 오류 반환
-		if (stdUserFoundedCnt != 2) {
+		if (stdUserFoundedCnt != 1) {
 			throw new BaseException(ErrorCode.INTERNAL_SERVER_ERROR, "Participants가 유효하지 않습니다.");
 		}
 

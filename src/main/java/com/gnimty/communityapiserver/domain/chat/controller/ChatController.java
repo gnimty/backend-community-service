@@ -94,7 +94,7 @@ public class ChatController {
 		ChatRoom chatRoom = chatRoomService.getChatRoom(chatRoomNo);
 
 		if (request.getType() == MessageRequestType.CHAT) {
-			ChatDto chatDto = stompService.sendChat(user, chatRoom, request.getData());
+			ChatDto chatDto = stompService.saveChat(user, chatRoom, request.getData());
 			stompService.sendToChatRoomSubscribers(chatRoomNo,
 				new MessageResponse(MessageResponseType.CHAT_MESSAGE, chatDto));
 		} else if (request.getType() == MessageRequestType.READ) {
@@ -104,6 +104,7 @@ public class ChatController {
 		} else {
 			stompService.exitChatRoom(user, chatRoomService.getChatRoom(chatRoomNo));
 		}
+
 
 	}
 
