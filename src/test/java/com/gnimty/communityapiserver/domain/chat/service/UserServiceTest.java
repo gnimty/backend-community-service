@@ -199,7 +199,6 @@ class UserServiceTest {
 			RiotAccount riotAccount = RiotAccount.builder()
 				.member(member)
 				.name("uni")
-				.internalName("uniInternal")
 				.tagLine("tagLine")
 				.internalTagName("uniInternalTagLine")
 				.puuid("puuid")
