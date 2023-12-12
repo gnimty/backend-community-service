@@ -58,16 +58,14 @@ public class RiotAccountService {
 
 	public RecentlySummonersServiceResponse getRecentlySummoners(Member member, List<Long> chattedMemberIds) {
 		RiotAccount riotAccount = riotAccountReadService.findMainAccountByMember(member);
-		RecentMemberInfo recentMemberInfo = getRecentMemberInfo(riotAccount.getInternalTagName(), GameMode.RANK_SOLO);
-		RecentMemberInfo recentMemberInfoFlex = getRecentMemberInfo(riotAccount.getInternalTagName(),
-			GameMode.RANK_FLEX);
+		String tagName = riotAccount.getName() + "-" + riotAccount.getTagLine();
+		RecentMemberInfo recentMemberInfo = getRecentMemberInfo(tagName, GameMode.RANK_SOLO);
+		RecentMemberInfo recentMemberInfoFlex = getRecentMemberInfo(tagName, GameMode.RANK_FLEX);
 		List<RiotAccount> chattedRiotAccounts = getChattedRiotAccounts(chattedMemberIds);
 
 		Map<String, RiotAccount> riotAccountMap = createRiotAccountMap(member, chattedRiotAccounts);
-		List<RecentlySummonersEntry> recentlySummoners = createMatchingRecentlySummoners(
-			recentMemberInfo, riotAccountMap);
-		List<RecentlySummonersEntry> recentlySummonersFlex = createMatchingRecentlySummoners(
-			recentMemberInfoFlex, riotAccountMap);
+		List<RecentlySummonersEntry> recentlySummoners = matchSummoners(recentMemberInfo, riotAccountMap);
+		List<RecentlySummonersEntry> recentlySummonersFlex = matchSummoners(recentMemberInfoFlex, riotAccountMap);
 
 		return RecentlySummonersServiceResponse.builder()
 			.recentlySummoners(recentlySummoners)
@@ -81,7 +79,7 @@ public class RiotAccountService {
 			.toList();
 	}
 
-	private List<RecentlySummonersEntry> createMatchingRecentlySummoners(
+	private List<RecentlySummonersEntry> matchSummoners(
 		RecentMemberInfo recentMemberInfo,
 		Map<String, RiotAccount> riotAccountMap
 	) {
