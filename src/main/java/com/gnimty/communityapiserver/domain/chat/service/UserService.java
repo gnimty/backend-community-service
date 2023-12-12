@@ -50,7 +50,7 @@ public class UserService {
 
 
 	public User save(User updatedUser) {
-		findAllUser(updatedUser.getActualUserId())
+		findUser(updatedUser.getActualUserId())
 			.orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_USER));
 		return userRepository.save(updatedUser);
 	}
