@@ -28,6 +28,7 @@ import com.gnimty.communityapiserver.domain.member.service.utils.GoogleOauthUtil
 import com.gnimty.communityapiserver.domain.member.service.utils.KakaoOauthUtil;
 import com.gnimty.communityapiserver.domain.member.service.utils.MailSenderUtil;
 import com.gnimty.communityapiserver.domain.member.service.utils.RiotOauthUtil;
+import com.gnimty.communityapiserver.domain.member.service.utils.RiotOauthUtil.RiotAccountInfo;
 import com.gnimty.communityapiserver.domain.memberlike.entity.MemberLike;
 import com.gnimty.communityapiserver.domain.memberlike.repository.MemberLikeRepository;
 import com.gnimty.communityapiserver.domain.memberlike.service.MemberLikeReadService;
@@ -40,6 +41,7 @@ import com.gnimty.communityapiserver.domain.prefergamemode.service.PreferGameMod
 import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
 import com.gnimty.communityapiserver.domain.riotaccount.repository.RiotAccountRepository;
 import com.gnimty.communityapiserver.domain.riotaccount.service.RiotAccountReadService;
+import com.gnimty.communityapiserver.domain.riotaccount.service.utils.RiotAccountUpdateUtil;
 import com.gnimty.communityapiserver.domain.schedule.controller.dto.request.ScheduleEntry;
 import com.gnimty.communityapiserver.domain.schedule.entity.Schedule;
 import com.gnimty.communityapiserver.domain.schedule.repository.ScheduleRepository;
@@ -47,10 +49,8 @@ import com.gnimty.communityapiserver.domain.schedule.service.ScheduleReadService
 import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
 import com.gnimty.communityapiserver.global.constant.Auth;
 import com.gnimty.communityapiserver.global.constant.KeyPrefix;
-import com.gnimty.communityapiserver.global.constant.Lane;
 import com.gnimty.communityapiserver.global.constant.Provider;
 import com.gnimty.communityapiserver.global.constant.Status;
-import com.gnimty.communityapiserver.global.constant.Tier;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
 import com.gnimty.communityapiserver.global.utils.RandomCodeGenerator;
@@ -91,31 +91,25 @@ public class MemberService {
 	private final BlockRepository blockRepository;
 	private final ScheduleRepository scheduleRepository;
 	private final MailSenderUtil mailSenderUtil;
+	private final RiotAccountUpdateUtil riotAccountUpdateUtil;
 
+	@Transactional
 	public RiotAccount summonerAccountLink(OauthLoginServiceRequest request) {
 		Member member = MemberThreadLocal.get();
 
-		String puuid = "puuid";
-		// String puuid = riotOauthUtil.getPuuid(request.getAuthCode());
-		// get summoner info by puuid
+		RiotAccountInfo info = riotOauthUtil.getPuuid(request.getAuthCode());
 
-		riotAccountReadService.throwIfExistsByPuuid(puuid);
+		riotAccountReadService.throwIfExistsByPuuid(info.getPuuid());
 		Boolean existsMain = riotAccountReadService.existsByMemberId(member);
 
 		RiotAccount riotAccount = riotAccountRepository.save(RiotAccount.builder()
-			.tagLine("summonerName")
+			.name(info.getGameName())
+			.internalTagName((info.getGameName() + "#" + info.getTagLine()).trim().toLowerCase())
+			.tagLine(info.getTagLine())
 			.isMain(!existsMain)
-			.queue(Tier.bronze)
-			.lp(100L)
-			.division(100)
-			.mmr(100L)
-			.frequentLane1(Lane.TOP)
-			.frequentLane2(Lane.BOTTOM)
-			.frequentChampionId1(1L)
-			.frequentChampionId2(1L)
-			.frequentChampionId3(1L)
-			.puuid(puuid)
+			.puuid(info.getPuuid())
 			.member(member)
+			.level(0L)
 			.build()
 		);
 
@@ -124,6 +118,7 @@ public class MemberService {
 			member.updateRsoLinked(true);
 		}
 
+		riotAccountUpdateUtil.updateSummonerInfo(info, riotAccount.getId());
 		return riotAccount;
 	}
 
