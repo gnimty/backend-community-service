@@ -14,10 +14,12 @@ import lombok.NoArgsConstructor;
 public class RecentlySummonersResponse {
 
 	private List<RecentlySummonersEntry> recentlySummoners;
+	private List<RecentlySummonersEntry> recentlySummonersFlex;
 
 	public static RecentlySummonersResponse from(RecentlySummonersServiceResponse response) {
 		return RecentlySummonersResponse.builder()
 			.recentlySummoners(response.getRecentlySummoners())
+			.recentlySummonersFlex(response.getRecentlySummonersFlex())
 			.build();
 	}
 

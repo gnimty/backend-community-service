@@ -58,15 +58,18 @@ public class RiotAccountService {
 
 	public RecentlySummonersServiceResponse getRecentlySummoners(Member member, List<Long> chattedMemberIds) {
 		RiotAccount riotAccount = riotAccountReadService.findMainAccountByMember(member);
-		RecentMemberInfo recentMemberInfo = getRecentMemberInfo(riotAccount.getInternalTagName());
+		String tagName = riotAccount.getName() + "-" + riotAccount.getTagLine();
+		RecentMemberInfo recentMemberInfo = getRecentMemberInfo(tagName, GameMode.RANK_SOLO);
+		RecentMemberInfo recentMemberInfoFlex = getRecentMemberInfo(tagName, GameMode.RANK_FLEX);
 		List<RiotAccount> chattedRiotAccounts = getChattedRiotAccounts(chattedMemberIds);
 
 		Map<String, RiotAccount> riotAccountMap = createRiotAccountMap(member, chattedRiotAccounts);
-		List<RecentlySummonersEntry> recentlySummoners = createMatchingRecentlySummoners(
-			recentMemberInfo, riotAccountMap);
+		List<RecentlySummonersEntry> recentlySummoners = matchSummoners(recentMemberInfo, riotAccountMap);
+		List<RecentlySummonersEntry> recentlySummonersFlex = matchSummoners(recentMemberInfoFlex, riotAccountMap);
 
 		return RecentlySummonersServiceResponse.builder()
 			.recentlySummoners(recentlySummoners)
+			.recentlySummonersFlex(recentlySummonersFlex)
 			.build();
 	}
 
@@ -76,7 +79,7 @@ public class RiotAccountService {
 			.toList();
 	}
 
-	private List<RecentlySummonersEntry> createMatchingRecentlySummoners(
+	private List<RecentlySummonersEntry> matchSummoners(
 		RecentMemberInfo recentMemberInfo,
 		Map<String, RiotAccount> riotAccountMap
 	) {
@@ -87,10 +90,10 @@ public class RiotAccountService {
 			.collect(Collectors.toList());
 	}
 
-	private RecentMemberInfo getRecentMemberInfo(String internalTagName) {
+	private RecentMemberInfo getRecentMemberInfo(String internalTagName, GameMode gameMode) {
 		return WebClient.create("https://gnimty.kro.kr")
 			.get()
-			.uri("/statistics/summoners/together/" + internalTagName)
+			.uri("/statistics/summoners/together/" + internalTagName + "?queue_type=" + gameMode.name())
 			.retrieve()
 			.bodyToMono(RecentMemberInfo.class)
 			.block();

@@ -1209,7 +1209,6 @@ public class MemberServiceTest extends ServiceTestSupport {
 		return RiotAccount.builder()
 			.name(summonerName)
 			.tagLine("tagLine")
-			.internalName(summonerName.toLowerCase().intern())
 			.internalTagName((summonerName + "#tagLine").toLowerCase().intern())
 			.isMain(isMain)
 			.queue(Tier.diamond)
