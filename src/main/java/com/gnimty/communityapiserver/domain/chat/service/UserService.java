@@ -49,13 +49,10 @@ public class UserService {
 	}
 
 
-	public User save(User user) {
-		return userRepository.findByActualUserId(user.getActualUserId())
-			.map(existingUser -> {
-				existingUser.updateByUser(user);
-				return userRepository.save(existingUser);
-			})
-			.orElseGet(() -> userRepository.save(user));
+	public User save(User updatedUser) {
+		findAllUser(updatedUser.getActualUserId())
+			.orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_USER));
+		return userRepository.save(updatedUser);
 	}
 
 	public BulkWriteResult updateMany(List<User> users) {
