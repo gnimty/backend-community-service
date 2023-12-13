@@ -26,7 +26,6 @@ public class ChampionCommentsRequest {
 	@NotNull
 	@Size(max = 1000)
 	private String contents;
-	@NotNull(message = INVALID_INPUT_VALUE)
 	private CommentsType commentsType;
 	private Long parentChampionCommentsId;
 
