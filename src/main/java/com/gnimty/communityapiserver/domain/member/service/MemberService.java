@@ -48,6 +48,8 @@ import com.gnimty.communityapiserver.domain.schedule.repository.ScheduleReposito
 import com.gnimty.communityapiserver.domain.schedule.service.ScheduleReadService;
 import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
 import com.gnimty.communityapiserver.global.constant.Auth;
+import com.gnimty.communityapiserver.global.constant.DayOfWeek;
+import com.gnimty.communityapiserver.global.constant.GameMode;
 import com.gnimty.communityapiserver.global.constant.KeyPrefix;
 import com.gnimty.communityapiserver.global.constant.Provider;
 import com.gnimty.communityapiserver.global.constant.Status;
@@ -114,8 +116,9 @@ public class MemberService {
 		);
 
 		if (!existsMain) {
-			member.updateNickname("summonerName");
+			member.updateNickname(riotAccount.getName() + "#" + riotAccount.getTagLine());
 			member.updateRsoLinked(true);
+			insertDefaultQueries(member);
 		}
 
 		riotAccountUpdateUtil.updateSummonerInfo(info, riotAccount.getId());
@@ -272,6 +275,25 @@ public class MemberService {
 		preferGameModeRepository.deleteAllFromMember(member.getId());
 		introductionRepository.deleteAllFromMember(member.getId());
 		memberRepository.delete(member);
+	}
+
+	private void insertDefaultQueries(Member member) {
+		for (GameMode gameMode : GameMode.values()) {
+			preferGameModeRepository.save(PreferGameMode.builder()
+				.member(member)
+				.gameMode(gameMode)
+				.build()
+			);
+		}
+		for (DayOfWeek dayOfWeek : DayOfWeek.values()) {
+			scheduleRepository.save(Schedule.builder()
+				.member(member)
+				.dayOfWeek(dayOfWeek)
+				.startTime(0)
+				.endTime(24)
+				.build()
+			);
+		}
 	}
 
 	private void updateIntroductions(List<IntroductionEntry> introductions, Member member) {
