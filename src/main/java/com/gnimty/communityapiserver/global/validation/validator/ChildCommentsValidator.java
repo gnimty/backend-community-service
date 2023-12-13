@@ -23,8 +23,7 @@ public class ChildCommentsValidator implements ConstraintValidator<IsChildCommen
 		Long parentChampionCommentsId = getParentId(value);
 		Integer depth = getDepth(value);
 
-		return (parentChampionCommentsId == null || depth != 0)
-			&& (parentChampionCommentsId != null || depth == 0);
+		return (parentChampionCommentsId == null && depth == 0) || (parentChampionCommentsId != null && depth != 0);
 	}
 
 	private Long getParentId(Object object) {
