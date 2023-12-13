@@ -16,11 +16,16 @@ import com.gnimty.communityapiserver.domain.chat.repository.Chat.ChatRepository;
 import com.gnimty.communityapiserver.domain.chat.repository.ChatRoom.ChatRoomRepository;
 import com.gnimty.communityapiserver.domain.chat.repository.User.UserRepository;
 import com.gnimty.communityapiserver.domain.chat.service.dto.UserWithBlockDto;
+import com.gnimty.communityapiserver.domain.member.entity.Member;
+import com.gnimty.communityapiserver.domain.member.repository.MemberRepository;
+import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
+import com.gnimty.communityapiserver.global.constant.Lane;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.constant.Tier;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
 import com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -43,6 +48,9 @@ public class StompServiceTest {
 
 	@Autowired
 	private UserRepository userRepository;
+
+	@Autowired
+	private MemberRepository memberRepository;
 
 	@Autowired
 	private ChatRepository chatRepository;
@@ -388,9 +396,10 @@ public class StompServiceTest {
 				Chat.builder().senderId(userB.getActualUserId()).sendDate(new Date()).message("bye")
 					.chatRoomNo(chatRoom.getChatRoomNo()).build());
 
+
 			Participant participantUserA = stompService.extractParticipant(userA,
 				chatRoom.getParticipants(), true);
-			participantUserA.setExitDate(new Date());
+			participantUserA.setExitDate(new Date()); // 채팅방을 나감
 			chatRoomRepository.update(chatRoom);
 
 			chatRepository.save(
@@ -877,6 +886,50 @@ public class StompServiceTest {
 			// when & then
 			assertThatCode(() -> stompService.withdrawal(1L))
 				.doesNotThrowAnyException();
+		}
+	}
+
+	@DisplayName("라이엇 정보 변경 시")
+	@Nested
+	class updateRiotAccount {
+
+		@DisplayName("User가 존재하면 라이엇 정보 업데이트 됨")
+		@Test
+		void updateProfileIconId() {
+			// given
+			Member member = new Member(true, "uni@naver.com", "afD23!", 1L, "uni", Status.ONLINE,
+				1L);
+			memberRepository.save(member);
+
+
+			RiotAccount riotAccount = RiotAccount.builder()
+				.member(member)
+				.division(2)
+				.frequentChampionId2(4L)
+				.frequentChampionId3(5L)
+				.build();
+
+			User user = User.builder()
+				.actualUserId(member.getId())
+				.name("uni")
+				.division(3)
+				.frequentChampionId1(1L)
+				.frequentChampionId2(2L)
+				.build();
+
+			userRepository.save(user);
+
+			// when
+			stompService.createOrUpdateUser(riotAccount);
+
+			// then
+			Optional<User> findUser = userRepository.findByActualUserId(user.getActualUserId());
+			assertThat(findUser).isPresent();
+			assertThat(findUser.get().getName()).isEqualTo("uni");
+			assertThat(findUser.get().getDivision()).isEqualTo(2);
+			assertThat(findUser.get().getFrequentChampionId1()).isEqualTo(1L);
+			assertThat(findUser.get().getFrequentChampionId2()).isEqualTo(4L);
+			assertThat(findUser.get().getFrequentChampionId3()).isEqualTo(5L);
 		}
 	}
 
