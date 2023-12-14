@@ -1,4 +1,4 @@
-package com.gnimty.communityapiserver.global.config;
+package com.gnimty.communityapiserver.global.config.async;
 
 import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +12,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @Configuration
 @EnableAsync
 @Slf4j
-public class AsyncConfiguration implements AsyncConfigurer {
+public class MailAsyncConfiguration implements AsyncConfigurer {
 
 	@Override
 	@Bean(name = "mailExecutor")

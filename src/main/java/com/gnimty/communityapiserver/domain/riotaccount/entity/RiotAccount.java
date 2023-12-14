@@ -4,6 +4,7 @@ import com.gnimty.communityapiserver.domain.base.entity.BaseEntity;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.global.constant.Lane;
 import com.gnimty.communityapiserver.global.constant.Tier;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -48,20 +49,16 @@ public class RiotAccount extends BaseEntity {
 	@Column(name = "is_main", columnDefinition = "TINYINT")
 	private Boolean isMain;
 
-	@NotNull
 	@Column(name = "queue", columnDefinition = "VARCHAR(20)")
 	@Enumerated(EnumType.STRING)
 	private Tier queue;
 
-	@NotNull
 	@Column(name = "lp", columnDefinition = "BIGINT")
 	private Long lp;
 
-	@NotNull
 	@Column(name = "division", columnDefinition = "TINYINT")
 	private Integer division;
 
-	@NotNull
 	@Column(name = "mmr", columnDefinition = "BIGINT")
 	private Long mmr;
 
@@ -86,24 +83,19 @@ public class RiotAccount extends BaseEntity {
 	@Column(name = "puuid", columnDefinition = "VARCHAR(100)")
 	private String puuid;
 
-	@NotNull
 	@Column(name = "icon_id", columnDefinition = "BIGINT")
 	private Long iconId;
 
-	@NotNull
 	@Column(name = "queue_flex", columnDefinition = "VARCHAR(20)")
 	@Enumerated(EnumType.STRING)
 	private Tier queueFlex;
 
-	@NotNull
 	@Column(name = "lp_flex", columnDefinition = "BIGINT")
 	private Long lpFlex;
 
-	@NotNull
 	@Column(name = "division_flex", columnDefinition = "TINYINT")
 	private Integer divisionFlex;
 
-	@NotNull
 	@Column(name = "mmr_flex", columnDefinition = "BIGINT")
 	private Long mmrFlex;
 
@@ -123,6 +115,10 @@ public class RiotAccount extends BaseEntity {
 
 	@Column(name = "frequent_champion_id_3_flex", columnDefinition = "BIGINT")
 	private Long frequentChampionId3Flex;
+
+	@NotNull
+	@Column(name = "level", columnDefinition = "BIGINT")
+	private Long level;
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "member_id", nullable = false)
@@ -154,6 +150,7 @@ public class RiotAccount extends BaseEntity {
 		Long frequentChampionId1Flex,
 		Long frequentChampionId2Flex,
 		Long frequentChampionId3Flex,
+		Long level,
 		Member member
 	) {
 		this.name = name;
@@ -180,10 +177,79 @@ public class RiotAccount extends BaseEntity {
 		this.frequentChampionId1Flex = frequentChampionId1Flex;
 		this.frequentChampionId2Flex = frequentChampionId2Flex;
 		this.frequentChampionId3Flex = frequentChampionId3Flex;
+		this.level = level;
 		this.member = member;
 	}
 
 	public void updateIsMain() {
 		isMain = !isMain;
+	}
+
+	public void updateIconId(Long iconId) {
+		this.iconId = iconId;
+	}
+
+	public void updateLevel(Long level) {
+		this.level = level;
+	}
+
+	public void updateSoloInfo(
+		Tier tier,
+		Integer division,
+		Long lp,
+		Long mmr,
+		List<Long> mostChampionIds,
+		List<Lane> mostLanes
+	) {
+		this.queue = tier;
+		this.division = division;
+		this.lp = lp;
+		this.mmr = mmr;
+		for (int i = 0; i < mostChampionIds.size(); i++) {
+			if (i == 0) {
+				this.frequentChampionId1 = mostChampionIds.get(i);
+			} else if (i == 1) {
+				this.frequentChampionId2 = mostChampionIds.get(i);
+			} else if (i == 2) {
+				this.frequentChampionId3 = mostChampionIds.get(i);
+			}
+		}
+		for (int i = 0; i < mostLanes.size(); i++) {
+			if (i == 0) {
+				this.frequentLane1 = mostLanes.get(i);
+			} else if (i == 1) {
+				this.frequentLane2 = mostLanes.get(i);
+			}
+		}
+	}
+
+	public void updateFlexInfo(
+		Tier tier,
+		Integer division,
+		Long lp,
+		Long mmr,
+		List<Long> mostChampionIds,
+		List<Lane> mostLanes
+	) {
+		this.queueFlex = tier;
+		this.divisionFlex = division;
+		this.lpFlex = lp;
+		this.mmrFlex = mmr;
+		for (int i = 0; i < mostChampionIds.size(); i++) {
+			if (i == 0) {
+				this.frequentChampionId1Flex = mostChampionIds.get(i);
+			} else if (i == 1) {
+				this.frequentChampionId2Flex = mostChampionIds.get(i);
+			} else if (i == 2) {
+				this.frequentChampionId3Flex = mostChampionIds.get(i);
+			}
+		}
+		for (int i = 0; i < mostLanes.size(); i++) {
+			if (i == 0) {
+				this.frequentLane1Flex = mostLanes.get(i);
+			} else if (i == 1) {
+				this.frequentLane2Flex = mostLanes.get(i);
+			}
+		}
 	}
 }
