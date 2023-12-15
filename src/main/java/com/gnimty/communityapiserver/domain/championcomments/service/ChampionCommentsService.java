@@ -147,11 +147,8 @@ public class ChampionCommentsService {
 			throw new BaseException(COMMENTS_ID_AND_CHAMPION_ID_INVALID);
 		}
 
-		championComments.updateLane(request.getLane());
-		championComments.updateOpponentChampionId(request.getOpponentChampionId());
 		championComments.updateMentionedMemberId(request.getMentionedMemberId());
 		championComments.updateContents(request.getContents());
-		championComments.updateCommentsType(request.getCommentsType());
 	}
 
 	public void deleteComments(Long championId, Long commentsId) {
