@@ -50,13 +50,14 @@ public class ChampionCommentsService {
 		ChampionComments parentComments,
 		VersionInfo versionInfo
 	) {
-		if (isChildComments(request)) {
-			if (invalidChildComments(request)) {
-				throw new BaseException(ErrorCode.INVALID_CHILD_COMMENTS);
-			}
-			if (isNotSameVersion(parentComments, versionInfo)) {
-				throw new BaseException(ErrorCode.INVALID_VERSION);
-			}
+		if (!isChildComments(request)) {
+			return;
+		}
+		if (invalidChildComments(request)) {
+			throw new BaseException(ErrorCode.INVALID_CHILD_COMMENTS);
+		}
+		if (isNotSameVersion(parentComments, versionInfo)) {
+			throw new BaseException(ErrorCode.INVALID_VERSION);
 		}
 	}
 
