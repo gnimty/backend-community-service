@@ -91,6 +91,7 @@ public class AuthService {
 			getRedisKey(KeyPrefix.REFRESH, String.valueOf(member.getId())),
 			authToken.getRefreshToken().replaceAll(Auth.BEARER.getContent(), ""),
 			Auth.REFRESH_TOKEN_EXPIRATION.getExpiration());
+		member.updateNickname(generateTemporaryNickname(member.getId()));
 		return authToken;
 	}
 
@@ -105,6 +106,7 @@ public class AuthService {
 			getRedisKey(KeyPrefix.REFRESH, String.valueOf(member.getId())),
 			authToken.getRefreshToken().replaceAll(Auth.BEARER.getContent(), ""),
 			Auth.REFRESH_TOKEN_EXPIRATION.getExpiration());
+		member.updateNickname(generateTemporaryNickname(member.getId()));
 		return authToken;
 	}
 
