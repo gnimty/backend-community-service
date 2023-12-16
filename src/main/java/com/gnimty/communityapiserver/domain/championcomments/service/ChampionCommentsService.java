@@ -62,7 +62,7 @@ public class ChampionCommentsService {
 	}
 
 	private boolean isNotSameVersion(ChampionComments parentComments, VersionInfo versionInfo) {
-		return parentComments.getVersion().equals(versionInfo.getData().getVersion());
+		return !parentComments.getVersion().equals(versionInfo.getData().getVersion());
 	}
 
 	private boolean isChildComments(ChampionCommentsServiceRequest request) {
