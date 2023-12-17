@@ -9,6 +9,7 @@ import com.gnimty.communityapiserver.domain.championcomments.service.dto.request
 import com.gnimty.communityapiserver.domain.championcomments.service.dto.request.ChampionCommentsUpdateServiceRequest;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.domain.member.service.MemberReadService;
+import com.gnimty.communityapiserver.domain.riotaccount.repository.RiotAccountQueryRepository;
 import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
@@ -28,20 +29,52 @@ public class ChampionCommentsService {
 	private final ChampionCommentsReadService championCommentsReadService;
 	private final MemberReadService memberReadService;
 	private final ChampionCommentsRepository championCommentsRepository;
+	private final RiotAccountQueryRepository riotAccountQueryRepository;
 
 	public void addComments(Long championId, ChampionCommentsServiceRequest request) {
 		Member member = MemberThreadLocal.get();
 
+		if (!riotAccountQueryRepository.existsByMember(member)) {
+			throw new BaseException(ErrorCode.NOT_LINKED_RSO);
+		}
 		// 해당하는 championId, opponentChampionId가 올바른지 validation
-
 		throwIfNotFoundMentionedMember(request);
-		ChampionComments parentComments = throwIfInvalidParentComments(request);
 		VersionInfo versionInfo = getVersion();
-		championCommentsRepository.save(
-			buildChampionComments(championId, request, member, parentComments, versionInfo));
+		ChampionComments parentComments = findParentComments(request);
+		validateAddRequest(request, parentComments, versionInfo);
+		championCommentsRepository.save(getChampionComments(championId, request, member, parentComments, versionInfo));
 	}
 
-	private ChampionComments buildChampionComments(
+	private void validateAddRequest(
+		ChampionCommentsServiceRequest request,
+		ChampionComments parentComments,
+		VersionInfo versionInfo
+	) {
+		if (!isChildComments(request)) {
+			return;
+		}
+		if (invalidChildComments(request)) {
+			throw new BaseException(ErrorCode.INVALID_CHILD_COMMENTS);
+		}
+		if (isNotSameVersion(parentComments, versionInfo)) {
+			throw new BaseException(ErrorCode.INVALID_VERSION);
+		}
+	}
+
+	private boolean isNotSameVersion(ChampionComments parentComments, VersionInfo versionInfo) {
+		return !parentComments.getVersion().equals(versionInfo.getData().getVersion());
+	}
+
+	private boolean isChildComments(ChampionCommentsServiceRequest request) {
+		return request.getDepth() == 1;
+	}
+
+	private boolean invalidChildComments(ChampionCommentsServiceRequest request) {
+		return request.getCommentsType() != null || request.getLane() != null
+			|| request.getOpponentChampionId() != null;
+	}
+
+	private ChampionComments getChampionComments(
 		Long championId,
 		ChampionCommentsServiceRequest request,
 		Member member,
@@ -74,14 +107,13 @@ public class ChampionCommentsService {
 		return versionInfo;
 	}
 
-	private ChampionComments throwIfInvalidParentComments(ChampionCommentsServiceRequest request) {
-		ChampionComments parentComments = null;
-		if (request.getParentChampionCommentsId() != null) {
-			parentComments = championCommentsReadService.findById(
-				request.getParentChampionCommentsId());
-			if (parentComments.getDepth() != 0) {
-				throw new BaseException(ErrorCode.PARENT_COMMENTS_DEPTH_MUST_BE_ONE);
-			}
+	private ChampionComments findParentComments(ChampionCommentsServiceRequest request) {
+		if (request.getParentChampionCommentsId() == null) {
+			return null;
+		}
+		ChampionComments parentComments = championCommentsReadService.findById(request.getParentChampionCommentsId());
+		if (parentComments.getDepth() != 0) {
+			throw new BaseException(ErrorCode.PARENT_COMMENTS_DEPTH_MUST_BE_ONE);
 		}
 		return parentComments;
 	}
@@ -116,11 +148,8 @@ public class ChampionCommentsService {
 			throw new BaseException(COMMENTS_ID_AND_CHAMPION_ID_INVALID);
 		}
 
-		championComments.updateLane(request.getLane());
-		championComments.updateOpponentChampionId(request.getOpponentChampionId());
 		championComments.updateMentionedMemberId(request.getMentionedMemberId());
 		championComments.updateContents(request.getContents());
-		championComments.updateCommentsType(request.getCommentsType());
 	}
 
 	public void deleteComments(Long championId, Long commentsId) {

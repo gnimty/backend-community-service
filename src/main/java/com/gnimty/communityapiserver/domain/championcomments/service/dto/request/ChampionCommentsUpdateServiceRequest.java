@@ -9,10 +9,7 @@ import lombok.Getter;
 @Getter
 public class ChampionCommentsUpdateServiceRequest {
 
-	private Lane lane;
-	private Long opponentChampionId;
 	private Long mentionedMemberId;
 	private String contents;
-	private CommentsType commentsType;
 
 }
