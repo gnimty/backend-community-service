@@ -495,7 +495,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 				.willReturn(List.of());
 			willDoNothing()
 				.given(introductionReadService)
-				.throwIfNotExistsOrExceedMain(any(Member.class));
+				.throwIfExceedMain(any(Member.class));
 
 			// when
 			memberService.updateMyProfileMain(request);
@@ -708,7 +708,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 				.willReturn(introductions.get(0));
 			willThrow(exception)
 				.given(introductionReadService)
-				.throwIfNotExistsOrExceedMain(any(Member.class));
+				.throwIfExceedMain(any(Member.class));
 
 			// when & then
 			assertThatThrownBy(() -> memberService.updateMyProfileMain(request))
