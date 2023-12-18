@@ -1,7 +1,5 @@
 package com.gnimty.communityapiserver.domain.championcomments.service.dto.request;
 
-import com.gnimty.communityapiserver.global.constant.CommentsType;
-import com.gnimty.communityapiserver.global.constant.Lane;
 import lombok.Builder;
 import lombok.Getter;
 
