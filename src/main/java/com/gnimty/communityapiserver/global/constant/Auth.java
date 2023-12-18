@@ -19,7 +19,12 @@ public enum Auth {
 	SUBJECT_REFRESH_TOKEN("refreshToken"),
 	BEARER("Bearer "),
 	AUTHORIZATION("Authorization"),
-	EMAIL_SUBJECT("gnimty : 이메일 인증번호 안내");
+	EMAIL_SUBJECT("gnimty : 이메일 인증번호 안내"),
+	AUTH_TYPE("typ"),
+	JWT_TYPE("JWT"),
+	TOKEN_SPLITTER("\\."),
+	EMAIL_PAYLOAD_NAME("email"),
+	ID_PAYLOAD_NAME("id");
 
 	private long expiration;
 	private String content;

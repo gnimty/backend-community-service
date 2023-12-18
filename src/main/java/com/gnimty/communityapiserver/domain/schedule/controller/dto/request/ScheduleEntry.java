@@ -1,5 +1,8 @@
 package com.gnimty.communityapiserver.domain.schedule.controller.dto.request;
 
+import static com.gnimty.communityapiserver.global.constant.Bound.MAX_HOUR;
+import static com.gnimty.communityapiserver.global.constant.Bound.MIN_HOUR;
+
 import com.gnimty.communityapiserver.domain.schedule.entity.Schedule;
 import com.gnimty.communityapiserver.global.constant.DayOfWeek;
 import com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage;
@@ -19,13 +22,13 @@ public class ScheduleEntry {
 	private DayOfWeek dayOfWeek;
 
 	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
-	@Min(value = 0, message = ErrorMessage.INVALID_INPUT_VALUE)
-	@Max(value = 24, message = ErrorMessage.INVALID_INPUT_VALUE)
+	@Min(value = MIN_HOUR, message = ErrorMessage.INVALID_INPUT_VALUE)
+	@Max(value = MAX_HOUR, message = ErrorMessage.INVALID_INPUT_VALUE)
 	private Integer startTime;
 
 	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
-	@Min(value = 0, message = ErrorMessage.INVALID_INPUT_VALUE)
-	@Max(value = 24, message = ErrorMessage.INVALID_INPUT_VALUE)
+	@Min(value = MIN_HOUR, message = ErrorMessage.INVALID_INPUT_VALUE)
+	@Max(value = MAX_HOUR, message = ErrorMessage.INVALID_INPUT_VALUE)
 	private Integer endTime;
 
 	public static ScheduleEntry from(Schedule schedule) {

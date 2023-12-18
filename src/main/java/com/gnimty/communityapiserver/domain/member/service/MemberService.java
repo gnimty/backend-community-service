@@ -1,5 +1,14 @@
 package com.gnimty.communityapiserver.domain.member.service;
 
+import static com.gnimty.communityapiserver.global.constant.Bound.INITIAL_COUNT;
+import static com.gnimty.communityapiserver.global.constant.Bound.MAIN_INTRODUCTION_COUNT;
+import static com.gnimty.communityapiserver.global.constant.Bound.MAX_HOUR;
+import static com.gnimty.communityapiserver.global.constant.Bound.MAX_INTRODUCTION_COUNT;
+import static com.gnimty.communityapiserver.global.constant.Bound.MIN_HOUR;
+import static com.gnimty.communityapiserver.global.constant.Bound.RANDOM_CODE_LENGTH;
+import static com.gnimty.communityapiserver.global.constant.CommonStringType.PASSWORD_EMAIL_BANNER;
+import static com.gnimty.communityapiserver.global.constant.CommonStringType.PASSWORD_EMAIL_TEMPLATE;
+import static com.gnimty.communityapiserver.global.constant.CommonStringType.TAG_SPLITTER;
 import static com.gnimty.communityapiserver.global.constant.KeyPrefix.PASSWORD;
 import static com.gnimty.communityapiserver.global.constant.KeyPrefix.REFRESH;
 import static com.gnimty.communityapiserver.global.constant.KeyPrefix.UPDATE_PASSWORD;
@@ -106,17 +115,17 @@ public class MemberService {
 
 		RiotAccount riotAccount = riotAccountRepository.save(RiotAccount.builder()
 			.name(info.getGameName())
-			.internalTagName((info.getGameName() + "#" + info.getTagLine()).trim().toLowerCase())
+			.internalTagName((info.getGameName() + TAG_SPLITTER.getValue() + info.getTagLine()).trim().toLowerCase())
 			.tagLine(info.getTagLine())
 			.isMain(!existsMain)
 			.puuid(info.getPuuid())
 			.member(member)
-			.level(0L)
+			.level((long) INITIAL_COUNT.getValue())
 			.build()
 		);
 
 		if (!existsMain) {
-			member.updateNickname(riotAccount.getName() + "#" + riotAccount.getTagLine());
+			member.updateNickname(riotAccount.getName() + TAG_SPLITTER.getValue() + riotAccount.getTagLine());
 			member.updateRsoLinked(true);
 			insertDefaultQueries(member);
 		}
@@ -168,9 +177,9 @@ public class MemberService {
 			throw new BaseException(ErrorCode.NOT_LOGIN_BY_FORM);
 		}
 
-		String code = RandomCodeGenerator.generateCodeByLength(6);
+		String code = RandomCodeGenerator.generateCodeByLength(RANDOM_CODE_LENGTH.getValue());
 		mailSenderUtil.sendEmail(Auth.EMAIL_SUBJECT.getContent(), member.getEmail(), code,
-			"password-mail", "static/images/banner-urf.png");
+			PASSWORD_EMAIL_TEMPLATE.getValue(), PASSWORD_EMAIL_BANNER.getValue());
 		String key = getRedisKey(PASSWORD, member.getEmail());
 		saveInRedis(key, code, Auth.EMAIL_CODE_EXPIRATION.getExpiration());
 	}
@@ -263,9 +272,7 @@ public class MemberService {
 		Member member = MemberThreadLocal.get();
 		List<MemberLike> targets = memberLikeReadService.findBySourceMember(member);
 		targets.forEach(
-			memberLike -> memberReadService.findById(memberLike.getTargetMember().getId())
-				.decreaseUpCount()
-		);
+			memberLike -> memberReadService.findById(memberLike.getTargetMember().getId()).decreaseUpCount());
 		memberLikeRepository.deleteAllFromMember(member.getId());
 		riotAccountRepository.deleteAllFromMember(member.getId());
 		// 챔피언 운용법, 댓글 좋아요
@@ -289,8 +296,8 @@ public class MemberService {
 			scheduleRepository.save(Schedule.builder()
 				.member(member)
 				.dayOfWeek(dayOfWeek)
-				.startTime(0)
-				.endTime(24)
+				.startTime(MIN_HOUR)
+				.endTime(MAX_HOUR)
 				.build()
 			);
 		}
@@ -312,7 +319,7 @@ public class MemberService {
 			List<Introduction> existIntroductions = introductionReadService.findByMember(member);
 			throwIfExceedIntroductionCount(existIntroductions.size(), insertIntroductions.size());
 			insertIntroductions.forEach(entry -> saveIntroduction(member, entry));
-			introductionReadService.throwIfNotExistsOrExceedMain(member);
+			introductionReadService.throwIfExceedMain(member);
 		}
 	}
 
@@ -338,7 +345,7 @@ public class MemberService {
 	}
 
 	private void throwIfExceedIntroductionCount(int updateSize, int insertSize) {
-		if (updateSize + insertSize > 3) {
+		if (updateSize + insertSize > MAX_INTRODUCTION_COUNT.getValue()) {
 			throw new BaseException(ErrorCode.EXCEED_INTRODUCTION_COUNT);
 		}
 	}
@@ -347,7 +354,7 @@ public class MemberService {
 		long mainCount = introductions.stream()
 			.filter(IntroductionEntry::getIsMain)
 			.count();
-		if (mainCount > 1) {
+		if (mainCount > MAIN_INTRODUCTION_COUNT.getValue()) {
 			throw new BaseException(ErrorCode.MAIN_CONTENT_MUST_BE_ONLY);
 		}
 	}

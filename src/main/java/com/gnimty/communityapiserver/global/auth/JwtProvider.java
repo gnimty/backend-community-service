@@ -3,10 +3,15 @@ package com.gnimty.communityapiserver.global.auth;
 
 import static com.gnimty.communityapiserver.global.constant.Auth.ACCESS_TOKEN_EXPIRATION;
 import static com.gnimty.communityapiserver.global.constant.Auth.AUTHORIZATION;
+import static com.gnimty.communityapiserver.global.constant.Auth.AUTH_TYPE;
 import static com.gnimty.communityapiserver.global.constant.Auth.BEARER;
+import static com.gnimty.communityapiserver.global.constant.Auth.EMAIL_PAYLOAD_NAME;
+import static com.gnimty.communityapiserver.global.constant.Auth.ID_PAYLOAD_NAME;
+import static com.gnimty.communityapiserver.global.constant.Auth.JWT_TYPE;
 import static com.gnimty.communityapiserver.global.constant.Auth.REFRESH_TOKEN_EXPIRATION;
 import static com.gnimty.communityapiserver.global.constant.Auth.SUBJECT_ACCESS_TOKEN;
 import static com.gnimty.communityapiserver.global.constant.Auth.SUBJECT_REFRESH_TOKEN;
+import static com.gnimty.communityapiserver.global.constant.Auth.TOKEN_SPLITTER;
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.TOKEN_EXPIRED;
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.TOKEN_INVALID;
 
@@ -54,7 +59,7 @@ public class JwtProvider {
 		Date expireDate = new Date();
 		expireDate.setTime(issueDate.getTime() + expiration);
 		return Jwts.builder()
-			.setHeaderParam("typ", "JWT")
+			.setHeaderParam(AUTH_TYPE.getContent(), JWT_TYPE.getContent())
 			.setClaims(generateClaims(id))
 			.setIssuedAt(issueDate)
 			.setSubject(subject)
@@ -89,14 +94,14 @@ public class JwtProvider {
 	}
 
 	public String getEmailByToken(String token) {
-		String[] chunks = token.split("\\.");
+		String[] chunks = token.split(TOKEN_SPLITTER.getContent());
 		Base64.Decoder decoder = Base64.getUrlDecoder();
 		String payload = new String(decoder.decode(chunks[1]));
 		ObjectMapper objectMapper = new ObjectMapper();
 
 		try {
 			Map<String, Object> payloadMap = objectMapper.readValue(payload, Map.class);
-			return (String) payloadMap.get("email");
+			return (String) payloadMap.get(EMAIL_PAYLOAD_NAME.getContent());
 		} catch (IOException e) {
 			throw new BaseException(TOKEN_INVALID);
 		}
@@ -124,7 +129,7 @@ public class JwtProvider {
 				.setSigningKey(generateKey())
 				.parseClaimsJws(token)
 				.getBody()
-				.get("id")));
+				.get(ID_PAYLOAD_NAME.getContent())));
 		} catch (ExpiredJwtException e) {
 			throw new BaseException(TOKEN_EXPIRED);
 		} catch (MalformedJwtException | SignatureException | IllegalArgumentException e) {
@@ -153,7 +158,7 @@ public class JwtProvider {
 
 	private Claims generateClaims(Long id) {
 		Claims claims = Jwts.claims();
-		claims.put("id", id);
+		claims.put(ID_PAYLOAD_NAME.getContent(), id);
 		return claims;
 	}
 

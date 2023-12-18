@@ -1,5 +1,7 @@
 package com.gnimty.communityapiserver.global.validation.validator;
 
+import static com.gnimty.communityapiserver.global.constant.Bound.PARENT_COMMENTS_DEPTH;
+
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
 import com.gnimty.communityapiserver.global.validation.annotation.IsChildComments;
@@ -23,7 +25,8 @@ public class ChildCommentsValidator implements ConstraintValidator<IsChildCommen
 		Long parentChampionCommentsId = getParentId(value);
 		Integer depth = getDepth(value);
 
-		return (parentChampionCommentsId == null && depth == 0) || (parentChampionCommentsId != null && depth != 0);
+		return (parentChampionCommentsId == null && depth == PARENT_COMMENTS_DEPTH.getValue())
+			|| (parentChampionCommentsId != null && depth != PARENT_COMMENTS_DEPTH.getValue());
 	}
 
 	private Long getParentId(Object object) {
