@@ -347,6 +347,42 @@ class UserServiceTest {
 			assertThat(findUserC).isPresent();
 			assertThat(findUserC.get().getStatus()).isEqualTo(Status.AWAY);
 		}
+
+		@DisplayName("존재하지 않은 User가 있다면 오류, 존재하는 User는 필드 수정")
+		@Test
+		void bulkUpdateUsersAndSaveUser() {
+			// given
+			User userA = createUser("userA", 1L);
+			User userB = createUser("userB", 2L);
+			User userC = createUser("userC", 3L);
+
+			userRepository.save(userA);
+			userRepository.save(userB);
+
+			userA.updateStatus(Status.AWAY);
+			userB.updateStatus(Status.AWAY);
+			userC.updateStatus(Status.AWAY);
+
+			List<User> users = Arrays.asList(userA, userB, userC);
+
+			// when & then
+			assertThatThrownBy(() -> userService.updateMany(users))
+				.isInstanceOf(BaseException.class)
+				.satisfies(exception -> {
+					assertThat(((BaseException) exception).getErrorCode()).isEqualTo(
+						ErrorCode.NOT_FOUND_CHAT_USER);
+				})
+				.hasMessageContaining(ErrorMessage.NOT_FOUND_CHAT_USER);
+
+			// then
+			Optional<User> findUserA = userRepository.findByActualUserId(userA.getActualUserId());
+			assertThat(findUserA).isPresent();
+			assertThat(findUserA.get().getStatus()).isEqualTo(Status.AWAY);
+
+			Optional<User> findUserB = userRepository.findByActualUserId(userB.getActualUserId());
+			assertThat(findUserB).isPresent();
+			assertThat(findUserB.get().getStatus()).isEqualTo(Status.AWAY);
+		}
 	}
 
 	@DisplayName("유저 삭제")

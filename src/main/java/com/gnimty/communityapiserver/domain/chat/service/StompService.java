@@ -149,8 +149,7 @@ public class StompService {
 		if (!accounts.isEmpty()) {
 			List<User> users = accounts.stream()
 				.map(User::toUser)
-				.filter(user -> userService.findUser(user.getActualUserId()).isEmpty())
-				.peek(userService::save)
+				.filter(user -> userService.findUser(user.getActualUserId()).isPresent())
 				.toList();
 //			List<User> users = accounts.stream()
 //				.map(User::toUser)

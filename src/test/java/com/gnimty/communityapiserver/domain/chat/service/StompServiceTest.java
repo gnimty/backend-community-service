@@ -19,7 +19,6 @@ import com.gnimty.communityapiserver.domain.chat.service.dto.UserWithBlockDto;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.domain.member.repository.MemberRepository;
 import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
-import com.gnimty.communityapiserver.global.constant.Lane;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.constant.Tier;
 import com.gnimty.communityapiserver.global.exception.BaseException;
@@ -28,7 +27,6 @@ import com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -396,7 +394,6 @@ public class StompServiceTest {
 			chatRepository.save(
 				Chat.builder().senderId(userB.getActualUserId()).sendDate(new Date()).message("bye")
 					.chatRoomNo(chatRoom.getChatRoomNo()).build());
-
 
 			Participant participantUserA = stompService.extractParticipant(userA,
 				chatRoom.getParticipants(), true);
@@ -908,7 +905,6 @@ public class StompServiceTest {
 				1L);
 			memberRepository.save(member);
 
-
 			RiotAccount riotAccount = RiotAccount.builder()
 				.member(member)
 				.division(2)
@@ -942,11 +938,10 @@ public class StompServiceTest {
 		@DisplayName("User가 없다면 User생성")
 		@Test
 		void createUserWhenNoUser() {
-		    // given
+			// given
 			Member member = new Member(true, "uni@naver.com", "afD23!", 1L, "uni", Status.ONLINE,
 				1L);
 			memberRepository.save(member);
-
 
 			RiotAccount riotAccount = RiotAccount.builder()
 				.member(member)
@@ -955,12 +950,127 @@ public class StompServiceTest {
 				.frequentChampionId3(5L)
 				.build();
 
-		    // when
+			// when
 			stompService.createOrUpdateUser(riotAccount);
 
-		    // then
+			// then
 			assertThat(userRepository.findByActualUserId(member.getId())).isPresent();
 		}
+	}
+
+	@DisplayName("라이엇 정보 bulk 변경 시")
+	@Nested
+	class bulkUpdateRiotAccount {
+
+		@AfterEach
+		void deleteUser() {
+			userRepository.deleteAll();
+			memberRepository.deleteAll();
+		}
+
+		@DisplayName("유저가 모두 존재 한다면 모든 유저 정보 수정")
+		@Test
+		void updateAllUser() {
+			// given
+			Member memberA = new Member(true, "uni1@naver.com", "afD23!", 1L, "uniA", Status.AWAY, 1L);
+			Member memberB = new Member(true, "uni2@naver.com", "afD23!", 1L, "uniB", Status.AWAY, 1L);
+			Member memberC = new Member(true, "uni3@naver.com", "afD23!", 1L, "uniC", Status.AWAY, 1L);
+
+			memberRepository.save(memberA);
+			memberRepository.save(memberB);
+			memberRepository.save(memberC);
+
+			RiotAccount riotAccountA = RiotAccount.builder()
+				.member(memberA)
+				.frequentChampionId1(3L)
+				.build();
+			RiotAccount riotAccountB = RiotAccount.builder()
+				.member(memberB)
+				.frequentChampionId1(3L)
+				.build();
+			RiotAccount riotAccountC = RiotAccount.builder()
+				.member(memberC)
+				.frequentChampionId1(3L)
+				.build();
+			List<RiotAccount> riotAccounts = new ArrayList<> (Arrays.asList(riotAccountA, riotAccountB, riotAccountC));
+
+
+			User userA = createUser("userA", memberA.getId());
+			User userB = createUser("userB", memberB.getId());
+			User userC = createUser("userC", memberC.getId());
+			userRepository.save(userA);
+			userRepository.save(userB);
+			userRepository.save(userC);
+
+			// when
+			stompService.createOrUpdateUser(riotAccounts);
+
+			// then
+			Optional<User> findUserA = userRepository.findByActualUserId(userA.getActualUserId());
+			assertThat(findUserA).isPresent();
+			assertThat(findUserA.get().getFrequentChampionId1()).isEqualTo(3L);
+			assertThat(findUserA.get().getStatus()).isEqualTo(Status.ONLINE);
+
+			Optional<User> findUserB = userRepository.findByActualUserId(userB.getActualUserId());
+			assertThat(findUserB).isPresent();
+			assertThat(findUserB.get().getFrequentChampionId1()).isEqualTo(3L);
+
+			Optional<User> findUserC = userRepository.findByActualUserId(userB.getActualUserId());
+			assertThat(findUserC).isPresent();
+			assertThat(findUserC.get().getFrequentChampionId1()).isEqualTo(3L);
+		}
+
+		@DisplayName("유저들 중 존재 하지 않는 user가 있다면 저장, 나머지는 수정")
+		@Test
+		void saveAndUpdate() {
+			// given
+			Member memberA = new Member(true, "uni1@naver.com", "afD23!", 1L, "uniA", Status.AWAY, 1L);
+			Member memberB = new Member(true, "uni2@naver.com", "afD23!", 1L, "uniB", Status.AWAY, 1L);
+			Member memberC = new Member(true, "uni3@naver.com", "afD23!", 1L, "uniC", Status.AWAY, 1L);
+
+			memberRepository.save(memberA);
+			memberRepository.save(memberB);
+			memberRepository.save(memberC);
+
+			RiotAccount riotAccountA = RiotAccount.builder()
+				.member(memberA)
+				.frequentChampionId1(3L)
+				.build();
+			RiotAccount riotAccountB = RiotAccount.builder()
+				.member(memberB)
+				.frequentChampionId1(3L)
+				.build();
+			RiotAccount riotAccountC = RiotAccount.builder()
+				.member(memberC)
+				.frequentChampionId1(3L)
+				.build();
+			List<RiotAccount> riotAccounts = new ArrayList<> (Arrays.asList(riotAccountA, riotAccountB, riotAccountC));
+
+
+			User userA = createUser("userA", memberA.getId());
+			User userB = createUser("userB", memberB.getId());
+			userRepository.save(userA);
+			userRepository.save(userB);
+
+			// when
+			stompService.createOrUpdateUser(riotAccounts);
+
+			// then
+			Optional<User> findUserA = userRepository.findByActualUserId(userA.getActualUserId());
+			assertThat(findUserA).isPresent();
+			assertThat(findUserA.get().getFrequentChampionId1()).isEqualTo(3L);
+			assertThat(findUserA.get().getStatus()).isEqualTo(Status.ONLINE);
+
+			Optional<User> findUserB = userRepository.findByActualUserId(userB.getActualUserId());
+			assertThat(findUserB).isPresent();
+			assertThat(findUserB.get().getFrequentChampionId1()).isEqualTo(3L);
+
+			Optional<User> findUserC = userRepository.findByActualUserId(userB.getActualUserId());
+			assertThat(findUserC).isPresent();
+			assertThat(findUserC.get().getFrequentChampionId1()).isEqualTo(3L);
+		}
+
+
 	}
 
 	public User createUser(String name, Long actualUserId) {
@@ -970,6 +1080,7 @@ public class StompServiceTest {
 			.division(3)
 			.name(name)
 			.tagLine("tagLine")
+			.frequentChampionId2(1L)
 			.status(Status.ONLINE).lp(3L)
 			.build();
 	}
