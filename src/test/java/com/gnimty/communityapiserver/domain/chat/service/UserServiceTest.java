@@ -1,6 +1,7 @@
 package com.gnimty.communityapiserver.domain.chat.service;
 
 
+import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -247,9 +248,12 @@ class UserServiceTest {
 			// then
 			ArrayList<Lane> lanes = new ArrayList<>(Arrays.asList(Lane.BOTTOM, Lane.JUNGLE));
 
-			assertThat(savedUser.getFrequentChampionId1()).isEqualTo(1L);
-			assertThat(savedUser.getFrequentChampionId2()).isEqualTo(2L);
-			assertThat(savedUser.getFrequentChampionId3()).isEqualTo(3L);
+//			assertThat(savedUser.getFrequentChampionId1()).isEqualTo(1L);
+//			assertThat(savedUser.getFrequentChampionId2()).isEqualTo(2L);
+//			assertThat(savedUser.getFrequentChampionId3()).isEqualTo(3L);
+			assertThat(savedUser.getMostChampions().get(0)).isEqualTo(1L);
+			assertThat(savedUser.getMostChampions().get(1)).isEqualTo(2L);
+			assertThat(savedUser.getMostChampions().get(2)).isEqualTo(3L);
 			assertThat(savedUser.getActualUserId()).isEqualTo(member.getId());
 			assertThat(savedUser.getStatus()).isEqualTo(Status.ONLINE);
 		}
@@ -309,11 +313,11 @@ class UserServiceTest {
 		}
 	}
 
-	@DisplayName("벌크 수정")
+	@DisplayName("벌크 수정 시")
 	@Nested
 	class updateUsers {
 
-		@DisplayName("같은 actualId를 가지고 있는 User의 필드를 수정")
+		@DisplayName("존재하는 User의 필드를 수정")
 		@Test
 		void bulkUpdateUsers() {
 			// given
@@ -348,7 +352,7 @@ class UserServiceTest {
 			assertThat(findUserC.get().getStatus()).isEqualTo(Status.AWAY);
 		}
 
-		@DisplayName("존재하지 않은 User가 있다면 오류, 존재하는 User는 필드 수정")
+		@DisplayName("존재하지 않은 User가 있다면 패스, 존재하는 User는 수정")
 		@Test
 		void bulkUpdateUsersAndSaveUser() {
 			// given
@@ -366,13 +370,7 @@ class UserServiceTest {
 			List<User> users = Arrays.asList(userA, userB, userC);
 
 			// when & then
-			assertThatThrownBy(() -> userService.updateMany(users))
-				.isInstanceOf(BaseException.class)
-				.satisfies(exception -> {
-					assertThat(((BaseException) exception).getErrorCode()).isEqualTo(
-						ErrorCode.NOT_FOUND_CHAT_USER);
-				})
-				.hasMessageContaining(ErrorMessage.NOT_FOUND_CHAT_USER);
+			userService.updateMany(users);
 
 			// then
 			Optional<User> findUserA = userRepository.findByActualUserId(userA.getActualUserId());
@@ -382,6 +380,9 @@ class UserServiceTest {
 			Optional<User> findUserB = userRepository.findByActualUserId(userB.getActualUserId());
 			assertThat(findUserB).isPresent();
 			assertThat(findUserB.get().getStatus()).isEqualTo(Status.AWAY);
+
+			Optional<User> findUserC = userRepository.findByActualUserId(userC.getActualUserId());
+			assertThat(findUserC).isEmpty();
 		}
 	}
 

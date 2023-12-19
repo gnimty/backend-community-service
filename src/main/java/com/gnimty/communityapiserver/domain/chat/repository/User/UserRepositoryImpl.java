@@ -37,21 +37,25 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 			setIfNotNull(update,"division", user.getDivision());
 			setIfNotNull(update,"lp", user.getLp());
 			setIfNotNull(update,"mmr", user.getMmr());
-			setIfNotNull(update,"frequentLane1", user.getFrequentLane1());
-			setIfNotNull(update,"frequentLane2", user.getFrequentLane2());
-			setIfNotNull(update,"frequentChampionId1", user.getFrequentChampionId1());
-			setIfNotNull(update,"frequentChampionId2", user.getFrequentChampionId2());
-			setIfNotNull(update,"frequentChampionId3", user.getFrequentChampionId3());
+			setIfNotNull(update, "mostChampions", user.getMostChampions());
+			setIfNotNull(update, "mostLanes", user.getMostLanes());
+//			setIfNotNull(update,"frequentLane1", user.getFrequentLane1());
+//			setIfNotNull(update,"frequentLane2", user.getFrequentLane2());
+//			setIfNotNull(update,"frequentChampionId1", user.getFrequentChampionId1());
+//			setIfNotNull(update,"frequentChampionId2", user.getFrequentChampionId2());
+//			setIfNotNull(update,"frequentChampionId3", user.getFrequentChampionId3());
 			// 자유 랭크
 			setIfNotNull(update,"tier", user.getTierFlex());
 			setIfNotNull(update,"division", user.getDivisionFlex());
 			setIfNotNull(update,"lp", user.getLpFlex());
 			setIfNotNull(update,"mmr", user.getMmrFlex());
-			setIfNotNull(update,"frequentLane1Flex", user.getFrequentLane1Flex());
-			setIfNotNull(update,"frequentLane2Flex", user.getFrequentLane2Flex());
-			setIfNotNull(update,"frequentChampionId1Flex", user.getFrequentChampionId1Flex());
-			setIfNotNull(update,"frequentChampionId2Flex", user.getFrequentChampionId2Flex());
-			setIfNotNull(update,"frequentChampionId3Flex", user.getFrequentChampionId3Flex());
+			setIfNotNull(update, "mostChampionsFlex", user.getMostChampionsFlex());
+			setIfNotNull(update, "mostLanesFlex", user.getMostLanesFlex());
+//			setIfNotNull(update,"frequentLane1Flex", user.getFrequentLane1Flex());
+//			setIfNotNull(update,"frequentLane2Flex", user.getFrequentLane2Flex());
+//			setIfNotNull(update,"frequentChampionId1Flex", user.getFrequentChampionId1Flex());
+//			setIfNotNull(update,"frequentChampionId2Flex", user.getFrequentChampionId2Flex());
+//			setIfNotNull(update,"frequentChampionId3Flex", user.getFrequentChampionId3Flex());
 
 			bulkOperations.updateOne(query, update);
 		}

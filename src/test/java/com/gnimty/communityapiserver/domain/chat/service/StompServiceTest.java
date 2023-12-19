@@ -1,6 +1,7 @@
 package com.gnimty.communityapiserver.domain.chat.service;
 
 
+import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -19,6 +20,7 @@ import com.gnimty.communityapiserver.domain.chat.service.dto.UserWithBlockDto;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.domain.member.repository.MemberRepository;
 import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
+import com.gnimty.communityapiserver.global.constant.Lane;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.constant.Tier;
 import com.gnimty.communityapiserver.global.exception.BaseException;
@@ -916,8 +918,6 @@ public class StompServiceTest {
 				.actualUserId(member.getId())
 				.name("uni")
 				.division(3)
-				.frequentChampionId1(1L)
-				.frequentChampionId2(2L)
 				.build();
 
 			userRepository.save(user);
@@ -930,9 +930,7 @@ public class StompServiceTest {
 			assertThat(findUser).isPresent();
 			assertThat(findUser.get().getName()).isEqualTo("uni");
 			assertThat(findUser.get().getDivision()).isEqualTo(2);
-			assertThat(findUser.get().getFrequentChampionId1()).isEqualTo(1L);
-			assertThat(findUser.get().getFrequentChampionId2()).isEqualTo(4L);
-			assertThat(findUser.get().getFrequentChampionId3()).isEqualTo(5L);
+			assertThat(findUser.get().getMostChampions()).isEqualTo(Arrays.asList(null, 4L, 5L));
 		}
 
 		@DisplayName("User가 없다면 User생성")
@@ -957,6 +955,7 @@ public class StompServiceTest {
 			assertThat(userRepository.findByActualUserId(member.getId())).isPresent();
 		}
 	}
+
 
 	@DisplayName("라이엇 정보 bulk 변경 시")
 	@Nested
@@ -983,17 +982,22 @@ public class StompServiceTest {
 			RiotAccount riotAccountA = RiotAccount.builder()
 				.member(memberA)
 				.frequentChampionId1(3L)
+				.frequentChampionId3(4L)
+				.frequentLane1(Lane.JUNGLE)
 				.build();
 			RiotAccount riotAccountB = RiotAccount.builder()
 				.member(memberB)
 				.frequentChampionId1(3L)
+				.frequentChampionId3(4L)
+				.frequentLane1(Lane.JUNGLE)
 				.build();
 			RiotAccount riotAccountC = RiotAccount.builder()
 				.member(memberC)
 				.frequentChampionId1(3L)
+				.frequentChampionId3(4L)
+				.frequentLane1(Lane.JUNGLE)
 				.build();
-			List<RiotAccount> riotAccounts = new ArrayList<> (Arrays.asList(riotAccountA, riotAccountB, riotAccountC));
-
+			List<RiotAccount> riotAccounts = new ArrayList<>(Arrays.asList(riotAccountA, riotAccountB, riotAccountC));
 
 			User userA = createUser("userA", memberA.getId());
 			User userB = createUser("userB", memberB.getId());
@@ -1008,16 +1012,21 @@ public class StompServiceTest {
 			// then
 			Optional<User> findUserA = userRepository.findByActualUserId(userA.getActualUserId());
 			assertThat(findUserA).isPresent();
-			assertThat(findUserA.get().getFrequentChampionId1()).isEqualTo(3L);
+			assertThat(findUserA.get().getMostChampions()).isEqualTo(Arrays.asList(3L, null, 4L));
+			assertThat(findUserA.get().getMostLanes()).isEqualTo(Arrays.asList(Lane.JUNGLE, null));
 			assertThat(findUserA.get().getStatus()).isEqualTo(Status.ONLINE);
 
 			Optional<User> findUserB = userRepository.findByActualUserId(userB.getActualUserId());
 			assertThat(findUserB).isPresent();
-			assertThat(findUserB.get().getFrequentChampionId1()).isEqualTo(3L);
+			assertThat(findUserB.get().getMostChampions()).isEqualTo(Arrays.asList(3L, null, 4L));
+			assertThat(findUserB.get().getMostLanes()).isEqualTo(Arrays.asList(Lane.JUNGLE, null));
+			assertThat(findUserB.get().getStatus()).isEqualTo(Status.ONLINE);
 
 			Optional<User> findUserC = userRepository.findByActualUserId(userB.getActualUserId());
 			assertThat(findUserC).isPresent();
-			assertThat(findUserC.get().getFrequentChampionId1()).isEqualTo(3L);
+			assertThat(findUserC.get().getMostChampions()).isEqualTo(Arrays.asList(3L, null, 4L));
+			assertThat(findUserC.get().getMostLanes()).isEqualTo(Arrays.asList(Lane.JUNGLE, null));
+			assertThat(findUserC.get().getStatus()).isEqualTo(Status.ONLINE);
 		}
 
 		@DisplayName("유저들 중 존재 하지 않는 user가 있다면 저장, 나머지는 수정")
@@ -1044,8 +1053,7 @@ public class StompServiceTest {
 				.member(memberC)
 				.frequentChampionId1(3L)
 				.build();
-			List<RiotAccount> riotAccounts = new ArrayList<> (Arrays.asList(riotAccountA, riotAccountB, riotAccountC));
-
+			List<RiotAccount> riotAccounts = new ArrayList<>(Arrays.asList(riotAccountA, riotAccountB, riotAccountC));
 
 			User userA = createUser("userA", memberA.getId());
 			User userB = createUser("userB", memberB.getId());
@@ -1058,19 +1066,17 @@ public class StompServiceTest {
 			// then
 			Optional<User> findUserA = userRepository.findByActualUserId(userA.getActualUserId());
 			assertThat(findUserA).isPresent();
-			assertThat(findUserA.get().getFrequentChampionId1()).isEqualTo(3L);
+			assertThat(findUserA.get().getMostChampions()).isEqualTo(Arrays.asList(3L, null, null));
 			assertThat(findUserA.get().getStatus()).isEqualTo(Status.ONLINE);
 
 			Optional<User> findUserB = userRepository.findByActualUserId(userB.getActualUserId());
 			assertThat(findUserB).isPresent();
-			assertThat(findUserB.get().getFrequentChampionId1()).isEqualTo(3L);
+			assertThat(findUserA.get().getMostChampions()).isEqualTo(Arrays.asList(3L, null, null));
 
 			Optional<User> findUserC = userRepository.findByActualUserId(userB.getActualUserId());
 			assertThat(findUserC).isPresent();
-			assertThat(findUserC.get().getFrequentChampionId1()).isEqualTo(3L);
+			assertThat(findUserA.get().getMostChampions()).isEqualTo(Arrays.asList(3L, null, null));
 		}
-
-
 	}
 
 	public User createUser(String name, Long actualUserId) {
@@ -1080,7 +1086,6 @@ public class StompServiceTest {
 			.division(3)
 			.name(name)
 			.tagLine("tagLine")
-			.frequentChampionId2(1L)
 			.status(Status.ONLINE).lp(3L)
 			.build();
 	}
