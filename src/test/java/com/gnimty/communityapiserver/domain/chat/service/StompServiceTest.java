@@ -28,6 +28,7 @@ import com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -893,6 +894,12 @@ public class StompServiceTest {
 	@Nested
 	class updateRiotAccount {
 
+		@AfterEach
+		void deleteUser() {
+			userRepository.deleteAll();
+			memberRepository.deleteAll();
+		}
+
 		@DisplayName("User가 존재하면 라이엇 정보 업데이트 됨")
 		@Test
 		void updateProfileIconId() {
@@ -930,6 +937,29 @@ public class StompServiceTest {
 			assertThat(findUser.get().getFrequentChampionId1()).isEqualTo(1L);
 			assertThat(findUser.get().getFrequentChampionId2()).isEqualTo(4L);
 			assertThat(findUser.get().getFrequentChampionId3()).isEqualTo(5L);
+		}
+
+		@DisplayName("User가 없다면 User생성")
+		@Test
+		void createUserWhenNoUser() {
+		    // given
+			Member member = new Member(true, "uni@naver.com", "afD23!", 1L, "uni", Status.ONLINE,
+				1L);
+			memberRepository.save(member);
+
+
+			RiotAccount riotAccount = RiotAccount.builder()
+				.member(member)
+				.division(2)
+				.frequentChampionId2(4L)
+				.frequentChampionId3(5L)
+				.build();
+
+		    // when
+			stompService.createOrUpdateUser(riotAccount);
+
+		    // then
+			assertThat(userRepository.findByActualUserId(member.getId())).isPresent();
 		}
 	}
 

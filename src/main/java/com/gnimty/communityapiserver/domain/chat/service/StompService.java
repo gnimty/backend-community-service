@@ -148,7 +148,18 @@ public class StompService {
 	public void createOrUpdateUser(List<RiotAccount> accounts) {
 		if (!accounts.isEmpty()) {
 			List<User> users = accounts.stream()
-				.map(User::toUser).toList();
+				.map(User::toUser)
+				.filter(user -> userService.findUser(user.getActualUserId()).isEmpty())
+				.peek(userService::save)
+				.toList();
+//			List<User> users = accounts.stream()
+//				.map(User::toUser)
+//				.forEach(user -> {
+//					if (userService.findUser(user.getActualUserId())==null) {
+//						userService.save(user);
+//					}
+//				})
+//				.toList();
 			BulkWriteResult bulkWriteResult = userService.updateMany(users);
 		}
 	}
