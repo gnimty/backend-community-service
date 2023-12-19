@@ -224,17 +224,8 @@ public class StompService {
 
 	// TODO janguni: 채팅방에 있는 상대방이 보낸 채팅의 readCount update
 	public void readOtherChats(User me, ChatRoom chatRoom) {
-		Long otherActualUserId = getOther(me, chatRoom).getActualUserId();
-
-		List<Chat> totalChats = chatService.findChats(chatRoom);
-
-		totalChats.stream()
-			.filter(
-				chat -> (chat.getReadCnt() == 1 && chat.getSenderId().equals(otherActualUserId)))
-			.forEach(chat -> {
-				chat.readByAllUser();
-				chatService.save(chat);
-			});
+		User other = getOther(me, chatRoom);
+		chatService.readAllChat(chatRoom, other);
 	}
 
 

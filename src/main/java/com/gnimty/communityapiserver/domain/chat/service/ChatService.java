@@ -23,6 +23,10 @@ public class ChatService {
 		return chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo());
 	}
 
+	public void readAllChat(ChatRoom chatRoom, User other) {
+		chatRepository.reduceReadCntToZero(chatRoom, other);
+	}
+
 	public Chat save(Chat chat) {
 		return chatRepository.save(chat);
 	}
