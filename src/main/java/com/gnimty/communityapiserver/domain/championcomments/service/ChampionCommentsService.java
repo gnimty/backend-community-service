@@ -1,5 +1,8 @@
 package com.gnimty.communityapiserver.domain.championcomments.service;
 
+import static com.gnimty.communityapiserver.global.constant.Bound.CHILD_COMMENTS_DEPTH;
+import static com.gnimty.communityapiserver.global.constant.Bound.INITIAL_COUNT;
+import static com.gnimty.communityapiserver.global.constant.Bound.PARENT_COMMENTS_DEPTH;
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.COMMENTS_ID_AND_CHAMPION_ID_INVALID;
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.NO_PERMISSION;
 
@@ -66,7 +69,7 @@ public class ChampionCommentsService {
 	}
 
 	private boolean isChildComments(ChampionCommentsServiceRequest request) {
-		return request.getDepth() == 1;
+		return request.getDepth() == CHILD_COMMENTS_DEPTH.getValue();
 	}
 
 	private boolean invalidChildComments(ChampionCommentsServiceRequest request) {
@@ -89,8 +92,8 @@ public class ChampionCommentsService {
 			.mentionedMemberId(request.getMentionedMemberId())
 			.contents(request.getContents())
 			.commentsType(request.getCommentsType())
-			.upCount(0L)
-			.downCount(0L)
+			.upCount((long) INITIAL_COUNT.getValue())
+			.downCount((long) INITIAL_COUNT.getValue())
 			.version(versionInfo.getData().getVersion())
 			.member(member)
 			.parentChampionComments(parentComments)
@@ -112,7 +115,7 @@ public class ChampionCommentsService {
 			return null;
 		}
 		ChampionComments parentComments = championCommentsReadService.findById(request.getParentChampionCommentsId());
-		if (parentComments.getDepth() != 0) {
+		if (parentComments.getDepth() != PARENT_COMMENTS_DEPTH.getValue()) {
 			throw new BaseException(ErrorCode.PARENT_COMMENTS_DEPTH_MUST_BE_ONE);
 		}
 		return parentComments;

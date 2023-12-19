@@ -87,8 +87,7 @@ public class MemberController {
 	public CommonResponse<Void> updateMyProfileMain(@RequestBody @Valid MyProfileMainUpdateRequest request) {
 		RiotAccount riotAccount = memberService.updateMyProfileMain(request.toServiceRequest());
 		if (request.getStatus() != null) {
-			stompService.updateConnStatus(userService.getUser(MemberThreadLocal.get().getId()),
-				request.getStatus());
+			stompService.updateConnStatus(userService.getUser(MemberThreadLocal.get().getId()), request.getStatus());
 		}
 		if (riotAccount != null) {
 			stompService.createOrUpdateUser(riotAccount);
@@ -107,8 +106,7 @@ public class MemberController {
 	public CommonResponse<PasswordEmailVerifyResponse> verifyEmailAuthCode(
 		@RequestBody @Valid PasswordEmailVerifyRequest request
 	) {
-		PasswordEmailVerifyServiceResponse response = memberService.verifyEmailAuthCode(
-			request.toServiceRequest());
+		PasswordEmailVerifyServiceResponse response = memberService.verifyEmailAuthCode(request.toServiceRequest());
 		return CommonResponse.success(PasswordEmailVerifyResponse.from(response));
 	}
 

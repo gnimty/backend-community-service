@@ -1,5 +1,12 @@
 package com.gnimty.communityapiserver.domain.member.service;
 
+import static com.gnimty.communityapiserver.global.constant.Bound.INITIAL_COUNT;
+import static com.gnimty.communityapiserver.global.constant.Bound.RANDOM_CODE_LENGTH;
+import static com.gnimty.communityapiserver.global.constant.CommonStringType.EMPTY;
+import static com.gnimty.communityapiserver.global.constant.CommonStringType.SIGNUP_EMAIL_BANNER;
+import static com.gnimty.communityapiserver.global.constant.CommonStringType.SIGNUP_EMAIL_TEMPLATE;
+import static com.gnimty.communityapiserver.global.constant.CommonStringType.VERIFY_SIGNUP;
+
 import com.gnimty.communityapiserver.domain.member.controller.dto.response.AuthToken;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.domain.member.repository.MemberRepository;
@@ -58,7 +65,7 @@ public class AuthService {
 			.password(encodePassword(request.getPassword()))
 			.favoriteChampionID(null)
 			.status(Status.OFFLINE)
-			.upCount(0L)
+			.upCount((long) INITIAL_COUNT.getValue())
 			.build();
 
 		memberRepository.save(member);
@@ -75,7 +82,7 @@ public class AuthService {
 		AuthToken authToken = generateTokenPair(member.getId());
 		saveInRedis(
 			getRedisKey(KeyPrefix.REFRESH, String.valueOf(member.getId())),
-			authToken.getRefreshToken().replaceAll(Auth.BEARER.getContent(), ""),
+			authToken.getRefreshToken().replaceAll(Auth.BEARER.getContent(), EMPTY.getValue()),
 			Auth.REFRESH_TOKEN_EXPIRATION.getExpiration());
 		return authToken;
 	}
@@ -89,7 +96,7 @@ public class AuthService {
 		AuthToken authToken = generateTokenPair(member.getId());
 		saveInRedis(
 			getRedisKey(KeyPrefix.REFRESH, String.valueOf(member.getId())),
-			authToken.getRefreshToken().replaceAll(Auth.BEARER.getContent(), ""),
+			authToken.getRefreshToken().replaceAll(Auth.BEARER.getContent(), EMPTY.getValue()),
 			Auth.REFRESH_TOKEN_EXPIRATION.getExpiration());
 		member.updateNickname(generateTemporaryNickname(member.getId()));
 		return authToken;
@@ -104,16 +111,16 @@ public class AuthService {
 		AuthToken authToken = generateTokenPair(member.getId());
 		saveInRedis(
 			getRedisKey(KeyPrefix.REFRESH, String.valueOf(member.getId())),
-			authToken.getRefreshToken().replaceAll(Auth.BEARER.getContent(), ""),
+			authToken.getRefreshToken().replaceAll(Auth.BEARER.getContent(), EMPTY.getValue()),
 			Auth.REFRESH_TOKEN_EXPIRATION.getExpiration());
 		member.updateNickname(generateTemporaryNickname(member.getId()));
 		return authToken;
 	}
 
 	public void sendEmailAuthCode(EmailAuthServiceRequest request) {
-		String code = RandomCodeGenerator.generateCodeByLength(6);
+		String code = RandomCodeGenerator.generateCodeByLength(RANDOM_CODE_LENGTH.getValue());
 		mailSenderUtil.sendEmail(Auth.EMAIL_SUBJECT.getContent(), request.getEmail(), code,
-			"signup-mail", "static/images/banner-pengu.png");
+			SIGNUP_EMAIL_TEMPLATE.getValue(), SIGNUP_EMAIL_BANNER.getValue());
 		String key = getRedisKey(KeyPrefix.EMAIL, request.getEmail());
 		saveInRedis(key, code, Auth.EMAIL_CODE_EXPIRATION.getExpiration());
 	}
@@ -129,7 +136,7 @@ public class AuthService {
 			throw new BaseException(ErrorCode.INVALID_EMAIL_AUTH_CODE);
 		}
 
-		saveInRedis(signupKey, "verified", Auth.SIGNUP_EXPIRATION.getExpiration());
+		saveInRedis(signupKey, VERIFY_SIGNUP.getValue(), Auth.SIGNUP_EXPIRATION.getExpiration());
 		redisTemplate.delete(emailAuthKey);
 	}
 
@@ -139,7 +146,7 @@ public class AuthService {
 		AuthToken authToken = generateTokenPair(idByToken);
 		saveInRedis(
 			getRedisKey(KeyPrefix.REFRESH, String.valueOf(idByToken)),
-			authToken.getRefreshToken().replaceAll(Auth.BEARER.getContent(), ""),
+			authToken.getRefreshToken().replaceAll(Auth.BEARER.getContent(), EMPTY.getValue()),
 			Auth.REFRESH_TOKEN_EXPIRATION.getExpiration()
 		);
 		return authToken;
@@ -159,7 +166,7 @@ public class AuthService {
 			.rsoLinked(false)
 			.favoriteChampionID(null)
 			.status(Status.OFFLINE)
-			.upCount(0L)
+			.upCount((long) INITIAL_COUNT.getValue())
 			.build();
 		memberRepository.save(member);
 

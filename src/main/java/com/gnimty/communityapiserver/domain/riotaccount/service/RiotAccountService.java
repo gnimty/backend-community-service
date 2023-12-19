@@ -1,5 +1,7 @@
 package com.gnimty.communityapiserver.domain.riotaccount.service;
 
+import static com.gnimty.communityapiserver.global.constant.CommonStringType.URL_TAG_SPLITTER;
+
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.SummonerUpdateEntry;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.SummonerUpdateServiceRequest;
@@ -58,7 +60,7 @@ public class RiotAccountService {
 
 	public RecentlySummonersServiceResponse getRecentlySummoners(Member member, List<Long> chattedMemberIds) {
 		RiotAccount riotAccount = riotAccountReadService.findMainAccountByMember(member);
-		String tagName = riotAccount.getName() + "-" + riotAccount.getTagLine();
+		String tagName = riotAccount.getName() + URL_TAG_SPLITTER.getValue() + riotAccount.getTagLine();
 		RecentMemberInfo recentMemberInfo = getRecentMemberInfo(tagName, GameMode.RANK_SOLO);
 		RecentMemberInfo recentMemberInfoFlex = getRecentMemberInfo(tagName, GameMode.RANK_FLEX);
 		List<RiotAccount> chattedRiotAccounts = getChattedRiotAccounts(chattedMemberIds);

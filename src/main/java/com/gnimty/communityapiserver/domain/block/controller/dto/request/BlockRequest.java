@@ -1,5 +1,7 @@
 package com.gnimty.communityapiserver.domain.block.controller.dto.request;
 
+import static com.gnimty.communityapiserver.global.constant.Bound.MAX_MEMO_SIZE;
+
 import com.gnimty.communityapiserver.domain.block.service.dto.request.BlockServiceRequest;
 import com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage;
 import javax.validation.constraints.NotNull;
@@ -18,7 +20,7 @@ public class BlockRequest {
 	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
 	private Long id;
 
-	@Size(max = 100)
+	@Size(max = MAX_MEMO_SIZE)
 	private String memo;
 
 	public BlockServiceRequest toServiceRequest() {

@@ -36,6 +36,12 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class RiotAccountQueryRepository {
 
+	public static final String FUNCTION_RAND = "function('rand')";
+	public static final int MAIN_SELECT_LIMIT = 5;
+	public static final int SECOND = 2;
+	public static final int THIRD = 3;
+	public static final long BASE_MMR_UNIT = 100L;
+	public static final long MASTER_WEIGHT = 2800L;
 	private final JPAQueryFactory queryFactory;
 
 	public Boolean existsByPuuid(String puuid) {
@@ -117,15 +123,15 @@ public class RiotAccountQueryRepository {
 			.fetchFirst();
 		return query
 			.where(duoable(account.getQueue(), account.getDivision(), true, gameMode))
-			.orderBy(Expressions.numberTemplate(Double.class, "function('rand')").asc())
-			.limit(5)
+			.orderBy(Expressions.numberTemplate(Double.class, FUNCTION_RAND).asc())
+			.limit(MAIN_SELECT_LIMIT)
 			.fetch();
 	}
 
 	private List<RecommendedSummonersEntry> notLinkedSummonersQuery(JPAQuery<RecommendedSummonersEntry> query) {
 		return query
-			.orderBy(Expressions.numberTemplate(Double.class, "function('rand')").asc())
-			.limit(5)
+			.orderBy(Expressions.numberTemplate(Double.class, FUNCTION_RAND).asc())
+			.limit(MAIN_SELECT_LIMIT)
 			.fetch();
 	}
 
@@ -242,29 +248,24 @@ public class RiotAccountQueryRepository {
 			return riotAccount.mmr.lt(getMmrByTier(Tier.platinum));
 		}
 		if (tier.equals(Tier.gold)) {
-			return riotAccount.mmr.goe(getMmrByTier(Tier.silver))
-				.and(riotAccount.mmr.lt(getMmrByTier(Tier.emerald)));
+			return riotAccount.mmr.goe(getMmrByTier(Tier.silver)).and(riotAccount.mmr.lt(getMmrByTier(Tier.emerald)));
 		}
 		if (tier.equals(Tier.platinum)) {
-			return riotAccount.mmr.goe(getMmrByTier(Tier.gold))
-				.and(riotAccount.mmr.lt(getMmrByTier(Tier.diamond)));
+			return riotAccount.mmr.goe(getMmrByTier(Tier.gold)).and(riotAccount.mmr.lt(getMmrByTier(Tier.diamond)));
 		}
 		if (tier.equals(Tier.emerald)) {
 			BooleanExpression be = riotAccount.mmr.goe(getMmrByTier(Tier.platinum));
-			if (division > 2) {
+			if (division > SECOND) {
 				return be.and(riotAccount.mmr.lt(getMmrByTier(Tier.diamond)));
 			}
-			if (division == 2) {
-				return be
-					.and(riotAccount.mmr.lt(getMmrByTierAndDivision(Tier.diamond, 3)));
+			if (division == SECOND) {
+				return be.and(riotAccount.mmr.lt(getMmrByTierAndDivision(Tier.diamond, THIRD)));
 			}
-			return be
-				.and(riotAccount.mmr.lt(getMmrByTierAndDivision(Tier.diamond, 2)));
+			return be.and(riotAccount.mmr.lt(getMmrByTierAndDivision(Tier.diamond, SECOND)));
 		}
 
 		// tier = DIAMOND
-		return riotAccount.mmr.goe(
-			getMmrByTierAndDivision(Tier.diamond, 3) - (division - 1) * 100L);
+		return riotAccount.mmr.goe(getMmrByTierAndDivision(Tier.diamond, THIRD) - (division - 1) * BASE_MMR_UNIT);
 	}
 
 	private BooleanExpression gameModeEq(GameMode gameMode) {
@@ -349,14 +350,14 @@ public class RiotAccountQueryRepository {
 	 */
 	private Long getMmrByTierAndDivision(Tier tier, Integer division) {
 		if (tier.getWeight() >= Tier.master.getWeight()) {
-			return 2800L;
+			return MASTER_WEIGHT;
 		}
 		return tier.getWeight() * 400 + (4 - division) * 100L;
 	}
 
 	private Long getMmrByTier(Tier tier) {
 		if (tier.getWeight() >= Tier.master.getWeight()) {
-			return 2800L;
+			return MASTER_WEIGHT;
 		}
 		return tier.getWeight() * 400L;
 	}
