@@ -1022,7 +1022,7 @@ public class StompServiceTest {
 			assertThat(findUserB.get().getMostLanes()).isEqualTo(Arrays.asList(Lane.JUNGLE, null));
 			assertThat(findUserB.get().getStatus()).isEqualTo(Status.ONLINE);
 
-			Optional<User> findUserC = userRepository.findByActualUserId(userB.getActualUserId());
+			Optional<User> findUserC = userRepository.findByActualUserId(userC.getActualUserId());
 			assertThat(findUserC).isPresent();
 			assertThat(findUserC.get().getMostChampions()).isEqualTo(Arrays.asList(3L, null, 4L));
 			assertThat(findUserC.get().getMostLanes()).isEqualTo(Arrays.asList(Lane.JUNGLE, null));
@@ -1064,16 +1064,16 @@ public class StompServiceTest {
 			stompService.createOrUpdateUser(riotAccounts);
 
 			// then
-			Optional<User> findUserA = userRepository.findByActualUserId(userA.getActualUserId());
+			Optional<User> findUserA = userRepository.findByActualUserId(memberA.getId());
 			assertThat(findUserA).isPresent();
 			assertThat(findUserA.get().getMostChampions()).isEqualTo(Arrays.asList(3L, null, null));
 			assertThat(findUserA.get().getStatus()).isEqualTo(Status.ONLINE);
 
-			Optional<User> findUserB = userRepository.findByActualUserId(userB.getActualUserId());
+			Optional<User> findUserB = userRepository.findByActualUserId(memberB.getId());
 			assertThat(findUserB).isPresent();
 			assertThat(findUserA.get().getMostChampions()).isEqualTo(Arrays.asList(3L, null, null));
 
-			Optional<User> findUserC = userRepository.findByActualUserId(userB.getActualUserId());
+			Optional<User> findUserC = userRepository.findByActualUserId(memberC.getId());
 			assertThat(findUserC).isPresent();
 			assertThat(findUserA.get().getMostChampions()).isEqualTo(Arrays.asList(3L, null, null));
 		}
