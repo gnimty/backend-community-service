@@ -51,26 +51,22 @@ public class User {
 	private Integer division;
 	private Long lp;
 	private Long mmr;
-	private List<Lane> mostLanes;
-	private List<Long> mostChampions;
-//	private Lane frequentLane1;
-//	private Lane frequentLane2;
-//	private Long frequentChampionId1;
-//	private Long frequentChampionId2;
-//	private Long frequentChampionId3;
+	private Lane frequentLane1;
+	private Lane frequentLane2;
+	private Long frequentChampionId1;
+	private Long frequentChampionId2;
+	private Long frequentChampionId3;
 
 	// 자유 랭크
 	private Tier tierFlex;
 	private Integer divisionFlex;
 	private Long lpFlex;
 	private Long mmrFlex;
-	private List<Lane> mostLanesFlex;
-	private List<Long> mostChampionsFlex;
-//	private Lane frequentLane1Flex;
-//	private Lane frequentLane2Flex;
-//	private Long frequentChampionId1Flex;
-//	private Long frequentChampionId2Flex;
-//	private Long frequentChampionId3Flex;
+	private Lane frequentLane1Flex;
+	private Lane frequentLane2Flex;
+	private Long frequentChampionId1Flex;
+	private Long frequentChampionId2Flex;
+	private Long frequentChampionId3Flex;
 
 
 	public static User toUser(RiotAccount riotAccount) {
@@ -86,25 +82,21 @@ public class User {
 			.division(riotAccount.getDivision())
 			.lp(riotAccount.getLp())
 			.mmr(riotAccount.getMmr())
-			.mostLanes(toListMostItems(riotAccount.getFrequentLane1(), riotAccount.getFrequentLane2()))
-			.mostChampions(toListMostItems(riotAccount.getFrequentChampionId1(), riotAccount.getFrequentChampionId2(), riotAccount.getFrequentChampionId3()))
-//			.frequentLane1(riotAccount.getFrequentLane1())
-//			.frequentLane2(riotAccount.getFrequentLane2())
-//			.frequentChampionId1(riotAccount.getFrequentChampionId1())
-//			.frequentChampionId2(riotAccount.getFrequentChampionId2())
-//			.frequentChampionId3(riotAccount.getFrequentChampionId3())
+			.frequentLane1(riotAccount.getFrequentLane1())
+			.frequentLane2(riotAccount.getFrequentLane2())
+			.frequentChampionId1(riotAccount.getFrequentChampionId1())
+			.frequentChampionId2(riotAccount.getFrequentChampionId2())
+			.frequentChampionId3(riotAccount.getFrequentChampionId3())
 			// 자유 랭크
 			.tierFlex(riotAccount.getQueueFlex())
 			.divisionFlex(riotAccount.getDivisionFlex())
 			.lpFlex(riotAccount.getLpFlex())
 			.mmrFlex(riotAccount.getMmrFlex())
-			.mostLanesFlex(toListMostItems(riotAccount.getFrequentLane1Flex(), riotAccount.getFrequentLane2Flex()))
-			.mostChampionsFlex(toListMostItems(riotAccount.getFrequentChampionId1Flex(), riotAccount.getFrequentChampionId2Flex(), riotAccount.getFrequentChampionId3Flex()))
-//			.frequentLane1Flex(riotAccount.getFrequentLane1Flex())
-//			.frequentLane2Flex(riotAccount.getFrequentLane2Flex())
-//			.frequentChampionId1Flex(riotAccount.getFrequentChampionId1Flex())
-//			.frequentChampionId2Flex(riotAccount.getFrequentChampionId2Flex())
-//			.frequentChampionId3Flex(riotAccount.getFrequentChampionId3Flex())
+			.frequentLane1Flex(riotAccount.getFrequentLane1Flex())
+			.frequentLane2Flex(riotAccount.getFrequentLane2Flex())
+			.frequentChampionId1Flex(riotAccount.getFrequentChampionId1Flex())
+			.frequentChampionId2Flex(riotAccount.getFrequentChampionId2Flex())
+			.frequentChampionId3Flex(riotAccount.getFrequentChampionId3Flex())
 			.build();
 	}
 
@@ -120,82 +112,24 @@ public class User {
 		this.division = Optional.ofNullable(riotAccount.getDivision()).orElse(this.division);
 		this.lp = Optional.ofNullable(riotAccount.getLp()).orElse(this.lp);
 		this.mmr = Optional.ofNullable(riotAccount.getMmr()).orElse(this.mmr);
-
-		if (this.mostLanes!=null) {
-			this.mostLanes = toListMostItems(
-				Optional.ofNullable(riotAccount.getFrequentLane1()).orElse(this.mostLanes.get(0)),
-				Optional.ofNullable(riotAccount.getFrequentLane2()).orElse(this.mostLanes.get(1))
-			);
-		}
-		else {
-			this.mostLanes = toListMostItems(
-				riotAccount.getFrequentLane1(),
-				riotAccount.getFrequentLane2()
-			);
-		}
-
-		if (mostChampions!=null) {
-			this.mostChampions = toListMostItems(
-				Optional.ofNullable(riotAccount.getFrequentChampionId1()).orElse(this.mostChampions.get(0)),
-				Optional.ofNullable(riotAccount.getFrequentChampionId2()).orElse(this.mostChampions.get(1)),
-				Optional.ofNullable(riotAccount.getFrequentChampionId3()).orElse(this.mostChampions.get(2))
-			);
-		} else {
-			this.mostChampions = toListMostItems(
-				riotAccount.getFrequentChampionId1(),
-				riotAccount.getFrequentChampionId2(),
-				riotAccount.getFrequentChampionId3()
-			);
-		}
-//		this.frequentLane1 =  Optional.ofNullable(riotAccount.getFrequentLane1()).orElse(this.frequentLane1);
-//		this.frequentLane2 =  Optional.ofNullable(riotAccount.getFrequentLane2()).orElse(this.frequentLane2);
-//		this.frequentChampionId1 =  Optional.ofNullable(riotAccount.getFrequentChampionId1()).orElse(this.frequentChampionId1);
-//		this.frequentChampionId2 =  Optional.ofNullable(riotAccount.getFrequentChampionId2()).orElse(this.frequentChampionId2);
-//		this.frequentChampionId3 =  Optional.ofNullable(riotAccount.getFrequentChampionId3()).orElse(this.frequentChampionId3);
+		this.frequentLane1 =  Optional.ofNullable(riotAccount.getFrequentLane1()).orElse(this.frequentLane1);
+		this.frequentLane2 =  Optional.ofNullable(riotAccount.getFrequentLane2()).orElse(this.frequentLane2);
+		this.frequentChampionId1 =  Optional.ofNullable(riotAccount.getFrequentChampionId1()).orElse(this.frequentChampionId1);
+		this.frequentChampionId2 =  Optional.ofNullable(riotAccount.getFrequentChampionId2()).orElse(this.frequentChampionId2);
+		this.frequentChampionId3 =  Optional.ofNullable(riotAccount.getFrequentChampionId3()).orElse(this.frequentChampionId3);
 		// 자유 랭크
 		this.tierFlex = Optional.ofNullable(riotAccount.getQueueFlex()).orElse(this.tierFlex);
 		this.divisionFlex = Optional.ofNullable(riotAccount.getDivisionFlex()).orElse(this.divisionFlex);
 		this.lpFlex = Optional.ofNullable(riotAccount.getLpFlex()).orElse(this.lpFlex);
 		this.mmrFlex = Optional.ofNullable(riotAccount.getMmrFlex()).orElse(this.mmrFlex);
-		if (mostLanesFlex!=null) {
-			this.mostLanesFlex = toListMostItems(
-				Optional.ofNullable(riotAccount.getFrequentLane1Flex()).orElse(this.mostLanesFlex.get(0)),
-				Optional.ofNullable(riotAccount.getFrequentLane2Flex()).orElse(this.mostLanesFlex.get(1))
-			);
-		} else {
-			this.mostLanesFlex = toListMostItems(
-				riotAccount.getFrequentLane1Flex(),
-				riotAccount.getFrequentLane2Flex()
-			);
-		}
-
-		if (mostChampionsFlex!=null) {
-			this.mostChampionsFlex = toListMostItems(
-				Optional.ofNullable(riotAccount.getFrequentChampionId1Flex()).orElse(this.mostChampionsFlex.get(0)),
-				Optional.ofNullable(riotAccount.getFrequentChampionId2Flex()).orElse(this.mostChampionsFlex.get(1)),
-				Optional.ofNullable(riotAccount.getFrequentChampionId3Flex()).orElse(this.mostChampionsFlex.get(2))
-			);
-		} else {
-			this.mostChampionsFlex = toListMostItems(
-				riotAccount.getFrequentChampionId1Flex(),
-				riotAccount.getFrequentChampionId2Flex(),
-				riotAccount.getFrequentChampionId3Flex()
-			);
-		}
-//		this.frequentLane1Flex =  Optional.ofNullable(riotAccount.getFrequentLane1Flex()).orElse(this.frequentLane1Flex);
-//		this.frequentLane2Flex =  Optional.ofNullable(riotAccount.getFrequentLane2Flex()).orElse(this.frequentLane2Flex);
-//		this.frequentChampionId1Flex =  Optional.ofNullable(riotAccount.getFrequentChampionId1Flex()).orElse(this.frequentChampionId1Flex);
-//		this.frequentChampionId2Flex =  Optional.ofNullable(riotAccount.getFrequentChampionId2Flex()).orElse(this.frequentChampionId2Flex);
-//		this.frequentChampionId3Flex =  Optional.ofNullable(riotAccount.getFrequentChampionId3Flex()).orElse(this.frequentChampionId3Flex);
+		this.frequentLane1Flex =  Optional.ofNullable(riotAccount.getFrequentLane1Flex()).orElse(this.frequentLane1Flex);
+		this.frequentLane2Flex =  Optional.ofNullable(riotAccount.getFrequentLane2Flex()).orElse(this.frequentLane2Flex);
+		this.frequentChampionId1Flex =  Optional.ofNullable(riotAccount.getFrequentChampionId1Flex()).orElse(this.frequentChampionId1Flex);
+		this.frequentChampionId2Flex =  Optional.ofNullable(riotAccount.getFrequentChampionId2Flex()).orElse(this.frequentChampionId2Flex);
+		this.frequentChampionId3Flex =  Optional.ofNullable(riotAccount.getFrequentChampionId3Flex()).orElse(this.frequentChampionId3Flex);
 	}
 
 	public void updateStatus(Status status) {
 		this.status = status;
 	}
-
-	private static <T> List<T> toListMostItems(T... items) {
-		return new ArrayList<>(Arrays.asList(items));
-	}
-
-
 }

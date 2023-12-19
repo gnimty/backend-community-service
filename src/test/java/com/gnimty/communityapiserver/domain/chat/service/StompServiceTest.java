@@ -930,7 +930,8 @@ public class StompServiceTest {
 			assertThat(findUser).isPresent();
 			assertThat(findUser.get().getName()).isEqualTo("uni");
 			assertThat(findUser.get().getDivision()).isEqualTo(2);
-			assertThat(findUser.get().getMostChampions()).isEqualTo(Arrays.asList(null, 4L, 5L));
+			assertThat(findUser.get().getFrequentChampionId2()).isEqualTo(4L);
+			assertThat(findUser.get().getFrequentChampionId3()).isEqualTo(5L);
 		}
 
 		@DisplayName("User가 없다면 User생성")
@@ -1012,20 +1013,23 @@ public class StompServiceTest {
 			// then
 			Optional<User> findUserA = userRepository.findByActualUserId(userA.getActualUserId());
 			assertThat(findUserA).isPresent();
-			assertThat(findUserA.get().getMostChampions()).isEqualTo(Arrays.asList(3L, null, 4L));
-			assertThat(findUserA.get().getMostLanes()).isEqualTo(Arrays.asList(Lane.JUNGLE, null));
+			assertThat(findUserA.get().getFrequentChampionId1()).isEqualTo(3L);
+			assertThat(findUserA.get().getFrequentChampionId3()).isEqualTo(4L);
+			assertThat(findUserA.get().getFrequentLane1()).isEqualTo(Lane.JUNGLE);
 			assertThat(findUserA.get().getStatus()).isEqualTo(Status.ONLINE);
 
 			Optional<User> findUserB = userRepository.findByActualUserId(userB.getActualUserId());
 			assertThat(findUserB).isPresent();
-			assertThat(findUserB.get().getMostChampions()).isEqualTo(Arrays.asList(3L, null, 4L));
-			assertThat(findUserB.get().getMostLanes()).isEqualTo(Arrays.asList(Lane.JUNGLE, null));
+			assertThat(findUserB.get().getFrequentChampionId1()).isEqualTo(3L);
+			assertThat(findUserB.get().getFrequentChampionId3()).isEqualTo(4L);
+			assertThat(findUserB.get().getFrequentLane1()).isEqualTo(Lane.JUNGLE);
 			assertThat(findUserB.get().getStatus()).isEqualTo(Status.ONLINE);
 
 			Optional<User> findUserC = userRepository.findByActualUserId(userC.getActualUserId());
 			assertThat(findUserC).isPresent();
-			assertThat(findUserC.get().getMostChampions()).isEqualTo(Arrays.asList(3L, null, 4L));
-			assertThat(findUserC.get().getMostLanes()).isEqualTo(Arrays.asList(Lane.JUNGLE, null));
+			assertThat(findUserC.get().getFrequentChampionId1()).isEqualTo(3L);
+			assertThat(findUserC.get().getFrequentChampionId3()).isEqualTo(4L);
+			assertThat(findUserC.get().getFrequentLane1()).isEqualTo(Lane.JUNGLE);
 			assertThat(findUserC.get().getStatus()).isEqualTo(Status.ONLINE);
 		}
 
@@ -1066,16 +1070,16 @@ public class StompServiceTest {
 			// then
 			Optional<User> findUserA = userRepository.findByActualUserId(memberA.getId());
 			assertThat(findUserA).isPresent();
-			assertThat(findUserA.get().getMostChampions()).isEqualTo(Arrays.asList(3L, null, null));
+			assertThat(findUserA.get().getFrequentChampionId1()).isEqualTo(3L);
 			assertThat(findUserA.get().getStatus()).isEqualTo(Status.ONLINE);
 
 			Optional<User> findUserB = userRepository.findByActualUserId(memberB.getId());
 			assertThat(findUserB).isPresent();
-			assertThat(findUserA.get().getMostChampions()).isEqualTo(Arrays.asList(3L, null, null));
+			assertThat(findUserB.get().getFrequentChampionId1()).isEqualTo(3L);
 
 			Optional<User> findUserC = userRepository.findByActualUserId(memberC.getId());
 			assertThat(findUserC).isPresent();
-			assertThat(findUserA.get().getMostChampions()).isEqualTo(Arrays.asList(3L, null, null));
+			assertThat(findUserC.get().getFrequentChampionId1()).isEqualTo(3L);
 		}
 	}
 

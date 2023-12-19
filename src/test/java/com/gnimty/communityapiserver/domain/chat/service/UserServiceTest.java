@@ -248,12 +248,9 @@ class UserServiceTest {
 			// then
 			ArrayList<Lane> lanes = new ArrayList<>(Arrays.asList(Lane.BOTTOM, Lane.JUNGLE));
 
-//			assertThat(savedUser.getFrequentChampionId1()).isEqualTo(1L);
-//			assertThat(savedUser.getFrequentChampionId2()).isEqualTo(2L);
-//			assertThat(savedUser.getFrequentChampionId3()).isEqualTo(3L);
-			assertThat(savedUser.getMostChampions().get(0)).isEqualTo(1L);
-			assertThat(savedUser.getMostChampions().get(1)).isEqualTo(2L);
-			assertThat(savedUser.getMostChampions().get(2)).isEqualTo(3L);
+			assertThat(savedUser.getFrequentChampionId1()).isEqualTo(1L);
+			assertThat(savedUser.getFrequentChampionId2()).isEqualTo(2L);
+			assertThat(savedUser.getFrequentChampionId3()).isEqualTo(3L);
 			assertThat(savedUser.getActualUserId()).isEqualTo(member.getId());
 			assertThat(savedUser.getStatus()).isEqualTo(Status.ONLINE);
 		}
