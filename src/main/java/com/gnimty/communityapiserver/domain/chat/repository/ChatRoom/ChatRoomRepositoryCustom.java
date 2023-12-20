@@ -12,6 +12,8 @@ public interface ChatRoomRepositoryCustom {
 	//    ChatRoom save(ChatRoom chatRoom);
 	List<ChatRoom> findByUser(User user);
 
+	List<ChatRoom> findUnBlockByUser(User user);
+
 	Optional<ChatRoom> findByUsers(User user1, User user2);
 
 	ChatRoom save(List<Participant> participants);

@@ -19,7 +19,11 @@ public class ChatService {
 
 	private final ChatRepository chatRepository;
 
-	public List<Chat> findChats(ChatRoom chatRoom) {
+	public List<Chat> findChats(ChatRoom chatRoom, Date exitDate) {
+		return chatRepository.findByChatRoomNoAfterExitDate(chatRoom, exitDate);
+	}
+
+	public List<Chat> findAllChats(ChatRoom chatRoom) {
 		return chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo());
 	}
 

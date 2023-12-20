@@ -72,11 +72,7 @@ public class StompService {
 	// blocked==UNBLOCK인 도큐먼트만 조회
 	public List<ChatRoomDto> getChatRoomsJoined(User me) {
 
-		List<ChatRoom> chatRooms = chatRoomService.findChatRoom(me)
-			.stream().filter(chatRoom ->
-				extractParticipant(me, chatRoom.getParticipants(), true).getBlockedStatus()
-					== Blocked.UNBLOCK
-			).toList();
+		List<ChatRoom> chatRooms = chatRoomService.findUnBlockChatRoom(me);
 
 		return chatRooms.stream().map(chatRoom ->
 			ChatRoomDto.builder()
@@ -187,10 +183,11 @@ public class StompService {
 
 	// TODO janguni: 채팅방별 채팅 목록 불러오기 (exitDate < sendDate)
 	public List<ChatDto> getChatList(User me, ChatRoom chatRoom) {
+		List<Chat> totalChats;
 
-		// TODO: 시간 순서대로 오는건지 확인
-		List<Chat> totalChats = chatService.findChats(chatRoom);
 		Date exitDate = getExitDate(chatRoom, me);
+		if (exitDate==null) totalChats = chatService.findAllChats(chatRoom);
+		else totalChats = chatService.findChats(chatRoom, exitDate);
 
 		return getChatDtoAfterExitDate(totalChats, exitDate);
 	}

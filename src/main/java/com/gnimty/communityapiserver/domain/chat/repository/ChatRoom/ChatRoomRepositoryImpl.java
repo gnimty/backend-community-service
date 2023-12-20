@@ -5,6 +5,7 @@ import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static org.springframework.data.mongodb.core.query.Query.query;
 
 import com.gnimty.communityapiserver.domain.chat.entity.AutoIncrementSequence;
+import com.gnimty.communityapiserver.domain.chat.entity.Blocked;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom.Participant;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
@@ -31,6 +32,18 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepositoryCustom {
 	@Override
 	public List<ChatRoom> findByUser(User user) {
 		Query query = new Query(Criteria.where("participants.user").is(user));
+		List<ChatRoom> chatRooms = mongoTemplate.find(query, ChatRoom.class);
+		return chatRooms;
+	}
+
+	@Override
+	public List<ChatRoom> findUnBlockByUser(User user) {
+		Query query = new Query().addCriteria(
+			Criteria.where("participants").elemMatch(
+				Criteria.where("user").is(user)
+					.and("blockedStatus").is(Blocked.UNBLOCK)
+			)
+		);
 		List<ChatRoom> chatRooms = mongoTemplate.find(query, ChatRoom.class);
 		return chatRooms;
 	}

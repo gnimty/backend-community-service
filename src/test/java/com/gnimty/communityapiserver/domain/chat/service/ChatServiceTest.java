@@ -178,7 +178,7 @@ class ChatServiceTest {
 			}
 
 			// when
-			List<Chat> chats = chatService.findChats(chatRoom);
+			List<Chat> chats = chatService.findAllChats(chatRoom);
 
 			// then
 			assertThat(chats.size()).isEqualTo(20);
@@ -246,7 +246,7 @@ class ChatServiceTest {
 			chatService.delete(chatRoom);
 
 			// then
-			List<Chat> chats = chatService.findChats(chatRoom);
+			List<Chat> chats = chatService.findAllChats(chatRoom);
 			assertThat(chats).isEmpty();
 		}
 	}

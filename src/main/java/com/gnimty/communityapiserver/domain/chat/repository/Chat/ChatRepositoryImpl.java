@@ -4,6 +4,7 @@ import com.gnimty.communityapiserver.domain.chat.entity.Chat;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
 import com.mongodb.client.result.UpdateResult;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -28,5 +29,15 @@ public class ChatRepositoryImpl implements ChatRepositoryCustom {
 			.set("readCnt", 0);
 
 		UpdateResult updateResult = mongoTemplate.updateMulti(query, update, Chat.class);
+	}
+
+	@Override
+	public List<Chat> findByChatRoomNoAfterExitDate(ChatRoom chatRoom, Date exitDate) {
+		Query query = new Query()
+			.addCriteria(new Criteria().andOperator(
+				Criteria.where("chatRoomNo").is(chatRoom.getChatRoomNo()),
+				Criteria.where("sendDate").gte(exitDate)
+			));
+		return mongoTemplate.find(query, Chat.class);
 	}
 }
