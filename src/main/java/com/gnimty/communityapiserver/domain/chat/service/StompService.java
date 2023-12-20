@@ -187,9 +187,13 @@ public class StompService {
 
 		Date exitDate = getExitDate(chatRoom, me);
 		if (exitDate==null) totalChats = chatService.findAllChats(chatRoom);
-		else totalChats = chatService.findChats(chatRoom, exitDate);
+		else {
+			totalChats = chatService.findChats(chatRoom, exitDate);
+		}
 
-		return getChatDtoAfterExitDate(totalChats, exitDate);
+		return totalChats.stream()
+			.map(ChatDto::new)
+			.toList();
 	}
 
 

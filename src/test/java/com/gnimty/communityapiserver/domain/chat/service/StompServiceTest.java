@@ -354,7 +354,7 @@ public class StompServiceTest {
 
 		@DisplayName("채팅방을 나간 이후 채팅이 없다면, 빈 리스트 가져옴")
 		@Test
-		void getEmptyChatsAfterExitChatRoom() {
+		void getEmptyChatsAfterExitChatRoom() throws InterruptedException {
 			// given
 			chatRepository.save(
 				Chat.builder().senderId(userA.getActualUserId()).sendDate(new Date()).message("hi")
@@ -364,13 +364,17 @@ public class StompServiceTest {
 				Chat.builder().senderId(userB.getActualUserId()).sendDate(new Date()).message("bye")
 					.chatRoomNo(chatRoom.getChatRoomNo()).build());
 
+
 			Participant participantUserA = stompService.extractParticipant(userA,
 				chatRoom.getParticipants(), true);
-			participantUserA.setExitDate(new Date());
+			Thread.sleep(2000);
+			Date exitDate = new Date();
+			participantUserA.setExitDate(exitDate);
 			chatRoomRepository.update(chatRoom);
 
 			// when
 			List<ChatDto> chats = stompService.getChatList(userA, chatRoom);
+
 
 			// then
 			assertThat(chats).isEmpty();
@@ -378,7 +382,7 @@ public class StompServiceTest {
 
 		@DisplayName("채팅방을 나간 이후 채팅이 있다면, 나간 이후의 채팅들만 가져옴")
 		@Test
-		void getSomeChatsAfterExitChatRoom() {
+		void getSomeChatsAfterExitChatRoom() throws InterruptedException {
 			// given
 			chatRepository.save(
 				Chat.builder().senderId(userA.getActualUserId()).sendDate(new Date()).message("hi")
@@ -392,6 +396,7 @@ public class StompServiceTest {
 				chatRoom.getParticipants(), true);
 			participantUserA.setExitDate(new Date());
 			chatRoomRepository.update(chatRoom);
+			Thread.sleep(2000);
 
 			chatRepository.save(
 				Chat.builder().senderId(userB.getActualUserId()).sendDate(new Date())

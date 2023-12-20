@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -15,6 +16,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
 @RequiredArgsConstructor
+@Slf4j
 public class ChatRepositoryImpl implements ChatRepositoryCustom {
 	@Autowired
 	private final MongoTemplate mongoTemplate;
@@ -33,11 +35,8 @@ public class ChatRepositoryImpl implements ChatRepositoryCustom {
 
 	@Override
 	public List<Chat> findByChatRoomNoAfterExitDate(ChatRoom chatRoom, Date exitDate) {
-		Query query = new Query()
-			.addCriteria(new Criteria().andOperator(
-				Criteria.where("chatRoomNo").is(chatRoom.getChatRoomNo()),
-				Criteria.where("sendDate").gte(exitDate)
-			));
+		Query query = new Query(Criteria.where("chatRoomNo").is(chatRoom.getChatRoomNo())
+			.and("sendDate").gte(exitDate));
 		return mongoTemplate.find(query, Chat.class);
 	}
 }
