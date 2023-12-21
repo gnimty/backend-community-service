@@ -10,6 +10,7 @@ import com.gnimty.communityapiserver.domain.championcommentsreport.reposiotry.Ch
 import com.gnimty.communityapiserver.domain.championcommentsreport.service.dto.request.ChampionCommentsReportServiceRequest;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
+import com.gnimty.communityapiserver.global.constant.ReportType;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -27,9 +28,7 @@ public class ChampionCommentsReportService {
 
 	public void doReport(Long championId, Long commentsId, ChampionCommentsReportServiceRequest request) {
 		Member member = MemberThreadLocal.get();
-		if (!member.getRsoLinked()) {
-			throw new BaseException(NOT_LINKED_RSO);
-		}
+		validationReport(request, member);
 		ChampionComments championComments = championCommentsReadService.findById(commentsId);
 		if (championCommentsReportQueryRepository.existsByMemberAndChampionComments(member, championComments)) {
 			throw new BaseException(DUPLICATED_REPORT);
@@ -44,5 +43,14 @@ public class ChampionCommentsReportService {
 				.reportComment(request.getReportComment())
 				.member(member)
 				.build());
+	}
+
+	private void validationReport(ChampionCommentsReportServiceRequest request, Member member) {
+		if (!member.getRsoLinked()) {
+			throw new BaseException(NOT_LINKED_RSO);
+		}
+		if (request.getReportType().equals(ReportType.OTHER) && request.getReportComment() == null) {
+			throw new BaseException(OTHER_TYPE_MUST_CONTAIN_COMMENT);
+		}
 	}
 }
