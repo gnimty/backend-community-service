@@ -1,6 +1,7 @@
 package com.gnimty.communityapiserver.domain.chat.service;
 
 
+import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -16,11 +17,16 @@ import com.gnimty.communityapiserver.domain.chat.repository.Chat.ChatRepository;
 import com.gnimty.communityapiserver.domain.chat.repository.ChatRoom.ChatRoomRepository;
 import com.gnimty.communityapiserver.domain.chat.repository.User.UserRepository;
 import com.gnimty.communityapiserver.domain.chat.service.dto.UserWithBlockDto;
+import com.gnimty.communityapiserver.domain.member.entity.Member;
+import com.gnimty.communityapiserver.domain.member.repository.MemberRepository;
+import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
+import com.gnimty.communityapiserver.global.constant.Lane;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.constant.Tier;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
 import com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -43,6 +49,9 @@ public class StompServiceTest {
 
 	@Autowired
 	private UserRepository userRepository;
+
+	@Autowired
+	private MemberRepository memberRepository;
 
 	@Autowired
 	private ChatRepository chatRepository;
@@ -390,7 +399,7 @@ public class StompServiceTest {
 
 			Participant participantUserA = stompService.extractParticipant(userA,
 				chatRoom.getParticipants(), true);
-			participantUserA.setExitDate(new Date());
+			participantUserA.setExitDate(new Date()); // 채팅방을 나감
 			chatRoomRepository.update(chatRoom);
 
 			chatRepository.save(
@@ -877,6 +886,200 @@ public class StompServiceTest {
 			// when & then
 			assertThatCode(() -> stompService.withdrawal(1L))
 				.doesNotThrowAnyException();
+		}
+	}
+
+	@DisplayName("라이엇 정보 변경 시")
+	@Nested
+	class updateRiotAccount {
+
+		@AfterEach
+		void deleteUser() {
+			userRepository.deleteAll();
+			memberRepository.deleteAll();
+		}
+
+		@DisplayName("User가 존재하면 라이엇 정보 업데이트 됨")
+		@Test
+		void updateProfileIconId() {
+			// given
+			Member member = new Member(true, "uni@naver.com", "afD23!", 1L, "uni", Status.ONLINE,
+				1L);
+			memberRepository.save(member);
+
+			RiotAccount riotAccount = RiotAccount.builder()
+				.member(member)
+				.division(2)
+				.frequentChampionId2(4L)
+				.frequentChampionId3(5L)
+				.build();
+
+			User user = User.builder()
+				.actualUserId(member.getId())
+				.name("uni")
+				.division(3)
+				.build();
+
+			userRepository.save(user);
+
+			// when
+			stompService.createOrUpdateUser(riotAccount);
+
+			// then
+			Optional<User> findUser = userRepository.findByActualUserId(user.getActualUserId());
+			assertThat(findUser).isPresent();
+			assertThat(findUser.get().getName()).isEqualTo("uni");
+			assertThat(findUser.get().getDivision()).isEqualTo(2);
+			assertThat(findUser.get().getFrequentChampionId2()).isEqualTo(4L);
+			assertThat(findUser.get().getFrequentChampionId3()).isEqualTo(5L);
+		}
+
+		@DisplayName("User가 없다면 User생성")
+		@Test
+		void createUserWhenNoUser() {
+			// given
+			Member member = new Member(true, "uni@naver.com", "afD23!", 1L, "uni", Status.ONLINE,
+				1L);
+			memberRepository.save(member);
+
+			RiotAccount riotAccount = RiotAccount.builder()
+				.member(member)
+				.division(2)
+				.frequentChampionId2(4L)
+				.frequentChampionId3(5L)
+				.build();
+
+			// when
+			stompService.createOrUpdateUser(riotAccount);
+
+			// then
+			assertThat(userRepository.findByActualUserId(member.getId())).isPresent();
+		}
+	}
+
+
+	@DisplayName("라이엇 정보 bulk 변경 시")
+	@Nested
+	class bulkUpdateRiotAccount {
+
+		@AfterEach
+		void deleteUser() {
+			userRepository.deleteAll();
+			memberRepository.deleteAll();
+		}
+
+		@DisplayName("유저가 모두 존재 한다면 모든 유저 정보 수정")
+		@Test
+		void updateAllUser() {
+			// given
+			Member memberA = new Member(true, "uni1@naver.com", "afD23!", 1L, "uniA", Status.AWAY, 1L);
+			Member memberB = new Member(true, "uni2@naver.com", "afD23!", 1L, "uniB", Status.AWAY, 1L);
+			Member memberC = new Member(true, "uni3@naver.com", "afD23!", 1L, "uniC", Status.AWAY, 1L);
+
+			memberRepository.save(memberA);
+			memberRepository.save(memberB);
+			memberRepository.save(memberC);
+
+			RiotAccount riotAccountA = RiotAccount.builder()
+				.member(memberA)
+				.frequentChampionId1(3L)
+				.frequentChampionId3(4L)
+				.frequentLane1(Lane.JUNGLE)
+				.build();
+			RiotAccount riotAccountB = RiotAccount.builder()
+				.member(memberB)
+				.frequentChampionId1(3L)
+				.frequentChampionId3(4L)
+				.frequentLane1(Lane.JUNGLE)
+				.build();
+			RiotAccount riotAccountC = RiotAccount.builder()
+				.member(memberC)
+				.frequentChampionId1(3L)
+				.frequentChampionId3(4L)
+				.frequentLane1(Lane.JUNGLE)
+				.build();
+			List<RiotAccount> riotAccounts = new ArrayList<>(Arrays.asList(riotAccountA, riotAccountB, riotAccountC));
+
+			User userA = createUser("userA", memberA.getId());
+			User userB = createUser("userB", memberB.getId());
+			User userC = createUser("userC", memberC.getId());
+			userRepository.save(userA);
+			userRepository.save(userB);
+			userRepository.save(userC);
+
+			// when
+			stompService.createOrUpdateUser(riotAccounts);
+
+			// then
+			Optional<User> findUserA = userRepository.findByActualUserId(userA.getActualUserId());
+			assertThat(findUserA).isPresent();
+			assertThat(findUserA.get().getFrequentChampionId1()).isEqualTo(3L);
+			assertThat(findUserA.get().getFrequentChampionId3()).isEqualTo(4L);
+			assertThat(findUserA.get().getFrequentLane1()).isEqualTo(Lane.JUNGLE);
+			assertThat(findUserA.get().getStatus()).isEqualTo(Status.ONLINE);
+
+			Optional<User> findUserB = userRepository.findByActualUserId(userB.getActualUserId());
+			assertThat(findUserB).isPresent();
+			assertThat(findUserB.get().getFrequentChampionId1()).isEqualTo(3L);
+			assertThat(findUserB.get().getFrequentChampionId3()).isEqualTo(4L);
+			assertThat(findUserB.get().getFrequentLane1()).isEqualTo(Lane.JUNGLE);
+			assertThat(findUserB.get().getStatus()).isEqualTo(Status.ONLINE);
+
+			Optional<User> findUserC = userRepository.findByActualUserId(userC.getActualUserId());
+			assertThat(findUserC).isPresent();
+			assertThat(findUserC.get().getFrequentChampionId1()).isEqualTo(3L);
+			assertThat(findUserC.get().getFrequentChampionId3()).isEqualTo(4L);
+			assertThat(findUserC.get().getFrequentLane1()).isEqualTo(Lane.JUNGLE);
+			assertThat(findUserC.get().getStatus()).isEqualTo(Status.ONLINE);
+		}
+
+		@DisplayName("유저들 중 존재 하지 않는 user가 있다면 저장, 나머지는 수정")
+		@Test
+		void saveAndUpdate() {
+			// given
+			Member memberA = new Member(true, "uni1@naver.com", "afD23!", 1L, "uniA", Status.AWAY, 1L);
+			Member memberB = new Member(true, "uni2@naver.com", "afD23!", 1L, "uniB", Status.AWAY, 1L);
+			Member memberC = new Member(true, "uni3@naver.com", "afD23!", 1L, "uniC", Status.AWAY, 1L);
+
+			memberRepository.save(memberA);
+			memberRepository.save(memberB);
+			memberRepository.save(memberC);
+
+			RiotAccount riotAccountA = RiotAccount.builder()
+				.member(memberA)
+				.frequentChampionId1(3L)
+				.build();
+			RiotAccount riotAccountB = RiotAccount.builder()
+				.member(memberB)
+				.frequentChampionId1(3L)
+				.build();
+			RiotAccount riotAccountC = RiotAccount.builder()
+				.member(memberC)
+				.frequentChampionId1(3L)
+				.build();
+			List<RiotAccount> riotAccounts = new ArrayList<>(Arrays.asList(riotAccountA, riotAccountB, riotAccountC));
+
+			User userA = createUser("userA", memberA.getId());
+			User userB = createUser("userB", memberB.getId());
+			userRepository.save(userA);
+			userRepository.save(userB);
+
+			// when
+			stompService.createOrUpdateUser(riotAccounts);
+
+			// then
+			Optional<User> findUserA = userRepository.findByActualUserId(memberA.getId());
+			assertThat(findUserA).isPresent();
+			assertThat(findUserA.get().getFrequentChampionId1()).isEqualTo(3L);
+			assertThat(findUserA.get().getStatus()).isEqualTo(Status.ONLINE);
+
+			Optional<User> findUserB = userRepository.findByActualUserId(memberB.getId());
+			assertThat(findUserB).isPresent();
+			assertThat(findUserB.get().getFrequentChampionId1()).isEqualTo(3L);
+
+			Optional<User> findUserC = userRepository.findByActualUserId(memberC.getId());
+			assertThat(findUserC).isPresent();
+			assertThat(findUserC.get().getFrequentChampionId1()).isEqualTo(3L);
 		}
 	}
 

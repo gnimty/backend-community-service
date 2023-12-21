@@ -1,6 +1,7 @@
 package com.gnimty.communityapiserver.domain.chat.service;
 
 
+import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -199,7 +200,6 @@ class UserServiceTest {
 			RiotAccount riotAccount = RiotAccount.builder()
 				.member(member)
 				.name("uni")
-				.internalName("uniInternal")
 				.tagLine("tagLine")
 				.internalTagName("uniInternalTagLine")
 				.puuid("puuid")
@@ -248,7 +248,9 @@ class UserServiceTest {
 			// then
 			ArrayList<Lane> lanes = new ArrayList<>(Arrays.asList(Lane.BOTTOM, Lane.JUNGLE));
 
-			assertThat(savedUser.getMostLanes()).containsAll(lanes);
+			assertThat(savedUser.getFrequentChampionId1()).isEqualTo(1L);
+			assertThat(savedUser.getFrequentChampionId2()).isEqualTo(2L);
+			assertThat(savedUser.getFrequentChampionId3()).isEqualTo(3L);
 			assertThat(savedUser.getActualUserId()).isEqualTo(member.getId());
 			assertThat(savedUser.getStatus()).isEqualTo(Status.ONLINE);
 		}
@@ -306,6 +308,112 @@ class UserServiceTest {
 				})
 				.hasMessageContaining(ErrorMessage.NOT_FOUND_CHAT_USER);
 		}
+	}
+
+	@DisplayName("벌크 수정 시")
+	@Nested
+	class updateUsers {
+
+		@DisplayName("존재하는 User의 필드를 수정")
+		@Test
+		void bulkUpdateUsers() {
+			// given
+			User userA = createUser("userA", 1L);
+			User userB = createUser("userB", 2L);
+			User userC = createUser("userC", 3L);
+
+			userRepository.save(userA);
+			userRepository.save(userB);
+			userRepository.save(userC);
+
+			userA.updateStatus(Status.AWAY);
+			userB.updateStatus(Status.AWAY);
+			userC.updateStatus(Status.AWAY);
+
+			List<User> users = Arrays.asList(userA, userB, userC);
+
+			// when
+			userService.updateMany(users);
+
+			// then
+			Optional<User> findUserA = userRepository.findByActualUserId(userA.getActualUserId());
+			assertThat(findUserA).isPresent();
+			assertThat(findUserA.get().getStatus()).isEqualTo(Status.AWAY);
+
+			Optional<User> findUserB = userRepository.findByActualUserId(userB.getActualUserId());
+			assertThat(findUserB).isPresent();
+			assertThat(findUserB.get().getStatus()).isEqualTo(Status.AWAY);
+
+			Optional<User> findUserC = userRepository.findByActualUserId(userC.getActualUserId());
+			assertThat(findUserC).isPresent();
+			assertThat(findUserC.get().getStatus()).isEqualTo(Status.AWAY);
+		}
+
+		@DisplayName("존재하지 않은 User가 있다면 패스, 존재하는 User는 수정")
+		@Test
+		void bulkUpdateUsersAndSaveUser() {
+			// given
+			User userA = createUser("userA", 1L);
+			User userB = createUser("userB", 2L);
+			User userC = createUser("userC", 3L);
+
+			userRepository.save(userA);
+			userRepository.save(userB);
+
+			userA.updateStatus(Status.AWAY);
+			userB.updateStatus(Status.AWAY);
+			userC.updateStatus(Status.AWAY);
+
+			List<User> users = Arrays.asList(userA, userB, userC);
+
+			// when & then
+			userService.updateMany(users);
+
+			// then
+			Optional<User> findUserA = userRepository.findByActualUserId(userA.getActualUserId());
+			assertThat(findUserA).isPresent();
+			assertThat(findUserA.get().getStatus()).isEqualTo(Status.AWAY);
+
+			Optional<User> findUserB = userRepository.findByActualUserId(userB.getActualUserId());
+			assertThat(findUserB).isPresent();
+			assertThat(findUserB.get().getStatus()).isEqualTo(Status.AWAY);
+
+			Optional<User> findUserC = userRepository.findByActualUserId(userC.getActualUserId());
+			assertThat(findUserC).isEmpty();
+		}
+	}
+
+	@DisplayName("유저 삭제")
+	@Nested
+	class deleteUser {
+
+		@DisplayName("유저가 성공적으로 삭제됨")
+		@Test
+		void successDeleteUser() {
+			// given
+			User user = createUser("user", 1L);
+			userRepository.save(user);
+
+			// when
+			userService.delete(user);
+
+			// then
+			Optional<User> findUser = userRepository.findByActualUserId(user.getActualUserId());
+			assertThat(findUser).isEmpty();
+
+		}
+	}
+
+
+	public User createUser(String name, Long actualUserId) {
+		return User.builder()
+			.actualUserId(actualUserId)
+			.tier(Tier.gold)
+			.division(3)
+			.name(name)
+			.tagLine("tagLine")
+			.status(Status.ONLINE).lp(3L)
+			.build();
 	}
 
 

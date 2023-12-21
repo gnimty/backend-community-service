@@ -16,7 +16,6 @@ import com.gnimty.communityapiserver.global.constant.MessageResponseType;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
-import com.mongodb.bulk.BulkWriteResult;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -147,8 +146,11 @@ public class StompService {
 
 	public void createOrUpdateUser(List<RiotAccount> accounts) {
 		if (!accounts.isEmpty()) {
-			List<User> users = accounts.stream().map(User::toUser).toList();
-			BulkWriteResult bulkWriteResult = userService.updateMany(users);
+			accounts.stream()
+				.filter(riotAccount ->
+					userService.findUser(riotAccount.getMember().getId()).isEmpty())
+				.forEach(userService::save);
+			userService.updateMany(accounts.stream().map(User::toUser).toList());
 		}
 	}
 
