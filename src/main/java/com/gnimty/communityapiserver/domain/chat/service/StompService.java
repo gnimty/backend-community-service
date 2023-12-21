@@ -183,17 +183,7 @@ public class StompService {
 
 	// TODO janguni: 채팅방별 채팅 목록 불러오기 (exitDate < sendDate)
 	public List<ChatDto> getChatList(User me, ChatRoom chatRoom) {
-		List<Chat> totalChats;
-
-		Date exitDate = getExitDate(chatRoom, me);
-		if (exitDate==null) totalChats = chatService.findAllChats(chatRoom);
-		else {
-			totalChats = chatService.findChats(chatRoom, exitDate);
-		}
-
-		return totalChats.stream()
-			.map(ChatDto::new)
-			.toList();
+		return chatService.findChats(chatRoom, getExitDate(chatRoom, me));
 	}
 
 
@@ -239,18 +229,11 @@ public class StompService {
 	}
 
 
-	private Date getExitDate(ChatRoom chatRoom, User user) {
-		return extractParticipant(user, chatRoom.getParticipants(), true)
-			.getExitDate();
-	}
-
-
 	private User getOther(User me, ChatRoom chatRoom) {
 		List<Participant> participants = chatRoom.getParticipants();
 		Participant participant = extractParticipant(me, participants, false);
 		return participant.getUser();
 	}
-
 
 	private List<ChatDto> getChatDtoAfterExitDate(List<Chat> totalChats, Date exitDate) {
 		return totalChats.stream()
@@ -260,9 +243,7 @@ public class StompService {
 	}
 
 
-	private Date getExitDate(Long chatRoomNo, User user) {
-		ChatRoom chatRoom = chatRoomService.getChatRoom(chatRoomNo);
-
+	private Date getExitDate(ChatRoom chatRoom, User user) {
 		return extractParticipant(user, chatRoom.getParticipants(), true)
 			.getExitDate();
 	}

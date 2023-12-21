@@ -1,6 +1,7 @@
 package com.gnimty.communityapiserver.domain.chat.service;
 
 
+import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatDto;
 import com.gnimty.communityapiserver.domain.chat.entity.Chat;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
@@ -19,12 +20,8 @@ public class ChatService {
 
 	private final ChatRepository chatRepository;
 
-	public List<Chat> findChats(ChatRoom chatRoom, Date exitDate) {
-		return chatRepository.findByChatRoomNoAfterExitDate(chatRoom, exitDate);
-	}
-
-	public List<Chat> findAllChats(ChatRoom chatRoom) {
-		return chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo());
+	public List<ChatDto> findChats(ChatRoom chatRoom, Date exitDate) {
+		return chatRepository.findByChatRoom(chatRoom, exitDate);
 	}
 
 	public void readAllChat(ChatRoom chatRoom, User other) {
