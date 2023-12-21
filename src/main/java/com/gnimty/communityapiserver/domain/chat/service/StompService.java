@@ -278,6 +278,4 @@ public class StompService {
 		//3. isMe에 따라 return하기
 		return isMe ? participants.get(stdUserIdx) : participants.get(1 - stdUserIdx);
 	}
-
-
 }
