@@ -4,14 +4,11 @@ import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatDto;
 import com.gnimty.communityapiserver.domain.chat.entity.Chat;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
-import com.mongodb.BasicDBObject;
 import com.mongodb.client.result.UpdateResult;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -21,6 +18,7 @@ import org.springframework.data.mongodb.core.query.Update;
 @RequiredArgsConstructor
 @Slf4j
 public class ChatRepositoryImpl implements ChatRepositoryCustom {
+
 	@Autowired
 	private final MongoTemplate mongoTemplate;
 
@@ -33,15 +31,15 @@ public class ChatRepositoryImpl implements ChatRepositoryCustom {
 		Update update = new Update()
 			.set("readCnt", 0);
 
-		UpdateResult updateResult = mongoTemplate.updateMulti(query, update, Chat.class);
+		mongoTemplate.updateMulti(query, update, Chat.class);
 	}
 
 	@Override
 	public List<ChatDto> findByChatRoom(ChatRoom chatRoom, Date exitDate) {
 		Query query = new Query(Criteria.where("chatRoomNo").is(chatRoom.getChatRoomNo()));
-		//query.and("sendDate").gte(exitDate));
-		if (exitDate!=null)
+		if (exitDate != null) {
 			query.addCriteria(Criteria.where("sendDate").gte(exitDate));
+		}
 		return mongoTemplate.find(query, ChatDto.class, "chat");
 	}
 }
