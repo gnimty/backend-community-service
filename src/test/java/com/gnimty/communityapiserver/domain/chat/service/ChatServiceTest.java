@@ -3,6 +3,7 @@ package com.gnimty.communityapiserver.domain.chat.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatDto;
 import com.gnimty.communityapiserver.domain.chat.entity.Chat;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
@@ -147,46 +148,6 @@ class ChatServiceTest {
 
 	}
 
-	public List<Chat> findChats(ChatRoom chatRoom) {
-		return chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo());
-	}
-
-
-	@DisplayName("chatRoom으로 조회")
-	@Nested
-	class findByChatRoom {
-
-		@DisplayName("채팅방의 모든 채팅내역 조회")
-		@Test
-		void findAllChats() {
-			// given
-			ChatRoom chatRoom = ChatRoom.builder()
-				.createdDate(new Date())
-				.lastModifiedDate(new Date())
-				.participants(null)
-				.chatRoomNo(1L)
-				.build();
-			chatRoomRepository.save(chatRoom);
-
-			for (int i = 0; i < 20; i++) {
-				chatRepository.save(Chat.builder()
-					.senderId(1L)
-					.chatRoomNo(chatRoom.getChatRoomNo())
-					.message("hi")
-					.sendDate(new Date())
-					.build());
-			}
-
-			// when
-			List<Chat> chats = chatService.findChats(chatRoom);
-
-			// then
-			assertThat(chats.size()).isEqualTo(20);
-
-		}
-
-	}
-
 
 	@DisplayName("chat의 readCount 수정")
 	@Nested
@@ -246,7 +207,7 @@ class ChatServiceTest {
 			chatService.delete(chatRoom);
 
 			// then
-			List<Chat> chats = chatService.findChats(chatRoom);
+			List<ChatDto> chats = chatRepository.findByChatRoom(chatRoom, null);
 			assertThat(chats).isEmpty();
 		}
 	}

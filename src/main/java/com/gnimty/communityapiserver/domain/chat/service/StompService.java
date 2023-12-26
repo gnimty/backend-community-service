@@ -71,11 +71,7 @@ public class StompService {
 	// blocked==UNBLOCK인 도큐먼트만 조회
 	public List<ChatRoomDto> getChatRoomsJoined(User me) {
 
-		List<ChatRoom> chatRooms = chatRoomService.findChatRoom(me)
-			.stream().filter(chatRoom ->
-				extractParticipant(me, chatRoom.getParticipants(), true).getBlockedStatus()
-					== Blocked.UNBLOCK
-			).toList();
+		List<ChatRoom> chatRooms = chatRoomService.findUnBlockChatRoom(me);
 
 		return chatRooms.stream().map(chatRoom ->
 			ChatRoomDto.builder()
@@ -189,12 +185,7 @@ public class StompService {
 
 	// TODO janguni: 채팅방별 채팅 목록 불러오기 (exitDate < sendDate)
 	public List<ChatDto> getChatList(User me, ChatRoom chatRoom) {
-
-		// TODO: 시간 순서대로 오는건지 확인
-		List<Chat> totalChats = chatService.findChats(chatRoom);
-		Date exitDate = getExitDate(chatRoom, me);
-
-		return getChatDtoAfterExitDate(totalChats, exitDate);
+		return chatService.findChats(chatRoom, getExitDate(chatRoom, me));
 	}
 
 
@@ -226,17 +217,8 @@ public class StompService {
 
 	// TODO janguni: 채팅방에 있는 상대방이 보낸 채팅의 readCount update
 	public void readOtherChats(User me, ChatRoom chatRoom) {
-		Long otherActualUserId = getOther(me, chatRoom).getActualUserId();
-
-		List<Chat> totalChats = chatService.findChats(chatRoom);
-
-		totalChats.stream()
-			.filter(
-				chat -> (chat.getReadCnt() == 1 && chat.getSenderId().equals(otherActualUserId)))
-			.forEach(chat -> {
-				chat.readByAllUser();
-				chatService.save(chat);
-			});
+		User other = getOther(me, chatRoom);
+		chatService.readAllChat(chatRoom, other);
 	}
 
 
@@ -249,18 +231,11 @@ public class StompService {
 	}
 
 
-	private Date getExitDate(ChatRoom chatRoom, User user) {
-		return extractParticipant(user, chatRoom.getParticipants(), true)
-			.getExitDate();
-	}
-
-
 	private User getOther(User me, ChatRoom chatRoom) {
 		List<Participant> participants = chatRoom.getParticipants();
 		Participant participant = extractParticipant(me, participants, false);
 		return participant.getUser();
 	}
-
 
 	private List<ChatDto> getChatDtoAfterExitDate(List<Chat> totalChats, Date exitDate) {
 		return totalChats.stream()
@@ -270,9 +245,7 @@ public class StompService {
 	}
 
 
-	private Date getExitDate(Long chatRoomNo, User user) {
-		ChatRoom chatRoom = chatRoomService.getChatRoom(chatRoomNo);
-
+	private Date getExitDate(ChatRoom chatRoom, User user) {
 		return extractParticipant(user, chatRoom.getParticipants(), true)
 			.getExitDate();
 	}
@@ -307,6 +280,4 @@ public class StompService {
 		//3. isMe에 따라 return하기
 		return isMe ? participants.get(stdUserIdx) : participants.get(1 - stdUserIdx);
 	}
-
-
 }

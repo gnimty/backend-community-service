@@ -40,6 +40,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.util.StopWatch;
 
 
 @Slf4j
@@ -66,7 +67,7 @@ public class StompServiceTest {
 	@Autowired
 	private StompService stompService;
 
-
+	@BeforeEach
 	@AfterEach
 	void deleteAll() {
 		userRepository.deleteAll();
@@ -229,7 +230,7 @@ public class StompServiceTest {
 
 			// then
 			assertThat(chatRoomRepository.findByChatRoomNo(chatRoom.getChatRoomNo())).isEmpty();
-			assertThat(chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo())).isEmpty();
+			assertThat(chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo(), ChatDto.class).isEmpty());
 		}
 
 		@DisplayName("상대방이 나를 차단했다면, 채팅방과 채팅내역 모두 삭제됨")
@@ -246,7 +247,7 @@ public class StompServiceTest {
 
 			// then
 			assertThat(chatRoomRepository.findByChatRoomNo(chatRoom.getChatRoomNo())).isEmpty();
-			assertThat(chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo())).isEmpty();
+			assertThat(chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo(), ChatDto.class)).isEmpty();
 		}
 	}
 
@@ -363,7 +364,7 @@ public class StompServiceTest {
 
 		@DisplayName("채팅방을 나간 이후 채팅이 없다면, 빈 리스트 가져옴")
 		@Test
-		void getEmptyChatsAfterExitChatRoom() {
+		void getEmptyChatsAfterExitChatRoom() throws InterruptedException {
 			// given
 			chatRepository.save(
 				Chat.builder().senderId(userA.getActualUserId()).sendDate(new Date()).message("hi")
@@ -373,13 +374,17 @@ public class StompServiceTest {
 				Chat.builder().senderId(userB.getActualUserId()).sendDate(new Date()).message("bye")
 					.chatRoomNo(chatRoom.getChatRoomNo()).build());
 
+
 			Participant participantUserA = stompService.extractParticipant(userA,
 				chatRoom.getParticipants(), true);
-			participantUserA.setExitDate(new Date());
+			Thread.sleep(2000);
+			Date exitDate = new Date();
+			participantUserA.setExitDate(exitDate);
 			chatRoomRepository.update(chatRoom);
 
 			// when
 			List<ChatDto> chats = stompService.getChatList(userA, chatRoom);
+
 
 			// then
 			assertThat(chats).isEmpty();
@@ -387,7 +392,7 @@ public class StompServiceTest {
 
 		@DisplayName("채팅방을 나간 이후 채팅이 있다면, 나간 이후의 채팅들만 가져옴")
 		@Test
-		void getSomeChatsAfterExitChatRoom() {
+		void getSomeChatsAfterExitChatRoom() throws InterruptedException {
 			// given
 			chatRepository.save(
 				Chat.builder().senderId(userA.getActualUserId()).sendDate(new Date()).message("hi")
@@ -401,6 +406,7 @@ public class StompServiceTest {
 				chatRoom.getParticipants(), true);
 			participantUserA.setExitDate(new Date()); // 채팅방을 나감
 			chatRoomRepository.update(chatRoom);
+			Thread.sleep(2000);
 
 			chatRepository.save(
 				Chat.builder().senderId(userB.getActualUserId()).sendDate(new Date())
@@ -479,7 +485,7 @@ public class StompServiceTest {
 			ChatDto chatDto = stompService.saveChat(userA, chatRoom, "hi");
 
 			// then
-			List<Chat> chats = chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo());
+			List<ChatDto> chats = chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo(), ChatDto.class);
 			assertThat(chats).isNotEmpty();
 			assertThat(chats.get(0).getMessage()).isEqualTo("hi");
 			ChatRoom findChatRoom = chatRoomRepository.findByChatRoomNo(chatRoom.getChatRoomNo())
@@ -677,7 +683,7 @@ public class StompServiceTest {
 
 			// then
 			assertThat(chatRoomRepository.findByUsers(userA, userB)).isEmpty();
-			assertThat(chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo())).isEmpty();
+			assertThat(chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo(), ChatDto.class)).isEmpty();
 		}
 
 		@DisplayName("상대방과의 채팅방이 있고 상대방도 나를 차단했다면, 채팅방과 해당 채팅방의 채팅이 모두 삭제됨")
@@ -694,7 +700,7 @@ public class StompServiceTest {
 
 			// then
 			assertThat(chatRoomRepository.findByUsers(userA, userB)).isEmpty();
-			assertThat(chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo())).isEmpty();
+			assertThat(chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo(),ChatDto.class)).isEmpty();
 		}
 
 
@@ -874,7 +880,7 @@ public class StompServiceTest {
 			// then
 			assertThat(userRepository.findByActualUserId(userA.getActualUserId())).isEmpty();
 			assertThat(chatRoomRepository.findByUser(userA)).isEmpty();
-			assertThat(chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo())).isEmpty();
+			assertThat(chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo(),ChatDto.class)).isEmpty();
 		}
 
 		@DisplayName("유효하지 않은 userId여도 아무일도 일어나지 않음")
