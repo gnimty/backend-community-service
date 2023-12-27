@@ -1,6 +1,8 @@
 package com.gnimty.communityapiserver.service.introduction;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.gnimty.communityapiserver.domain.introduction.entity.Introduction;
 import com.gnimty.communityapiserver.domain.introduction.repository.IntroductionRepository;
