@@ -3,9 +3,15 @@ package com.gnimty.communityapiserver.domain.championcommentslike.controller.dto
 import com.gnimty.communityapiserver.domain.championcommentslike.service.dto.request.ChampionCommentsLikeServiceRequest;
 import com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage;
 import javax.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ChampionCommentsLikeRequest {
 
 	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
