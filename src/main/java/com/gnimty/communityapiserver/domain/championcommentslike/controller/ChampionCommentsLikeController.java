@@ -27,8 +27,7 @@ public class ChampionCommentsLikeController {
 		@PathVariable("comments_id") Long commentsId,
 		@RequestBody @Valid ChampionCommentsLikeRequest request
 	) {
-		championCommentsLikeService.doChampionCommentsLike(
-			championId, commentsId, request.toServiceRequest());
+		championCommentsLikeService.doChampionCommentsLike(championId, commentsId, request.toServiceRequest());
 		return CommonResponse.success(SUCCESS_CHAMPION_COMMENTS_LIKE, CREATED);
 	}
 }
