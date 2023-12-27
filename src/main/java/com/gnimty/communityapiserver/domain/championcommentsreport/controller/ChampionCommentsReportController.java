@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/champions/{champion_id}/comments/{comments_id}/report")
+@RequestMapping("/champions/{champion_id}/comments/{comments_id}/reports")
 public class ChampionCommentsReportController {
 
 	private final ChampionCommentsReportService championCommentsReportService;
