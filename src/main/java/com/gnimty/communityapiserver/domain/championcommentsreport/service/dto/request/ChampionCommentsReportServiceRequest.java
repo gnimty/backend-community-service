@@ -1,6 +1,7 @@
 package com.gnimty.communityapiserver.domain.championcommentsreport.service.dto.request;
 
 import com.gnimty.communityapiserver.global.constant.ReportType;
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -8,6 +9,6 @@ import lombok.Getter;
 @Getter
 public class ChampionCommentsReportServiceRequest {
 
-	private ReportType reportType;
+	private List<ReportType> reportType;
 	private String reportComment;
 }

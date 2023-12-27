@@ -1,6 +1,9 @@
 package com.gnimty.communityapiserver.domain.championcommentsreport.service;
 
-import static com.gnimty.communityapiserver.global.exception.ErrorCode.*;
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.COMMENTS_ID_AND_CHAMPION_ID_INVALID;
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.DUPLICATED_REPORT;
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.NOT_LINKED_RSO;
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.OTHER_TYPE_MUST_CONTAIN_COMMENT;
 
 import com.gnimty.communityapiserver.domain.championcomments.entity.ChampionComments;
 import com.gnimty.communityapiserver.domain.championcomments.service.ChampionCommentsReadService;
@@ -36,21 +39,28 @@ public class ChampionCommentsReportService {
 		if (!Objects.equals(championId, championComments.getChampionId())) {
 			throw new BaseException(COMMENTS_ID_AND_CHAMPION_ID_INVALID);
 		}
-		championCommentsReportRepository.save(
-			ChampionCommentsReport.builder()
-				.championComments(championComments)
-				.reportType(request.getReportType())
-				.reportComment(request.getReportComment())
-				.member(member)
-				.build());
+		request.getReportType().forEach(
+			reportType -> championCommentsReportRepository.save(
+				ChampionCommentsReport.builder()
+					.championComments(championComments)
+					.reportType(reportType)
+					.reportComment(request.getReportComment())
+					.member(member)
+					.build())
+		);
 	}
 
 	private void validationReport(ChampionCommentsReportServiceRequest request, Member member) {
 		if (!member.getRsoLinked()) {
 			throw new BaseException(NOT_LINKED_RSO);
 		}
-		if (request.getReportType().equals(ReportType.OTHER) && request.getReportComment() == null) {
+		if (isInvalidReportRelation(request)) {
 			throw new BaseException(OTHER_TYPE_MUST_CONTAIN_COMMENT);
 		}
+	}
+
+	private boolean isInvalidReportRelation(ChampionCommentsReportServiceRequest request) {
+		return (request.getReportType().contains(ReportType.OTHER) && request.getReportComment() == null)
+			|| (!request.getReportType().contains(ReportType.OTHER) && request.getReportComment() != null);
 	}
 }
