@@ -21,6 +21,7 @@ public enum Bound {
 	public static final int MAX_INTRODUCTION_CONTENT_SIZE = 90;
 	public static final int MIN_HOUR = 0;
 	public static final int MAX_HOUR = 24;
+	public static final int MAX_REPORT_COMMENT_SIZE = 1000;
 
 	private final int value;
 
