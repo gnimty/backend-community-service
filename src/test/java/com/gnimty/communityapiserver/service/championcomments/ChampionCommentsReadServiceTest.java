@@ -183,7 +183,8 @@ public class ChampionCommentsReadServiceTest extends ServiceTestSupport {
 		@DisplayName("내가 좋아요한 댓글의 경우, likeOrNot이 true로 조회되어야 한다.")
 		@Test
 		void should_likeOrNotIsTrue_when_commentsLiked() {
-			ChampionComments championComments = championCommentsRepository.save(createChampionCommentsByChampionId(1L, member2));
+			ChampionComments championComments = championCommentsRepository.save(
+				createChampionCommentsByChampionId(1L, member2));
 			championCommentsRepository.save(createChampionCommentsByChampionId(1L, member2));
 			championCommentsLikeRepository.save(ChampionCommentsLike.builder()
 				.member(member1)

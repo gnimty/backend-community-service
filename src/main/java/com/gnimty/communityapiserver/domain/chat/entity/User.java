@@ -5,14 +5,7 @@ import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
 import com.gnimty.communityapiserver.global.constant.Lane;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.constant.Tier;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import javax.persistence.Column;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -112,21 +105,27 @@ public class User {
 		this.division = Optional.ofNullable(riotAccount.getDivision()).orElse(this.division);
 		this.lp = Optional.ofNullable(riotAccount.getLp()).orElse(this.lp);
 		this.mmr = Optional.ofNullable(riotAccount.getMmr()).orElse(this.mmr);
-		this.frequentLane1 =  Optional.ofNullable(riotAccount.getFrequentLane1()).orElse(this.frequentLane1);
-		this.frequentLane2 =  Optional.ofNullable(riotAccount.getFrequentLane2()).orElse(this.frequentLane2);
-		this.frequentChampionId1 =  Optional.ofNullable(riotAccount.getFrequentChampionId1()).orElse(this.frequentChampionId1);
-		this.frequentChampionId2 =  Optional.ofNullable(riotAccount.getFrequentChampionId2()).orElse(this.frequentChampionId2);
-		this.frequentChampionId3 =  Optional.ofNullable(riotAccount.getFrequentChampionId3()).orElse(this.frequentChampionId3);
+		this.frequentLane1 = Optional.ofNullable(riotAccount.getFrequentLane1()).orElse(this.frequentLane1);
+		this.frequentLane2 = Optional.ofNullable(riotAccount.getFrequentLane2()).orElse(this.frequentLane2);
+		this.frequentChampionId1 = Optional.ofNullable(riotAccount.getFrequentChampionId1())
+			.orElse(this.frequentChampionId1);
+		this.frequentChampionId2 = Optional.ofNullable(riotAccount.getFrequentChampionId2())
+			.orElse(this.frequentChampionId2);
+		this.frequentChampionId3 = Optional.ofNullable(riotAccount.getFrequentChampionId3())
+			.orElse(this.frequentChampionId3);
 		// 자유 랭크
 		this.tierFlex = Optional.ofNullable(riotAccount.getQueueFlex()).orElse(this.tierFlex);
 		this.divisionFlex = Optional.ofNullable(riotAccount.getDivisionFlex()).orElse(this.divisionFlex);
 		this.lpFlex = Optional.ofNullable(riotAccount.getLpFlex()).orElse(this.lpFlex);
 		this.mmrFlex = Optional.ofNullable(riotAccount.getMmrFlex()).orElse(this.mmrFlex);
-		this.frequentLane1Flex =  Optional.ofNullable(riotAccount.getFrequentLane1Flex()).orElse(this.frequentLane1Flex);
-		this.frequentLane2Flex =  Optional.ofNullable(riotAccount.getFrequentLane2Flex()).orElse(this.frequentLane2Flex);
-		this.frequentChampionId1Flex =  Optional.ofNullable(riotAccount.getFrequentChampionId1Flex()).orElse(this.frequentChampionId1Flex);
-		this.frequentChampionId2Flex =  Optional.ofNullable(riotAccount.getFrequentChampionId2Flex()).orElse(this.frequentChampionId2Flex);
-		this.frequentChampionId3Flex =  Optional.ofNullable(riotAccount.getFrequentChampionId3Flex()).orElse(this.frequentChampionId3Flex);
+		this.frequentLane1Flex = Optional.ofNullable(riotAccount.getFrequentLane1Flex()).orElse(this.frequentLane1Flex);
+		this.frequentLane2Flex = Optional.ofNullable(riotAccount.getFrequentLane2Flex()).orElse(this.frequentLane2Flex);
+		this.frequentChampionId1Flex = Optional.ofNullable(riotAccount.getFrequentChampionId1Flex())
+			.orElse(this.frequentChampionId1Flex);
+		this.frequentChampionId2Flex = Optional.ofNullable(riotAccount.getFrequentChampionId2Flex())
+			.orElse(this.frequentChampionId2Flex);
+		this.frequentChampionId3Flex = Optional.ofNullable(riotAccount.getFrequentChampionId3Flex())
+			.orElse(this.frequentChampionId3Flex);
 	}
 
 	public void updateStatus(Status status) {

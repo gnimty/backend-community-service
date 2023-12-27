@@ -1,7 +1,7 @@
 package com.gnimty.communityapiserver.domain.championcommentsreport.controller;
 
-import static com.gnimty.communityapiserver.global.constant.ResponseMessage.*;
-import static org.springframework.http.HttpStatus.*;
+import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_COMMENTS_REPORT;
+import static org.springframework.http.HttpStatus.CREATED;
 
 import com.gnimty.communityapiserver.domain.championcommentsreport.controller.dto.request.ChampionCommentsReportRequest;
 import com.gnimty.communityapiserver.domain.championcommentsreport.service.ChampionCommentsReportService;
