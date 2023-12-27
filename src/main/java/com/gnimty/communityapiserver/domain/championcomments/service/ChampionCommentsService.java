@@ -14,14 +14,17 @@ import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.domain.member.service.MemberReadService;
 import com.gnimty.communityapiserver.domain.riotaccount.repository.RiotAccountQueryRepository;
 import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
+import com.gnimty.communityapiserver.global.config.WebClientWrapper;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
 import java.util.Objects;
+import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClient.RequestHeadersSpec;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 @Service
@@ -32,12 +35,12 @@ public class ChampionCommentsService {
 	private final ChampionCommentsReadService championCommentsReadService;
 	private final MemberReadService memberReadService;
 	private final ChampionCommentsRepository championCommentsRepository;
-	private final RiotAccountQueryRepository riotAccountQueryRepository;
+	private final WebClientWrapper webClientWrapper;
 
 	public void addComments(Long championId, ChampionCommentsServiceRequest request) {
 		Member member = MemberThreadLocal.get();
 
-		if (!riotAccountQueryRepository.existsByMember(member)) {
+		if (!member.getRsoLinked()) {
 			throw new BaseException(ErrorCode.NOT_LINKED_RSO);
 		}
 		// 해당하는 championId, opponentChampionId가 올바른지 validation
@@ -122,14 +125,13 @@ public class ChampionCommentsService {
 	}
 
 	private void throwIfNotFoundMentionedMember(ChampionCommentsServiceRequest request) {
-		if (request.getMentionedMemberId() != null
-			&& !memberReadService.existsById(request.getMentionedMemberId())) {
+		if (request.getMentionedMemberId() != null && !memberReadService.existsById(request.getMentionedMemberId())) {
 			throw new BaseException(ErrorCode.MEMBER_NOT_FOUND);
 		}
 	}
 
 	private VersionInfo getVersionInfo() {
-		return WebClient.create("https://gnimty.kro.kr")
+		return webClientWrapper
 			.get()
 			.uri("/asset/version")
 			.retrieve()
@@ -167,13 +169,13 @@ public class ChampionCommentsService {
 		championComments.delete();
 	}
 
-	@Getter
+	@Data
 	public static class VersionInfo {
 
 		private VersionData data;
 	}
 
-	@Getter
+	@Data
 	public static class VersionData {
 
 		private String version;
