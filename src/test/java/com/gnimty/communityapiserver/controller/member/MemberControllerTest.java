@@ -1,5 +1,6 @@
 package com.gnimty.communityapiserver.controller.member;
 
+import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_BLOCK;
 import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_DISCONNECT_OAUTH;
 import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_GOOGLE_LINK;
 import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_KAKAO_LINK;
@@ -976,15 +977,19 @@ public class MemberControllerTest extends ControllerTestSupport {
 		@Test
 		void should_success_when_authenticated() throws Exception {
 
-			willDoNothing()
-				.given(memberService)
-				.withdrawal();
+			try (MockedStatic<MemberThreadLocal> ignored = mockStatic(MemberThreadLocal.class)) {
+				given(MemberThreadLocal.get())
+					.willReturn(Member.builder().build());
+				willDoNothing()
+					.given(memberService)
+					.withdrawal();
 
-			mockMvc.perform(delete(REQUEST_URL))
-				.andExpectAll(
-					status().isOk(),
-					jsonPath("$.status.message").value(SUCCESS_WITHDRAWAL.getMessage())
-				);
+				mockMvc.perform(delete(REQUEST_URL))
+					.andExpectAll(
+						status().isOk(),
+						jsonPath("$.status.message").value(SUCCESS_WITHDRAWAL.getMessage())
+					);
+			}
 		}
 	}
 
