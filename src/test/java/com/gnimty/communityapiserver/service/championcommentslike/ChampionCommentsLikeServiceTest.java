@@ -26,6 +26,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class ChampionCommentsLikeServiceTest extends ServiceTestSupport {
@@ -193,6 +195,22 @@ public class ChampionCommentsLikeServiceTest extends ServiceTestSupport {
 				() -> championCommentsLikeService.doChampionCommentsLike(1L, championComments.getId(), request))
 				.isInstanceOf(exception.getClass())
 				.hasMessage(exception.getMessage());
+		}
+
+		@DisplayName("좋아요한 댓글에 싫어요를 하거나, 싫어요한 댓글에 좋아요를 하면 실패한다.")
+		@ParameterizedTest
+		@CsvSource({"true,false", "false,true"})
+		void should_fail_when_crossLikeOrNot(Boolean likeOrNot1, Boolean likeOrNot2) {
+			ChampionCommentsLikeServiceRequest request = createRequest(likeOrNot1, false);
+			championCommentsLikeService.doChampionCommentsLike(1L, championComments.getId(), request);
+
+			ChampionCommentsLikeServiceRequest request2 = createRequest(likeOrNot2, false);
+			BaseException exception = new BaseException(ALREADY_CHAMPION_COMMENTS_LIKE);
+			assertThatThrownBy(
+				() -> championCommentsLikeService.doChampionCommentsLike(1L, championComments.getId(), request2))
+				.isInstanceOf(exception.getClass())
+				.hasMessage(exception.getMessage());
+
 		}
 
 		@DisplayName("RSO 연동이 안된 계정은 API를 사용할 수 없다.")
