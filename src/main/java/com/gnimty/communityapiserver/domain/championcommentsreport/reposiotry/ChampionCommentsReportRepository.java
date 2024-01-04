@@ -4,4 +4,5 @@ import com.gnimty.communityapiserver.domain.championcommentsreport.entity.Champi
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ChampionCommentsReportRepository extends JpaRepository<ChampionCommentsReport, Long> {
+
 }

@@ -54,7 +54,6 @@ public class ChampionComments extends BaseEntity {
 	@Column(name = "contents", columnDefinition = "VARCHAR(1000)")
 	private String contents;
 
-	@NotNull
 	@Column(name = "comments_type", columnDefinition = "VARCHAR(20)")
 	@Enumerated(EnumType.STRING)
 	private CommentsType commentsType;

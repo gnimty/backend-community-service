@@ -26,11 +26,9 @@ public class ChampionCommentsReadService {
 	}
 
 	public ChampionCommentsServiceResponse findByChampionId(Long championId) {
-		List<ChampionCommentsEntry> contents = championCommentsQueryRepository
-			.findByChampionId(championId);
+		List<ChampionCommentsEntry> contents = championCommentsQueryRepository.findByChampionId(championId);
 		return ChampionCommentsServiceResponse.builder()
 			.championComments(contents)
 			.build();
-
 	}
 }

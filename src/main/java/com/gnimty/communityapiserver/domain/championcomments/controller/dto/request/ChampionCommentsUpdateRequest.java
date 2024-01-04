@@ -5,9 +5,15 @@ import static com.gnimty.communityapiserver.global.constant.Bound.MAX_CONTENTS_S
 import com.gnimty.communityapiserver.domain.championcomments.service.dto.request.ChampionCommentsUpdateServiceRequest;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ChampionCommentsUpdateRequest {
 
 	private Long mentionedMemberId;

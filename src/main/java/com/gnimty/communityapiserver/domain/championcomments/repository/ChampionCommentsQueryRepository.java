@@ -25,19 +25,28 @@ public class ChampionCommentsQueryRepository {
 
 	public List<ChampionCommentsEntry> findByChampionId(Long championId) {
 		Member me = MemberThreadLocal.get();
-		return queryFactory.select(
-				getProjections(me)
-			)
+		return queryFactory.select(getProjections(me))
 			.from(championComments)
 			.join(championComments.member, member)
 			.leftJoin(block).on(block.blocked.eq(championComments.member))
 			.join(riotAccount).on(riotAccount.member.eq(member))
 			.leftJoin(championCommentsLike)
 			.on(championCommentsLike.championComments.id.eq(championComments.id)
-				.and(championCommentsLike.member.id.eq(me.getId())))
-			.where(championComments.championId.eq(championId))
-			.orderBy(championComments.upCount.desc(), championComments.downCount.asc())
+				.and(getMemberLikeEq(me)))
+			.where(championComments.championId.eq(championId), riotAccount.isMain.isTrue())
+			.orderBy(
+				championComments.depth.asc(),
+				championComments.upCount.desc(),
+				championComments.downCount.asc(),
+				championComments.createdAt.asc())
 			.fetch();
+	}
+
+	private BooleanExpression getMemberLikeEq(Member me) {
+		if (me == null) {
+			return null;
+		}
+		return championCommentsLike.member.id.eq(me.getId());
 	}
 
 	private QBean<ChampionCommentsEntry> getProjections(Member me) {
@@ -60,7 +69,7 @@ public class ChampionCommentsQueryRepository {
 			championComments.member.id.as("memberId"),
 			riotAccount.name.as("name"),
 			riotAccount.tagLine.as("tagLine"),
-			championCommentsLike.likeOrNot.as("reaction")
+			championCommentsLike.likeOrNot.as("like")
 		);
 	}
 

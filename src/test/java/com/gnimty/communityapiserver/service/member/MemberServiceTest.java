@@ -1227,6 +1227,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 			.divisionFlex(1)
 			.mmrFlex(10000L)
 			.member(member)
+			.level(0L)
 			.build();
 	}
 

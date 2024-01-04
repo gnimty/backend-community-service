@@ -4,6 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gnimty.communityapiserver.domain.block.controller.BlockController;
 import com.gnimty.communityapiserver.domain.block.service.BlockReadService;
 import com.gnimty.communityapiserver.domain.block.service.BlockService;
+import com.gnimty.communityapiserver.domain.championcomments.controller.ChampionCommentsController;
+import com.gnimty.communityapiserver.domain.championcomments.service.ChampionCommentsReadService;
+import com.gnimty.communityapiserver.domain.championcomments.service.ChampionCommentsService;
+import com.gnimty.communityapiserver.domain.championcommentslike.controller.ChampionCommentsLikeController;
+import com.gnimty.communityapiserver.domain.championcommentslike.service.ChampionCommentsLikeService;
+import com.gnimty.communityapiserver.domain.championcommentsreport.controller.ChampionCommentsReportController;
+import com.gnimty.communityapiserver.domain.championcommentsreport.service.ChampionCommentsReportService;
 import com.gnimty.communityapiserver.domain.chat.service.StompService;
 import com.gnimty.communityapiserver.domain.chat.service.UserService;
 import com.gnimty.communityapiserver.domain.introduction.service.IntroductionReadService;
@@ -27,7 +34,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 @ActiveProfiles("test")
-@WebMvcTest(controllers = {MemberController.class, AuthController.class, BlockController.class})
+@WebMvcTest(controllers = {MemberController.class, AuthController.class, BlockController.class,
+	ChampionCommentsController.class, ChampionCommentsLikeController.class, ChampionCommentsReportController.class})
 @MockBean(JpaMetamodelMappingContext.class)
 public abstract class ControllerTestSupport {
 
@@ -81,4 +89,16 @@ public abstract class ControllerTestSupport {
 
 	@MockBean
 	protected UserService userService;
+
+	@MockBean
+	protected ChampionCommentsService championCommentsService;
+
+	@MockBean
+	protected ChampionCommentsReadService championCommentsReadService;
+
+	@MockBean
+	protected ChampionCommentsLikeService championCommentsLikeService;
+
+	@MockBean
+	protected ChampionCommentsReportService championCommentsReportService;
 }

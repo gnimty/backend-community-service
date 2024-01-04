@@ -137,6 +137,6 @@ public enum ErrorCode {
 		public static final String INVALID_VERSION = "답글 작성 시, 상위 답글과의 버전 정보가 동일해야합니다.";
 		public static final String INVALID_CHILD_COMMENTS = "하위 댓글 또는 답글은 카테고리, 포지션, 상대 챔피언을 선택할 수 없습니다.";
 		public static final String DUPLICATED_REPORT = "한 댓글에 한 번의 신고만 허용됩니다.";
-		public static final String OTHER_TYPE_MUST_CONTAIN_COMMENT = "기타 타입의 신고 사유는 상세 신고 사유를 반드시 작성해야 합니다.";
+		public static final String OTHER_TYPE_MUST_CONTAIN_COMMENT = "기타 타입의 신고 사유는 상세 신고 사유를 반드시 작성해야 하며, 기타 타입의 신고 사유가 아닌 경우 상세 신고 사유는 작성할 수 없습니다.";
 	}
 }

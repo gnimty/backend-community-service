@@ -31,7 +31,7 @@ public class BlockReadServiceTest extends ServiceTestSupport {
 	@Autowired
 	private BlockRepository blockRepository;
 	@Autowired
-	BlockReadService blockReadService;
+	private BlockReadService blockReadService;
 
 	@DisplayName("차단 목록 조회 시")
 	@Nested
