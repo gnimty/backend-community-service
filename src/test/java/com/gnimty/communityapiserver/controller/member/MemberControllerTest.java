@@ -1,5 +1,6 @@
 package com.gnimty.communityapiserver.controller.member;
 
+import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_BLOCK;
 import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_DISCONNECT_OAUTH;
 import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_GOOGLE_LINK;
 import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_KAKAO_LINK;

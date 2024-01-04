@@ -34,6 +34,10 @@ public class ChatRoomService {
 		return chatRoomRepository.findByUser(user);
 	}
 
+	public List<ChatRoom> findUnBlockChatRoom(User user) {
+		return chatRoomRepository.findUnBlockByUser(user);
+	}
+
 
 	// TODO solomon : 단일 채팅방 정보 가져오기
 	public Optional<ChatRoom> findChatRoom(Long chatRoomNo) {

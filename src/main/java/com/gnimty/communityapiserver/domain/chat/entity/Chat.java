@@ -28,7 +28,6 @@ public class Chat {
 		this.senderId = senderId;
 		this.message = message;
 		this.sendDate = sendDate;
-		// chat을 보내면 readCnt는 항상 1로 생성됨
 	}
 
 	public void readByAllUser() {
