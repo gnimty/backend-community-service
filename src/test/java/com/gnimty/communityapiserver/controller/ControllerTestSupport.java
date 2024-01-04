@@ -19,6 +19,8 @@ import com.gnimty.communityapiserver.domain.member.controller.MemberController;
 import com.gnimty.communityapiserver.domain.member.service.AuthService;
 import com.gnimty.communityapiserver.domain.member.service.MemberReadService;
 import com.gnimty.communityapiserver.domain.member.service.MemberService;
+import com.gnimty.communityapiserver.domain.memberlike.controller.MemberLikeController;
+import com.gnimty.communityapiserver.domain.memberlike.service.MemberLikeService;
 import com.gnimty.communityapiserver.domain.oauthinfo.service.OauthInfoReadService;
 import com.gnimty.communityapiserver.domain.prefergamemode.service.PreferGameModeReadService;
 import com.gnimty.communityapiserver.domain.riotaccount.service.RiotAccountReadService;
@@ -35,7 +37,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @ActiveProfiles("test")
 @WebMvcTest(controllers = {MemberController.class, AuthController.class, BlockController.class,
-	ChampionCommentsController.class, ChampionCommentsLikeController.class, ChampionCommentsReportController.class})
+	ChampionCommentsController.class, ChampionCommentsLikeController.class, ChampionCommentsReportController.class,
+	MemberLikeController.class})
 @MockBean(JpaMetamodelMappingContext.class)
 public abstract class ControllerTestSupport {
 
@@ -101,4 +104,7 @@ public abstract class ControllerTestSupport {
 
 	@MockBean
 	protected ChampionCommentsReportService championCommentsReportService;
+
+	@MockBean
+	protected MemberLikeService memberLikeService;
 }
