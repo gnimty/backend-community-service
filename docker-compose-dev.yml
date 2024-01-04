@@ -46,7 +46,7 @@ services:
     restart: always
 
   community-redis-dev:
-    image: redis:latest
+    image: redis:7.2
     container_name: gnimty-community-redis-main
     ports:
       - "16379:6379"
