@@ -43,6 +43,13 @@ spring:
         transport:
           protocol: smtp
 
+springdoc:
+  api-docs:
+    groups:
+      enabled: true
+  swagger-ui:
+    path: '/swagger-ui.html'
+    enabled: true
 ---
 spring:
   config:
