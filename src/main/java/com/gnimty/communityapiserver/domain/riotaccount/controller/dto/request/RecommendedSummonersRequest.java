@@ -8,6 +8,7 @@ import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.constant.Tier;
 import com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage;
 import com.gnimty.communityapiserver.global.validation.annotation.ValidateCursor;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import javax.validation.constraints.NotNull;
 import lombok.Builder;
@@ -19,23 +20,35 @@ import lombok.Getter;
 	lastSummonerMmr = "lastSummonerMmr", lastSummonerUpCount = "lastSummonerUpCount")
 public class RecommendedSummonersRequest {
 
+	@Schema(example = "RANK_SOLO", description = "조회하려는 게임 모드, not null")
 	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
 	private GameMode gameMode;
+	@Schema(example = "OFFLINE", description = "조회하려는 소환사 상태, not null")
 	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
 	private Status status;
+	@Schema(example = "[1, 2, 3]", description = "선호 챔피언 id")
 	private List<Long> preferChampionIds;
+	@Schema(example = "true", description = "듀오 가능한 소환사만 조회 여부")
 	private Boolean duoable;
+	@Schema(example = "DIAMOND", description = "해당 티어 이상으로 조회")
 	private Tier tier;
+	@Schema(example = "[TOP, MIDDLE]", description = "조회하려는 라인")
 	private List<Lane> lanes;
-
+	@Schema(example = "RECOMMEND", description = "정렬 기준")
 	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
 	private SortBy sortBy;
+	@Schema(example = "true", description = "선호 플레이 시간 겹치는 소환사만 조회 여부")
 	private Boolean timeMatch;
+	@Schema(example = "1", description = "최근 조회한 소환사 중, 마지막 소환사의 id. 최초 조회라면 0. not null")
 	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
 	private Long lastSummonerId;
+	@Schema(example = "name", description = "최근 조회한 소환사 중, 마지막 소환사의 name")
 	private String lastName;
+	@Schema(example = "1000", description = "최근 조회한 소환사 중, 마지막 소환사의 mmr")
 	private Long lastSummonerMmr;
+	@Schema(example = "100", description = "최근 조회한 소환사 중, 마지막 소환사의 up count")
 	private Long lastSummonerUpCount;
+	@Schema(example = "10", description = "조회하려는 소환사 수, not null")
 	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
 	private Integer pageSize;
 

@@ -1,5 +1,9 @@
 package com.gnimty.communityapiserver.domain.riotaccount.controller;
 
+import static com.gnimty.communityapiserver.global.constant.ApiSummary.GET_MAIN_SUMMONERS;
+import static com.gnimty.communityapiserver.global.constant.ApiSummary.GET_RECENTLY_SUMMONERS;
+import static com.gnimty.communityapiserver.global.constant.ApiSummary.GET_RECOMMENDED_SUMMONERS;
+import static com.gnimty.communityapiserver.global.constant.ApiSummary.UPDATE_SUMMONERS;
 import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_UPDATE_SUMMONERS;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -15,8 +19,13 @@ import com.gnimty.communityapiserver.domain.riotaccount.service.RiotAccountServi
 import com.gnimty.communityapiserver.domain.riotaccount.service.dto.response.RecentlySummonersServiceResponse;
 import com.gnimty.communityapiserver.domain.riotaccount.service.dto.response.RecommendedSummonersServiceResponse;
 import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
+import com.gnimty.communityapiserver.global.constant.ApiDescription;
 import com.gnimty.communityapiserver.global.constant.GameMode;
 import com.gnimty.communityapiserver.global.response.CommonResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +46,7 @@ public class RiotAccountController {
 	private final StompService stompService;
 	private final UserService userService;
 
+	@Operation(summary = UPDATE_SUMMONERS, description = ApiDescription.UPDATE_SUMMONERS)
 	@PatchMapping
 	public CommonResponse<Void> updateSummoners(@RequestBody @Valid SummonerUpdateRequest request) {
 		List<RiotAccount> riotAccounts = riotAccountService.updateSummoners(request.toServiceRequest());
@@ -46,6 +56,8 @@ public class RiotAccountController {
 		return CommonResponse.success(SUCCESS_UPDATE_SUMMONERS, OK);
 	}
 
+	@Operation(summary = GET_RECOMMENDED_SUMMONERS, description = ApiDescription.GET_RECOMMENDED_SUMMONERS)
+	@Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token", required = true)
 	@GetMapping
 	public CommonResponse<RecommendedSummonersResponse> getRecommendedSummoners(
 		@ModelAttribute @Valid RecommendedSummonersRequest request
@@ -55,12 +67,18 @@ public class RiotAccountController {
 		return CommonResponse.success(RecommendedSummonersResponse.from(response));
 	}
 
+	@Operation(summary = GET_MAIN_SUMMONERS, description = ApiDescription.GET_MAIN_SUMMONERS)
+	@Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token")
 	@GetMapping("/main")
-	public CommonResponse<RecommendedSummonersResponse> getMainSummoners(@RequestParam("game-mode") GameMode gameMode) {
+	public CommonResponse<RecommendedSummonersResponse> getMainSummoners(
+		@Schema(example = "RANK_SOLO", description = "조회하려는 게임 모드, not null") @RequestParam("game-mode") GameMode gameMode
+	) {
 		RecommendedSummonersServiceResponse response = riotAccountService.getMainSummoners(gameMode);
 		return CommonResponse.success(RecommendedSummonersResponse.from(response));
 	}
 
+	@Operation(summary = GET_RECENTLY_SUMMONERS, description = ApiDescription.GET_RECENTLY_SUMMONERS)
+	@Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token", required = true)
 	@GetMapping("/recently")
 	public CommonResponse<RecentlySummonersResponse> getRecentlySummoners() {
 		Member member = MemberThreadLocal.get();
