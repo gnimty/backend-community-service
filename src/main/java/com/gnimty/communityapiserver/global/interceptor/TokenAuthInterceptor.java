@@ -23,17 +23,14 @@ public class TokenAuthInterceptor implements HandlerInterceptor {
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-		if (request.getServletPath().equals("/summoners") && request.getMethod().equals(HttpMethod.PATCH.toString())) {
+		String path = request.getServletPath();
+		String method = request.getMethod();
+		if (skipTokenCheckBeforeHeader(path, method)) {
 			return true;
 		}
 		Optional<String> tokenByHeader = jwtProvider.resolveToken(request);
 		if (tokenByHeader.isEmpty()) {
-			if (request.getServletPath().contains("champions")
-				&& request.getMethod().equals(HttpMethod.GET.toString())) {
-				return true;
-			}
-			if (request.getServletPath().equals("/summoners/main")
-				&& request.getMethod().equals(HttpMethod.GET.toString())) {
+			if (skipTokenCheckAfterHeader(path, method)) {
 				return true;
 			}
 			throw new BaseException(ErrorCode.TOKEN_NOT_FOUND);
@@ -57,5 +54,21 @@ public class TokenAuthInterceptor implements HandlerInterceptor {
 		}
 
 		MemberThreadLocal.remove();
+	}
+
+	private boolean skipTokenCheckBeforeHeader(String path, String method) {
+		if (path.contains("/members") && Character.isDigit(lastPathSegment(path)) && HttpMethod.GET.matches(method)) {
+			return true;
+		}
+		return path.equals("/summoners") && HttpMethod.PATCH.matches(method);
+	}
+
+	private boolean skipTokenCheckAfterHeader(String path, String method) {
+		return (path.contains("/champions") || path.equals("/summoners/main")) && HttpMethod.GET.matches(method);
+	}
+
+	private char lastPathSegment(String path) {
+		String[] segments = path.split("/");
+		return segments[segments.length - 1].charAt(0);
 	}
 }
