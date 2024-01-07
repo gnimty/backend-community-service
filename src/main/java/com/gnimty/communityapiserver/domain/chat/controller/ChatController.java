@@ -76,11 +76,11 @@ public class ChatController {
 
 		// getchatRoomNo를 호출하기 X
 		// chatRoom을 먼저 생성 또는 조회 후 그 정보를 그대로 보내주거나 DTO로 변환해서 보내주는 게 좋아 보임
-		stompService.sendToUserSubscribers(me.getId(),
+		stompService.sendToUserSubscribers(me.getActualUserId(),
 			new MessageResponse(MessageResponseType.CHATROOM_INFO, chatRoomDto));
 
 		if (!isOtherBlock) {
-			stompService.sendToUserSubscribers(other.getId(), new MessageResponse(
+			stompService.sendToUserSubscribers(other.getActualUserId(), new MessageResponse(
 				MessageResponseType.CHATROOM_INFO, chatRoomDto));
 		}
 	}
@@ -99,7 +99,7 @@ public class ChatController {
 				new MessageResponse(MessageResponseType.CHAT_MESSAGE, chatDto));
 		} else if (request.getType() == MessageRequestType.READ) {
 			stompService.readOtherChats(user, chatRoom);
-			stompService.sendToUserSubscribers(user.getId(),
+			stompService.sendToUserSubscribers(user.getActualUserId(),
 				new MessageResponse(MessageResponseType.READ_CHATS, chatRoomNo));
 		} else {
 			stompService.exitChatRoom(user, chatRoomService.getChatRoom(chatRoomNo));
