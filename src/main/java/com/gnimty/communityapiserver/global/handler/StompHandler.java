@@ -3,6 +3,7 @@ package com.gnimty.communityapiserver.global.handler;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.global.auth.JwtProvider;
 import com.gnimty.communityapiserver.global.connect.WebSocketSessionManager;
+import com.gnimty.communityapiserver.global.constant.Auth;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
@@ -32,9 +33,10 @@ public class StompHandler implements ChannelInterceptor {
 		// websocket 연결시 헤더의 jwt token 유효성 검증
 		if (StompCommand.CONNECT == accessor.getCommand()) {
 			final String authorization = jwtProvider.extractJwt(accessor);
-			jwtProvider.checkValidation(authorization);
+			String token = authorization.replaceFirst(Auth.BEARER.getContent(), "");
+			jwtProvider.checkValidation(token);
 
-			Member member = jwtProvider.findMemberByToken(authorization);
+			Member member = jwtProvider.findMemberByToken(token);
 			webSocketSessionManager.addSession(accessor.getSessionId(), member.getId());
 		}
 		return message;
