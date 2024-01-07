@@ -3,9 +3,26 @@ package com.gnimty.communityapiserver.global.constant;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.stream.Stream;
 import lombok.Getter;
 
+@Schema(
+	enumAsRef = true,
+	description = """
+		challenger - 챌린저
+		grandmaster - 그랜드 마스터
+		master - 마스터
+		diamond - 다이아몬드
+		emerald - 에메랄드
+		platinum - 플레티넘
+		gold - 골드
+		silver - 실버
+		bronze - 브론즈
+		iron - 아이언
+		unknown - 언랭
+		"""
+)
 @Getter
 public enum Tier {
 

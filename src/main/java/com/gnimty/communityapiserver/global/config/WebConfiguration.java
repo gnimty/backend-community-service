@@ -35,9 +35,9 @@ public class WebConfiguration implements WebMvcConfigurer {
 		registry
 			.addInterceptor(tokenAuthInterceptor)
 			.addPathPatterns("/**")
-			.excludePathPatterns("/auth/**")
-			.excludePathPatterns("/oauth/**")
-			.excludePathPatterns("/members/password/**")
+			.excludePathPatterns("/swagger-ui/**", "/swagger-resources/**", "/v3/api-docs/**")
+			.excludePathPatterns("/auth/**", "/oauth/**")
+			.excludePathPatterns("/members/password/**", "/members/{member_id}")
 			.excludePathPatterns(
 				"/css/**", "/*.ico"
 				, "/error", "/error-page/**"
