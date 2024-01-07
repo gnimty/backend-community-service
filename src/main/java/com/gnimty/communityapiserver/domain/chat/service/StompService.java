@@ -222,7 +222,7 @@ public class StompService {
 	}
 
 
-	public void sendToUserSubscribers(String userId, MessageResponse response) {
+	public void sendToUserSubscribers(Long userId, MessageResponse response) {
 		template.convertAndSend("/sub/user/" + userId, response);
 	}
 
