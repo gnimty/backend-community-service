@@ -13,7 +13,10 @@ import com.gnimty.communityapiserver.domain.chat.service.ChatService;
 import com.gnimty.communityapiserver.domain.chat.service.StompService;
 import com.gnimty.communityapiserver.domain.chat.service.UserService;
 import com.gnimty.communityapiserver.domain.chat.service.dto.UserWithBlockDto;
+import com.gnimty.communityapiserver.domain.member.entity.Member;
+import com.gnimty.communityapiserver.domain.member.service.MemberReadService;
 import com.gnimty.communityapiserver.domain.member.service.MemberService;
+import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
 import com.gnimty.communityapiserver.global.connect.WebSocketSessionManager;
 import com.gnimty.communityapiserver.global.constant.MessageRequestType;
 import com.gnimty.communityapiserver.global.constant.MessageResponseType;
@@ -42,6 +45,7 @@ public class ChatController {
 	private final ChatRoomService chatRoomService;
 	private final UserService userService;
 	private final MemberService memberService;
+	private final MemberReadService memberReadService;
 	private final BlockReadService blockReadService;
 	private final WebSocketSessionManager webSocketSessionManager;
 
@@ -104,8 +108,6 @@ public class ChatController {
 		} else {
 			stompService.exitChatRoom(user, chatRoomService.getChatRoom(chatRoomNo));
 		}
-
-
 	}
 
 
@@ -115,6 +117,8 @@ public class ChatController {
 		if (!isMultipleUser(user.getActualUserId())) {
 			stompService.updateConnStatus(user, Status.OFFLINE);
 			memberService.updateStatus(Status.OFFLINE);
+			Member member = memberReadService.findById(user.getActualUserId());
+			MemberThreadLocal.set(member);
 		}
 		webSocketSessionManager.deleteSession(event.getSessionId());
 	}
@@ -126,6 +130,7 @@ public class ChatController {
 		if (!isMultipleUser(user.getActualUserId())) {
 			stompService.updateConnStatus(user, Status.ONLINE);
 			memberService.updateStatus(Status.ONLINE);
+			MemberThreadLocal.remove();
 		}
 	}
 
@@ -133,6 +138,7 @@ public class ChatController {
 		Long actualUserId = webSocketSessionManager.getMemberId(sessionId);
 		return userService.getUser(actualUserId);
 	}
+
 
 	private boolean isMultipleUser(Long memberId) {
 		return webSocketSessionManager.getSessionCountByMemberId(memberId) > 1;
