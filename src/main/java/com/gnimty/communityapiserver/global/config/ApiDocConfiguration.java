@@ -11,17 +11,20 @@ import org.springframework.context.annotation.Configuration;
 public class ApiDocConfiguration {
 
 	private final List<Server> servers;
-	private final Server server;
+	private final Server localServer;
+	private final Server productionServer;
 
 	public ApiDocConfiguration() {
-		this.server = new Server();
+		this.localServer = new Server();
+		this.productionServer = new Server();
 
 		setServerUrls();
-		servers = List.of(server);
+		servers = List.of(localServer, productionServer);
 	}
 
 	public void setServerUrls() {
-		server.setUrl("https://gnimty.kro.kr");
+		localServer.setUrl("http://localhost:8080/community");
+		productionServer.setUrl("https://gnimty.kro.kr/community");
 	}
 
 	@Bean
