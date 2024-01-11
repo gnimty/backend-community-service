@@ -11,17 +11,17 @@ import org.springframework.context.annotation.Configuration;
 public class ApiDocConfiguration {
 
 	private final List<Server> servers;
-	private final Server localServer;
+	private final Server server;
 
 	public ApiDocConfiguration() {
-		this.localServer = new Server();
+		this.server = new Server();
 
 		setServerUrls();
-		servers = List.of(localServer);
+		servers = List.of(server);
 	}
 
 	public void setServerUrls() {
-		localServer.setUrl("http://localhost:8080");
+		server.setUrl("https://gnimty.kro.kr");
 	}
 
 	@Bean
