@@ -112,6 +112,7 @@ public class ChatController {
 	@EventListener
 	public void onClientDisconnect(SessionDisconnectEvent event) {
 		User user = getUserBySessionId(event.getSessionId());
+		log.info("[DisConnect] userId: {}", user.getActualUserId());
 		if (!isMultipleUser(user.getActualUserId())) {
 			stompService.updateConnStatus(user, Status.OFFLINE);
 			memberService.updateStatus(Status.OFFLINE);
@@ -123,6 +124,7 @@ public class ChatController {
 	public void onClientConnect(SessionConnectedEvent event) {
 		String sessionId = String.valueOf(event.getMessage().getHeaders().get("simpSessionId"));
 		User user = getUserBySessionId(sessionId);
+		log.info("[Connect] userId: {}", user.getActualUserId());
 		if (!isMultipleUser(user.getActualUserId())) {
 			stompService.updateConnStatus(user, Status.ONLINE);
 			memberService.updateStatus(Status.ONLINE);
