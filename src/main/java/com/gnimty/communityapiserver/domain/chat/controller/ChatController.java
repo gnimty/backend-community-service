@@ -13,10 +13,7 @@ import com.gnimty.communityapiserver.domain.chat.service.ChatService;
 import com.gnimty.communityapiserver.domain.chat.service.StompService;
 import com.gnimty.communityapiserver.domain.chat.service.UserService;
 import com.gnimty.communityapiserver.domain.chat.service.dto.UserWithBlockDto;
-import com.gnimty.communityapiserver.domain.member.entity.Member;
-import com.gnimty.communityapiserver.domain.member.service.MemberReadService;
 import com.gnimty.communityapiserver.domain.member.service.MemberService;
-import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
 import com.gnimty.communityapiserver.global.connect.WebSocketSessionManager;
 import com.gnimty.communityapiserver.global.constant.MessageRequestType;
 import com.gnimty.communityapiserver.global.constant.MessageResponseType;
@@ -45,7 +42,6 @@ public class ChatController {
 	private final ChatRoomService chatRoomService;
 	private final UserService userService;
 	private final MemberService memberService;
-	private final MemberReadService memberReadService;
 	private final BlockReadService blockReadService;
 	private final WebSocketSessionManager webSocketSessionManager;
 

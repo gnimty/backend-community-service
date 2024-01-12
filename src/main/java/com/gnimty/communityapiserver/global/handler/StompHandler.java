@@ -42,9 +42,4 @@ public class StompHandler implements ChannelInterceptor {
 		return message;
 	}
 
-
-	@Override
-	public void postSend(Message<?> message, MessageChannel channel, boolean sent) {
-		MemberThreadLocal.remove();
-	}
 }
