@@ -195,7 +195,8 @@ public class MemberController {
 	@Operation(summary = GET_OTHER_PROFILE, description = ApiDescription.GET_OTHER_PROFILE)
 	@GetMapping("/{member_id}")
 	public CommonResponse<OtherProfileResponse> getOtherProfile(
-		@Schema(example = "1", description = "조회할 회원 id") @PathVariable("member_id") Long memberId) {
+		@Schema(example = "1", description = "조회할 회원 id") @PathVariable("member_id") Long memberId
+	) {
 		OtherProfileServiceResponse response = memberReadService.findOtherById(memberId);
 		return CommonResponse.success(OtherProfileResponse.from(response));
 	}

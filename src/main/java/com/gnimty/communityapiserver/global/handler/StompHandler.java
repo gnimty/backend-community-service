@@ -28,7 +28,6 @@ public class StompHandler implements ChannelInterceptor {
 
 	@Override
 	public Message<?> preSend(Message<?> message, MessageChannel channel) {
-		log.info("StompHandler.preSend");
 		final StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
 
 		// websocket 연결시 헤더의 jwt token 유효성 검증
@@ -38,9 +37,7 @@ public class StompHandler implements ChannelInterceptor {
 			jwtProvider.checkValidation(token);
 
 			Member member = jwtProvider.findMemberByToken(token);
-			MemberThreadLocal.set(member);
 			webSocketSessionManager.addSession(accessor.getSessionId(), member.getId());
-
 		}
 		return message;
 	}
@@ -48,7 +45,6 @@ public class StompHandler implements ChannelInterceptor {
 
 	@Override
 	public void postSend(Message<?> message, MessageChannel channel, boolean sent) {
-		log.info("StompHandler. postSend");
 		MemberThreadLocal.remove();
 	}
 }

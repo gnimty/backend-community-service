@@ -114,11 +114,10 @@ public class ChatController {
 	@EventListener
 	public void onClientDisconnect(SessionDisconnectEvent event) {
 		User user = getUserBySessionId(event.getSessionId());
+		log.info("[DisConnect] userId: {}", user.getActualUserId());
 		if (!isMultipleUser(user.getActualUserId())) {
 			stompService.updateConnStatus(user, Status.OFFLINE);
-			memberService.updateStatus(Status.OFFLINE);
-			Member member = memberReadService.findById(user.getActualUserId());
-			MemberThreadLocal.set(member);
+			memberService.updateStatus(Status.OFFLINE, user.getActualUserId());
 		}
 		webSocketSessionManager.deleteSession(event.getSessionId());
 	}
@@ -127,11 +126,12 @@ public class ChatController {
 	public void onClientConnect(SessionConnectedEvent event) {
 		String sessionId = String.valueOf(event.getMessage().getHeaders().get("simpSessionId"));
 		User user = getUserBySessionId(sessionId);
+		log.info("[Connect] userId: {}", user.getActualUserId());
 		if (!isMultipleUser(user.getActualUserId())) {
 			stompService.updateConnStatus(user, Status.ONLINE);
-			memberService.updateStatus(Status.ONLINE);
-			MemberThreadLocal.remove();
+			memberService.updateStatus(Status.ONLINE, user.getActualUserId());
 		}
+
 	}
 
 	private User getUserBySessionId(String sessionId) {
@@ -141,6 +141,8 @@ public class ChatController {
 
 
 	private boolean isMultipleUser(Long memberId) {
+		int cnt = webSocketSessionManager.getSessionCountByMemberId(memberId);
+		log.info("isMultipleUser.cnt: {}", cnt);
 		return webSocketSessionManager.getSessionCountByMemberId(memberId) > 1;
 	}
 
