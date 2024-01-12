@@ -52,7 +52,6 @@ public class TokenAuthInterceptor implements HandlerInterceptor {
 		if (member == null) {
 			return;
 		}
-
 		MemberThreadLocal.remove();
 	}
 

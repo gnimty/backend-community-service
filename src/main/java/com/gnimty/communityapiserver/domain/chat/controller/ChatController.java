@@ -104,8 +104,6 @@ public class ChatController {
 		} else {
 			stompService.exitChatRoom(user, chatRoomService.getChatRoom(chatRoomNo));
 		}
-
-
 	}
 
 
@@ -115,7 +113,7 @@ public class ChatController {
 		log.info("[DisConnect] userId: {}", user.getActualUserId());
 		if (!isMultipleUser(user.getActualUserId())) {
 			stompService.updateConnStatus(user, Status.OFFLINE);
-			memberService.updateStatus(Status.OFFLINE);
+			memberService.updateStatus(Status.OFFLINE, user.getActualUserId());
 		}
 		webSocketSessionManager.deleteSession(event.getSessionId());
 	}
@@ -127,8 +125,9 @@ public class ChatController {
 		log.info("[Connect] userId: {}", user.getActualUserId());
 		if (!isMultipleUser(user.getActualUserId())) {
 			stompService.updateConnStatus(user, Status.ONLINE);
-			memberService.updateStatus(Status.ONLINE);
+			memberService.updateStatus(Status.ONLINE, user.getActualUserId());
 		}
+
 	}
 
 	private User getUserBySessionId(String sessionId) {
@@ -136,7 +135,10 @@ public class ChatController {
 		return userService.getUser(actualUserId);
 	}
 
+
 	private boolean isMultipleUser(Long memberId) {
+		int cnt = webSocketSessionManager.getSessionCountByMemberId(memberId);
+		log.info("isMultipleUser.cnt: {}", cnt);
 		return webSocketSessionManager.getSessionCountByMemberId(memberId) > 1;
 	}
 
