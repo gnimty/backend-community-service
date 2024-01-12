@@ -63,9 +63,9 @@ public class RecommendedSummonersRequest {
 			.sortBy(sortBy)
 			.timeMatch(timeMatch)
 			.lastSummonerId(lastSummonerId)
-			.lastName(lastName)
-			.lastSummonerMmr(lastSummonerMmr)
-			.lastSummonerUpCount(lastSummonerUpCount)
+			.lastName(lastName == null ? "A" : lastName)
+			.lastSummonerMmr(lastSummonerMmr == null ? 0L : lastSummonerMmr)
+			.lastSummonerUpCount(lastSummonerUpCount == null ? 0L : lastSummonerUpCount)
 			.pageSize(pageSize)
 			.build();
 	}

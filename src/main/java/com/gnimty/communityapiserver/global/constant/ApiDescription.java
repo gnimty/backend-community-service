@@ -274,7 +274,7 @@ public class ApiDescription {
 		   
 		- sortBy는 정렬 조건으로, null일 수 없습니다.
 					
-		- lastSummonerId는 기본 커서 정렬 조건으로, null일 수 없습니다.
+		- lastSummonerId는 기본 커서 정렬 조건으로, null일 수 없습니다. 만약 최초 조회 시 0으로 요청해야 합니다.
 		   
 		- sortBy가 ATOZ(이름순)일 경우, lastName은 null일 수 없습니다.
 					

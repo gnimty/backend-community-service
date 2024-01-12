@@ -6,9 +6,11 @@ import com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import javax.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
+@Builder
 public class SummonerUpdateEntry {
 
 	@Schema(example = "name", description = "태그 이전 닉네임, not null")
