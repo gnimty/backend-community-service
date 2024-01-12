@@ -246,7 +246,6 @@ public class MemberService {
 	public void updateStatus(Status status, Long memberId) {
 		Member member = memberReadService.findById(memberId);
 		member.updateStatus(status);
-		memberRepository.save(member);
 	}
 
 	private void updatePreferGameMode(List<PreferGameModeEntry> preferGameModes) {
