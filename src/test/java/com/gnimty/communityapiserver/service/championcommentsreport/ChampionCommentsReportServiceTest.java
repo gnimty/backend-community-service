@@ -32,18 +32,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class ChampionCommentsReportServiceTest extends ServiceTestSupport {
 
 	@Autowired
-	private MemberRepository memberRepository;
-
-	@Autowired
-	private ChampionCommentsRepository championCommentsRepository;
-
-	@Autowired
-	private ChampionCommentsReportRepository championCommentsReportRepository;
-
-	@Autowired
-	private RiotAccountRepository riotAccountRepository;
-
-	@Autowired
 	private ChampionCommentsReportService championCommentsReportService;
 
 	@DisplayName("챔피언 운용법 신고 시")
@@ -80,15 +68,6 @@ public class ChampionCommentsReportServiceTest extends ServiceTestSupport {
 				.level(0L)
 				.build());
 			MemberThreadLocal.set(member);
-		}
-
-		@AfterEach
-		void tearDown() {
-			championCommentsReportRepository.deleteAllInBatch();
-			championCommentsRepository.deleteAllInBatch();
-			riotAccountRepository.deleteAllInBatch();
-			memberRepository.deleteAllInBatch();
-			MemberThreadLocal.remove();
 		}
 
 		@DisplayName("신고를 하지 않은 상태에서 OTHER이 포함되지 않은 카테고리로 신고하면 성공한다.")

@@ -33,18 +33,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class ChampionCommentsLikeServiceTest extends ServiceTestSupport {
 
 	@Autowired
-	private MemberRepository memberRepository;
-
-	@Autowired
-	private ChampionCommentsRepository championCommentsRepository;
-
-	@Autowired
-	private ChampionCommentsLikeRepository championCommentsLikeRepository;
-
-	@Autowired
-	private RiotAccountRepository riotAccountRepository;
-
-	@Autowired
 	private ChampionCommentsLikeService championCommentsLikeService;
 
 	@DisplayName("챔피언 운용법 좋아요/싫어요 또는 취소 시")
@@ -81,15 +69,6 @@ public class ChampionCommentsLikeServiceTest extends ServiceTestSupport {
 				.level(0L)
 				.build());
 			MemberThreadLocal.set(member);
-		}
-
-		@AfterEach
-		void tearDown() {
-			championCommentsLikeRepository.deleteAllInBatch();
-			championCommentsRepository.deleteAllInBatch();
-			riotAccountRepository.deleteAllInBatch();
-			memberRepository.deleteAllInBatch();
-			MemberThreadLocal.remove();
 		}
 
 		@DisplayName("좋아요를 하지 않은 댓글에 좋아요를 하려 하면 성공한다.")

@@ -23,12 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class MemberLikeReadServiceTest extends ServiceTestSupport {
 
 	@Autowired
-	private MemberRepository memberRepository;
-
-	@Autowired
-	private MemberLikeRepository memberLikeRepository;
-
-	@Autowired
 	private MemberLikeReadService memberLikeReadService;
 
 	private Member member;
@@ -48,12 +42,6 @@ public class MemberLikeReadServiceTest extends ServiceTestSupport {
 			.nickname("nickname2")
 			.rsoLinked(true)
 			.build());
-	}
-
-	@AfterEach
-	void tearDown() {
-		memberLikeRepository.deleteAllInBatch();
-		memberRepository.deleteAllInBatch();
 	}
 
 	@DisplayName("source와 target으로 조회 시")

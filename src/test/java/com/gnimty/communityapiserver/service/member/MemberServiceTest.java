@@ -3,6 +3,7 @@ package com.gnimty.communityapiserver.service.member;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -82,27 +83,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 public class MemberServiceTest extends ServiceTestSupport {
-
-	@Autowired
-	private RiotAccountRepository riotAccountRepository;
-	@Autowired
-	private OauthInfoRepository oauthInfoRepository;
-	@Autowired
-	private MemberRepository memberRepository;
-	@Autowired
-	private PreferGameModeRepository preferGameModeRepository;
-	@Autowired
-	private MemberLikeRepository memberLikeRepository;
-	@Autowired
-	private BlockRepository blockRepository;
-	@Autowired
-	private ScheduleRepository scheduleRepository;
 	@Autowired
 	private MemberService memberService;
-	@Autowired
-	private IntroductionRepository introductionRepository;
-	@MockBean
-	private RiotOauthUtil riotOauthUtil;
 	@MockBean
 	private RiotAccountReadService riotAccountReadService;
 	@MockBean
@@ -124,8 +106,6 @@ public class MemberServiceTest extends ServiceTestSupport {
 	@MockBean
 	private MemberReadService memberReadService;
 	@MockBean
-	private MemberLikeReadService memberLikeReadService;
-	@MockBean
 	private MailSenderUtil mailSenderUtil;
 
 	@DisplayName("rso 연동 시")
@@ -145,13 +125,6 @@ public class MemberServiceTest extends ServiceTestSupport {
 			member = memberRepository.save(
 				createMemberByEmailAndNickname("email@email.com", "nickname1"));
 			MemberThreadLocal.set(member);
-		}
-
-		@AfterEach
-		void tearDown() {
-			oauthInfoRepository.deleteAllInBatch();
-			memberRepository.deleteAllInBatch();
-			MemberThreadLocal.remove();
 		}
 
 		@DisplayName("Provider에 따라서 OauthInfo entity가 저장된다.")
@@ -255,17 +228,6 @@ public class MemberServiceTest extends ServiceTestSupport {
 			member = memberRepository.save(
 				createMemberByEmailAndNickname("email@email.com", "nickname"));
 			MemberThreadLocal.set(member);
-		}
-
-		@AfterEach
-		void tearDown() {
-			riotAccountRepository.deleteAllInBatch();
-			introductionRepository.deleteAllInBatch();
-			scheduleRepository.deleteAllInBatch();
-			preferGameModeRepository.deleteAllInBatch();
-			oauthInfoRepository.deleteAllInBatch();
-			memberRepository.deleteAllInBatch();
-			MemberThreadLocal.remove();
 		}
 
 		@DisplayName("저장된 회원 관련 정보들이 조회된다.")
@@ -407,15 +369,6 @@ public class MemberServiceTest extends ServiceTestSupport {
 			given(memberReadService.findById(any(Long.class)))
 				.willReturn(member);
 			MemberThreadLocal.set(member);
-		}
-
-		@AfterEach
-		void tearDown() {
-			introductionRepository.deleteAllInBatch();
-			scheduleRepository.deleteAllInBatch();
-			riotAccountRepository.deleteAllInBatch();
-			memberRepository.deleteAllInBatch();
-			MemberThreadLocal.remove();
 		}
 
 		@DisplayName("올바른 mainRiotAccountId를 입력하면 수정된다.")
@@ -730,12 +683,6 @@ public class MemberServiceTest extends ServiceTestSupport {
 			MemberThreadLocal.set(member);
 		}
 
-		@AfterEach
-		void tearDown() {
-			memberRepository.deleteAllInBatch();
-			MemberThreadLocal.remove();
-		}
-
 		@DisplayName("form 로그인 회원인 경우, 이메일이 전송된다.")
 		@Test
 		void should_sendEmail_when_formLoginMember() throws Exception {
@@ -806,12 +753,6 @@ public class MemberServiceTest extends ServiceTestSupport {
 			Member member = memberRepository.save(
 				createMemberByEmailAndNickname("email@email.com", "nickname"));
 			MemberThreadLocal.set(member);
-		}
-
-		@AfterEach
-		void tearDown() {
-			memberRepository.deleteAllInBatch();
-			MemberThreadLocal.remove();
 		}
 
 		@DisplayName("올바른 입력 코드를 요청하면 성공하며, uuid가 반환된다.")
@@ -897,11 +838,6 @@ public class MemberServiceTest extends ServiceTestSupport {
 				createMemberByEmailAndNickname("email@email.com", "nickname"));
 		}
 
-		@AfterEach
-		void tearDown() {
-			memberRepository.deleteAllInBatch();
-		}
-
 		@DisplayName("요청의 uuid가 올바르면 비밀번호가 변경된다.")
 		@Test
 		void should_updatePassword_when_uuidIsValid() {
@@ -972,12 +908,6 @@ public class MemberServiceTest extends ServiceTestSupport {
 			member = memberRepository.save(
 				createMemberByEmailAndNickname("email@email.com", "nickname"));
 			MemberThreadLocal.set(member);
-		}
-
-		@AfterEach
-		void tearDown() {
-			memberRepository.deleteAllInBatch();
-			MemberThreadLocal.remove();
 		}
 
 		@DisplayName("올바른 currentPassword를 입력하면 비밀번호가 변경된다.")
@@ -1053,12 +983,6 @@ public class MemberServiceTest extends ServiceTestSupport {
 			MemberThreadLocal.set(member);
 		}
 
-		@AfterEach
-		void tearDown() {
-			memberRepository.deleteAllInBatch();
-			MemberThreadLocal.remove();
-		}
-
 		@DisplayName("요청의 provider에 해당하는 OauthInfo가 존재할 경우, 삭제한다.")
 		@ParameterizedTest
 		@EnumSource(Provider.class)
@@ -1106,12 +1030,6 @@ public class MemberServiceTest extends ServiceTestSupport {
 			MemberThreadLocal.set(member);
 		}
 
-		@AfterEach
-		void tearDown() {
-			memberRepository.deleteAllInBatch();
-			MemberThreadLocal.remove();
-		}
-
 		@DisplayName("redis에 저장돼있던 Refresh token이 삭제된다.")
 		@Test
 		void should_deleteRefreshTokenInRedis_when_logout() {
@@ -1147,21 +1065,13 @@ public class MemberServiceTest extends ServiceTestSupport {
 			MemberThreadLocal.set(member);
 		}
 
-		@AfterEach
-		void tearDown() {
-			blockRepository.deleteAllInBatch();
-			memberLikeRepository.deleteAllInBatch();
-			memberRepository.deleteAllInBatch();
-			MemberThreadLocal.remove();
-		}
-
 		@DisplayName("회원 테이블과 연결된 모든 테이블에 회원에 대한 정보가 삭제 된다.")
 		@Test
 		void should_deleteAllInfoRelatedToMember_when_withdrawal() {
 			// given
 			Member newMember = memberRepository.save(
 				createMemberByEmailAndNickname("email@email.comm", "nickname2"));
-			memberLikeRepository.saveAll(List.of(
+			List<MemberLike> memberLikes = memberLikeRepository.saveAll(List.of(
 				MemberLike.builder().targetMember(member).sourceMember(newMember).build(),
 				MemberLike.builder().targetMember(newMember).sourceMember(member).build()
 			));
@@ -1175,13 +1085,13 @@ public class MemberServiceTest extends ServiceTestSupport {
 			preferGameModeRepository.save(createPreferGameMode(member));
 			introductionRepository.save(createIntroduction(member, true));
 
+			given(memberReadService.findById(anyLong())).willReturn(memberLikes.get(0).getTargetMember());
 			// when
 			memberService.withdrawal();
 
 			// then
 			assertThat(memberLikeRepository.findBySourceMember(member)).isEmpty();
-			assertThat(memberLikeRepository.findBySourceMemberAndTargetMember(newMember,
-				member)).isEmpty();
+			assertThat(memberLikeRepository.findBySourceMemberAndTargetMember(newMember, member)).isEmpty();
 			assertThat(riotAccountRepository.findByMember(member)).isEmpty();
 			assertThat(oauthInfoRepository.findByMember(member)).isEmpty();
 			assertThat(blockRepository.findByBlocker(member)).isEmpty();

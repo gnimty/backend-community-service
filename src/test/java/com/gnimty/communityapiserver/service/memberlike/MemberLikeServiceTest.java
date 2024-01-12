@@ -27,12 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class MemberLikeServiceTest extends ServiceTestSupport {
 
 	@Autowired
-	private MemberRepository memberRepository;
-
-	@Autowired
-	private MemberLikeRepository memberLikeRepository;
-
-	@Autowired
 	private MemberLikeService memberLikeService;
 
 	@DisplayName("회원 좋아요 시")
@@ -57,13 +51,6 @@ public class MemberLikeServiceTest extends ServiceTestSupport {
 				.rsoLinked(true)
 				.build());
 			MemberThreadLocal.set(member);
-		}
-
-		@AfterEach
-		void tearDown() {
-			memberLikeRepository.deleteAllInBatch();
-			memberRepository.deleteAllInBatch();
-			MemberThreadLocal.remove();
 		}
 
 		@DisplayName("좋아요를 하지 않은 상태에서 좋아요 시 성공한다.")

@@ -39,14 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ChampionCommentsServiceTest extends ServiceTestSupport {
 
 	@Autowired
-	private MemberRepository memberRepository;
-
-	@Autowired
-	private ChampionCommentsRepository championCommentsRepository;
-
-	@Autowired
 	private ChampionCommentsService championCommentsService;
-
 	@MockBean(answer = Answers.RETURNS_DEEP_STUBS)
 	private WebClientWrapper webClientWrapper;
 
@@ -79,13 +72,6 @@ public class ChampionCommentsServiceTest extends ServiceTestSupport {
 				.bodyToMono(VersionInfo.class)
 				.block())
 				.willReturn(versionInfo);
-		}
-
-		@AfterEach
-		void tearDown() {
-			championCommentsRepository.deleteAllInBatch();
-			memberRepository.deleteAllInBatch();
-			MemberThreadLocal.remove();
 		}
 
 		@DisplayName("최초 댓글 추가 시 부모 댓글로 취급된다.")
@@ -225,12 +211,6 @@ public class ChampionCommentsServiceTest extends ServiceTestSupport {
 			MemberThreadLocal.set(member);
 		}
 
-		@AfterEach
-		void tearDown() {
-			championCommentsRepository.deleteAllInBatch();
-			memberRepository.deleteAllInBatch();
-		}
-
 		@Transactional
 		@DisplayName("자신이 작성한 댓글id, request를 요청하면 성공한다.")
 		@Test
@@ -294,12 +274,6 @@ public class ChampionCommentsServiceTest extends ServiceTestSupport {
 					.upCount(0L)
 					.build());
 			MemberThreadLocal.set(member);
-		}
-
-		@AfterEach
-		void tearDown() {
-			championCommentsRepository.deleteAllInBatch();
-			memberRepository.deleteAllInBatch();
 		}
 
 		@Transactional
