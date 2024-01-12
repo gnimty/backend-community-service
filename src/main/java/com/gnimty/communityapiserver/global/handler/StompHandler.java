@@ -2,7 +2,6 @@ package com.gnimty.communityapiserver.global.handler;
 
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.global.auth.JwtProvider;
-import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
 import com.gnimty.communityapiserver.global.connect.WebSocketSessionManager;
 import com.gnimty.communityapiserver.global.constant.Auth;
 import lombok.RequiredArgsConstructor;
