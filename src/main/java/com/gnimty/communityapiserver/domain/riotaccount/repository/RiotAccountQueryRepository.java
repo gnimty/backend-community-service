@@ -124,6 +124,7 @@ public class RiotAccountQueryRepository {
 		return query
 			.where(duoable(account.getQueue(), account.getDivision(), true, gameMode))
 			.orderBy(Expressions.numberTemplate(Double.class, FUNCTION_RAND).asc())
+			.distinct()
 			.limit(MAIN_SELECT_LIMIT)
 			.fetch();
 	}
@@ -131,6 +132,7 @@ public class RiotAccountQueryRepository {
 	private List<RecommendedSummonersEntry> notLinkedSummonersQuery(JPAQuery<RecommendedSummonersEntry> query) {
 		return query
 			.orderBy(Expressions.numberTemplate(Double.class, FUNCTION_RAND).asc())
+			.distinct()
 			.limit(MAIN_SELECT_LIMIT)
 			.fetch();
 	}
