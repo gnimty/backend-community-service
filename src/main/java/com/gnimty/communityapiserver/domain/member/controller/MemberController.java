@@ -115,7 +115,7 @@ public class MemberController {
 	public CommonResponse<Void> updateMyProfileMain(@RequestBody @Valid MyProfileMainUpdateRequest request) {
 		RiotAccount riotAccount = memberService.updateMyProfileMain(request.toServiceRequest());
 		if (request.getStatus() != null) {
-			stompService.updateConnStatus(userService.getUser(MemberThreadLocal.get().getId()), request.getStatus());
+			stompService.updateConnStatus(userService.getUser(MemberThreadLocal.get().getId()), request.getStatus(), true);
 		}
 		if (riotAccount != null) {
 			stompService.createOrUpdateUser(riotAccount);
@@ -160,7 +160,7 @@ public class MemberController {
 	@PatchMapping("/me")
 	public CommonResponse<Void> updateMyProfile(@RequestBody @Valid MyProfileUpdateRequest request) {
 		memberService.updateMyProfile(request.toServiceRequest());
-		stompService.updateConnStatus(userService.getUser(MemberThreadLocal.get().getId()), request.getStatus());
+		stompService.updateConnStatus(userService.getUser(MemberThreadLocal.get().getId()), request.getStatus(), true);
 		return CommonResponse.success(SUCCESS_UPDATE_PROFILE, OK);
 	}
 

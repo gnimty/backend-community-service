@@ -19,7 +19,7 @@ public class UserDto {
 
 	public UserDto(User user) {
 		this.userId = user.getActualUserId();
-		this.status = user.getStatus();
+		this.status = user.getNowStatus();
 		this.tier = user.getTier();
 		this.division = user.getDivision();
 		this.iconId = user.getProfileIconId();

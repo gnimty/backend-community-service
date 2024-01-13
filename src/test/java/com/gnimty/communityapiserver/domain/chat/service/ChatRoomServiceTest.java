@@ -391,7 +391,7 @@ class ChatRoomServiceTest {
 			.division(3)
 			.name(name)
 			.tagLine("tagLine")
-			.status(Status.ONLINE).lp(3L)
+			.nowStatus(Status.ONLINE).lp(3L)
 			.build();
 	}
 

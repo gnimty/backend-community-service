@@ -309,7 +309,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.willReturn(null);
 			willDoNothing()
 				.given(stompService)
-				.updateConnStatus(any(User.class), any(Status.class));
+				.updateConnStatus(any(User.class), any(Status.class), true);
 			willDoNothing()
 				.given(stompService)
 				.createOrUpdateUser(any(RiotAccount.class));
@@ -337,7 +337,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.willReturn(null);
 			willDoNothing()
 				.given(stompService)
-				.updateConnStatus(any(User.class), any(Status.class));
+				.updateConnStatus(any(User.class), any(Status.class), true);
 			willDoNothing()
 				.given(stompService)
 				.createOrUpdateUser(any(RiotAccount.class));
@@ -361,7 +361,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.willReturn(null);
 			willDoNothing()
 				.given(stompService)
-				.updateConnStatus(any(User.class), any(Status.class));
+				.updateConnStatus(any(User.class), any(Status.class), true);
 			willDoNothing()
 				.given(stompService)
 				.createOrUpdateUser(any(RiotAccount.class));
@@ -686,7 +686,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 					.updateMyProfile(any(MyProfileUpdateServiceRequest.class));
 				willDoNothing()
 					.given(stompService)
-					.updateConnStatus(any(User.class), any(Status.class));
+					.updateConnStatus(any(User.class), any(Status.class), true);
 
 				mockMvc.perform(patch(REQUEST_URL)
 						.content(om.writeValueAsString(request))
@@ -709,7 +709,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.updateMyProfile(any(MyProfileUpdateServiceRequest.class));
 			willDoNothing()
 				.given(stompService)
-				.updateConnStatus(any(User.class), any(Status.class));
+				.updateConnStatus(any(User.class), any(Status.class), true);
 
 			mockMvc.perform(patch(REQUEST_URL)
 					.content(om.writeValueAsString(request))
@@ -732,7 +732,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.updateMyProfile(any(MyProfileUpdateServiceRequest.class));
 			willDoNothing()
 				.given(stompService)
-				.updateConnStatus(any(User.class), any(Status.class));
+				.updateConnStatus(any(User.class), any(Status.class), true);
 
 			mockMvc.perform(patch(REQUEST_URL)
 					.content(om.writeValueAsString(request))
@@ -758,7 +758,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.updateMyProfile(any(MyProfileUpdateServiceRequest.class));
 			willDoNothing()
 				.given(stompService)
-				.updateConnStatus(any(User.class), any(Status.class));
+				.updateConnStatus(any(User.class), any(Status.class), true);
 
 			mockMvc.perform(patch(REQUEST_URL)
 					.content(om.writeValueAsString(request))
@@ -784,7 +784,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.updateMyProfile(any(MyProfileUpdateServiceRequest.class));
 			willDoNothing()
 				.given(stompService)
-				.updateConnStatus(any(User.class), any(Status.class));
+				.updateConnStatus(any(User.class), any(Status.class), true);
 
 			mockMvc.perform(patch(REQUEST_URL)
 					.content(om.writeValueAsString(request))
@@ -807,7 +807,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.updateMyProfile(any(MyProfileUpdateServiceRequest.class));
 			willDoNothing()
 				.given(stompService)
-				.updateConnStatus(any(User.class), any(Status.class));
+				.updateConnStatus(any(User.class), any(Status.class), true);
 
 			mockMvc.perform(patch(REQUEST_URL)
 					.content(om.writeValueAsString(request))
@@ -830,7 +830,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.updateMyProfile(any(MyProfileUpdateServiceRequest.class));
 			willDoNothing()
 				.given(stompService)
-				.updateConnStatus(any(User.class), any(Status.class));
+				.updateConnStatus(any(User.class), any(Status.class), true);
 
 			mockMvc.perform(patch(REQUEST_URL)
 					.content(om.writeValueAsString(request))
@@ -855,7 +855,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.updateMyProfile(any(MyProfileUpdateServiceRequest.class));
 			willDoNothing()
 				.given(stompService)
-				.updateConnStatus(any(User.class), any(Status.class));
+				.updateConnStatus(any(User.class), any(Status.class), true);
 
 			mockMvc.perform(patch(REQUEST_URL)
 					.content(om.writeValueAsString(request))
@@ -878,7 +878,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.updateMyProfile(any(MyProfileUpdateServiceRequest.class));
 			willDoNothing()
 				.given(stompService)
-				.updateConnStatus(any(User.class), any(Status.class));
+				.updateConnStatus(any(User.class), any(Status.class), true);
 
 			mockMvc.perform(patch(REQUEST_URL)
 					.content(om.writeValueAsString(request))

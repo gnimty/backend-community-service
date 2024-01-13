@@ -29,7 +29,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 			setIfNotNull(update, "name", user.getName());
 			setIfNotNull(update, "tagLine", user.getTagLine());
 			setIfNotNull(update, "internalTagName", user.getInternalTagName());
-			setIfNotNull(update, "status", user.getStatus());
+			setIfNotNull(update, "status", user.getNowStatus());
 			setIfNotNull(update, "profileIconId", user.getProfileIconId());
 			setIfNotNull(update, "puuid", user.getPuuid());
 			// 솔로 랭크

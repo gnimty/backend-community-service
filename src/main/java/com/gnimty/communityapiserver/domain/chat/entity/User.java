@@ -35,7 +35,8 @@ public class User {
 	private String name;
 	private String tagLine;
 	private String internalTagName;
-	private Status status;
+	private Status nowStatus;
+	private Status selectedStatus;
 	private Long profileIconId;
 	private String puuid;
 
@@ -70,6 +71,7 @@ public class User {
 			.internalTagName(riotAccount.getInternalTagName())
 			.profileIconId(riotAccount.getIconId())
 			.puuid(riotAccount.getPuuid())
+			.selectedStatus(Status.ONLINE)
 			// 솔로 랭크
 			.tier(riotAccount.getQueue())
 			.division(riotAccount.getDivision())
@@ -128,7 +130,12 @@ public class User {
 			.orElse(this.frequentChampionId3Flex);
 	}
 
-	public void updateStatus(Status status) {
-		this.status = status;
+	public void updateNowStatus(Status nowStatus) {
+		this.nowStatus = nowStatus;
 	}
+
+	public void updateSelectedStatus(Status selectedStatus){
+		this.selectedStatus = selectedStatus;
+	}
+
 }
