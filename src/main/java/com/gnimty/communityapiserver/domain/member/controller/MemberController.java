@@ -115,7 +115,8 @@ public class MemberController {
 	public CommonResponse<Void> updateMyProfileMain(@RequestBody @Valid MyProfileMainUpdateRequest request) {
 		RiotAccount riotAccount = memberService.updateMyProfileMain(request.toServiceRequest());
 		if (request.getStatus() != null) {
-			stompService.updateConnStatus(userService.getUser(MemberThreadLocal.get().getId()), request.getStatus(), true);
+			stompService.updateConnStatus(userService.getUser(MemberThreadLocal.get().getId()), request.getStatus(),
+				true);
 		}
 		if (riotAccount != null) {
 			stompService.createOrUpdateUser(riotAccount);

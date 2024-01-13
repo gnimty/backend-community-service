@@ -134,7 +134,7 @@ public class User {
 		this.nowStatus = nowStatus;
 	}
 
-	public void updateSelectedStatus(Status selectedStatus){
+	public void updateSelectedStatus(Status selectedStatus) {
 		this.selectedStatus = selectedStatus;
 	}
 

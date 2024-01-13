@@ -372,7 +372,6 @@ public class StompServiceTest {
 				Chat.builder().senderId(userB.getActualUserId()).sendDate(new Date()).message("bye")
 					.chatRoomNo(chatRoom.getChatRoomNo()).build());
 
-
 			Participant participantUserA = stompService.extractParticipant(userA,
 				chatRoom.getParticipants(), true);
 			Thread.sleep(2000);
@@ -382,7 +381,6 @@ public class StompServiceTest {
 
 			// when
 			List<ChatDto> chats = stompService.getChatList(userA, chatRoom);
-
 
 			// then
 			assertThat(chats).isEmpty();
@@ -698,7 +696,7 @@ public class StompServiceTest {
 
 			// then
 			assertThat(chatRoomRepository.findByUsers(userA, userB)).isEmpty();
-			assertThat(chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo(),ChatDto.class)).isEmpty();
+			assertThat(chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo(), ChatDto.class)).isEmpty();
 		}
 
 
@@ -878,7 +876,7 @@ public class StompServiceTest {
 			// then
 			assertThat(userRepository.findByActualUserId(userA.getActualUserId())).isEmpty();
 			assertThat(chatRoomRepository.findByUser(userA)).isEmpty();
-			assertThat(chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo(),ChatDto.class)).isEmpty();
+			assertThat(chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo(), ChatDto.class)).isEmpty();
 		}
 
 		@DisplayName("유효하지 않은 userId여도 아무일도 일어나지 않음")
