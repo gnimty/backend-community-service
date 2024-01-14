@@ -12,16 +12,19 @@ public class ApiDocConfiguration {
 
 	private final List<Server> servers;
 	private final Server localServer;
+	private final Server productionServer;
 
 	public ApiDocConfiguration() {
 		this.localServer = new Server();
+		this.productionServer = new Server();
 
 		setServerUrls();
-		servers = List.of(localServer);
+		servers = List.of(localServer, productionServer);
 	}
 
 	public void setServerUrls() {
-		localServer.setUrl("http://localhost:8080");
+		localServer.setUrl("http://localhost:8080/community");
+		productionServer.setUrl("https://gnimty.kro.kr/community");
 	}
 
 	@Bean
