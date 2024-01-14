@@ -271,7 +271,7 @@ class UserServiceTest {
 				.build();
 			userRepository.save(user);
 
-			user.updateStatus(Status.AWAY);
+			user.updateNowStatus(Status.AWAY);
 
 			// when
 			userService.save(user);
@@ -325,9 +325,9 @@ class UserServiceTest {
 			userRepository.save(userB);
 			userRepository.save(userC);
 
-			userA.updateStatus(Status.AWAY);
-			userB.updateStatus(Status.AWAY);
-			userC.updateStatus(Status.AWAY);
+			userA.updateNowStatus(Status.AWAY);
+			userB.updateNowStatus(Status.AWAY);
+			userC.updateNowStatus(Status.AWAY);
 
 			List<User> users = Arrays.asList(userA, userB, userC);
 
@@ -359,9 +359,9 @@ class UserServiceTest {
 			userRepository.save(userA);
 			userRepository.save(userB);
 
-			userA.updateStatus(Status.AWAY);
-			userB.updateStatus(Status.AWAY);
-			userC.updateStatus(Status.AWAY);
+			userA.updateNowStatus(Status.AWAY);
+			userB.updateNowStatus(Status.AWAY);
+			userC.updateNowStatus(Status.AWAY);
 
 			List<User> users = Arrays.asList(userA, userB, userC);
 
