@@ -39,7 +39,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.util.StopWatch;
 
 
 @Slf4j
@@ -373,7 +372,6 @@ public class StompServiceTest {
 				Chat.builder().senderId(userB.getActualUserId()).sendDate(new Date()).message("bye")
 					.chatRoomNo(chatRoom.getChatRoomNo()).build());
 
-
 			Participant participantUserA = stompService.extractParticipant(userA,
 				chatRoom.getParticipants(), true);
 			Thread.sleep(2000);
@@ -383,7 +381,6 @@ public class StompServiceTest {
 
 			// when
 			List<ChatDto> chats = stompService.getChatList(userA, chatRoom);
-
 
 			// then
 			assertThat(chats).isEmpty();
@@ -570,11 +567,11 @@ public class StompServiceTest {
 			userRepository.save(userA);
 
 			// when
-			stompService.updateConnStatus(userA, Status.AWAY);
+			stompService.updateConnStatus(userA, Status.AWAY, true);
 
 			// then
 			User findUserA = userRepository.findByActualUserId(userA.getActualUserId()).get();
-			assertThat(findUserA.getStatus()).isEqualTo(Status.AWAY);
+			assertThat(findUserA.getNowStatus()).isEqualTo(Status.AWAY);
 		}
 	}
 
@@ -699,7 +696,7 @@ public class StompServiceTest {
 
 			// then
 			assertThat(chatRoomRepository.findByUsers(userA, userB)).isEmpty();
-			assertThat(chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo(),ChatDto.class)).isEmpty();
+			assertThat(chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo(), ChatDto.class)).isEmpty();
 		}
 
 
@@ -879,7 +876,7 @@ public class StompServiceTest {
 			// then
 			assertThat(userRepository.findByActualUserId(userA.getActualUserId())).isEmpty();
 			assertThat(chatRoomRepository.findByUser(userA)).isEmpty();
-			assertThat(chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo(),ChatDto.class)).isEmpty();
+			assertThat(chatRepository.findByChatRoomNo(chatRoom.getChatRoomNo(), ChatDto.class)).isEmpty();
 		}
 
 		@DisplayName("유효하지 않은 userId여도 아무일도 일어나지 않음")
@@ -1021,21 +1018,21 @@ public class StompServiceTest {
 			assertThat(findUserA.get().getFrequentChampionId1()).isEqualTo(3L);
 			assertThat(findUserA.get().getFrequentChampionId3()).isEqualTo(4L);
 			assertThat(findUserA.get().getFrequentLane1()).isEqualTo(Lane.JUNGLE);
-			assertThat(findUserA.get().getStatus()).isEqualTo(Status.ONLINE);
+			assertThat(findUserA.get().getNowStatus()).isEqualTo(Status.ONLINE);
 
 			Optional<User> findUserB = userRepository.findByActualUserId(userB.getActualUserId());
 			assertThat(findUserB).isPresent();
 			assertThat(findUserB.get().getFrequentChampionId1()).isEqualTo(3L);
 			assertThat(findUserB.get().getFrequentChampionId3()).isEqualTo(4L);
 			assertThat(findUserB.get().getFrequentLane1()).isEqualTo(Lane.JUNGLE);
-			assertThat(findUserB.get().getStatus()).isEqualTo(Status.ONLINE);
+			assertThat(findUserB.get().getNowStatus()).isEqualTo(Status.ONLINE);
 
 			Optional<User> findUserC = userRepository.findByActualUserId(userC.getActualUserId());
 			assertThat(findUserC).isPresent();
 			assertThat(findUserC.get().getFrequentChampionId1()).isEqualTo(3L);
 			assertThat(findUserC.get().getFrequentChampionId3()).isEqualTo(4L);
 			assertThat(findUserC.get().getFrequentLane1()).isEqualTo(Lane.JUNGLE);
-			assertThat(findUserC.get().getStatus()).isEqualTo(Status.ONLINE);
+			assertThat(findUserC.get().getNowStatus()).isEqualTo(Status.ONLINE);
 		}
 
 		@DisplayName("유저들 중 존재 하지 않는 user가 있다면 저장, 나머지는 수정")
@@ -1076,7 +1073,7 @@ public class StompServiceTest {
 			Optional<User> findUserA = userRepository.findByActualUserId(memberA.getId());
 			assertThat(findUserA).isPresent();
 			assertThat(findUserA.get().getFrequentChampionId1()).isEqualTo(3L);
-			assertThat(findUserA.get().getStatus()).isEqualTo(Status.ONLINE);
+			assertThat(findUserA.get().getNowStatus()).isEqualTo(Status.ONLINE);
 
 			Optional<User> findUserB = userRepository.findByActualUserId(memberB.getId());
 			assertThat(findUserB).isPresent();
@@ -1095,7 +1092,7 @@ public class StompServiceTest {
 			.division(3)
 			.name(name)
 			.tagLine("tagLine")
-			.status(Status.ONLINE).lp(3L)
+			.nowStatus(Status.ONLINE).lp(3L)
 			.build();
 	}
 }

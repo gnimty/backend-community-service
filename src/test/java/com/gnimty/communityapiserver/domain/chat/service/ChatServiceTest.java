@@ -120,7 +120,7 @@ class ChatServiceTest {
 				.division(3)
 				.name("uni")
 				.tagLine("tag")
-				.status(Status.ONLINE)
+				.nowStatus(Status.ONLINE)
 				.lp(3L).build();
 			userRepository.save(user);
 

@@ -108,27 +108,27 @@ public class ChatController {
 
 
 	@EventListener
-	public void onClientDisconnect(SessionDisconnectEvent event) {
-		User user = getUserBySessionId(event.getSessionId());
-		log.info("[DisConnect] userId: {}", user.getActualUserId());
-		if (!isMultipleUser(user.getActualUserId())) {
-			stompService.updateConnStatus(user, Status.OFFLINE);
-			memberService.updateStatus(Status.OFFLINE, user.getActualUserId());
-		}
-		webSocketSessionManager.deleteSession(event.getSessionId());
-	}
-
-	@EventListener
 	public void onClientConnect(SessionConnectedEvent event) {
 		String sessionId = String.valueOf(event.getMessage().getHeaders().get("simpSessionId"));
 		User user = getUserBySessionId(sessionId);
 		log.info("[Connect] userId: {}", user.getActualUserId());
 		if (!isMultipleUser(user.getActualUserId())) {
-			stompService.updateConnStatus(user, Status.ONLINE);
-			memberService.updateStatus(Status.ONLINE, user.getActualUserId());
+			stompService.updateConnStatus(user, user.getSelectedStatus(), false);
+			memberService.updateStatus(user.getSelectedStatus(), user.getActualUserId());
 		}
-
 	}
+
+	@EventListener
+	public void onClientDisconnect(SessionDisconnectEvent event) {
+		User user = getUserBySessionId(event.getSessionId());
+		log.info("[DisConnect] userId: {}", user.getActualUserId());
+		if (!isMultipleUser(user.getActualUserId())) {
+			stompService.updateConnStatus(user, Status.OFFLINE, false);
+			memberService.updateStatus(Status.OFFLINE, user.getActualUserId());
+		}
+		webSocketSessionManager.deleteSession(event.getSessionId());
+	}
+
 
 	private User getUserBySessionId(String sessionId) {
 		Long actualUserId = webSocketSessionManager.getMemberId(sessionId);

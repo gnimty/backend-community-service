@@ -203,8 +203,11 @@ public class StompService {
 
 
 	// TODO janguni: 접속정보 변동내역 전송
-	public void updateConnStatus(User user, Status connectStatus) {
-		user.updateStatus(connectStatus);
+	public void updateConnStatus(User user, Status connectStatus, Boolean isByUser) {
+		user.updateNowStatus(connectStatus);
+		if (connectStatus.equals(Status.OFFLINE) && isByUser) {
+			user.updateSelectedStatus(connectStatus);
+		}
 		userService.save(user);
 
 		List<ChatRoom> chatRooms = chatRoomService.findChatRoom(user);

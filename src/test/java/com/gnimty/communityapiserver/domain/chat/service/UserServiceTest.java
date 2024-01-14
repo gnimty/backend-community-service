@@ -69,7 +69,7 @@ class UserServiceTest {
 				.division(3)
 				.name("uni")
 				.tagLine("tag")
-				.status(Status.ONLINE)
+				.nowStatus(Status.ONLINE)
 				.lp(3L).build();
 			userRepository.save(user);
 
@@ -120,7 +120,7 @@ class UserServiceTest {
 				.division(3)
 				.name("uni")
 				.tagLine("tag")
-				.status(Status.ONLINE)
+				.nowStatus(Status.ONLINE)
 				.lp(3L).build();
 			userRepository.save(user);
 
@@ -165,7 +165,7 @@ class UserServiceTest {
 					.actualUserId(i.longValue())
 					.tier(Tier.diamond)
 					.lp(1L)
-					.status(Status.ONLINE)
+					.nowStatus(Status.ONLINE)
 					.name("name" + i)
 					.tagLine("tag")
 					.profileIconId(1L)
@@ -226,7 +226,7 @@ class UserServiceTest {
 				.actualUserId(member.getId())
 				.tier(Tier.diamond)
 				.lp(1L)
-				.status(Status.ONLINE)
+				.nowStatus(Status.ONLINE)
 				.name("uni")
 				.tagLine("tag")
 				.profileIconId(1L)
@@ -251,7 +251,7 @@ class UserServiceTest {
 			assertThat(savedUser.getFrequentChampionId2()).isEqualTo(2L);
 			assertThat(savedUser.getFrequentChampionId3()).isEqualTo(3L);
 			assertThat(savedUser.getActualUserId()).isEqualTo(member.getId());
-			assertThat(savedUser.getStatus()).isEqualTo(Status.ONLINE);
+			assertThat(savedUser.getNowStatus()).isEqualTo(Status.ONLINE);
 		}
 
 
@@ -263,7 +263,7 @@ class UserServiceTest {
 				.actualUserId(1L)
 				.tier(Tier.diamond)
 				.lp(1L)
-				.status(Status.ONLINE)
+				.nowStatus(Status.ONLINE)
 				.name("uni")
 				.tagLine("tag")
 				.profileIconId(1L)
@@ -280,7 +280,7 @@ class UserServiceTest {
 			User findUser = userRepository.findByActualUserId(1L).get();
 			assertThat(findUser.getTier()).isEqualTo(Tier.diamond);
 			assertThat(findUser.getName()).isEqualTo("uni");
-			assertThat(findUser.getStatus()).isEqualTo(Status.AWAY);
+			assertThat(findUser.getNowStatus()).isEqualTo(Status.AWAY);
 		}
 
 		@DisplayName("user가 없는 상태에서 user를 저장하면 실패")
@@ -291,7 +291,7 @@ class UserServiceTest {
 				.actualUserId(1L)
 				.tier(Tier.diamond)
 				.lp(1L)
-				.status(Status.ONLINE)
+				.nowStatus(Status.ONLINE)
 				.name("uni")
 				.tagLine("tag")
 				.profileIconId(1L)
@@ -337,15 +337,15 @@ class UserServiceTest {
 			// then
 			Optional<User> findUserA = userRepository.findByActualUserId(userA.getActualUserId());
 			assertThat(findUserA).isPresent();
-			assertThat(findUserA.get().getStatus()).isEqualTo(Status.AWAY);
+			assertThat(findUserA.get().getNowStatus()).isEqualTo(Status.AWAY);
 
 			Optional<User> findUserB = userRepository.findByActualUserId(userB.getActualUserId());
 			assertThat(findUserB).isPresent();
-			assertThat(findUserB.get().getStatus()).isEqualTo(Status.AWAY);
+			assertThat(findUserB.get().getNowStatus()).isEqualTo(Status.AWAY);
 
 			Optional<User> findUserC = userRepository.findByActualUserId(userC.getActualUserId());
 			assertThat(findUserC).isPresent();
-			assertThat(findUserC.get().getStatus()).isEqualTo(Status.AWAY);
+			assertThat(findUserC.get().getNowStatus()).isEqualTo(Status.AWAY);
 		}
 
 		@DisplayName("존재하지 않은 User가 있다면 패스, 존재하는 User는 수정")
@@ -371,11 +371,11 @@ class UserServiceTest {
 			// then
 			Optional<User> findUserA = userRepository.findByActualUserId(userA.getActualUserId());
 			assertThat(findUserA).isPresent();
-			assertThat(findUserA.get().getStatus()).isEqualTo(Status.AWAY);
+			assertThat(findUserA.get().getNowStatus()).isEqualTo(Status.AWAY);
 
 			Optional<User> findUserB = userRepository.findByActualUserId(userB.getActualUserId());
 			assertThat(findUserB).isPresent();
-			assertThat(findUserB.get().getStatus()).isEqualTo(Status.AWAY);
+			assertThat(findUserB.get().getNowStatus()).isEqualTo(Status.AWAY);
 
 			Optional<User> findUserC = userRepository.findByActualUserId(userC.getActualUserId());
 			assertThat(findUserC).isEmpty();
@@ -411,7 +411,7 @@ class UserServiceTest {
 			.division(3)
 			.name(name)
 			.tagLine("tagLine")
-			.status(Status.ONLINE).lp(3L)
+			.nowStatus(Status.ONLINE).lp(3L)
 			.build();
 	}
 
