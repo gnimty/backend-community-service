@@ -12,6 +12,7 @@ import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCC
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage.INVALID_INPUT_VALUE;
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage.MISSING_REQUEST_PARAMETER;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.mockStatic;
@@ -308,7 +309,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.willReturn(null);
 			willDoNothing()
 				.given(stompService)
-				.updateConnStatus(any(User.class), any(Status.class), true);
+				.updateConnStatus(any(User.class), any(Status.class), anyBoolean());
 			willDoNothing()
 				.given(stompService)
 				.createOrUpdateUser(any(RiotAccount.class));
@@ -336,7 +337,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.willReturn(null);
 			willDoNothing()
 				.given(stompService)
-				.updateConnStatus(any(User.class), any(Status.class), true);
+				.updateConnStatus(any(User.class), any(Status.class), anyBoolean());
 			willDoNothing()
 				.given(stompService)
 				.createOrUpdateUser(any(RiotAccount.class));
@@ -360,7 +361,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.willReturn(null);
 			willDoNothing()
 				.given(stompService)
-				.updateConnStatus(any(User.class), any(Status.class), true);
+				.updateConnStatus(any(User.class), any(Status.class), anyBoolean());
 			willDoNothing()
 				.given(stompService)
 				.createOrUpdateUser(any(RiotAccount.class));
@@ -685,7 +686,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 					.updateMyProfile(any(MyProfileUpdateServiceRequest.class));
 				willDoNothing()
 					.given(stompService)
-					.updateConnStatus(any(User.class), any(Status.class), true);
+					.updateConnStatus(any(User.class), any(Status.class), anyBoolean());
 
 				mockMvc.perform(patch(REQUEST_URL)
 						.content(om.writeValueAsString(request))
@@ -708,7 +709,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.updateMyProfile(any(MyProfileUpdateServiceRequest.class));
 			willDoNothing()
 				.given(stompService)
-				.updateConnStatus(any(User.class), any(Status.class), true);
+				.updateConnStatus(any(User.class), any(Status.class), anyBoolean());
 
 			mockMvc.perform(patch(REQUEST_URL)
 					.content(om.writeValueAsString(request))
@@ -731,7 +732,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.updateMyProfile(any(MyProfileUpdateServiceRequest.class));
 			willDoNothing()
 				.given(stompService)
-				.updateConnStatus(any(User.class), any(Status.class), true);
+				.updateConnStatus(any(User.class), any(Status.class), anyBoolean());
 
 			mockMvc.perform(patch(REQUEST_URL)
 					.content(om.writeValueAsString(request))
@@ -757,7 +758,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.updateMyProfile(any(MyProfileUpdateServiceRequest.class));
 			willDoNothing()
 				.given(stompService)
-				.updateConnStatus(any(User.class), any(Status.class), true);
+				.updateConnStatus(any(User.class), any(Status.class), anyBoolean());
 
 			mockMvc.perform(patch(REQUEST_URL)
 					.content(om.writeValueAsString(request))
@@ -783,7 +784,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.updateMyProfile(any(MyProfileUpdateServiceRequest.class));
 			willDoNothing()
 				.given(stompService)
-				.updateConnStatus(any(User.class), any(Status.class), true);
+				.updateConnStatus(any(User.class), any(Status.class), anyBoolean());
 
 			mockMvc.perform(patch(REQUEST_URL)
 					.content(om.writeValueAsString(request))
@@ -806,7 +807,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.updateMyProfile(any(MyProfileUpdateServiceRequest.class));
 			willDoNothing()
 				.given(stompService)
-				.updateConnStatus(any(User.class), any(Status.class), true);
+				.updateConnStatus(any(User.class), any(Status.class), anyBoolean());
 
 			mockMvc.perform(patch(REQUEST_URL)
 					.content(om.writeValueAsString(request))
@@ -829,7 +830,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.updateMyProfile(any(MyProfileUpdateServiceRequest.class));
 			willDoNothing()
 				.given(stompService)
-				.updateConnStatus(any(User.class), any(Status.class), true);
+				.updateConnStatus(any(User.class), any(Status.class), anyBoolean());
 
 			mockMvc.perform(patch(REQUEST_URL)
 					.content(om.writeValueAsString(request))
@@ -854,7 +855,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.updateMyProfile(any(MyProfileUpdateServiceRequest.class));
 			willDoNothing()
 				.given(stompService)
-				.updateConnStatus(any(User.class), any(Status.class), true);
+				.updateConnStatus(any(User.class), any(Status.class), anyBoolean());
 
 			mockMvc.perform(patch(REQUEST_URL)
 					.content(om.writeValueAsString(request))
@@ -877,7 +878,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 				.updateMyProfile(any(MyProfileUpdateServiceRequest.class));
 			willDoNothing()
 				.given(stompService)
-				.updateConnStatus(any(User.class), any(Status.class), true);
+				.updateConnStatus(any(User.class), any(Status.class), anyBoolean());
 
 			mockMvc.perform(patch(REQUEST_URL)
 					.content(om.writeValueAsString(request))
