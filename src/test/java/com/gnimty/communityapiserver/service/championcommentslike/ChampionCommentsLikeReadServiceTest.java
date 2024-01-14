@@ -27,18 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class ChampionCommentsLikeReadServiceTest extends ServiceTestSupport {
 
 	@Autowired
-	private MemberRepository memberRepository;
-
-	@Autowired
-	private RiotAccountRepository riotAccountRepository;
-
-	@Autowired
-	private ChampionCommentsRepository championCommentsRepository;
-
-	@Autowired
-	private ChampionCommentsLikeRepository championCommentsLikeRepository;
-
-	@Autowired
 	private ChampionCommentsLikeReadService championCommentsLikeReadService;
 
 	@DisplayName("좋아요/싫어요 존재 여부 판단 시")
@@ -75,15 +63,6 @@ public class ChampionCommentsLikeReadServiceTest extends ServiceTestSupport {
 				.level(0L)
 				.build());
 			MemberThreadLocal.set(member);
-		}
-
-		@AfterEach
-		void tearDown() {
-			championCommentsLikeRepository.deleteAllInBatch();
-			championCommentsRepository.deleteAllInBatch();
-			riotAccountRepository.deleteAllInBatch();
-			memberRepository.deleteAllInBatch();
-			MemberThreadLocal.remove();
 		}
 
 		@DisplayName("좋아요/싫어요를 하지 않았으면 false가 반환된다")
@@ -141,15 +120,6 @@ public class ChampionCommentsLikeReadServiceTest extends ServiceTestSupport {
 				.level(0L)
 				.build());
 			MemberThreadLocal.set(member);
-		}
-
-		@AfterEach
-		void tearDown() {
-			championCommentsLikeRepository.deleteAllInBatch();
-			championCommentsRepository.deleteAllInBatch();
-			riotAccountRepository.deleteAllInBatch();
-			memberRepository.deleteAllInBatch();
-			MemberThreadLocal.remove();
 		}
 
 		@DisplayName("내가 좋아요/싫어요 한 정보가 조회되어야 한다.")

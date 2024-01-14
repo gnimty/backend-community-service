@@ -25,12 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class IntroductionReadServiceTest extends ServiceTestSupport {
 
 	@Autowired
-	private MemberRepository memberRepository;
-
-	@Autowired
-	private IntroductionRepository introductionRepository;
-
-	@Autowired
 	private IntroductionReadService introductionReadService;
 
 
@@ -44,12 +38,6 @@ public class IntroductionReadServiceTest extends ServiceTestSupport {
 			.nickname("nickname")
 			.rsoLinked(true)
 			.build());
-	}
-
-	@AfterEach
-	void tearDown() {
-		introductionRepository.deleteAllInBatch();
-		memberRepository.deleteAllInBatch();
 	}
 
 	@DisplayName("회원으로 조회 시")

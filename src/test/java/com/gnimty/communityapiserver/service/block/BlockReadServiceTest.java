@@ -27,10 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class BlockReadServiceTest extends ServiceTestSupport {
 
 	@Autowired
-	private MemberRepository memberRepository;
-	@Autowired
-	private BlockRepository blockRepository;
-	@Autowired
 	private BlockReadService blockReadService;
 
 	@DisplayName("차단 목록 조회 시")
@@ -54,12 +50,6 @@ public class BlockReadServiceTest extends ServiceTestSupport {
 				.blocked(blocker)
 				.memo(" ")
 				.build());
-		}
-
-		@AfterEach
-		void tearDown() {
-			blockRepository.deleteAllInBatch();
-			memberRepository.deleteAllInBatch();
 		}
 
 		@DisplayName("readBlocks호출 시 저장된 차단 목록이 조회된다.")
@@ -95,12 +85,6 @@ public class BlockReadServiceTest extends ServiceTestSupport {
 				.build());
 		}
 
-		@AfterEach
-		void tearDown() {
-			blockRepository.deleteAllInBatch();
-			memberRepository.deleteAllInBatch();
-		}
-
 		@DisplayName("올바른 차단된 사람, 차단한 사람 요청 시 true를 반환한다.")
 		@Test
 		void should_returnTrue_when_validBlockedAndBlocker() {
@@ -131,12 +115,6 @@ public class BlockReadServiceTest extends ServiceTestSupport {
 				.blocked(blocked)
 				.memo(" ")
 				.build());
-		}
-
-		@AfterEach
-		void tearDown() {
-			blockRepository.deleteAllInBatch();
-			memberRepository.deleteAllInBatch();
 		}
 
 		@DisplayName("존재하는 차단 id를 요청하면 조회된다.")

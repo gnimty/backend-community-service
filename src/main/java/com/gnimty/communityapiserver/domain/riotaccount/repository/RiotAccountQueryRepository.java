@@ -75,7 +75,7 @@ public class RiotAccountQueryRepository {
 			.join(riotAccount.member, member)
 			.leftJoin(preferGameMode).on(preferGameMode.member.eq(member))
 			.leftJoin(introduction).on(introduction.member.eq(member))
-			.leftJoin(schedule).on(schedule.member.eq(me))
+			.leftJoin(schedule).on(schedule.member.eq(member))
 			.where(
 				cursorGt(request)
 					.and(isMainRiotAccount())
@@ -106,9 +106,9 @@ public class RiotAccountQueryRepository {
 				getProjectionBean(gameMode))
 			.from(riotAccount)
 			.join(riotAccount.member, member)
-			.join(preferGameMode).on(preferGameMode.member.eq(member))
-			.join(introduction).on(introduction.member.eq(member))
-			.join(schedule).on(schedule.member.eq(member))
+			.leftJoin(preferGameMode).on(preferGameMode.member.eq(member))
+			.leftJoin(introduction).on(introduction.member.eq(member))
+			.leftJoin(schedule).on(schedule.member.eq(member))
 			.where(
 				memberStatusEq(Status.ONLINE)
 					.and(gameModeEq(gameMode))
@@ -124,6 +124,7 @@ public class RiotAccountQueryRepository {
 		return query
 			.where(duoable(account.getQueue(), account.getDivision(), true, gameMode))
 			.orderBy(Expressions.numberTemplate(Double.class, FUNCTION_RAND).asc())
+			.distinct()
 			.limit(MAIN_SELECT_LIMIT)
 			.fetch();
 	}
@@ -131,6 +132,7 @@ public class RiotAccountQueryRepository {
 	private List<RecommendedSummonersEntry> notLinkedSummonersQuery(JPAQuery<RecommendedSummonersEntry> query) {
 		return query
 			.orderBy(Expressions.numberTemplate(Double.class, FUNCTION_RAND).asc())
+			.distinct()
 			.limit(MAIN_SELECT_LIMIT)
 			.fetch();
 	}
@@ -221,7 +223,7 @@ public class RiotAccountQueryRepository {
 	}
 
 	private BooleanExpression duoable(Tier tier, Integer division, Boolean duoable, GameMode gameMode) {
-		if (duoable == null || !duoable) {
+		if (duoable == null || !duoable || tier == null) {
 			return null;
 		}
 		if (gameMode.equals(GameMode.RANK_SOLO)) {
@@ -344,9 +346,15 @@ public class RiotAccountQueryRepository {
 	}
 
 	/**
-	 * IV		III		II		I 아이언		LP+0	LP+100	LP+200	LP+300 브론즈		LP+400	LP+500	LP+600	LP+700 실버		LP+800	LP+900	LP+1000	LP+1100
-	 * 골드		LP+1200	LP+1300	LP+1400	LP+1500 플레티넘	LP+1600	LP+1700	LP+1800	LP+1900 에메랄드	LP+2000	LP+2100	LP+2200	LP+2300
-	 * 다이아몬드	LP+2400	LP+2500	LP+2600	LP+2700 마스터 /그랜드마스터 / 챌린저	LP+2800
+	 * 			IV		III		II		I
+	 * 아이언		LP+0	LP+100	LP+200	LP+300
+	 * 브론즈		LP+400	LP+500	LP+600	LP+700
+	 * 실버		LP+800	LP+900	LP+1000	LP+1100
+	 * 골드		LP+1200	LP+1300	LP+1400	LP+1500
+	 * 플레티넘	LP+1600	LP+1700	LP+1800	LP+1900
+	 * 에메랄드	LP+2000	LP+2100	LP+2200	LP+2300
+	 * 다이아몬드	LP+2400	LP+2500	LP+2600	LP+2700
+	 * 마스터 /그랜드마스터 / 챌린저	LP+2800
 	 */
 	private Long getMmrByTierAndDivision(Tier tier, Integer division) {
 		if (tier.getWeight() >= Tier.master.getWeight()) {

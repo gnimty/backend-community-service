@@ -46,12 +46,6 @@ public class ScheduleReadServiceTest extends ServiceTestSupport {
 				.build());
 		}
 
-		@AfterEach
-		void tearDown() {
-			scheduleRepository.deleteAllInBatch();
-			memberRepository.deleteAllInBatch();
-		}
-
 		@DisplayName("존재하는 모든 일정이 조회된다.")
 		@Test
 		@Transactional

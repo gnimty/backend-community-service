@@ -26,12 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class OauthInfoReadServiceTest extends ServiceTestSupport {
 
 	@Autowired
-	private MemberRepository memberRepository;
-
-	@Autowired
-	private OauthInfoRepository oauthInfoRepository;
-
-	@Autowired
 	private OauthInfoReadService oauthInfoReadService;
 
 	private Member member;
@@ -44,12 +38,6 @@ public class OauthInfoReadServiceTest extends ServiceTestSupport {
 			.status(Status.ONLINE)
 			.upCount(0L)
 			.build());
-	}
-
-	@AfterEach
-	void tearDown() {
-		oauthInfoRepository.deleteAllInBatch();
-		memberRepository.deleteAllInBatch();
 	}
 
 	@DisplayName("email과 provider로 조회 시")

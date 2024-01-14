@@ -33,22 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class ChampionCommentsReadServiceTest extends ServiceTestSupport {
 
 	@Autowired
-	private ChampionCommentsRepository championCommentsRepository;
-
-	@Autowired
-	private MemberRepository memberRepository;
-
-	@Autowired
 	private ChampionCommentsReadService championCommentsReadService;
-
-	@Autowired
-	private BlockRepository blockRepository;
-
-	@Autowired
-	private RiotAccountRepository riotAccountRepository;
-
-	@Autowired
-	private ChampionCommentsLikeRepository championCommentsLikeRepository;
 
 	@DisplayName("id로 단건 조회 시")
 	@Nested
@@ -73,12 +58,6 @@ public class ChampionCommentsReadServiceTest extends ServiceTestSupport {
 				.contents("contents")
 				.version("1.1")
 				.build());
-		}
-
-		@AfterEach
-		void tearDown() {
-			championCommentsRepository.deleteAllInBatch();
-			memberRepository.deleteAllInBatch();
 		}
 
 		@DisplayName("조회하려는 댓글이 존재하면 해당 댓글이 조회된다.")
@@ -115,16 +94,6 @@ public class ChampionCommentsReadServiceTest extends ServiceTestSupport {
 			riotAccountRepository.save(createRiotAccountByNameAndPuuid("name1", "puuid1", member1));
 			riotAccountRepository.save(createRiotAccountByNameAndPuuid("name2", "puuid2", member2));
 			MemberThreadLocal.set(member1);
-		}
-
-		@AfterEach
-		void tearDown() {
-			blockRepository.deleteAllInBatch();
-			championCommentsLikeRepository.deleteAllInBatch();
-			championCommentsRepository.deleteAllInBatch();
-			riotAccountRepository.deleteAllInBatch();
-			memberRepository.deleteAllInBatch();
-			MemberThreadLocal.remove();
 		}
 
 		@DisplayName("championId에 맞는 댓글만 조회되어야 한다.")

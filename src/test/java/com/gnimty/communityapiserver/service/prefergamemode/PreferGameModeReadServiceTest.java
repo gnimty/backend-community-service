@@ -22,12 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class PreferGameModeReadServiceTest extends ServiceTestSupport {
 
 	@Autowired
-	private MemberRepository memberRepository;
-
-	@Autowired
-	private PreferGameModeRepository preferGameModeRepository;
-
-	@Autowired
 	private PreferGameModeReadService preferGameModeReadService;
 
 	@DisplayName("회원으로 조회 시")
@@ -44,12 +38,6 @@ public class PreferGameModeReadServiceTest extends ServiceTestSupport {
 				.status(Status.ONLINE)
 				.upCount(0L)
 				.build());
-		}
-
-		@AfterEach
-		void tearDown() {
-			preferGameModeRepository.deleteAllInBatch();
-			memberRepository.deleteAllInBatch();
 		}
 
 		@Transactional

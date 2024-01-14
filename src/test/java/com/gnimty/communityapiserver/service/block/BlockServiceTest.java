@@ -36,12 +36,8 @@ public class BlockServiceTest extends ServiceTestSupport {
 	private BlockService blockService;
 	@MockBean
 	private MemberReadService memberReadService;
-	@Autowired
-	private BlockRepository blockRepository;
 	@MockBean
 	private BlockReadService blockReadService;
-	@Autowired
-	private MemberRepository memberRepository;
 
 	@DisplayName("회원 차단 시")
 	@Nested
@@ -54,12 +50,6 @@ public class BlockServiceTest extends ServiceTestSupport {
 		void setUp() {
 			blocker = memberRepository.save(createMember("email@email.com", "nick1"));
 			blocked = memberRepository.save(createMember("email@email2.com", "nick2"));
-		}
-
-		@AfterEach
-		void tearDown() {
-			blockRepository.deleteAllInBatch();
-			memberRepository.deleteAllInBatch();
 		}
 
 		@DisplayName("차단 목록에 없는 회원을 차단 시, 성공한다.")
@@ -137,12 +127,6 @@ public class BlockServiceTest extends ServiceTestSupport {
 				.blocked(blocked)
 				.memo(" ")
 				.build());
-		}
-
-		@AfterEach
-		void tearDown() {
-			blockRepository.deleteAllInBatch();
-			memberRepository.deleteAllInBatch();
 		}
 
 		@DisplayName("올바른 차단 id를 요청하면 성공한다.")

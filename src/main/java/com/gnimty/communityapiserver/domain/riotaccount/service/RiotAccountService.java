@@ -15,6 +15,7 @@ import com.gnimty.communityapiserver.domain.riotaccount.service.dto.response.Rec
 import com.gnimty.communityapiserver.domain.schedule.entity.Schedule;
 import com.gnimty.communityapiserver.domain.schedule.service.ScheduleReadService;
 import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
+import com.gnimty.communityapiserver.global.config.WebClientWrapper;
 import com.gnimty.communityapiserver.global.constant.GameMode;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +24,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +34,7 @@ public class RiotAccountService {
 	private final RiotAccountJdbcRepository riotAccountJdbcRepository;
 	private final ScheduleReadService scheduleReadService;
 	private final MemberLikeReadService memberLikeReadService;
+	private final WebClientWrapper webClientWrapper;
 
 	public List<RiotAccount> updateSummoners(SummonerUpdateServiceRequest request) {
 		List<SummonerUpdateEntry> summonerUpdateEntries = request.getSummonerUpdates()
@@ -93,9 +94,9 @@ public class RiotAccountService {
 	}
 
 	private RecentMemberInfo getRecentMemberInfo(String internalTagName, GameMode gameMode) {
-		return WebClient.create("https://gnimty.kro.kr")
-			.get()
-			.uri("/statistics/summoners/together/" + internalTagName + "?queue_type=" + gameMode.name())
+		return webClientWrapper.get()
+			.uri("https://gnimty.kro.kr/statistics/summoners/together/" + internalTagName + "?queue_type="
+				+ gameMode.name())
 			.retrieve()
 			.bodyToMono(RecentMemberInfo.class)
 			.block();

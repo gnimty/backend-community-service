@@ -57,10 +57,6 @@ public class AuthServiceTest extends ServiceTestSupport {
 
 	@Autowired
 	private AuthService authService;
-	@Autowired
-	private MemberRepository memberRepository;
-	@Autowired
-	private OauthInfoRepository oauthInfoRepository;
 	@MockBean
 	private MemberReadService memberReadService;
 	@MockBean
@@ -103,11 +99,6 @@ public class AuthServiceTest extends ServiceTestSupport {
 				.throwIfExistByEmail(any(String.class));
 			given(valueOperations.get(any()))
 				.willReturn("verify");
-		}
-
-		@AfterEach
-		void tearDown() {
-			memberRepository.deleteAllInBatch();
 		}
 
 		@DisplayName("이메일 인증을 완료하고, form 회원가입 이력이 없는 이메일일 경우, 회원가입 되고, redis의 key가 삭제되며, id로 임시 닉네임이 만들어진다.")
@@ -191,11 +182,6 @@ public class AuthServiceTest extends ServiceTestSupport {
 				.willReturn(member);
 			given(passwordEncoder.matches(any(CharSequence.class), any(String.class)))
 				.willReturn(true);
-		}
-
-		@AfterEach
-		void tearDown() {
-			memberRepository.deleteAllInBatch();
 		}
 
 		@DisplayName("올바른 이메일, 비밀번호를 입력하면 로그인에 성공한다.")
@@ -285,12 +271,6 @@ public class AuthServiceTest extends ServiceTestSupport {
 				.willReturn("email@email.com");
 		}
 
-		@AfterEach
-		void tearDown() {
-			oauthInfoRepository.deleteAllInBatch();
-			memberRepository.deleteAllInBatch();
-		}
-
 		@DisplayName("OauthInfo가 존재할 경우, token을 생성하여 응답한다.")
 		@Test
 		void should_generateTokenPair_when_oauthInfoExist() {
@@ -360,12 +340,6 @@ public class AuthServiceTest extends ServiceTestSupport {
 				.willReturn("token");
 			given(googleOauthUtil.getGoogleUserEmail(any(String.class)))
 				.willReturn("email@email.com");
-		}
-
-		@AfterEach
-		void tearDown() {
-			oauthInfoRepository.deleteAllInBatch();
-			memberRepository.deleteAllInBatch();
 		}
 
 		@DisplayName("OauthInfo가 존재할 경우, token을 생성하여 응답한다.")
