@@ -204,9 +204,11 @@ public class StompService {
 
 	// TODO janguni: 접속정보 변동내역 전송
 	public void updateConnStatus(User user, Status connectStatus, Boolean isByUser) {
-		user.updateNowStatus(connectStatus);
-		if (connectStatus.equals(Status.OFFLINE) && isByUser) {
+		if (isByUser) {
+			user.updateNowStatus(connectStatus);
 			user.updateSelectedStatus(connectStatus);
+		} else {
+			user.updateNowStatus((connectStatus == Status.ONLINE) ? user.getSelectedStatus() : connectStatus);
 		}
 		userService.save(user);
 
