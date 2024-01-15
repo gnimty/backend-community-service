@@ -249,7 +249,6 @@ public class StompService {
 			.toList();
 	}
 
-
 	private Date getExitDate(ChatRoom chatRoom, User user) {
 		return extractParticipant(user, chatRoom.getParticipants(), true)
 			.getExitDate();
