@@ -31,11 +31,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.Test;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -559,9 +559,9 @@ public class StompServiceTest {
 	@Nested
 	class changeUserConnectStatus {
 
-		@DisplayName("성공적으로 접속상태가 변경됨")
+		@DisplayName("사용자가 직접 변경 했다면, nowStatus, selectedStatus 둘다 변경됨")
 		@Test
-		void updateUser() {
+		void updateByUser() {
 			// given
 			User userA = createUser("uni", 1L);
 			userRepository.save(userA);
@@ -572,6 +572,41 @@ public class StompServiceTest {
 			// then
 			User findUserA = userRepository.findByActualUserId(userA.getActualUserId()).get();
 			assertThat(findUserA.getNowStatus()).isEqualTo(Status.AWAY);
+			assertThat(findUserA.getSelectedStatus()).isEqualTo(Status.AWAY);
+		}
+
+		@DisplayName("상태가 자동 변경 됐다면, nowStatus가 selectedStatus값과 동일함")
+		@Test
+		void updateByConnect() {
+			// given
+			User userA = createUser("uni", 1L);
+			userA.updateNowStatus(Status.OFFLINE);
+			userA.updateSelectedStatus(Status.AWAY);
+			userRepository.save(userA);
+
+			// when
+			stompService.updateConnStatus(userA, Status.ONLINE, false);
+
+			// then
+			User findUserA = userRepository.findByActualUserId(userA.getActualUserId()).get();
+			assertThat(findUserA.getNowStatus()).isEqualTo(Status.AWAY);
+		}
+
+		@DisplayName("상태가 자동 변경 됐다면, nowStatus가 offline으로 바뀜")
+		@Test
+		void updateByDisConnect() {
+			// given
+			User userA = createUser("uni", 1L);
+			userA.updateNowStatus(Status.ONLINE);
+			userA.updateSelectedStatus(Status.ONLINE);
+			userRepository.save(userA);
+
+			// when
+			stompService.updateConnStatus(userA, Status.OFFLINE, false);
+
+			// then
+			User findUserA = userRepository.findByActualUserId(userA.getActualUserId()).get();
+			assertThat(findUserA.getNowStatus()).isEqualTo(Status.OFFLINE);
 		}
 	}
 
