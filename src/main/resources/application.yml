@@ -87,12 +87,12 @@ logging:
       hibernate:
         SQL: DEBUG
         orm.jdbc.bind: TRACE
+        type: TRACE
       springframework:
         data:
           mongodb:
             core:
               MongoTemplate: DEBUG
-
 
 oauth:
   kakao:

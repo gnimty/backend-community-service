@@ -13,6 +13,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -23,7 +24,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "riot_account")
+@Table(
+	name = "riot_account",
+	indexes = {
+		@Index(name = "puuid_idx", columnList = "puuid"),
+		@Index(name = "member_id_is_main_idx", columnList = "member_id, is_main")
+	}
+)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RiotAccount extends BaseEntity {
