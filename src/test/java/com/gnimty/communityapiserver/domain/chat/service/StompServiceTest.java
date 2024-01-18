@@ -31,7 +31,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -57,10 +57,6 @@ public class StompServiceTest {
 
 	@Autowired
 	private ChatRoomRepository chatRoomRepository;
-
-	@Autowired
-	private UserService userService;
-
 
 	@Autowired
 	private StompService stompService;
