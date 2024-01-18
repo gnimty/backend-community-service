@@ -43,7 +43,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @Slf4j
 @SpringBootTest
-@ActiveProfiles(value = "local")
+@ActiveProfiles(value = "test")
 public class StompServiceTest {
 
 	@Autowired

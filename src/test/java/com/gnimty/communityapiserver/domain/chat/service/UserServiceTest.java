@@ -30,7 +30,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @Slf4j
 @SpringBootTest
-@ActiveProfiles(value = "local")
+@ActiveProfiles(value = "test")
 class UserServiceTest {
 
 	@Autowired
