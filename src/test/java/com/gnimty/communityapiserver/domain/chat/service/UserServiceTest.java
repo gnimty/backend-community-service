@@ -364,13 +364,15 @@ class UserServiceTest {
 			userC.updateNowStatus(Status.AWAY);
 
 			List<User> users = Arrays.asList(userA, userB, userC);
+			log.info("{}", users);
 
-			// when & then
+			// when
 			userService.updateMany(users);
 
 			// then
 			Optional<User> findUserA = userRepository.findByActualUserId(userA.getActualUserId());
 			assertThat(findUserA).isPresent();
+			log.info("{}", findUserA);
 			assertThat(findUserA.get().getNowStatus()).isEqualTo(Status.AWAY);
 
 			Optional<User> findUserB = userRepository.findByActualUserId(userB.getActualUserId());
