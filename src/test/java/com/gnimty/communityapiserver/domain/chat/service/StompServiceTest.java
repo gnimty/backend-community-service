@@ -30,8 +30,10 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
+
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -43,7 +45,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @Slf4j
 @SpringBootTest
-@ActiveProfiles(value = "local")
+@ActiveProfiles(value = "test")
 public class StompServiceTest {
 
 	@Autowired
@@ -57,10 +59,6 @@ public class StompServiceTest {
 
 	@Autowired
 	private ChatRoomRepository chatRoomRepository;
-
-	@Autowired
-	private UserService userService;
-
 
 	@Autowired
 	private StompService stompService;
@@ -374,10 +372,11 @@ public class StompServiceTest {
 
 			Participant participantUserA = stompService.extractParticipant(userA,
 				chatRoom.getParticipants(), true);
-			Thread.sleep(2000);
+
 			Date exitDate = new Date();
 			participantUserA.setExitDate(exitDate);
-			chatRoomRepository.update(chatRoom);
+			TryUntilSuccess.work(()-> {chatRoomRepository.update(chatRoom); return true;}, 10000);
+			Thread.sleep(3000);
 
 			// when
 			List<ChatDto> chats = stompService.getChatList(userA, chatRoom);
@@ -401,8 +400,7 @@ public class StompServiceTest {
 			Participant participantUserA = stompService.extractParticipant(userA,
 				chatRoom.getParticipants(), true);
 			participantUserA.setExitDate(new Date()); // 채팅방을 나감
-			chatRoomRepository.update(chatRoom);
-			Thread.sleep(2000);
+			TryUntilSuccess.work(()-> {chatRoomRepository.update(chatRoom); return true;}, 10000);
 
 			chatRepository.save(
 				Chat.builder().senderId(userB.getActualUserId()).sendDate(new Date())
@@ -412,6 +410,7 @@ public class StompServiceTest {
 			List<ChatDto> chats = stompService.getChatList(userA, chatRoom);
 
 			// then
+
 			assertThat(chats.size()).isEqualTo(1);
 			assertThat(chats.get(0).getMessage()).isEqualTo("bye2");
 		}
@@ -1129,6 +1128,18 @@ public class StompServiceTest {
 			.tagLine("tagLine")
 			.nowStatus(Status.ONLINE).lp(3L)
 			.build();
+	}
+
+	public static class TryUntilSuccess {
+		public static boolean work(Supplier<Boolean> task, long timeoutMillis) {
+			long startMillis = System.currentTimeMillis();
+			while (System.currentTimeMillis() - startMillis < timeoutMillis) {
+				if (task.get()) {
+					return true;
+				}
+			}
+			return false;
+		}
 	}
 }
 
