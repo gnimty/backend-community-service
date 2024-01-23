@@ -11,8 +11,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface MemberLikeRepository extends JpaRepository<MemberLike, Long> {
 
-	Optional<MemberLike> findBySourceMemberAndTargetMember(Member sourceMember,
-		Member targetMember);
+	Optional<MemberLike> findBySourceMemberAndTargetMember(Member sourceMember, Member targetMember);
 
 	List<MemberLike> findBySourceMember(Member sourceMember);
 

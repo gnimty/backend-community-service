@@ -9,6 +9,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -18,7 +19,10 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(
-	name = "member"
+	name = "member",
+	indexes = {
+		@Index(name = "email_idx", columnList = "email")
+	}
 )
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
