@@ -64,6 +64,7 @@ public abstract class ServiceTestSupport {
 		memberLikeRepository.deleteAllInBatch();
 		riotAccountRepository.deleteAllInBatch();
 		championCommentsLikeRepository.deleteAllInBatch();
+		championCommentsReportRepository.deleteAllInBatch();
 		championCommentsRepository.deleteAllInBatch();
 		memberRepository.deleteAllInBatch();
 		MemberThreadLocal.remove();

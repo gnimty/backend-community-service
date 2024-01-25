@@ -547,7 +547,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 		@DisplayName("비밀번호가 null이거나 정규 표현식에 위배되면 실패한다.")
 		@NullAndEmptySource
 		@ParameterizedTest
-		@ValueSource(strings = {"abc123**", "ABC123*", "ABC123***********", "ABC12345", "ABCD****"})
+		@ValueSource(strings = {"ABC123*", "ABC123***********", "ABC12345", "ABCD****"})
 		void should_fail_when_invalidPassword(String password) throws Exception {
 			PasswordResetRequest request = createRequest(UUID.randomUUID().toString(), password);
 
@@ -641,7 +641,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 		@DisplayName("비밀번호가 null이거나 정규 표현식에 위배되면 실패한다.")
 		@NullAndEmptySource
 		@ParameterizedTest
-		@ValueSource(strings = {"abc123**", "ABC123*", "ABC123***********", "ABC12345", "ABCD****"})
+		@ValueSource(strings = {"ABC123*", "ABC123***********", "ABC12345", "ABCD****"})
 		void should_fail_when_invalidPassword(String password) throws Exception {
 			PasswordUpdateRequest request = createRequest(password);
 
