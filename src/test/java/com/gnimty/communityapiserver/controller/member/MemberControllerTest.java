@@ -93,6 +93,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 		void should_success_when_validRequest() throws Exception {
 			OauthLoginRequest request = OauthLoginRequest.builder()
 				.authCode("authCode")
+				.redirectUri("redirectUri")
 				.build();
 
 			given(memberService.summonerAccountLink(any(OauthLoginServiceRequest.class)))
@@ -147,6 +148,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 		void should_success_when_validRequest() throws Exception {
 			OauthLoginRequest request = OauthLoginRequest.builder()
 				.authCode("authCode")
+				.redirectUri("redirectUri")
 				.build();
 
 			willDoNothing()
@@ -197,6 +199,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 		void should_success_when_validRequest() throws Exception {
 			OauthLoginRequest request = OauthLoginRequest.builder()
 				.authCode("authCode")
+				.redirectUri("redirectUri")
 				.build();
 
 			willDoNothing()
