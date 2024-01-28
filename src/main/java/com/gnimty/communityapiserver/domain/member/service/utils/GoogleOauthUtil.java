@@ -6,7 +6,6 @@ import com.gnimty.communityapiserver.global.exception.ErrorCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -14,8 +13,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-import reactor.core.Disposable;
-import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
@@ -28,13 +25,14 @@ public class GoogleOauthUtil {
 	private final JwtProvider jwtProvider;
 
 	public String getGoogleUserEmail(String authCode, String redirectUri) {
-		TokenInfo block;
+		UserInfo userInfo;
 		try {
-			block = getTokenInfo(authCode, redirectUri);
+			TokenInfo tokenInfo = getTokenInfo(authCode, redirectUri);
+			userInfo = getUserInfo(tokenInfo.getAccess_token());
 		} catch (WebClientResponseException e) {
 			throw new BaseException(ErrorCode.INVALID_AUTH_CODE);
 		}
-		return jwtProvider.getEmailByToken(block.getId_token());
+		return userInfo.getEmail();
 	}
 
 	private TokenInfo getTokenInfo(String authCode, String redirectUri) {
@@ -54,9 +52,24 @@ public class GoogleOauthUtil {
 			.block();
 	}
 
+	private UserInfo getUserInfo(String accessToken) {
+		return WebClient.create("https://www.googleapis.com")
+			.get()
+			.uri("/userinfo/v2/me?access_token=" + accessToken)
+			.retrieve()
+			.bodyToMono(UserInfo.class)
+			.block();
+	}
+
 	@Getter
 	public static class TokenInfo {
 
-		private String id_token;
+		private String access_token;
+	}
+
+	@Getter
+	public static class UserInfo {
+
+		private String email;
 	}
 }
