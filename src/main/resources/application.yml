@@ -94,14 +94,6 @@ logging:
             core:
               MongoTemplate: DEBUG
 
-oauth:
-  kakao:
-    redirect_uri: http://localhost:8080/community/oauth/kakao/redirect
-  google:
-    redirect_uri: http://localhost:8080/community/oauth/google/redirect
-  riot:
-    redirect_uri: http://localhost:8080/community/oauth/riot/redirect
-
 ---
 spring:
   config:
@@ -138,14 +130,6 @@ logging:
     org.hibernate.SQL: DEBUG
     org.hibernate.type: TRACE
 
-oauth:
-  kakao:
-    redirect_uri: http://localhost:8080/community/oauth/kakao/redirect
-  google:
-    redirect_uri: http://localhost:8080/community/oauth/google/redirect
-  riot:
-    redirect_uri: http://localhost:8080/community/oauth/riot/redirect
-
 ---
 spring:
   config:
@@ -181,12 +165,4 @@ spring:
   redis:
     host: ${REDIS_HOST}
     port: ${REDIS_PORT}
-
-oauth:
-  kakao:
-    redirect_uri: ${OAUTH_KAKAO_REDIRECT_URI}
-  google:
-    redirect_uri: ${OAUTH_GOOGLE_REDIRECT_URI}
-  riot:
-    redirect_uri: ${OAUTH_GOOGLE_REDIRECT_URI}
 

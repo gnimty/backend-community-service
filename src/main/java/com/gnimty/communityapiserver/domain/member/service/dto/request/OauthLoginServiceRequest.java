@@ -8,4 +8,5 @@ import lombok.Getter;
 public class OauthLoginServiceRequest {
 
 	private String authCode;
+	private String redirectUri;
 }
