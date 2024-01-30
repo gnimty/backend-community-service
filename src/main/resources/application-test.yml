@@ -80,9 +80,4 @@ logging:
   level:
     org.hibernate.SQL: DEBUG
     org.hibernate.type: TRACE
-    org:
-      springframework:
-        boot:
-          autoconfigure:
-            mongo:
-              embedded: DEBUG
+    de.flapdoodle.embed.mongo: DEBUG
