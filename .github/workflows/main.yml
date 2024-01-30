@@ -21,7 +21,7 @@ jobs:
         run: ./gradlew build -x test
 
       - name: Test with Gradle
-        run: ./gradlew test
+        run: ./gradlew test -Pspring.profiles.active=test
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
