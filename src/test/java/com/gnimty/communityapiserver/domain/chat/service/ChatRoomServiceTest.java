@@ -31,7 +31,7 @@ import org.springframework.test.context.TestPropertySource;
 
 
 @Slf4j
-@TestPropertySource(properties = "spring.mongodb.embedded.version=5.0.6")
+@TestPropertySource(properties = "spring.mongodb.embedded.version=4.0.2")
 @SpringBootTest
 class ChatRoomServiceTest {
 
