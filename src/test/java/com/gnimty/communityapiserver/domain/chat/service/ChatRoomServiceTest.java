@@ -31,7 +31,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @Slf4j
 @SpringBootTest
-//@ActiveProfiles(value = "test")
+@ActiveProfiles(value = "test")
 class ChatRoomServiceTest {
 
 	@Autowired
