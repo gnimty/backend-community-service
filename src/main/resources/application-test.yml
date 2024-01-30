@@ -81,3 +81,8 @@ logging:
     org.hibernate.SQL: DEBUG
     org.hibernate.type: TRACE
     de.flap-doodle.embed.mongo: DEBUG
+    org:
+      springframework:
+        data:
+          mongodb:
+            core=DEBUG:
