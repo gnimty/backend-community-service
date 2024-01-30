@@ -25,7 +25,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -33,7 +32,6 @@ import org.springframework.test.context.ActiveProfiles;
 @Slf4j
 @ActiveProfiles(value = "test")
 @SpringBootTest
-@DataMongoTest
 class ChatRoomServiceTest {
 
 	@Autowired

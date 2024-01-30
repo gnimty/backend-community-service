@@ -51,7 +51,6 @@ springdoc:
     path: '/swagger-ui.html'
     enabled: true
 
-
   datasource:
     driver-class-name: org.h2.Driver
     username: sa
@@ -81,4 +80,9 @@ logging:
   level:
     org.hibernate.SQL: DEBUG
     org.hibernate.type: TRACE
-    org.springframework.data.mongodb: DEBUG
+    org:
+      springframework:
+        boot:
+          autoconfigure:
+            mongo:
+              embedded: DEBUG
