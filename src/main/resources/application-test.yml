@@ -80,4 +80,4 @@ logging:
   level:
     org.hibernate.SQL: DEBUG
     org.hibernate.type: TRACE
-    de.flapdoodle.embed.mongo: DEBUG
+    de.flap-doodle.embed.mongo: DEBUG

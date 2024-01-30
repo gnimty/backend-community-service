@@ -122,13 +122,14 @@ spring:
       embedded:
         version: 3.5.5
       host: localhost
-      port: 27017
+      port: 27016
       database: communityTest
 
 logging:
   level:
     org.hibernate.SQL: DEBUG
     org.hibernate.type: TRACE
+    de.flap-doodle.embed.mongo: DEBUG
 
 ---
 spring:
