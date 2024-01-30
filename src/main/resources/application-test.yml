@@ -72,7 +72,7 @@ springdoc:
     embedded:
       version: 4.0.2
       host: localhost
-      port: 27017
+      port: 37017
       database: communityTest
 
 logging:

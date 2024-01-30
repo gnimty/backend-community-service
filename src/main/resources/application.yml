@@ -117,14 +117,13 @@ spring:
         dialect: org.hibernate.dialect.MySQL5InnoDBDialect
     defer-datasource-initialization: true
 
-#  data:
-#    mongodb:
-#      embedded:
-#        version: 3.5.5
-#      host: localhost
-#      port: 27017
-#      database: communityTest
-
+  data:
+    mongodb:
+      embedded:
+        version: 4.0.2
+      host: localhost
+      port: 27017
+      database: communityTest
 
 logging:
   level:
