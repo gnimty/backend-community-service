@@ -121,7 +121,7 @@ spring:
     mongodb:
       embedded:
         version: 4.0.2
-      host: localhost
+      host: 127.0.0.1
       port: 27017
       database: communityTest
 

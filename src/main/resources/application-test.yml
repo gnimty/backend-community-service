@@ -68,10 +68,11 @@ springdoc:
         dialect: org.hibernate.dialect.MySQL5InnoDBDialect
     defer-datasource-initialization: true
 
-  mongodb:
-    embedded:
-      version: 4.0.2
-      host: localhost
+  data:
+    mongodb:
+      embedded:
+        version: 4.0.2
+      host: 127.0.0.1
       port: 37017
       database: communityTest
 
