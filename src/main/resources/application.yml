@@ -25,11 +25,6 @@ spring:
   web:
     resources:
       add-mappings: false
-  jpa:
-    properties:
-      hibernate:
-        format_sql: true
-    show-sql: true
 
   mail:
     host: smtp.gmail.com
@@ -76,6 +71,8 @@ spring:
       hibernate:
         hbm2ddl:
           auto: create-drop
+        format_sql: true
+    show-sql: true
 
   data:
     mongodb:
@@ -194,3 +191,6 @@ oauth:
   riot:
     redirect_uri: ${OAUTH_GOOGLE_REDIRECT_URI}
 
+logging:
+  level:
+    root: info
