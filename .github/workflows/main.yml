@@ -20,8 +20,10 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build -x test
 
-      - name: Start Embedded MongoDB
-          run: |
+      - name: Start MongoDB
+          uses: supercharge/mongodb-github-action@v2
+          with:
+            mongodb-version: 'latest'
 
       - name: Test with Gradle
         run: ./gradlew test
