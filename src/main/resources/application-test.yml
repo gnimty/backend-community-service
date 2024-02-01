@@ -1,16 +1,16 @@
 jwt:
-  secret: a
+  secret: ${TEST_JWT_SECRET}
 
 oauth:
   kakao:
-    client_id: a
-    client_secret: a
+    client_id: ${TEST_OAUTH_KAKAO_CLIENT_ID}
+    client_secret: ${TEST_OAUTH_KAKAO_CLIENT_SECRET}
   google:
-    client_id: a
-    client_secret: a
+    client_id: ${TEST_OAUTH_GOOGLE_CLIENT_ID}
+    client_secret: ${TEST_OAUTH_GOOGLE_CLIENT_SECRET}
   riot:
-    client_id: a
-    client_secret: a
+    client_id: ${TEST_OAUTH_RIOT_CLIENT_ID}
+    client_secret: ${TEST_OAUTH_RIOT_CLIENT_SECRET}
 
 server:
   servlet:
@@ -30,8 +30,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: a
-    password: a
+    username: ${TEST_MAIL_USERNAME}
+    password: ${TEST_MAIL_PASSWORD}
     properties:
       mail:
         smtp:
@@ -72,15 +72,14 @@ springdoc:
     mongodb:
       embedded:
         version: 4.0.2
-      host: localhost
-      port: 27017
-      database: community
+      host: ${TEST_EMBEDDED_HOST}
+      port: ${TEST_EMBEDDED_PORT}
+      database: ${TEST_EMBEDDED_DATABASE}
 
 logging:
   level:
     org.hibernate.SQL: DEBUG
     org.hibernate.type: TRACE
-    de.flap-doodle.embed.mongo: DEBUG
     org:
       springframework:
         data:
