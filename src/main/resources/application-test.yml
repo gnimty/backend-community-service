@@ -72,9 +72,9 @@ springdoc:
     mongodb:
       embedded:
         version: 4.0.2
-      host: 146.56.167.174
-      port: 37017
-      database: communityTest
+      host: localhost
+      port: 27017
+      database: community
 
 logging:
   level:
