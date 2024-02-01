@@ -1,0 +1,87 @@
+jwt:
+  secret: test
+
+oauth:
+  kakao:
+    client_id: test
+    client_secret: test
+  google:
+    client_id: test
+    client_secret: test
+  riot:
+    client_id: test
+    client_secret: test
+
+server:
+  servlet:
+    context-path: /community
+spring:
+  mvc:
+    throw-exception-if-no-handler-found: true
+  web:
+    resources:
+      add-mappings: false
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: true
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: test
+    password: test
+    properties:
+      mail:
+        smtp:
+          auth: true
+          timeout: 10000
+          starttls:
+            enable: true
+        debug: true
+        transport:
+          protocol: smtp
+
+springdoc:
+  api-docs:
+    groups:
+      enabled: true
+  swagger-ui:
+    path: '/swagger-ui.html'
+    enabled: true
+
+  datasource:
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+    url: jdbc:h2:mem:test;MODE=MySQL
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+    defer-datasource-initialization: true
+
+  data:
+    mongodb:
+      embedded:
+        version: 4.0.2
+      host: localhost
+      port: 27017
+      database: communityTest
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type: TRACE
+    org:
+      springframework:
+        data:
+          mongodb:
+            core: DEBUG

@@ -234,6 +234,7 @@ public class AuthControllerTest extends ControllerTestSupport {
 		private OauthLoginRequest createRequest(String authCode) {
 			return OauthLoginRequest.builder()
 				.authCode(authCode)
+				.redirectUri("redirectUri")
 				.build();
 		}
 	}
@@ -291,6 +292,7 @@ public class AuthControllerTest extends ControllerTestSupport {
 		private OauthLoginRequest createRequest(String authCode) {
 			return OauthLoginRequest.builder()
 				.authCode(authCode)
+				.redirectUri("redirectUri")
 				.build();
 		}
 	}

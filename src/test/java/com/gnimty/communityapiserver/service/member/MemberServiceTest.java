@@ -139,10 +139,10 @@ public class MemberServiceTest extends ServiceTestSupport {
 
 			// stub
 			if (provider.equals(Provider.KAKAO)) {
-				given(kakaoOauthUtil.getKakaoUserEmail(any(String.class)))
+				given(kakaoOauthUtil.getKakaoUserEmail(any(String.class), anyString()))
 					.willReturn(email);
 			} else {
-				given(googleOauthUtil.getGoogleUserEmail(any(String.class)))
+				given(googleOauthUtil.getGoogleUserEmail(any(String.class), anyString()))
 					.willReturn(email);
 			}
 			willDoNothing()
@@ -197,10 +197,10 @@ public class MemberServiceTest extends ServiceTestSupport {
 				.given(oauthInfoReadService)
 				.throwIfExistsByEmailAndProvider(any(String.class), any(Provider.class));
 			if (provider.equals(Provider.KAKAO)) {
-				given(kakaoOauthUtil.getKakaoUserEmail(any(String.class)))
+				given(kakaoOauthUtil.getKakaoUserEmail(any(String.class), anyString()))
 					.willReturn(email);
 			} else {
-				given(googleOauthUtil.getGoogleUserEmail(any(String.class)))
+				given(googleOauthUtil.getGoogleUserEmail(any(String.class), anyString()))
 					.willReturn(email);
 			}
 
@@ -213,6 +213,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 		private OauthLoginServiceRequest createServiceRequest() {
 			return OauthLoginServiceRequest.builder()
 				.authCode("authCode")
+				.redirectUri("redirectUri")
 				.build();
 		}
 	}

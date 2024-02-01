@@ -3,7 +3,7 @@
 *.env
 
 # test yaml
-application-test.yml
+#application-test.yml
 
 # dev mounting directory
 **/dev-data/

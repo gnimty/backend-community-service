@@ -93,20 +93,6 @@ public class JwtProvider {
 			.build();
 	}
 
-	public String getEmailByToken(String token) {
-		String[] chunks = token.split(TOKEN_SPLITTER.getContent());
-		Base64.Decoder decoder = Base64.getUrlDecoder();
-		String payload = new String(decoder.decode(chunks[1]));
-		ObjectMapper objectMapper = new ObjectMapper();
-
-		try {
-			Map<String, Object> payloadMap = objectMapper.readValue(payload, Map.class);
-			return (String) payloadMap.get(EMAIL_PAYLOAD_NAME.getContent());
-		} catch (IOException e) {
-			throw new BaseException(TOKEN_INVALID);
-		}
-	}
-
 	public void checkValidation(String token) {
 		try {
 			Jwts.parser()

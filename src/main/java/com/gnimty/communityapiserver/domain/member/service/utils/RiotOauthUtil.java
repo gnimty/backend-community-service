@@ -20,27 +20,25 @@ public class RiotOauthUtil {
 	private String client_id;
 	@Value("${oauth.riot.client_secret}")
 	private String client_secret;
-	@Value("${oauth.riot.redirect_uri}")
-	private String redirect_uri;
 	private final JwtProvider jwtProvider;
 
-	public RiotAccountInfo getPuuid(String authCode) {
+	public RiotAccountInfo getPuuid(String authCode, String redirectUri) {
 		TokenInfo token;
 		try {
-			token = getTokenInfo(authCode);
+			token = getTokenInfo(authCode, redirectUri);
 		} catch (WebClientResponseException e) {
 			throw new BaseException(ErrorCode.INVALID_AUTH_CODE);
 		}
 		return getAccountInfo(token);
 	}
 
-	private TokenInfo getTokenInfo(String authCode) {
+	private TokenInfo getTokenInfo(String authCode, String redirectUri) {
 		return WebClient.create("https://auth.riotgames.com")
 			.post()
 			.uri("/token")
 			.contentType(MediaType.APPLICATION_FORM_URLENCODED)
 			.headers(headers -> headers.setBasicAuth(client_id, client_secret))
-			.bodyValue("grant_type=authorization_code&code=" + authCode + "&redirect_uri=" + redirect_uri)
+			.bodyValue("grant_type=authorization_code&code=" + authCode + "&redirect_uri=" + redirectUri)
 			.retrieve()
 			.bodyToMono(TokenInfo.class)
 			.block();
