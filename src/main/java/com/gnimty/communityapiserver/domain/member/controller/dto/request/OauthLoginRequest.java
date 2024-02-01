@@ -18,10 +18,14 @@ public class OauthLoginRequest {
 	@Schema(example = "abdclsdkalfjkasdnflkne*()-", description = "provider 인가 코드, not null")
 	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
 	private String authCode;
+	@Schema(example = "http://localhost", description = "redirect uri, not null")
+	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+	private String redirectUri;
 
 	public OauthLoginServiceRequest toServiceRequest() {
 		return OauthLoginServiceRequest.builder()
 			.authCode(authCode)
+			.redirectUri(redirectUri)
 			.build();
 	}
 }

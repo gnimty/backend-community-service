@@ -375,8 +375,7 @@ public class StompServiceTest {
 
 			Date exitDate = new Date();
 			participantUserA.setExitDate(exitDate);
-			TryUntilSuccess.work(()-> {chatRoomRepository.update(chatRoom); return true;}, 10000);
-			Thread.sleep(3000);
+			TryUntilSuccess.work(()-> {chatRoomRepository.update(chatRoom); return true;}, 30000);
 
 			// when
 			List<ChatDto> chats = stompService.getChatList(userA, chatRoom);
@@ -400,7 +399,7 @@ public class StompServiceTest {
 			Participant participantUserA = stompService.extractParticipant(userA,
 				chatRoom.getParticipants(), true);
 			participantUserA.setExitDate(new Date()); // 채팅방을 나감
-			TryUntilSuccess.work(()-> {chatRoomRepository.update(chatRoom); return true;}, 10000);
+			TryUntilSuccess.work(()-> {chatRoomRepository.update(chatRoom); return true;}, 30000);
 
 			chatRepository.save(
 				Chat.builder().senderId(userB.getActualUserId()).sendDate(new Date())
@@ -410,7 +409,6 @@ public class StompServiceTest {
 			List<ChatDto> chats = stompService.getChatList(userA, chatRoom);
 
 			// then
-
 			assertThat(chats.size()).isEqualTo(1);
 			assertThat(chats.get(0).getMessage()).isEqualTo("bye2");
 		}

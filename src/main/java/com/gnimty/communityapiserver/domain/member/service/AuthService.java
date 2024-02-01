@@ -88,7 +88,7 @@ public class AuthService {
 	}
 
 	public AuthToken kakaoLogin(OauthLoginServiceRequest request) {
-		String userEmail = kakaoOauthUtil.getKakaoUserEmail(request.getAuthCode());
+		String userEmail = kakaoOauthUtil.getKakaoUserEmail(request.getAuthCode(), request.getRedirectUri());
 
 		Member member = oauthInfoRepository.findByEmail(userEmail)
 			.map(OauthInfo::getMember)
@@ -103,7 +103,7 @@ public class AuthService {
 	}
 
 	public AuthToken googleLogin(OauthLoginServiceRequest request) {
-		String googleUserEmail = googleOauthUtil.getGoogleUserEmail(request.getAuthCode());
+		String googleUserEmail = googleOauthUtil.getGoogleUserEmail(request.getAuthCode(), request.getRedirectUri());
 
 		Member member = oauthInfoRepository.findByEmail(googleUserEmail)
 			.map(OauthInfo::getMember)
