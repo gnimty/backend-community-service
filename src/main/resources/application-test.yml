@@ -1,16 +1,16 @@
 jwt:
-  secret: ${TEST_JWT_SECRET}
+  secret: test
 
 oauth:
   kakao:
-    client_id: ${TEST_OAUTH_KAKAO_CLIENT_ID}
-    client_secret: ${TEST_OAUTH_KAKAO_CLIENT_SECRET}
+    client_id: test
+    client_secret: test
   google:
-    client_id: ${TEST_OAUTH_GOOGLE_CLIENT_ID}
-    client_secret: ${TEST_OAUTH_GOOGLE_CLIENT_SECRET}
+    client_id: test
+    client_secret: test
   riot:
-    client_id: ${TEST_OAUTH_RIOT_CLIENT_ID}
-    client_secret: ${TEST_OAUTH_RIOT_CLIENT_SECRET}
+    client_id: test
+    client_secret: test
 
 server:
   servlet:
@@ -30,8 +30,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: ${TEST_MAIL_USERNAME}
-    password: ${TEST_MAIL_PASSWORD}
+    username: test
+    password: test
     properties:
       mail:
         smtp:
@@ -72,9 +72,9 @@ springdoc:
     mongodb:
       embedded:
         version: 4.0.2
-      host: ${TEST_EMBEDDED_HOST}
-      port: ${TEST_EMBEDDED_PORT}
-      database: ${TEST_EMBEDDED_DATABASE}
+      host: localhost
+      port: 27017
+      database: communityTest
 
 logging:
   level:
