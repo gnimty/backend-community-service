@@ -20,11 +20,6 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build -x test
 
-      - name: Start MongoDB
-        uses: supercharge/mongodb-github-action@1.10.0
-        with:
-          mongodb-version: '4.0.2'
-
       - name: Test with Gradle
         run: ./gradlew test
 
