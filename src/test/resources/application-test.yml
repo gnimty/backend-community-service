@@ -22,16 +22,11 @@ spring:
     resources:
       add-mappings: false
   jpa:
-    properties:
-      hibernate:
-        format_sql: true
-    show-sql: true
     hibernate:
       ddl-auto: create-drop
       properties:
         hibernate:
           dialect: org.hibernate.dialect.MySQL5InnoDBDialect
-      defer-datasource-initialization: true
 
   mail:
     host: smtp.gmail.com
