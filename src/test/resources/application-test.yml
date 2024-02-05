@@ -58,15 +58,15 @@ spring:
     console:
       enabled: true
       path: /h2-console
-
   data:
     mongodb:
-      embedded:
-        version: 3.6.5
       host: localhost
-      port: 27017
+      port: 0
       database: communityTest
 
+  mongodb:
+    embedded:
+      version: 4.0.2
 
 logging:
   level:

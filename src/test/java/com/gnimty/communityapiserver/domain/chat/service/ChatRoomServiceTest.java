@@ -26,14 +26,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
-import org.springframework.boot.autoconfigure.mongo.embedded.EmbeddedMongoAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.data.mongo.AutoConfigureDataMongo;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 
 
 @Slf4j
 @SpringBootTest
-@ImportAutoConfiguration(exclude = EmbeddedMongoAutoConfiguration.class)
 @ActiveProfiles("test")
 class ChatRoomServiceTest {
 
@@ -51,6 +52,7 @@ class ChatRoomServiceTest {
         userRepository.deleteAll();
         chatRoomRepository.deleteAll();
     }
+
 
     @DisplayName("User로 채팅방 조회")
     @Nested
@@ -367,6 +369,7 @@ class ChatRoomServiceTest {
         @Test
         void successToDeleteChatRoom() {
             // given
+
             User user = createUser("uni", 1L);
             userRepository.save(user);
 
@@ -383,6 +386,7 @@ class ChatRoomServiceTest {
 
             //then
             assertThat(chatRoomRepository.findByChatRoomNo(1L)).isEmpty();
+
         }
     }
 

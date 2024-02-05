@@ -36,9 +36,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     runtimeOnly 'com.h2database:h2'
-    //testImplementation group: 'de.flapdoodle.embed', name: 'de.flapdoodle.embed.mongo', version: '4.9.2'
-    testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo'
-//    implementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo'
+
 
     //querydsl 추가
     implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
@@ -66,6 +64,8 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.projectlombok:lombok:1.18.22'
     testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo'
+
+    //testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo.packageresolver:1.0.7'
 
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
