@@ -6,6 +6,8 @@ import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.global.constant.ReportType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -36,6 +38,7 @@ public class ChampionCommentsReport extends BaseEntity {
 	@Column(name = "champion_comments_report_id", columnDefinition = "BIGINT", unique = true, nullable = false)
 	private Long id;
 
+	@Enumerated(EnumType.STRING)
 	@NotNull
 	@Column(name = "report_type", columnDefinition = "VARCHAR(100)")
 	private ReportType reportType;
