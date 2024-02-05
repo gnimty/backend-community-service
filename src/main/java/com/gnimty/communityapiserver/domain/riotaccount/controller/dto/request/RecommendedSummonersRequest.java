@@ -15,13 +15,11 @@ import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
 @ValidateCursor(sortBy = "sortBy", lastName = "lastName",
 	lastSummonerMmr = "lastSummonerMmr", lastSummonerUpCount = "lastSummonerUpCount")
-@NoArgsConstructor
 @AllArgsConstructor
 public class RecommendedSummonersRequest {
 
