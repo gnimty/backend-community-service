@@ -22,10 +22,11 @@ spring:
     resources:
       add-mappings: false
   jpa:
-    properties:
-      hibernate:
-        format_sql: true
-    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
+      properties:
+        hibernate:
+          dialect: org.hibernate.dialect.MySQL5InnoDBDialect
 
   mail:
     host: smtp.gmail.com
@@ -43,14 +44,6 @@ spring:
         transport:
           protocol: smtp
 
-springdoc:
-  api-docs:
-    groups:
-      enabled: true
-  swagger-ui:
-    path: '/swagger-ui.html'
-    enabled: true
-
   datasource:
     driver-class-name: org.h2.Driver
     username: sa
@@ -60,21 +53,15 @@ springdoc:
     console:
       enabled: true
       path: /h2-console
-  jpa:
-    hibernate:
-      ddl-auto: create-drop
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
-    defer-datasource-initialization: true
-
   data:
     mongodb:
-      embedded:
-        version: 4.0.2
       host: localhost
-      port: 27017
+      port: 0
       database: communityTest
+
+  mongodb:
+    embedded:
+      version: 4.0.2
 
 logging:
   level:
