@@ -95,57 +95,6 @@ logging:
             core:
               MongoTemplate: DEBUG
 
-oauth:
-  kakao:
-    redirect_uri: http://localhost:8080/community/oauth/kakao/redirect
-  google:
-    redirect_uri: http://localhost:8080/community/oauth/google/redirect
-  riot:
-    redirect_uri: http://localhost:8080/community/oauth/riot/redirect
-
----
-spring:
-  config:
-    activate:
-      on-profile: test
-
-  datasource:
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
-    url: jdbc:h2:mem:test;MODE=MySQL
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
-  jpa:
-    hibernate:
-      ddl-auto: create-drop
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
-    defer-datasource-initialization: true
-
-  data:
-    mongodb:
-      embedded:
-        version: 3.5.5
-      host: localhost
-      port: 27017
-      database: communityTest
-
-logging:
-  level:
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type: TRACE
-
-oauth:
-  kakao:
-    redirect_uri: http://localhost:8080/community/oauth/kakao/redirect
-  google:
-    redirect_uri: http://localhost:8080/community/oauth/google/redirect
-  riot:
-    redirect_uri: http://localhost:8080/community/oauth/riot/redirect
 
 ---
 spring:
@@ -182,15 +131,3 @@ spring:
   redis:
     host: ${REDIS_HOST}
     port: ${REDIS_PORT}
-
-oauth:
-  kakao:
-    redirect_uri: ${OAUTH_KAKAO_REDIRECT_URI}
-  google:
-    redirect_uri: ${OAUTH_GOOGLE_REDIRECT_URI}
-  riot:
-    redirect_uri: ${OAUTH_GOOGLE_REDIRECT_URI}
-
-logging:
-  level:
-    root: info

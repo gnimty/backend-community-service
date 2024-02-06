@@ -1,6 +1,5 @@
 package com.gnimty.communityapiserver.service;
 
-import com.gnimty.communityapiserver.config.RedisTestConfig;
 import com.gnimty.communityapiserver.domain.block.repository.BlockRepository;
 import com.gnimty.communityapiserver.domain.championcomments.repository.ChampionCommentsRepository;
 import com.gnimty.communityapiserver.domain.championcommentslike.repository.ChampionCommentsLikeRepository;
@@ -15,7 +14,6 @@ import com.gnimty.communityapiserver.domain.riotaccount.repository.RiotAccountRe
 import com.gnimty.communityapiserver.domain.schedule.repository.ScheduleRepository;
 import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -24,7 +22,6 @@ import org.springframework.test.context.ActiveProfiles;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@ExtendWith(RedisTestConfig.class)
 public abstract class ServiceTestSupport {
 
 	@LocalServerPort
@@ -64,6 +61,7 @@ public abstract class ServiceTestSupport {
 		memberLikeRepository.deleteAllInBatch();
 		riotAccountRepository.deleteAllInBatch();
 		championCommentsLikeRepository.deleteAllInBatch();
+		championCommentsReportRepository.deleteAllInBatch();
 		championCommentsRepository.deleteAllInBatch();
 		memberRepository.deleteAllInBatch();
 		MemberThreadLocal.remove();

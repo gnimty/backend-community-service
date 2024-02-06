@@ -22,28 +22,26 @@ public class GoogleOauthUtil {
 	private String client_id;
 	@Value("${oauth.google.client_secret}")
 	private String client_secret;
-	@Value("${oauth.google.redirect_uri}")
-	private String redirect_uri;
 	private final JwtProvider jwtProvider;
 
-	public String getGoogleUserEmail(String authCode) {
-		TokenInfo block;
+	public String getGoogleUserEmail(String authCode, String redirectUri) {
+		UserInfo userInfo;
 		try {
-			block = getTokenInfo(authCode);
+			TokenInfo tokenInfo = getTokenInfo(authCode, redirectUri);
+			userInfo = getUserInfo(tokenInfo.getAccess_token());
 		} catch (WebClientResponseException e) {
 			throw new BaseException(ErrorCode.INVALID_AUTH_CODE);
 		}
-		return jwtProvider.getEmailByToken(block.getId_token());
+		return userInfo.getEmail();
 	}
 
-	private TokenInfo getTokenInfo(String authCode) {
+	private TokenInfo getTokenInfo(String authCode, String redirectUri) {
 		MultiValueMap<String, String> bodyMap = new LinkedMultiValueMap<>();
 		bodyMap.add("grant_type", "authorization_code");
 		bodyMap.add("client_id", client_id);
 		bodyMap.add("client_secret", client_secret);
-		bodyMap.add("redirect_uri", redirect_uri);
+		bodyMap.add("redirect_uri", redirectUri);
 		bodyMap.add("code", authCode);
-
 		return WebClient.create("https://oauth2.googleapis.com")
 			.post()
 			.uri("/token")
@@ -54,9 +52,24 @@ public class GoogleOauthUtil {
 			.block();
 	}
 
+	private UserInfo getUserInfo(String accessToken) {
+		return WebClient.create("https://www.googleapis.com")
+			.get()
+			.uri("/userinfo/v2/me?access_token=" + accessToken)
+			.retrieve()
+			.bodyToMono(UserInfo.class)
+			.block();
+	}
+
 	@Getter
 	public static class TokenInfo {
 
-		private String id_token;
+		private String access_token;
+	}
+
+	@Getter
+	public static class UserInfo {
+
+		private String email;
 	}
 }

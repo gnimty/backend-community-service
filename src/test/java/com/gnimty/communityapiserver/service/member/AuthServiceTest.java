@@ -9,6 +9,7 @@ import static com.gnimty.communityapiserver.global.exception.ErrorCode.UNAUTHORI
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -267,7 +268,7 @@ public class AuthServiceTest extends ServiceTestSupport {
 		void setUp() {
 			given(jwtProvider.generateToken(any(Long.class), any(Long.class), any(String.class)))
 				.willReturn("token");
-			given(kakaoOauthUtil.getKakaoUserEmail(any(String.class)))
+			given(kakaoOauthUtil.getKakaoUserEmail(any(String.class), anyString()))
 				.willReturn("email@email.com");
 		}
 
@@ -292,6 +293,7 @@ public class AuthServiceTest extends ServiceTestSupport {
 
 			OauthLoginServiceRequest request = OauthLoginServiceRequest.builder()
 				.authCode("authCode")
+				.redirectUri("redirectUri")
 				.build();
 
 			AuthToken authToken = authService.kakaoLogin(request);
@@ -310,6 +312,7 @@ public class AuthServiceTest extends ServiceTestSupport {
 		void should_generateMember_when_oauthInfoNotExist() {
 			OauthLoginServiceRequest request = OauthLoginServiceRequest.builder()
 				.authCode("authCode")
+				.redirectUri("redirectUri")
 				.build();
 
 			AuthToken authToken = authService.kakaoLogin(request);
@@ -338,7 +341,7 @@ public class AuthServiceTest extends ServiceTestSupport {
 		void setUp() {
 			given(jwtProvider.generateToken(any(Long.class), any(Long.class), any(String.class)))
 				.willReturn("token");
-			given(googleOauthUtil.getGoogleUserEmail(any(String.class)))
+			given(googleOauthUtil.getGoogleUserEmail(any(String.class), anyString()))
 				.willReturn("email@email.com");
 		}
 
@@ -363,6 +366,7 @@ public class AuthServiceTest extends ServiceTestSupport {
 
 			OauthLoginServiceRequest request = OauthLoginServiceRequest.builder()
 				.authCode("authCode")
+				.redirectUri("redirectUri")
 				.build();
 
 			AuthToken authToken = authService.googleLogin(request);
@@ -381,6 +385,7 @@ public class AuthServiceTest extends ServiceTestSupport {
 		void should_generateMember_when_oauthInfoNotExist() {
 			OauthLoginServiceRequest request = OauthLoginServiceRequest.builder()
 				.authCode("authCode")
+				.redirectUri("redirectUri")
 				.build();
 
 			AuthToken authToken = authService.googleLogin(request);

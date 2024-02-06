@@ -108,7 +108,7 @@ public class MemberService {
 	public RiotAccount summonerAccountLink(OauthLoginServiceRequest request) {
 		Member member = MemberThreadLocal.get();
 
-		RiotAccountInfo info = riotOauthUtil.getPuuid(request.getAuthCode());
+		RiotAccountInfo info = riotOauthUtil.getPuuid(request.getAuthCode(), request.getRedirectUri());
 
 		riotAccountReadService.throwIfExistsByPuuid(info.getPuuid());
 		Boolean existsMain = riotAccountReadService.existsByMemberId(member);
@@ -139,9 +139,9 @@ public class MemberService {
 		throwIfAlreadyLinkedProvider(member, provider);
 		String userEmail;
 		if (provider.equals(Provider.KAKAO)) {
-			userEmail = kakaoOauthUtil.getKakaoUserEmail(request.getAuthCode());
+			userEmail = kakaoOauthUtil.getKakaoUserEmail(request.getAuthCode(), request.getRedirectUri());
 		} else {
-			userEmail = googleOauthUtil.getGoogleUserEmail(request.getAuthCode());
+			userEmail = googleOauthUtil.getGoogleUserEmail(request.getAuthCode(), request.getRedirectUri());
 		}
 		oauthInfoReadService.throwIfExistsByEmailAndProvider(userEmail, provider);
 		createOauthInfoByEmail(member, userEmail, provider);
