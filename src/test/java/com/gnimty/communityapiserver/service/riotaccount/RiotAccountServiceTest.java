@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 
@@ -17,23 +18,25 @@ import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
 import com.gnimty.communityapiserver.domain.riotaccount.repository.RiotAccountJdbcRepository;
 import com.gnimty.communityapiserver.domain.riotaccount.service.RiotAccountReadService;
 import com.gnimty.communityapiserver.domain.riotaccount.service.RiotAccountService;
-import com.gnimty.communityapiserver.domain.riotaccount.service.RiotAccountService.RecentMemberInfo;
 import com.gnimty.communityapiserver.domain.riotaccount.service.dto.request.RecommendedSummonersServiceRequest;
 import com.gnimty.communityapiserver.domain.riotaccount.service.dto.response.RecommendedSummonersServiceResponse;
 import com.gnimty.communityapiserver.domain.schedule.entity.Schedule;
 import com.gnimty.communityapiserver.domain.schedule.service.ScheduleReadService;
 import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
-import com.gnimty.communityapiserver.global.config.WebClientWrapper;
 import com.gnimty.communityapiserver.global.constant.GameMode;
+import com.gnimty.communityapiserver.global.dto.webclient.RecentMemberInfo;
 import com.gnimty.communityapiserver.service.ServiceTestSupport;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.Answers;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 public class RiotAccountServiceTest extends ServiceTestSupport {
 
@@ -45,8 +48,6 @@ public class RiotAccountServiceTest extends ServiceTestSupport {
 	private RiotAccountJdbcRepository riotAccountJdbcRepository;
 	@MockBean
 	private ScheduleReadService scheduleReadService;
-	@MockBean(answer = Answers.RETURNS_DEEP_STUBS)
-	private WebClientWrapper webClientWrapper;
 
 	@DisplayName("bulk update 시")
 	@Nested
@@ -127,15 +128,26 @@ public class RiotAccountServiceTest extends ServiceTestSupport {
 			given(riotAccount.getName()).willReturn("name");
 			given(riotAccount.getTagLine()).willReturn("tag");
 			RecentMemberInfo recentMemberInfo = mock(RecentMemberInfo.class);
-			given(webClientWrapper.get()
-				.uri(anyString())
-				.retrieve()
-				.bodyToMono(RecentMemberInfo.class)
-				.block())
-				.willReturn(recentMemberInfo);
 
-			assertThatNoException().isThrownBy(
-				() -> riotAccountService.getRecentlySummoners(member, Collections.emptyList()));
+			try (MockedStatic<WebClient> ignored = mockStatic(WebClient.class)) {
+				WebClient mockWebClient = mock(WebClient.class);
+				WebClient.Builder mockBuilder = mock(WebClient.Builder.class);
+				WebClient.RequestHeadersUriSpec mockRequestHeadersUriSpec = mock(WebClient.RequestHeadersUriSpec.class);
+				WebClient.ResponseSpec mockResponseSpec = mock(WebClient.ResponseSpec.class);
+				Mono mockMono = mock(Mono.class);
+
+				Mockito.when(WebClient.builder()).thenReturn(mockBuilder);
+
+				Mockito.when(mockBuilder.build()).thenReturn(mockWebClient);
+				Mockito.when(mockWebClient.get()).thenReturn(mockRequestHeadersUriSpec);
+				Mockito.when(mockRequestHeadersUriSpec.uri(Mockito.anyString())).thenReturn(mockRequestHeadersUriSpec);
+				Mockito.when(mockRequestHeadersUriSpec.retrieve()).thenReturn(mockResponseSpec);
+				Mockito.when(mockResponseSpec.bodyToMono(Mockito.any(Class.class))).thenReturn(mockMono);
+
+				Mockito.when(mockMono.block()).thenReturn(recentMemberInfo);
+				assertThatNoException().isThrownBy(
+					() -> riotAccountService.getRecentlySummoners(member, Collections.emptyList()));
+			}
 		}
 	}
 }
