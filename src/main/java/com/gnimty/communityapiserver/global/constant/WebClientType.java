@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum WEB_CLIENT_TYPE {
+public enum WebClientType {
 
 	// KAKAO
 	KAKAO_ACCOUNT_REQUEST_URI("https://kapi.kakao.com/v2/user/me"),
@@ -19,9 +19,15 @@ public enum WEB_CLIENT_TYPE {
 
 	// GOOGLE
 	GOOGLE_TOKEN_REQUEST_URI("https://oauth2.googleapis.com/token"),
+	GOOGLE_USER_INFO_REQUEST_URI("https://www.googleapis.com/userinfo/v2/me?access_token="),
+
+	// GNIMTY
+	GNIMTY_VERSION_URI("https://gnimty.kro.kr/asset/version"),
+	GNIMTY_TOGETHER_URI("https://gnimty.kro.kr/statistics/summoners/together/%s?queue_type=%s"),
+	GNIMTY_POST_SUMMONER_URI("https://gnimty.kro.kr/statistics/summoners/%s"),
+	GNIMTY_GET_SUMMONER_URI("https://gnimty.kro.kr/statistics/summoners/%s-%s"),
 
 	// COMMON
-	HEADER_AUTHORIZATION("Authorization"),
 	GRANT_TYPE("grant_type"),
 	AUTHORIZATION_CODE("authorization_code"),
 	CLIENT_ID("client_id"),
@@ -31,4 +37,8 @@ public enum WEB_CLIENT_TYPE {
 	;
 
 	private final String value;
+
+	public String getValue(Object... args) {
+		return String.format(value, args);
+	}
 }
