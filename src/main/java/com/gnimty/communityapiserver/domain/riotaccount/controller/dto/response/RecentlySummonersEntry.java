@@ -1,8 +1,8 @@
 package com.gnimty.communityapiserver.domain.riotaccount.controller.dto.response;
 
 import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
-import com.gnimty.communityapiserver.domain.riotaccount.service.RiotAccountService.RecentMemberDto;
 import com.gnimty.communityapiserver.global.constant.Tier;
+import com.gnimty.communityapiserver.global.dto.webclient.RecentMemberDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
