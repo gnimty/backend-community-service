@@ -41,7 +41,6 @@ public enum ErrorCode {
 	ALREADY_LINKED_PROVIDER(CONFLICT, ErrorMessage.ALREADY_LINKED_PROVIDER),
 	ALREADY_BLOCKED_MEMBER(CONFLICT, ErrorMessage.ALREADY_BLOCKED_MEMBER),
 	BLOCK_NOT_FOUND(NOT_FOUND, ErrorMessage.BLOCK_NOT_FOUND),
-	INVALID_AUTH_CODE(BAD_REQUEST, ErrorMessage.INVALID_AUTH_CODE),
 	HEADER_NOT_FOUND(BAD_REQUEST, ErrorMessage.HEADER_NOT_FOUND),
 	REQUEST_BODY_INVALID(BAD_REQUEST, ErrorMessage.REQUEST_BODY_INVALID),
 	INVALID_PATH_VARIABLE(BAD_REQUEST, ErrorMessage.INVALID_PATH_VARIABLE),
@@ -69,6 +68,7 @@ public enum ErrorCode {
 	INVALID_CHILD_COMMENTS(BAD_REQUEST, ErrorMessage.INVALID_CHILD_COMMENTS),
 	DUPLICATED_REPORT(CONFLICT, ErrorMessage.DUPLICATED_REPORT),
 	OTHER_TYPE_MUST_CONTAIN_COMMENT(BAD_REQUEST, ErrorMessage.OTHER_TYPE_MUST_CONTAIN_COMMENT),
+	WEBCLIENT_CLIENT_ERROR(BAD_REQUEST, null),
 
 	// server
 	INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Server Error");
@@ -109,7 +109,6 @@ public enum ErrorCode {
 		public static final String ALREADY_LINKED_PROVIDER = "이미 요청의 provider에 해당하는 oauth에 연결돼 있습니다.";
 		public static final String ALREADY_BLOCKED_MEMBER = "이미 차단된 회원입니다.";
 		public static final String BLOCK_NOT_FOUND = "요청에 해당하는 차단 정보가 존재하지 않습니다.";
-		public static final String INVALID_AUTH_CODE = "요청한 code가 유효하지 않습니다.";
 		public static final String HEADER_NOT_FOUND = "요청에 필요한 header가 존재하지 않습니다.";
 		public static final String REQUEST_BODY_INVALID = "request의 type 등이 유효하지 않습니다.";
 		public static final String INVALID_PATH_VARIABLE = "path variable이 유효하지 않습니다.";
