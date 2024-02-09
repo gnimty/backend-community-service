@@ -3,6 +3,7 @@ package com.gnimty.communityapiserver.domain.member.controller;
 import static com.gnimty.communityapiserver.global.constant.ApiSummary.DELETE_OAUTH_INFO;
 import static com.gnimty.communityapiserver.global.constant.ApiSummary.GET_MY_PROFILE;
 import static com.gnimty.communityapiserver.global.constant.ApiSummary.GET_OTHER_PROFILE;
+import static com.gnimty.communityapiserver.global.constant.ApiSummary.GET_UP_COUNT;
 import static com.gnimty.communityapiserver.global.constant.ApiSummary.GOOGLE_ADDITIONAL_LINK;
 import static com.gnimty.communityapiserver.global.constant.ApiSummary.KAKAO_ADDITIONAL_LINK;
 import static com.gnimty.communityapiserver.global.constant.ApiSummary.LOGOUT;
@@ -38,6 +39,7 @@ import com.gnimty.communityapiserver.domain.member.controller.dto.request.SendEm
 import com.gnimty.communityapiserver.domain.member.controller.dto.response.MyProfileResponse;
 import com.gnimty.communityapiserver.domain.member.controller.dto.response.OtherProfileResponse;
 import com.gnimty.communityapiserver.domain.member.controller.dto.response.PasswordEmailVerifyResponse;
+import com.gnimty.communityapiserver.domain.member.controller.dto.response.UpCountResponse;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.domain.member.service.MemberReadService;
 import com.gnimty.communityapiserver.domain.member.service.MemberService;
@@ -55,6 +57,7 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -202,5 +205,16 @@ public class MemberController {
 	) {
 		OtherProfileServiceResponse response = memberReadService.findOtherById(memberId);
 		return CommonResponse.success(OtherProfileResponse.from(response));
+	}
+
+	@Operation(summary = GET_UP_COUNT, description = ApiDescription.GET_UP_COUNT)
+	@GetMapping("/up-count")
+	public CommonResponse<UpCountResponse> getUpCountByPuuid(
+		@Schema(example = "puuid", description = "puuid") @NotNull @RequestParam("puuid") String puuid
+	) {
+		return CommonResponse.success(UpCountResponse.builder()
+			.upCount(memberReadService.findUpCountByPuuid(puuid))
+			.build()
+		);
 	}
 }
