@@ -3,6 +3,7 @@ package com.gnimty.communityapiserver.domain.member.repository;
 import static com.gnimty.communityapiserver.domain.introduction.entity.QIntroduction.introduction;
 import static com.gnimty.communityapiserver.domain.member.entity.QMember.member;
 import static com.gnimty.communityapiserver.domain.prefergamemode.entity.QPreferGameMode.preferGameMode;
+import static com.gnimty.communityapiserver.domain.riotaccount.entity.QRiotAccount.*;
 import static com.gnimty.communityapiserver.domain.schedule.entity.QSchedule.schedule;
 
 import com.gnimty.communityapiserver.domain.introduction.entity.Introduction;
@@ -66,6 +67,22 @@ public class MemberQueryRepository {
 				.map(PreferGameModeEntry::from)
 				.toList())
 			.build();
+	}
+
+	public Long findUpCountByPuuid(String puuid) {
+		return queryFactory.select(member.upCount)
+			.from(member)
+			.join(riotAccount).on(memberEq())
+			.where(puuidEq(puuid))
+			.fetchFirst();
+	}
+
+	private BooleanExpression puuidEq(String puuid) {
+		return riotAccount.puuid.eq(puuid);
+	}
+
+	private BooleanExpression memberEq() {
+		return riotAccount.member.id.eq(member.id);
 	}
 
 	private BooleanExpression isMainIntroduction() {

@@ -41,4 +41,8 @@ public class MemberReadService {
 	public OtherProfileServiceResponse findOtherById(Long id) {
 		return memberQueryRepository.findOtherById(id);
 	}
+
+	public Long findUpCountByPuuid(String puuid) {
+		return memberQueryRepository.findUpCountByPuuid(puuid);
+	}
 }
