@@ -308,4 +308,8 @@ public class ApiDescription {
 					
 		- **내 채팅방에 소속된 유저**(+딸려있는 연동 소환사) 목록 불러오기 결과에서 내가 up 안한 사람들 거르기
 		""";
+
+	public static final String GET_UP_COUNT = """
+		해당 전적 검색 아이디가 community 서비스에 회원가입 돼 있지 않은 경우, null을 응답합니다.
+		""";
 }
