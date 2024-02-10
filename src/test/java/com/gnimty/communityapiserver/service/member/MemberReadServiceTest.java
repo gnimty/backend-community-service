@@ -51,9 +51,9 @@ public class MemberReadServiceTest extends ServiceTestSupport {
 			assertThat(memberReadService.findUpCountByPuuid(riotAccount.getPuuid())).isEqualTo(member.getUpCount());
 		}
 
-		@DisplayName("존재하지 않는 puuid일 경우, 예외를 반환한다.")
+		@DisplayName("존재하지 않는 puuid일 경우, null을 반환한다.")
 		@Test
-		void should_returnException_when_puuidIsNotExist() {
+		void should_returnNull_when_puuidIsNotExist() {
 			assertThat(memberReadService.findUpCountByPuuid(riotAccount.getPuuid() + "a")).isNull();
 		}
 
