@@ -2,20 +2,17 @@ package com.gnimty.communityapiserver.global.auth;
 
 
 import static com.gnimty.communityapiserver.global.constant.Auth.ACCESS_TOKEN_EXPIRATION;
-import static com.gnimty.communityapiserver.global.constant.Auth.AUTHORIZATION;
 import static com.gnimty.communityapiserver.global.constant.Auth.AUTH_TYPE;
 import static com.gnimty.communityapiserver.global.constant.Auth.BEARER;
-import static com.gnimty.communityapiserver.global.constant.Auth.EMAIL_PAYLOAD_NAME;
 import static com.gnimty.communityapiserver.global.constant.Auth.ID_PAYLOAD_NAME;
 import static com.gnimty.communityapiserver.global.constant.Auth.JWT_TYPE;
 import static com.gnimty.communityapiserver.global.constant.Auth.REFRESH_TOKEN_EXPIRATION;
 import static com.gnimty.communityapiserver.global.constant.Auth.SUBJECT_ACCESS_TOKEN;
 import static com.gnimty.communityapiserver.global.constant.Auth.SUBJECT_REFRESH_TOKEN;
-import static com.gnimty.communityapiserver.global.constant.Auth.TOKEN_SPLITTER;
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.TOKEN_EXPIRED;
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.TOKEN_INVALID;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gnimty.communityapiserver.domain.member.controller.dto.response.AuthToken;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.domain.member.service.MemberReadService;
@@ -27,11 +24,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.SignatureException;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.Date;
-import java.util.Map;
 import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -106,7 +100,7 @@ public class JwtProvider {
 	}
 
 	public Optional<String> resolveToken(HttpServletRequest request) {
-		return Optional.ofNullable(request.getHeader(AUTHORIZATION.getContent()));
+		return Optional.ofNullable(request.getHeader(AUTHORIZATION));
 	}
 
 	public Long getIdByToken(String token) {
@@ -153,6 +147,6 @@ public class JwtProvider {
 	}
 
 	public String extractJwt(final StompHeaderAccessor accessor) {
-		return accessor.getFirstNativeHeader(AUTHORIZATION.getContent());
+		return accessor.getFirstNativeHeader(AUTHORIZATION);
 	}
 }

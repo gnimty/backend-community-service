@@ -7,6 +7,7 @@ import com.gnimty.communityapiserver.domain.schedule.controller.dto.request.Sche
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.ArrayList;
 import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -24,15 +25,15 @@ public class MyProfileUpdateRequest {
 	@Schema(example = "OFFLINE", description = "변경할 상태, not null")
 	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
 	private Status status;
+	@Builder.Default
 	@Schema(description = "변경할 소개글 정보")
-	@Valid
-	private List<IntroductionEntry> introductions;
+	private List<@Valid IntroductionEntry> introductions = new ArrayList<>();
+	@Builder.Default
 	@Schema(description = "변경할 선호 게임 모드 정보")
-	@Valid
-	private List<PreferGameModeEntry> preferGameModes;
+	private List<@Valid PreferGameModeEntry> preferGameModes = new ArrayList<>();
+	@Builder.Default
 	@Schema(description = "변경할 게임 선호 시간 정보")
-	@Valid
-	private List<ScheduleEntry> schedules;
+	private List<@Valid ScheduleEntry> schedules = new ArrayList<>();
 
 	public MyProfileUpdateServiceRequest toServiceRequest() {
 		return MyProfileUpdateServiceRequest.builder()

@@ -4,6 +4,7 @@ import com.gnimty.communityapiserver.domain.member.service.dto.request.MyProfile
 import com.gnimty.communityapiserver.domain.member.service.dto.response.IntroductionEntry;
 import com.gnimty.communityapiserver.global.constant.Status;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.ArrayList;
 import java.util.List;
 import javax.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -21,9 +22,9 @@ public class MyProfileMainUpdateRequest {
 	private Long mainRiotAccountId;
 	@Schema(example = "변경할 상태")
 	private Status status;
+	@Builder.Default
 	@Schema(example = "변경할 소개글 정보")
-	@Valid
-	private List<IntroductionEntry> introductions;
+	private List<@Valid IntroductionEntry> introductions = new ArrayList<>();
 
 	public MyProfileUpdateMainServiceRequest toServiceRequest() {
 		return MyProfileUpdateMainServiceRequest.builder()

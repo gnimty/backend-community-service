@@ -1,6 +1,7 @@
 package com.gnimty.communityapiserver.domain.riotaccount.service;
 
 import static com.gnimty.communityapiserver.global.constant.CommonStringType.URL_TAG_SPLITTER;
+import static com.gnimty.communityapiserver.global.constant.WebClientType.GNIMTY_TOGETHER_URI;
 
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.SummonerUpdateEntry;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
@@ -15,12 +16,12 @@ import com.gnimty.communityapiserver.domain.riotaccount.service.dto.response.Rec
 import com.gnimty.communityapiserver.domain.schedule.entity.Schedule;
 import com.gnimty.communityapiserver.domain.schedule.service.ScheduleReadService;
 import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
-import com.gnimty.communityapiserver.global.config.WebClientWrapper;
 import com.gnimty.communityapiserver.global.constant.GameMode;
+import com.gnimty.communityapiserver.global.dto.webclient.RecentMemberInfo;
+import com.gnimty.communityapiserver.global.utils.WebClientUtil;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +35,6 @@ public class RiotAccountService {
 	private final RiotAccountJdbcRepository riotAccountJdbcRepository;
 	private final ScheduleReadService scheduleReadService;
 	private final MemberLikeReadService memberLikeReadService;
-	private final WebClientWrapper webClientWrapper;
 
 	public List<RiotAccount> updateSummoners(SummonerUpdateServiceRequest request) {
 		List<SummonerUpdateEntry> summonerUpdateEntries = request.getSummonerUpdates()
@@ -94,12 +94,8 @@ public class RiotAccountService {
 	}
 
 	private RecentMemberInfo getRecentMemberInfo(String internalTagName, GameMode gameMode) {
-		return webClientWrapper.get()
-			.uri("https://gnimty.kro.kr/statistics/summoners/together/" + internalTagName + "?queue_type="
-				+ gameMode.name())
-			.retrieve()
-			.bodyToMono(RecentMemberInfo.class)
-			.block();
+		return WebClientUtil.get(RecentMemberInfo.class, GNIMTY_TOGETHER_URI.getValue(internalTagName, gameMode.name()),
+			null);
 	}
 
 	private Map<String, RiotAccount> createRiotAccountMap(Member member, List<RiotAccount> chattedRiotAccounts) {
@@ -107,22 +103,5 @@ public class RiotAccountService {
 			.filter(riotAccount -> !memberLikeReadService
 				.existsBySourceAndTarget(member, riotAccount.getMember()))
 			.collect(Collectors.toMap(RiotAccount::getPuuid, ra -> ra));
-	}
-
-	@Getter
-	public static class RecentMemberInfo {
-
-		private Integer count;
-		private List<RecentMemberDto> recentMembers;
-	}
-
-	@Getter
-	public static class RecentMemberDto {
-
-		private String puuid;
-		private Integer totalPlay;
-		private Integer totalWin;
-		private Integer totalDefeat;
-		private Double winRate;
 	}
 }

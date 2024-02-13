@@ -1,18 +1,22 @@
 package com.gnimty.communityapiserver.domain.riotaccount.service.utils;
 
-import com.gnimty.communityapiserver.domain.member.service.utils.RiotOauthUtil.RiotAccountInfo;
+import static com.gnimty.communityapiserver.global.constant.WebClientType.GNIMTY_GET_SUMMONER_URI;
+import static com.gnimty.communityapiserver.global.constant.WebClientType.GNIMTY_POST_SUMMONER_URI;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+
 import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
 import com.gnimty.communityapiserver.domain.riotaccount.service.RiotAccountReadService;
-import com.gnimty.communityapiserver.global.constant.Lane;
-import com.gnimty.communityapiserver.global.constant.Tier;
-import java.util.List;
+import com.gnimty.communityapiserver.global.config.async.AfterRiotAccountCommitEvent;
+import com.gnimty.communityapiserver.global.dto.webclient.SummonerDto;
+import com.gnimty.communityapiserver.global.dto.webclient.SummonerResponse;
+import com.gnimty.communityapiserver.global.utils.WebClientUtil;
 import java.util.Optional;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.transaction.event.TransactionalEventListener;
+import org.springframework.util.LinkedMultiValueMap;
 
 @Service
 @RequiredArgsConstructor
@@ -22,19 +26,14 @@ public class RiotAccountUpdateUtil {
 
 	@Async(value = "riotAccountExecutor")
 	@Transactional
-	public void updateSummonerInfo(RiotAccountInfo info, Long id) {
-		RiotAccount riotAccount = riotAccountReadService.findById(id);
-		WebClient.create("https://gnimty.kro.kr")
-			.get()
-			.uri("/summoners/" + info.getPuuid())
-			.retrieve();
+	@TransactionalEventListener
+	public void updateSummonerInfo(AfterRiotAccountCommitEvent event) {
+		RiotAccount riotAccount = riotAccountReadService.findById(event.getId());
+		WebClientUtil.post(Object.class, GNIMTY_POST_SUMMONER_URI.getValue(event.getInfo().getPuuid()),
+			APPLICATION_JSON, new LinkedMultiValueMap<>(), null);
 
-		Optional<SummonerResponse> response = Optional.ofNullable(WebClient.create("https://gnimty.kro.kr")
-			.get()
-			.uri("statistics/summoners/" + info.getGameName() + "-" + info.getTagLine())
-			.retrieve()
-			.bodyToMono(SummonerResponse.class)
-			.block());
+		Optional<SummonerResponse> response = Optional.ofNullable(WebClientUtil.get(SummonerResponse.class,
+			GNIMTY_GET_SUMMONER_URI.getValue(event.getInfo().getGameName(), event.getInfo().getTagLine()), null));
 
 		updateEntity(riotAccount, response);
 	}
@@ -62,31 +61,4 @@ public class RiotAccountUpdateUtil {
 				data.getFlexTierInfo().getMostChampionIds(), data.getFlexTierInfo().getMostLanes());
 		}
 	}
-
-	@Getter
-	public static class SummonerResponse {
-
-		private SummonerDto data;
-	}
-
-	@Getter
-	public static class SummonerDto {
-
-		private Long profileIconId;
-		private Long summonerLevel;
-		private SummonerTierDto soloTierInfo;
-		private SummonerTierDto flexTierInfo;
-	}
-
-	@Getter
-	public static class SummonerTierDto {
-
-		private Tier tier;
-		private Integer division;
-		private Long lp;
-		private Long mmr;
-		private List<Long> mostChampionIds;
-		private List<Lane> mostLanes;
-	}
-
 }
