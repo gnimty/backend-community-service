@@ -12,9 +12,15 @@ import com.gnimty.communityapiserver.domain.chat.repository.ChatRoom.ChatRoomRep
 import com.gnimty.communityapiserver.domain.chat.repository.User.UserRepository;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.constant.Tier;
+
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+
+import com.gnimty.communityapiserver.global.utils.InstantKoreaTimeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -58,12 +64,12 @@ class ChatServiceTest {
 		@Test
 		void createChat() {
 			// given
-			Date date = new Date();
+            Instant now = InstantKoreaTimeUtil.getNow();
 			Chat chat = Chat.builder()
 				.message("hi")
 				.chatRoomNo(1L)
 				.senderId(1L)
-				.sendDate(date)
+				.sendDate(now)
 				.build();
 
 			// when
@@ -74,20 +80,21 @@ class ChatServiceTest {
 			assertThat(findChat).isNotEmpty();
 			assertThat(findChat.get().getSenderId()).isEqualTo(1L);
 			assertThat(findChat.get().getChatRoomNo()).isEqualTo(1L);
-			assertThat(findChat.get().getSendDate()).isEqualTo(date);
+			assertThat(findChat.get().getSendDate()).isEqualTo(now);
 			assertThat(findChat.get().getMessage()).isEqualTo("hi");
 		}
+
 
 		@DisplayName("readByAllUser()으로 readCount를 변경한 후 다시 저장")
 		@Test
 		void updateChat() {
 			// given
-			Date date = new Date();
+            Instant now = InstantKoreaTimeUtil.getNow();
 			Chat chat = Chat.builder()
 				.message("hi")
 				.chatRoomNo(1L)
 				.senderId(1L)
-				.sendDate(date)
+				.sendDate(now)
 				.build();
 			chatService.save(chat);
 
@@ -100,7 +107,7 @@ class ChatServiceTest {
 			assertThat(findChat).isNotEmpty();
 			assertThat(findChat.get().getSenderId()).isEqualTo(1L);
 			assertThat(findChat.get().getChatRoomNo()).isEqualTo(1L);
-			assertThat(findChat.get().getSendDate()).isEqualTo(date);
+			assertThat(findChat.get().getSendDate()).isEqualTo(now);
 			assertThat(findChat.get().getMessage()).isEqualTo("hi");
 			assertThat(findChat.get().getReadCnt()).isEqualTo(0);
 		}
@@ -125,17 +132,18 @@ class ChatServiceTest {
 				.lp(3L).build();
 			userRepository.save(user);
 
+            Instant chatRoomDate = InstantKoreaTimeUtil.getNow();
 			ChatRoom chatRoom = ChatRoom.builder()
-				.createdDate(new Date())
-				.lastModifiedDate(new Date())
+				.createdDate(chatRoomDate)
+				.lastModifiedDate(chatRoomDate)
 				.participants(null)
 				.chatRoomNo(1L)
 				.build();
 			chatRoomRepository.save(chatRoom);
 
 			// when
-			Date date = new Date();
-			Chat savedChat = chatService.save(user, chatRoom, "hi", date);
+            Instant chatDate = InstantKoreaTimeUtil.getNow();
+            Chat savedChat = chatService.save(user, chatRoom, "hi", chatDate);
 
 			// then
 			Optional<Chat> findChat = chatRepository.findById(savedChat.getId());
@@ -144,7 +152,7 @@ class ChatServiceTest {
 			assertThat(findChat.get().getMessage()).isEqualTo("hi");
 			assertThat(findChat.get().getReadCnt()).isEqualTo(1);
 			assertThat(findChat.get().getSenderId()).isEqualTo(user.getActualUserId());
-			assertThat(findChat.get().getSendDate()).isEqualTo(date);
+			assertThat(findChat.get().getSendDate()).isEqualTo(chatDate);
 		}
 
 	}
@@ -158,19 +166,21 @@ class ChatServiceTest {
 		@Test
 		void updateReadCountTo0() {
 			// given
+            Instant chatRoomDate = InstantKoreaTimeUtil.getNow();
 			ChatRoom chatRoom = ChatRoom.builder()
-				.createdDate(new Date())
-				.lastModifiedDate(new Date())
+				.createdDate(chatRoomDate)
+				.lastModifiedDate(chatRoomDate)
 				.participants(null)
 				.chatRoomNo(1L)
 				.build();
 			chatRoomRepository.save(chatRoom);
 
+            Instant chatDate = InstantKoreaTimeUtil.getNow();
 			Chat chat = Chat.builder()
 				.senderId(1L)
 				.chatRoomNo(chatRoom.getChatRoomNo())
 				.message("hi")
-				.sendDate(new Date())
+				.sendDate(chatDate)
 				.build();
 			chatRepository.save(chat);
 
@@ -187,20 +197,22 @@ class ChatServiceTest {
 		@Test
 		void deleteAllChatByChatRoom() {
 			// given
+            Instant chatRoomDate = InstantKoreaTimeUtil.getNow();
 			ChatRoom chatRoom = ChatRoom.builder()
-				.createdDate(new Date())
-				.lastModifiedDate(new Date())
+				.createdDate(chatRoomDate)
+				.lastModifiedDate(chatRoomDate)
 				.participants(null)
 				.chatRoomNo(1L)
 				.build();
 			chatRoomRepository.save(chatRoom);
+
 
 			for (int i = 0; i < 10; i++) {
 				chatRepository.save(Chat.builder()
 					.senderId(1L)
 					.chatRoomNo(chatRoom.getChatRoomNo())
 					.message("hi")
-					.sendDate(new Date())
+					.sendDate(InstantKoreaTimeUtil.getNow())
 					.build());
 			}
 

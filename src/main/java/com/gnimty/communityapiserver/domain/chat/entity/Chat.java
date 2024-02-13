@@ -1,5 +1,6 @@
 package com.gnimty.communityapiserver.domain.chat.entity;
 
+import java.time.Instant;
 import java.util.Date;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -19,11 +20,11 @@ public class Chat {
 	private Long chatRoomNo;
 	private Long senderId;
 	private String message;
-	private Date sendDate;
+	private Instant sendDate;
 	private Integer readCnt = 1;
 
 	@Builder
-	public Chat(Long chatRoomNo, Long senderId, String message, Date sendDate) {
+	public Chat(Long chatRoomNo, Long senderId, String message, Instant sendDate) {
 		this.chatRoomNo = chatRoomNo;
 		this.senderId = senderId;
 		this.message = message;

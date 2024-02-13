@@ -10,6 +10,10 @@ import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom.Participant;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
 import com.mongodb.client.result.UpdateResult;
+
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -67,10 +71,11 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepositoryCustom {
 	@Override
 	public ChatRoom save(List<Participant> participants) {
 		// 3. 저장하고 리턴
+		Instant now = Instant.now(Clock.system(ZoneId.of("Asia/Seoul")));
 		return mongoTemplate.save(ChatRoom.builder()
 			.chatRoomNo(generateSequence())
-			.createdDate(new Date())
-			.lastModifiedDate(new Date())
+			.createdDate(now)
+			.lastModifiedDate(now)
 			.participants(participants)
 			.build());
 	}

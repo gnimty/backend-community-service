@@ -1,6 +1,8 @@
 package com.gnimty.communityapiserver.domain.chat.controller.dto;
 
 import com.gnimty.communityapiserver.domain.chat.entity.Chat;
+
+import java.time.Instant;
 import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +17,7 @@ public class ChatDto {
 
 	private Long senderId;
 	private String message;
-	private Date sendDate;
+	private Instant sendDate;
 	private Integer readCnt;
 
 	@Builder

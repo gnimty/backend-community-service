@@ -1,5 +1,6 @@
 package com.gnimty.communityapiserver.domain.chat.entity;
 
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -34,7 +35,7 @@ public class ChatRoom {
 	@Indexed(unique = true)
 	private Long chatRoomNo;
 	private List<Participant> participants;
-	private Date createdDate;
+	private Instant createdDate;
 
 	@Getter
 	@Setter
@@ -46,13 +47,13 @@ public class ChatRoom {
 
 		@DBRef
 		private User user;
-		private Date exitDate;
+		private Instant exitDate;
 		private Blocked blockedStatus;
 	}
 
-	private Date lastModifiedDate;
+	private Instant lastModifiedDate;
 
-	public void refreshModifiedDate(Date date) {
+	public void refreshModifiedDate(Instant date) {
 		this.lastModifiedDate = date;
 	}
 
