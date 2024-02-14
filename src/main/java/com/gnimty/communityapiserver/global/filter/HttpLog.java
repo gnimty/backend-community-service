@@ -39,7 +39,8 @@ public class HttpLog {
 		this.requestBody = new String(requestWrapper.getContentAsByteArray(), requestWrapper.getCharacterEncoding());
 		this.httpStatus = HttpStatus.valueOf(responseWrapper.getStatus());
 		this.responseHeaders = responseWrapper.getHeaderNames().stream()
-			.map(headerName -> headerName + ": " + responseWrapper.getHeader(headerName))
+			.distinct()
+			.map(headerName -> headerName + ": " + responseWrapper.getHeaders(headerName))
 			.collect(Collectors.joining(", "));
 		this.responseBody = new String(responseWrapper.getContentAsByteArray(), responseWrapper.getCharacterEncoding());
 		this.elapsedTime = elapsedTime;
