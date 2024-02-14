@@ -1,6 +1,5 @@
 package com.gnimty.communityapiserver.service.member;
 
-import static com.gnimty.communityapiserver.global.constant.Auth.BEARER;
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.ALREADY_REGISTERED_EMAIL;
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.INVALID_EMAIL_AUTH_CODE;
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.INVALID_LOGIN;
@@ -193,10 +192,10 @@ public class AuthServiceTest extends ServiceTestSupport {
 
 			given(jwtProvider.generateToken(any(Long.class),
 				eq(Auth.ACCESS_TOKEN_EXPIRATION.getExpiration()), any(String.class)))
-				.willReturn(authToken.getAccessToken().replaceAll(BEARER.getContent(), ""));
+				.willReturn(authToken.getAccessToken());
 			given(jwtProvider.generateToken(any(Long.class),
 				eq(Auth.REFRESH_TOKEN_EXPIRATION.getExpiration()), any(String.class)))
-				.willReturn(authToken.getRefreshToken().replaceAll(BEARER.getContent(), ""));
+				.willReturn(authToken.getRefreshToken());
 
 			AuthToken login = authService.login(request);
 
@@ -254,8 +253,8 @@ public class AuthServiceTest extends ServiceTestSupport {
 
 		private AuthToken createAuthToken() {
 			return AuthToken.builder()
-				.accessToken(BEARER.getContent() + "accessToken")
-				.refreshToken(BEARER.getContent() + "refreshToken")
+				.accessToken("accessToken")
+				.refreshToken("refreshToken")
 				.build();
 		}
 	}
@@ -298,10 +297,8 @@ public class AuthServiceTest extends ServiceTestSupport {
 
 			AuthToken authToken = authService.kakaoLogin(request);
 
-			assertThat(authToken.getAccessToken().replaceAll(BEARER.getContent(), ""))
-				.isEqualTo("token");
-			assertThat(authToken.getRefreshToken().replaceAll(BEARER.getContent(), ""))
-				.isEqualTo("token");
+			assertThat(authToken.getAccessToken()).isEqualTo("token");
+			assertThat(authToken.getRefreshToken()).isEqualTo("token");
 			assertThat(oauthInfoRepository.findAll()).hasSize(1);
 			assertThat(memberRepository.findAll()).hasSize(1);
 		}
@@ -317,11 +314,8 @@ public class AuthServiceTest extends ServiceTestSupport {
 
 			AuthToken authToken = authService.kakaoLogin(request);
 
-			assertThat(authToken.getAccessToken()
-				.replaceAll(BEARER.getContent(), ""))
-				.isEqualTo("token");
-			assertThat(authToken.getRefreshToken().replaceAll(BEARER.getContent(), ""))
-				.isEqualTo("token");
+			assertThat(authToken.getAccessToken()).isEqualTo("token");
+			assertThat(authToken.getRefreshToken()).isEqualTo("token");
 
 			Member member = memberRepository.findAll().get(0);
 			OauthInfo oauthInfo = oauthInfoRepository.findAll().get(0);
@@ -371,10 +365,8 @@ public class AuthServiceTest extends ServiceTestSupport {
 
 			AuthToken authToken = authService.googleLogin(request);
 
-			assertThat(authToken.getAccessToken().replaceAll(BEARER.getContent(), ""))
-				.isEqualTo("token");
-			assertThat(authToken.getRefreshToken().replaceAll(BEARER.getContent(), ""))
-				.isEqualTo("token");
+			assertThat(authToken.getAccessToken()).isEqualTo("token");
+			assertThat(authToken.getRefreshToken()).isEqualTo("token");
 			assertThat(oauthInfoRepository.findAll()).hasSize(1);
 			assertThat(memberRepository.findAll()).hasSize(1);
 		}
@@ -390,11 +382,8 @@ public class AuthServiceTest extends ServiceTestSupport {
 
 			AuthToken authToken = authService.googleLogin(request);
 
-			assertThat(authToken.getAccessToken()
-				.replaceAll(BEARER.getContent(), ""))
-				.isEqualTo("token");
-			assertThat(authToken.getRefreshToken().replaceAll(BEARER.getContent(), ""))
-				.isEqualTo("token");
+			assertThat(authToken.getAccessToken()).isEqualTo("token");
+			assertThat(authToken.getRefreshToken()).isEqualTo("token");
 
 			Member member = memberRepository.findAll().get(0);
 			OauthInfo oauthInfo = oauthInfoRepository.findAll().get(0);
@@ -505,10 +494,8 @@ public class AuthServiceTest extends ServiceTestSupport {
 
 			AuthToken authToken = authService.tokenRefresh(refreshToken);
 
-			assertThat(authToken.getAccessToken().replaceAll(BEARER.getContent(), ""))
-				.isEqualTo("token");
-			assertThat(authToken.getAccessToken().replaceAll(BEARER.getContent(), ""))
-				.isEqualTo("token");
+			assertThat(authToken.getAccessToken()).isEqualTo("token");
+			assertThat(authToken.getAccessToken()).isEqualTo("token");
 		}
 
 		@DisplayName("저장된 refresh token과 일치하지 않는 토큰을 요청하면 실패한다.")

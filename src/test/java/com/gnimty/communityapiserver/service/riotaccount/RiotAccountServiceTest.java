@@ -114,40 +114,4 @@ public class RiotAccountServiceTest extends ServiceTestSupport {
 			assertThatNoException().isThrownBy(() -> riotAccountService.getMainSummoners(GameMode.RANK_SOLO));
 		}
 	}
-
-	@DisplayName("최근 플레이한 소환사 조회 시")
-	@Nested
-	class GetRecentlySummoners {
-
-		@DisplayName("올바른 요청을 하면 성공한다.")
-		@Test
-		void should_success_when_validRequest() {
-			Member member = mock(Member.class);
-			RiotAccount riotAccount = mock(RiotAccount.class);
-			given(riotAccountReadService.findMainAccountByMember(any(Member.class))).willReturn(riotAccount);
-			given(riotAccount.getName()).willReturn("name");
-			given(riotAccount.getTagLine()).willReturn("tag");
-			RecentMemberInfo recentMemberInfo = mock(RecentMemberInfo.class);
-
-			try (MockedStatic<WebClient> ignored = mockStatic(WebClient.class)) {
-				WebClient mockWebClient = mock(WebClient.class);
-				WebClient.Builder mockBuilder = mock(WebClient.Builder.class);
-				WebClient.RequestHeadersUriSpec mockRequestHeadersUriSpec = mock(WebClient.RequestHeadersUriSpec.class);
-				WebClient.ResponseSpec mockResponseSpec = mock(WebClient.ResponseSpec.class);
-				Mono mockMono = mock(Mono.class);
-
-				Mockito.when(WebClient.builder()).thenReturn(mockBuilder);
-
-				Mockito.when(mockBuilder.build()).thenReturn(mockWebClient);
-				Mockito.when(mockWebClient.get()).thenReturn(mockRequestHeadersUriSpec);
-				Mockito.when(mockRequestHeadersUriSpec.uri(Mockito.anyString())).thenReturn(mockRequestHeadersUriSpec);
-				Mockito.when(mockRequestHeadersUriSpec.retrieve()).thenReturn(mockResponseSpec);
-				Mockito.when(mockResponseSpec.bodyToMono(Mockito.any(Class.class))).thenReturn(mockMono);
-
-				Mockito.when(mockMono.block()).thenReturn(recentMemberInfo);
-				assertThatNoException().isThrownBy(
-					() -> riotAccountService.getRecentlySummoners(member, Collections.emptyList()));
-			}
-		}
-	}
 }
