@@ -66,7 +66,7 @@ spring:
       maximum-pool-size: 10
 
   jpa:
-    database: mysql   # 추가 해준 부분
+    database-platform: org.hibernate.dialect.MySQL8Dialect
     properties:
       hibernate:
         hbm2ddl:
@@ -94,8 +94,6 @@ logging:
           mongodb:
             core:
               MongoTemplate: DEBUG
-
-
 ---
 spring:
   config:
@@ -106,6 +104,7 @@ spring:
       hibernate:
         hbm2ddl:
           auto: update
+    database-platform: org.hibernate.dialect.MySQL8Dialect
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
