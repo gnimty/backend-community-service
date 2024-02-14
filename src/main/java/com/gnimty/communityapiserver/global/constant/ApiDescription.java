@@ -140,7 +140,7 @@ public class ApiDescription {
 	public static final String GET_MY_PROFILE = """
 		내 정보 조회하는 API입니다.
 
-		Authorization header로 access token을 담아 요청하면 내 정보가 조회됩니다.
+		cookie로 access token을 담아 요청하면 내 정보가 조회됩니다.
 
 		RSO 연동한 계정만 소개글, 선호 플레이 타임, 선호 큐 타입이 조회됩니다.
 
@@ -242,7 +242,7 @@ public class ApiDescription {
 	public static final String GET_OTHER_PROFILE = """
 		다른 회원의 정보를 조회하는 API입니다.
 					
-		Authorization header가 필요하지 않습니다.
+		cookie가 필요하지 않습니다.
 					
 		RSO 연동한 계정만 소개글, 선호 플레이 타임, 선호 큐 타입이 조회됩니다.
 					
