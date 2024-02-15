@@ -27,7 +27,9 @@ public enum ResponseMessage {
 	SUCCESS_UPDATE_CHAMPION_COMMENTS("성공적으로 챔피언 운용법을 수정했습니다."),
 	SUCCESS_DELETE_CHAMPION_COMMENTS("성공적으로 챔피언 운용법을 삭제했습니다."),
 	SUCCESS_CHAMPION_COMMENTS_LIKE("성공적으로 챔피언 운용법 좋아요/싫어요에 대한 수정을 완료하였습니다."),
-	SUCCESS_COMMENTS_REPORT("성공적으로 챔피언 운용법에 대한 신고를 완료하였습니다.");
+	SUCCESS_COMMENTS_REPORT("성공적으로 챔피언 운용법에 대한 신고를 완료하였습니다."),
+	SUCCESS_LOGIN("성공적으로 로그인하였습니다."),
+	SUCCESS_REFRESH_TOKEN("성공적으로 토큰을 재발급하였습니다.");
 
 	private final String message;
 

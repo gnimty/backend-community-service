@@ -82,7 +82,7 @@ public class MemberController {
 	private final UserService userService;
 
 	@Operation(summary = SUMMONER_ACCOUNT_LINK, description = ApiDescription.SUMMONER_ACCOUNT_LINK)
-	@Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token", required = true)
+	@Parameter(in = ParameterIn.COOKIE, name = "accessToken", description = "인증을 위한 Access Token", required = true)
 	@PostMapping("/me/rso")
 	public CommonResponse<Void> summonerAccountLink(@RequestBody @Valid OauthLoginRequest request) {
 		RiotAccount riotAccount = memberService.summonerAccountLink(request.toServiceRequest());
@@ -91,7 +91,7 @@ public class MemberController {
 	}
 
 	@Operation(summary = KAKAO_ADDITIONAL_LINK, description = ApiDescription.KAKAO_ADDITIONAL_LINK)
-	@Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token", required = true)
+	@Parameter(in = ParameterIn.COOKIE, name = "accessToken", description = "인증을 위한 Access Token", required = true)
 	@PostMapping("/me/oauth/kakao")
 	public CommonResponse<Void> kakaoAdditionalLink(@RequestBody @Valid OauthLoginRequest request) {
 		memberService.oauthAdditionalLink(Provider.KAKAO, request.toServiceRequest());
@@ -99,7 +99,7 @@ public class MemberController {
 	}
 
 	@Operation(summary = GOOGLE_ADDITIONAL_LINK, description = ApiDescription.GOOGLE_ADDITIONAL_LINK)
-	@Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token", required = true)
+	@Parameter(in = ParameterIn.COOKIE, name = "accessToken", description = "인증을 위한 Access Token", required = true)
 	@PostMapping("/me/oauth/google")
 	public CommonResponse<Void> googleAdditionalLink(@RequestBody @Valid OauthLoginRequest request) {
 		memberService.oauthAdditionalLink(Provider.GOOGLE, request.toServiceRequest());
@@ -107,7 +107,7 @@ public class MemberController {
 	}
 
 	@Operation(summary = GET_MY_PROFILE, description = ApiDescription.GET_MY_PROFILE)
-	@Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token", required = true)
+	@Parameter(in = ParameterIn.COOKIE, name = "accessToken", description = "인증을 위한 Access Token", required = true)
 	@GetMapping("/me")
 	public CommonResponse<MyProfileResponse> getMyProfile() {
 		MyProfileServiceResponse response = memberService.getMyProfile();
@@ -115,7 +115,7 @@ public class MemberController {
 	}
 
 	@Operation(summary = UPDATE_MY_PROFILE_MAIN, description = ApiDescription.UPDATE_MY_PROFILE_MAIN)
-	@Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token", required = true)
+	@Parameter(in = ParameterIn.COOKIE, name = "accessToken", description = "인증을 위한 Access Token", required = true)
 	@PatchMapping("/me/main")
 	public CommonResponse<Void> updateMyProfileMain(@RequestBody @Valid MyProfileMainUpdateRequest request) {
 		RiotAccount riotAccount = memberService.updateMyProfileMain(request.toServiceRequest());
@@ -154,7 +154,7 @@ public class MemberController {
 	}
 
 	@Operation(summary = UPDATE_PASSWORD, description = ApiDescription.UPDATE_PASSWORD)
-	@Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token", required = true)
+	@Parameter(in = ParameterIn.COOKIE, name = "accessToken", description = "인증을 위한 Access Token", required = true)
 	@PatchMapping("/me/password")
 	public CommonResponse<Void> updatePassword(@RequestBody @Valid PasswordUpdateRequest request) {
 		memberService.updatePassword(request.toServiceRequest());
@@ -162,7 +162,7 @@ public class MemberController {
 	}
 
 	@Operation(summary = UPDATE_MY_PROFILE, description = ApiDescription.UPDATE_MY_PROFILE)
-	@Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token", required = true)
+	@Parameter(in = ParameterIn.COOKIE, name = "accessToken", description = "인증을 위한 Access Token", required = true)
 	@PatchMapping("/me")
 	public CommonResponse<Void> updateMyProfile(@RequestBody @Valid MyProfileUpdateRequest request) {
 		memberService.updateMyProfile(request.toServiceRequest());
@@ -171,7 +171,7 @@ public class MemberController {
 	}
 
 	@Operation(summary = DELETE_OAUTH_INFO, description = ApiDescription.DELETE_OAUTH_INFO)
-	@Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token", required = true)
+	@Parameter(in = ParameterIn.COOKIE, name = "accessToken", description = "인증을 위한 Access Token", required = true)
 	@DeleteMapping("/me/oauth")
 	public CommonResponse<Void> deleteOauthInfo(
 		@Schema(example = "KAKAO", description = "서비스 제공자") @RequestParam Provider provider
@@ -181,7 +181,7 @@ public class MemberController {
 	}
 
 	@Operation(summary = LOGOUT, description = ApiDescription.LOGOUT)
-	@Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token", required = true)
+	@Parameter(in = ParameterIn.COOKIE, name = "accessToken", description = "인증을 위한 Access Token", required = true)
 	@DeleteMapping("/me/logout")
 	public CommonResponse<Void> logout() {
 		memberService.logout();
@@ -189,7 +189,7 @@ public class MemberController {
 	}
 
 	@Operation(summary = WITHDRAWAL, description = ApiDescription.WITHDRAWAL)
-	@Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token", required = true)
+	@Parameter(in = ParameterIn.COOKIE, name = "accessToken", description = "인증을 위한 Access Token", required = true)
 	@DeleteMapping("/me")
 	public CommonResponse<Void> withdrawal() {
 		Member member = MemberThreadLocal.get();

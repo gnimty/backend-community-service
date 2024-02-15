@@ -45,7 +45,7 @@ public class BlockController {
 	private final UserService userService;
 
 	@Operation(summary = READ_BLOCKS, description = ApiDescription.READ_BLOCKS)
-	@Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token", required = true)
+	@Parameter(in = ParameterIn.COOKIE, name = "accessToken", description = "인증을 위한 Access Token", required = true)
 	@GetMapping
 	public CommonResponse<BlockReadResponse> readBlocks() {
 		BlockReadServiceResponse response = blockReadService.readBlocks();
@@ -53,7 +53,7 @@ public class BlockController {
 	}
 
 	@Operation(summary = DO_BLOCK, description = ApiDescription.DO_BLOCK)
-	@Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token", required = true)
+	@Parameter(in = ParameterIn.COOKIE, name = "accessToken", description = "인증을 위한 Access Token", required = true)
 	@PostMapping
 	public CommonResponse<Void> doBlock(@RequestBody @Valid BlockRequest request) {
 		Member member = MemberThreadLocal.get();
@@ -64,7 +64,7 @@ public class BlockController {
 	}
 
 	@Operation(summary = CLEAR_BLOCK, description = ApiDescription.CLEAR_BLOCK)
-	@Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token", required = true)
+	@Parameter(in = ParameterIn.COOKIE, name = "accessToken", description = "인증을 위한 Access Token", required = true)
 	@DeleteMapping
 	public CommonResponse<Void> clearBlock(@RequestBody @Valid BlockClearRequest request) {
 		Member member = MemberThreadLocal.get();

@@ -3,7 +3,8 @@ package com.gnimty.communityapiserver.global.handler;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.global.auth.JwtProvider;
 import com.gnimty.communityapiserver.global.connect.WebSocketSessionManager;
-import com.gnimty.communityapiserver.global.constant.Auth;
+import com.gnimty.communityapiserver.global.exception.BaseException;
+import com.gnimty.communityapiserver.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
@@ -14,16 +15,16 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.stereotype.Component;
+import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
 
 @Component
 @RequiredArgsConstructor
 @Order(Ordered.HIGHEST_PRECEDENCE + 99)
 @Slf4j
-public class StompHandler implements ChannelInterceptor {
+public class StompHandler extends HttpSessionHandshakeInterceptor implements ChannelInterceptor {
 
 	private final JwtProvider jwtProvider;
 	private final WebSocketSessionManager webSocketSessionManager;
-
 
 	@Override
 	public Message<?> preSend(Message<?> message, MessageChannel channel) {
@@ -31,14 +32,24 @@ public class StompHandler implements ChannelInterceptor {
 
 		// websocket 연결시 헤더의 jwt token 유효성 검증
 		if (StompCommand.CONNECT == accessor.getCommand()) {
-			final String authorization = jwtProvider.extractJwt(accessor);
-			String token = authorization.replaceFirst(Auth.BEARER.getContent(), "");
+			String token = parseTokenByHeader(accessor);
 			jwtProvider.checkValidation(token);
 
 			Member member = jwtProvider.findMemberByToken(token);
 			webSocketSessionManager.addSession(accessor.getSessionId(), member.getId());
 		}
 		return message;
+	}
+
+	private String parseTokenByHeader(StompHeaderAccessor accessor) {
+		String token = jwtProvider.extractJwt(accessor);
+		if (token == null) {
+			throw new BaseException(ErrorCode.COOKIE_NOT_FOUND);
+		}
+		token = token.substring(token.indexOf("accessToken=") + "accessToken=".length());
+		int semicolonIndex = token.indexOf(';');
+		token = token.substring(0, semicolonIndex);
+		return token;
 	}
 
 }

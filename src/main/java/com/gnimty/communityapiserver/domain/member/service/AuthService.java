@@ -1,8 +1,14 @@
 package com.gnimty.communityapiserver.domain.member.service;
 
+import static com.gnimty.communityapiserver.global.constant.Auth.ACCESS_TOKEN_EXPIRATION;
+import static com.gnimty.communityapiserver.global.constant.Auth.EMAIL_CODE_EXPIRATION;
+import static com.gnimty.communityapiserver.global.constant.Auth.EMAIL_SUBJECT;
+import static com.gnimty.communityapiserver.global.constant.Auth.REFRESH_TOKEN_EXPIRATION;
+import static com.gnimty.communityapiserver.global.constant.Auth.SIGNUP_EXPIRATION;
+import static com.gnimty.communityapiserver.global.constant.Auth.SUBJECT_ACCESS_TOKEN;
+import static com.gnimty.communityapiserver.global.constant.Auth.SUBJECT_REFRESH_TOKEN;
 import static com.gnimty.communityapiserver.global.constant.Bound.INITIAL_COUNT;
 import static com.gnimty.communityapiserver.global.constant.Bound.RANDOM_CODE_LENGTH;
-import static com.gnimty.communityapiserver.global.constant.CommonStringType.EMPTY;
 import static com.gnimty.communityapiserver.global.constant.CommonStringType.SIGNUP_EMAIL_BANNER;
 import static com.gnimty.communityapiserver.global.constant.CommonStringType.SIGNUP_EMAIL_TEMPLATE;
 import static com.gnimty.communityapiserver.global.constant.CommonStringType.VERIFY_SIGNUP;
@@ -21,7 +27,6 @@ import com.gnimty.communityapiserver.domain.member.service.utils.MailSenderUtil;
 import com.gnimty.communityapiserver.domain.oauthinfo.entity.OauthInfo;
 import com.gnimty.communityapiserver.domain.oauthinfo.repository.OauthInfoRepository;
 import com.gnimty.communityapiserver.global.auth.JwtProvider;
-import com.gnimty.communityapiserver.global.constant.Auth;
 import com.gnimty.communityapiserver.global.constant.KeyPrefix;
 import com.gnimty.communityapiserver.global.constant.Provider;
 import com.gnimty.communityapiserver.global.constant.Status;
@@ -82,8 +87,8 @@ public class AuthService {
 		AuthToken authToken = generateTokenPair(member.getId());
 		saveInRedis(
 			getRedisKey(KeyPrefix.REFRESH, String.valueOf(member.getId())),
-			authToken.getRefreshToken().replaceAll(Auth.BEARER.getContent(), EMPTY.getValue()),
-			Auth.REFRESH_TOKEN_EXPIRATION.getExpiration());
+			authToken.getRefreshToken(),
+			REFRESH_TOKEN_EXPIRATION.getExpiration());
 		return authToken;
 	}
 
@@ -96,8 +101,8 @@ public class AuthService {
 		AuthToken authToken = generateTokenPair(member.getId());
 		saveInRedis(
 			getRedisKey(KeyPrefix.REFRESH, String.valueOf(member.getId())),
-			authToken.getRefreshToken().replaceAll(Auth.BEARER.getContent(), EMPTY.getValue()),
-			Auth.REFRESH_TOKEN_EXPIRATION.getExpiration());
+			authToken.getRefreshToken(),
+			REFRESH_TOKEN_EXPIRATION.getExpiration());
 		member.updateNickname(generateTemporaryNickname(member.getId()));
 		return authToken;
 	}
@@ -111,18 +116,18 @@ public class AuthService {
 		AuthToken authToken = generateTokenPair(member.getId());
 		saveInRedis(
 			getRedisKey(KeyPrefix.REFRESH, String.valueOf(member.getId())),
-			authToken.getRefreshToken().replaceAll(Auth.BEARER.getContent(), EMPTY.getValue()),
-			Auth.REFRESH_TOKEN_EXPIRATION.getExpiration());
+			authToken.getRefreshToken(),
+			REFRESH_TOKEN_EXPIRATION.getExpiration());
 		member.updateNickname(generateTemporaryNickname(member.getId()));
 		return authToken;
 	}
 
 	public void sendEmailAuthCode(EmailAuthServiceRequest request) {
 		String code = RandomCodeGenerator.generateCodeByLength(RANDOM_CODE_LENGTH.getValue());
-		mailSenderUtil.sendEmail(Auth.EMAIL_SUBJECT.getContent(), request.getEmail(), code,
+		mailSenderUtil.sendEmail(EMAIL_SUBJECT.getContent(), request.getEmail(), code,
 			SIGNUP_EMAIL_TEMPLATE.getValue(), SIGNUP_EMAIL_BANNER.getValue());
 		String key = getRedisKey(KeyPrefix.EMAIL, request.getEmail());
-		saveInRedis(key, code, Auth.EMAIL_CODE_EXPIRATION.getExpiration());
+		saveInRedis(key, code, EMAIL_CODE_EXPIRATION.getExpiration());
 	}
 
 	public void verifyEmailAuthCode(EmailVerifyServiceRequest request) {
@@ -136,7 +141,7 @@ public class AuthService {
 			throw new BaseException(ErrorCode.INVALID_EMAIL_AUTH_CODE);
 		}
 
-		saveInRedis(signupKey, VERIFY_SIGNUP.getValue(), Auth.SIGNUP_EXPIRATION.getExpiration());
+		saveInRedis(signupKey, VERIFY_SIGNUP.getValue(), SIGNUP_EXPIRATION.getExpiration());
 		redisTemplate.delete(emailAuthKey);
 	}
 
@@ -146,8 +151,8 @@ public class AuthService {
 		AuthToken authToken = generateTokenPair(idByToken);
 		saveInRedis(
 			getRedisKey(KeyPrefix.REFRESH, String.valueOf(idByToken)),
-			authToken.getRefreshToken().replaceAll(Auth.BEARER.getContent(), EMPTY.getValue()),
-			Auth.REFRESH_TOKEN_EXPIRATION.getExpiration()
+			authToken.getRefreshToken(),
+			REFRESH_TOKEN_EXPIRATION.getExpiration()
 		);
 		return authToken;
 	}
@@ -194,10 +199,10 @@ public class AuthService {
 	}
 
 	private AuthToken generateTokenPair(Long id) {
-		String accessToken = Auth.BEARER.getContent() + jwtProvider.generateToken(id,
-			Auth.ACCESS_TOKEN_EXPIRATION.getExpiration(), Auth.SUBJECT_ACCESS_TOKEN.getContent());
-		String refreshToken = Auth.BEARER.getContent() + jwtProvider.generateToken(id,
-			Auth.REFRESH_TOKEN_EXPIRATION.getExpiration(), Auth.SUBJECT_REFRESH_TOKEN.getContent());
+		String accessToken = jwtProvider.generateToken(id, ACCESS_TOKEN_EXPIRATION.getExpiration(),
+			SUBJECT_ACCESS_TOKEN.getContent());
+		String refreshToken = jwtProvider.generateToken(id, REFRESH_TOKEN_EXPIRATION.getExpiration(),
+			SUBJECT_REFRESH_TOKEN.getContent());
 
 		return AuthToken.builder()
 			.accessToken(accessToken)

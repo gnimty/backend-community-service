@@ -31,7 +31,7 @@ public class ChampionCommentsReportController {
 	private final ChampionCommentsReportService championCommentsReportService;
 
 	@Operation(summary = DO_REPORT, description = ApiDescription.DO_REPORT)
-	@Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token", required = true)
+	@Parameter(in = ParameterIn.COOKIE, name = "accessToken", description = "인증을 위한 Access Token", required = true)
 	@ResponseStatus(CREATED)
 	@PostMapping
 	public CommonResponse<Void> doReport(

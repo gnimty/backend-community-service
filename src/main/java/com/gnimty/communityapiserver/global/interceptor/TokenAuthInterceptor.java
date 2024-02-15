@@ -3,7 +3,6 @@ package com.gnimty.communityapiserver.global.interceptor;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.global.auth.JwtProvider;
 import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
-import com.gnimty.communityapiserver.global.constant.Auth;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
 import java.util.Optional;
@@ -25,18 +24,18 @@ public class TokenAuthInterceptor implements HandlerInterceptor {
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
 		String path = request.getServletPath();
 		String method = request.getMethod();
-		if (skipTokenCheckBeforeHeader(path, method)) {
+		if (skipTokenCheckBeforeCookie(path, method)) {
 			return true;
 		}
-		Optional<String> tokenByHeader = jwtProvider.resolveToken(request);
-		if (tokenByHeader.isEmpty()) {
-			if (skipTokenCheckAfterHeader(path, method)) {
+		Optional<String> tokenByCookie = jwtProvider.resolveToken(request);
+		if (tokenByCookie.isEmpty()) {
+			if (skipTokenCheckAfterCookie(path, method)) {
 				return true;
 			}
 			throw new BaseException(ErrorCode.TOKEN_NOT_FOUND);
 		}
 
-		String token = tokenByHeader.get().replaceFirst(Auth.BEARER.getContent(), "");
+		String token = tokenByCookie.get();
 		jwtProvider.checkValidation(token);
 		Member member = jwtProvider.findMemberByToken(token);
 		MemberThreadLocal.set(member);
@@ -55,14 +54,14 @@ public class TokenAuthInterceptor implements HandlerInterceptor {
 		MemberThreadLocal.remove();
 	}
 
-	private boolean skipTokenCheckBeforeHeader(String path, String method) {
+	private boolean skipTokenCheckBeforeCookie(String path, String method) {
 		if (path.contains("/members") && Character.isDigit(lastPathSegment(path)) && HttpMethod.GET.matches(method)) {
 			return true;
 		}
 		return path.equals("/summoners") && HttpMethod.PATCH.matches(method);
 	}
 
-	private boolean skipTokenCheckAfterHeader(String path, String method) {
+	private boolean skipTokenCheckAfterCookie(String path, String method) {
 		return (path.contains("/champions") || path.equals("/summoners/main")) && HttpMethod.GET.matches(method);
 	}
 

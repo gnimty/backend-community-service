@@ -59,7 +59,7 @@ public class RiotAccountController {
 	}
 
 	@Operation(summary = GET_RECOMMENDED_SUMMONERS, description = ApiDescription.GET_RECOMMENDED_SUMMONERS)
-	@Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token", required = true)
+	@Parameter(in = ParameterIn.COOKIE, name = "accessToken", description = "인증을 위한 Access Token", required = true)
 	@GetMapping
 	public CommonResponse<RecommendedSummonersResponse> getRecommendedSummoners(
 		@ModelAttribute @Valid RecommendedSummonersRequest request
@@ -70,7 +70,7 @@ public class RiotAccountController {
 	}
 
 	@Operation(summary = GET_MAIN_SUMMONERS, description = ApiDescription.GET_MAIN_SUMMONERS)
-	@Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token")
+	@Parameter(in = ParameterIn.COOKIE, name = "accessToken", description = "인증을 위한 Access Token", required = true)
 	@GetMapping("/main")
 	public CommonResponse<RecommendedSummonersResponse> getMainSummoners(
 		@Schema(example = "RANK_SOLO", description = "조회하려는 게임 모드, not null") @RequestParam("game-mode") GameMode gameMode
@@ -80,7 +80,7 @@ public class RiotAccountController {
 	}
 
 	@Operation(summary = GET_RECENTLY_SUMMONERS, description = ApiDescription.GET_RECENTLY_SUMMONERS)
-	@Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token", required = true)
+	@Parameter(in = ParameterIn.COOKIE, name = "accessToken", description = "인증을 위한 Access Token", required = true)
 	@GetMapping("/recently")
 	public CommonResponse<RecentlySummonersResponse> getRecentlySummoners() {
 		Member member = MemberThreadLocal.get();

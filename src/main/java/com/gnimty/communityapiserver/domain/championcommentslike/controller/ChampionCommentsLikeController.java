@@ -30,7 +30,7 @@ public class ChampionCommentsLikeController {
 	private final ChampionCommentsLikeService championCommentsLikeService;
 
 	@Operation(summary = DO_CHAMPION_COMMENTS_LIKE, description = ApiDescription.DO_CHAMPION_COMMENTS_LIKE)
-	@Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token", required = true)
+	@Parameter(in = ParameterIn.COOKIE, name = "accessToken", description = "인증을 위한 Access Token", required = true)
 	@PostMapping
 	public CommonResponse<Void> doChampionCommentsLike(
 		@Schema(example = "1", description = "조회하려는 챔피언 id") @PathVariable("champion_id") Long championId,
