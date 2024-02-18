@@ -15,12 +15,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class StatusUpdateRequest {
 
-    @NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
-    private Status status;
+	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+	private Status status;
 
-    public StatusUpdateServiceRequest toServiceRequest() {
-        return StatusUpdateServiceRequest.builder()
-            .status(status)
-            .build();
-    }
+	public StatusUpdateServiceRequest toServiceRequest() {
+		return StatusUpdateServiceRequest.builder()
+			.status(status)
+			.build();
+	}
 }

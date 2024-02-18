@@ -17,25 +17,25 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class OauthInfoReadService {
 
-    private final OauthInfoRepository oauthInfoRepository;
-    private final OauthInfoQueryRepository oauthInfoQueryRepository;
+	private final OauthInfoRepository oauthInfoRepository;
+	private final OauthInfoQueryRepository oauthInfoQueryRepository;
 
-    public void throwIfExistsByEmailAndProvider(String email, Provider provider) {
-        if (oauthInfoQueryRepository.existsByEmailAndProvider(email, provider)) {
-            throw new BaseException(ErrorCode.ALREADY_LINKED_OAUTH);
-        }
-    }
+	public void throwIfExistsByEmailAndProvider(String email, Provider provider) {
+		if (oauthInfoQueryRepository.existsByEmailAndProvider(email, provider)) {
+			throw new BaseException(ErrorCode.ALREADY_LINKED_OAUTH);
+		}
+	}
 
-    public List<OauthInfo> findByMember(Member member) {
-        return oauthInfoRepository.findByMember(member);
-    }
+	public List<OauthInfo> findByMember(Member member) {
+		return oauthInfoRepository.findByMember(member);
+	}
 
-    public Boolean existsByMemberAndProvider(Member member, Provider provider) {
-        return oauthInfoQueryRepository.existsByMemberAndProvider(member, provider);
-    }
+	public Boolean existsByMemberAndProvider(Member member, Provider provider) {
+		return oauthInfoQueryRepository.existsByMemberAndProvider(member, provider);
+	}
 
-    public OauthInfo findByMemberAndProvider(Member member, Provider provider) {
-        return oauthInfoRepository.findByMemberAndProvider(member, provider)
-            .orElseThrow(() -> new BaseException(ErrorCode.OAUTH_INFO_NOT_FOUND));
-    }
+	public OauthInfo findByMemberAndProvider(Member member, Provider provider) {
+		return oauthInfoRepository.findByMemberAndProvider(member, provider)
+			.orElseThrow(() -> new BaseException(ErrorCode.OAUTH_INFO_NOT_FOUND));
+	}
 }

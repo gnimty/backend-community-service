@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SendEmailServiceRequest {
 
-    private String email;
+	private String email;
 }

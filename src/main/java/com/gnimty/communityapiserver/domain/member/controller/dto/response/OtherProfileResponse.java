@@ -12,18 +12,18 @@ import lombok.Getter;
 @Getter
 public class OtherProfileResponse {
 
-    @Schema(description = "선호 게임 시간 정보")
-    private List<ScheduleEntry> schedules;
-    @Schema(example = "intro", description = "대표 소개글")
-    private String mainIntroduction;
-    @Schema(description = "선호 게임 모드 정보")
-    private List<PreferGameModeEntry> preferGameModes;
+	@Schema(description = "선호 게임 시간 정보")
+	private List<ScheduleEntry> schedules;
+	@Schema(example = "intro", description = "대표 소개글")
+	private String mainIntroduction;
+	@Schema(description = "선호 게임 모드 정보")
+	private List<PreferGameModeEntry> preferGameModes;
 
-    public static OtherProfileResponse from(OtherProfileServiceResponse response) {
-        return OtherProfileResponse.builder()
-            .schedules(response.getSchedules())
-            .mainIntroduction(response.getMainIntroduction())
-            .preferGameModes(response.getPreferGameModes())
-            .build();
-    }
+	public static OtherProfileResponse from(OtherProfileServiceResponse response) {
+		return OtherProfileResponse.builder()
+			.schedules(response.getSchedules())
+			.mainIntroduction(response.getMainIntroduction())
+			.preferGameModes(response.getPreferGameModes())
+			.build();
+	}
 }

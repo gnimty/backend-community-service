@@ -13,20 +13,20 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class ChampionCommentsReportQueryRepository {
 
-    private final JPAQueryFactory queryFactory;
+	private final JPAQueryFactory queryFactory;
 
-    public boolean existsByMemberAndChampionComments(Member member, ChampionComments championComments) {
-        return queryFactory.selectOne()
-            .from(championCommentsReport)
-            .where(memberIdEq(member), championCommentsIdEq(championComments))
-            .fetchFirst() != null;
-    }
+	public boolean existsByMemberAndChampionComments(Member member, ChampionComments championComments) {
+		return queryFactory.selectOne()
+			.from(championCommentsReport)
+			.where(memberIdEq(member), championCommentsIdEq(championComments))
+			.fetchFirst() != null;
+	}
 
-    private BooleanExpression championCommentsIdEq(ChampionComments championComments) {
-        return championCommentsReport.championComments.id.eq(championComments.getId());
-    }
+	private BooleanExpression championCommentsIdEq(ChampionComments championComments) {
+		return championCommentsReport.championComments.id.eq(championComments.getId());
+	}
 
-    private BooleanExpression memberIdEq(Member member) {
-        return championCommentsReport.member.id.eq(member.getId());
-    }
+	private BooleanExpression memberIdEq(Member member) {
+		return championCommentsReport.member.id.eq(member.getId());
+	}
 }

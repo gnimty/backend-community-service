@@ -15,12 +15,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PreferGameModeUpdateRequest {
 
-    @Valid
-    private List<PreferGameModeEntry> preferGameModes;
+	@Valid
+	private List<PreferGameModeEntry> preferGameModes;
 
-    public PreferGameModeUpdateServiceRequest toServiceRequest() {
-        return PreferGameModeUpdateServiceRequest.builder()
-            .preferGameModes(preferGameModes)
-            .build();
-    }
+	public PreferGameModeUpdateServiceRequest toServiceRequest() {
+		return PreferGameModeUpdateServiceRequest.builder()
+			.preferGameModes(preferGameModes)
+			.build();
+	}
 }

@@ -14,17 +14,17 @@ import javax.validation.Payload;
 @Constraint(validatedBy = SummonerCursorValidator.class)
 public @interface ValidateCursor {
 
-    String message() default ErrorMessage.INVALID_INPUT_VALUE;
+	String message() default ErrorMessage.INVALID_INPUT_VALUE;
 
-    Class<?>[] groups() default {};
+	Class<?>[] groups() default {};
 
-    Class<? extends Payload>[] payload() default {};
+	Class<? extends Payload>[] payload() default {};
 
-    String sortBy();
+	String sortBy();
 
-    String lastName();
+	String lastName();
 
-    String lastSummonerMmr();
+	String lastSummonerMmr();
 
-    String lastSummonerUpCount();
+	String lastSummonerUpCount();
 }

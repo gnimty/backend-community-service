@@ -28,18 +28,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/champions/{champion_id}/comments/{comments_id}/reports")
 public class ChampionCommentsReportController {
 
-    private final ChampionCommentsReportService championCommentsReportService;
+	private final ChampionCommentsReportService championCommentsReportService;
 
-    @Operation(summary = DO_REPORT, description = ApiDescription.DO_REPORT)
-    @Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token", required = true)
-    @ResponseStatus(CREATED)
-    @PostMapping
-    public CommonResponse<Void> doReport(
-        @Schema(example = "1", description = "조회하려는 챔피언 id") @PathVariable("champion_id") Long championId,
-        @Schema(example = "1", description = "신고하려는 댓글 id") @PathVariable("comments_id") Long commentsId,
-        @Valid @RequestBody ChampionCommentsReportRequest request
-    ) {
-        championCommentsReportService.doReport(championId, commentsId, request.toServiceRequest());
-        return CommonResponse.success(SUCCESS_COMMENTS_REPORT, CREATED);
-    }
+	@Operation(summary = DO_REPORT, description = ApiDescription.DO_REPORT)
+	@Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token", required = true)
+	@ResponseStatus(CREATED)
+	@PostMapping
+	public CommonResponse<Void> doReport(
+		@Schema(example = "1", description = "조회하려는 챔피언 id") @PathVariable("champion_id") Long championId,
+		@Schema(example = "1", description = "신고하려는 댓글 id") @PathVariable("comments_id") Long commentsId,
+		@Valid @RequestBody ChampionCommentsReportRequest request
+	) {
+		championCommentsReportService.doReport(championId, commentsId, request.toServiceRequest());
+		return CommonResponse.success(SUCCESS_COMMENTS_REPORT, CREATED);
+	}
 }

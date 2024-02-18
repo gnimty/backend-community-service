@@ -9,8 +9,8 @@ import java.util.List;
 
 public interface ChatRepositoryCustom {
 
-    void reduceReadCntToZero(ChatRoom chatRoom, User user);
+	void reduceReadCntToZero(ChatRoom chatRoom, User user);
 
-    List<ChatDto> findByChatRoom(ChatRoom chatRoom, OffsetDateTime exitDate);
+	List<ChatDto> findByChatRoom(ChatRoom chatRoom, OffsetDateTime exitDate);
 
 }

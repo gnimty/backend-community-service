@@ -17,14 +17,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SendEmailRequest {
 
-    @Schema(example = "email@email.com", description = "이메일, not null, email pattern")
-    @NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
-    @Pattern(regexp = RequestPattern.EMAIL_PATTERN, message = ErrorMessage.INVALID_INPUT_VALUE)
-    private String email;
+	@Schema(example = "email@email.com", description = "이메일, not null, email pattern")
+	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+	@Pattern(regexp = RequestPattern.EMAIL_PATTERN, message = ErrorMessage.INVALID_INPUT_VALUE)
+	private String email;
 
-    public SendEmailServiceRequest toServiceRequest() {
-        return SendEmailServiceRequest.builder()
-            .email(email)
-            .build();
-    }
+	public SendEmailServiceRequest toServiceRequest() {
+		return SendEmailServiceRequest.builder()
+			.email(email)
+			.build();
+	}
 }

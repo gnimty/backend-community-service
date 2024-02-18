@@ -9,6 +9,6 @@ import lombok.Getter;
 @Getter
 public class ChampionCommentsReportServiceRequest {
 
-    private List<ReportType> reportType;
-    private String reportComment;
+	private List<ReportType> reportType;
+	private String reportComment;
 }

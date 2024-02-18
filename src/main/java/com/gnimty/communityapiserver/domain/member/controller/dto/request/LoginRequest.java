@@ -13,15 +13,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class LoginRequest {
 
-    @Schema(example = "email@email.com", description = "이메일")
-    private String email;
-    @Schema(example = "Abc1234***", description = "비밀번호")
-    private String password;
+	@Schema(example = "email@email.com", description = "이메일")
+	private String email;
+	@Schema(example = "Abc1234***", description = "비밀번호")
+	private String password;
 
-    public LoginServiceRequest toServiceRequest() {
-        return LoginServiceRequest.builder()
-            .email(email)
-            .password(password)
-            .build();
-    }
+	public LoginServiceRequest toServiceRequest() {
+		return LoginServiceRequest.builder()
+			.email(email)
+			.password(password)
+			.build();
+	}
 }

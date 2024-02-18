@@ -12,14 +12,14 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class ChampionCommentsLikeQueryRepository {
 
-    private final JPAQueryFactory queryFactory;
+	private final JPAQueryFactory queryFactory;
 
-    public Boolean existsByMemberAndChampionComments(Member member, ChampionComments championComments) {
-        return queryFactory
-            .selectOne()
-            .from(championCommentsLike)
-            .where(championCommentsLike.member.id.eq(member.getId())
-                .and(championCommentsLike.championComments.id.eq(championComments.getId())))
-            .fetchFirst() != null;
-    }
+	public Boolean existsByMemberAndChampionComments(Member member, ChampionComments championComments) {
+		return queryFactory
+			.selectOne()
+			.from(championCommentsLike)
+			.where(championCommentsLike.member.id.eq(member.getId())
+				.and(championCommentsLike.championComments.id.eq(championComments.getId())))
+			.fetchFirst() != null;
+	}
 }

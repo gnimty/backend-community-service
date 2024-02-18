@@ -30,99 +30,99 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class RiotAccountService {
 
-    private final RiotAccountReadService riotAccountReadService;
-    private final RiotAccountJdbcRepository riotAccountJdbcRepository;
-    private final ScheduleReadService scheduleReadService;
-    private final MemberLikeReadService memberLikeReadService;
-    private final WebClientWrapper webClientWrapper;
+	private final RiotAccountReadService riotAccountReadService;
+	private final RiotAccountJdbcRepository riotAccountJdbcRepository;
+	private final ScheduleReadService scheduleReadService;
+	private final MemberLikeReadService memberLikeReadService;
+	private final WebClientWrapper webClientWrapper;
 
-    public List<RiotAccount> updateSummoners(SummonerUpdateServiceRequest request) {
-        List<SummonerUpdateEntry> summonerUpdateEntries = request.getSummonerUpdates()
-            .stream()
-            .filter(v -> riotAccountReadService.existsByPuuid(v.getPuuid()))
-            .toList();
-        List<RiotAccount> existRiotAccounts = riotAccountReadService.findByPuuids(
-            summonerUpdateEntries.stream().map(SummonerUpdateEntry::getPuuid).toList());
-        riotAccountJdbcRepository.processBatchUpdate(existRiotAccounts, summonerUpdateEntries);
-        return existRiotAccounts;
-    }
+	public List<RiotAccount> updateSummoners(SummonerUpdateServiceRequest request) {
+		List<SummonerUpdateEntry> summonerUpdateEntries = request.getSummonerUpdates()
+			.stream()
+			.filter(v -> riotAccountReadService.existsByPuuid(v.getPuuid()))
+			.toList();
+		List<RiotAccount> existRiotAccounts = riotAccountReadService.findByPuuids(
+			summonerUpdateEntries.stream().map(SummonerUpdateEntry::getPuuid).toList());
+		riotAccountJdbcRepository.processBatchUpdate(existRiotAccounts, summonerUpdateEntries);
+		return existRiotAccounts;
+	}
 
-    public RecommendedSummonersServiceResponse getRecommendedSummoners(RecommendedSummonersServiceRequest request) {
-        Member member = MemberThreadLocal.get();
-        RiotAccount mainRiotAccount = riotAccountReadService.findMainAccountByMember(member);
-        List<Schedule> schedules = scheduleReadService.findByMember(member);
-        return riotAccountReadService.getRecommendedSummoners(request, mainRiotAccount, schedules);
-    }
+	public RecommendedSummonersServiceResponse getRecommendedSummoners(RecommendedSummonersServiceRequest request) {
+		Member member = MemberThreadLocal.get();
+		RiotAccount mainRiotAccount = riotAccountReadService.findMainAccountByMember(member);
+		List<Schedule> schedules = scheduleReadService.findByMember(member);
+		return riotAccountReadService.getRecommendedSummoners(request, mainRiotAccount, schedules);
+	}
 
-    public RecommendedSummonersServiceResponse getMainSummoners(GameMode gameMode) {
-        Member member = MemberThreadLocal.get();
-        return riotAccountReadService.getMainSummoners(member, gameMode);
-    }
+	public RecommendedSummonersServiceResponse getMainSummoners(GameMode gameMode) {
+		Member member = MemberThreadLocal.get();
+		return riotAccountReadService.getMainSummoners(member, gameMode);
+	}
 
-    public RecentlySummonersServiceResponse getRecentlySummoners(Member member, List<Long> chattedMemberIds) {
-        RiotAccount riotAccount = riotAccountReadService.findMainAccountByMember(member);
-        String tagName = riotAccount.getName() + URL_TAG_SPLITTER.getValue() + riotAccount.getTagLine();
-        RecentMemberInfo recentMemberInfo = getRecentMemberInfo(tagName, GameMode.RANK_SOLO);
-        RecentMemberInfo recentMemberInfoFlex = getRecentMemberInfo(tagName, GameMode.RANK_FLEX);
-        List<RiotAccount> chattedRiotAccounts = getChattedRiotAccounts(chattedMemberIds);
+	public RecentlySummonersServiceResponse getRecentlySummoners(Member member, List<Long> chattedMemberIds) {
+		RiotAccount riotAccount = riotAccountReadService.findMainAccountByMember(member);
+		String tagName = riotAccount.getName() + URL_TAG_SPLITTER.getValue() + riotAccount.getTagLine();
+		RecentMemberInfo recentMemberInfo = getRecentMemberInfo(tagName, GameMode.RANK_SOLO);
+		RecentMemberInfo recentMemberInfoFlex = getRecentMemberInfo(tagName, GameMode.RANK_FLEX);
+		List<RiotAccount> chattedRiotAccounts = getChattedRiotAccounts(chattedMemberIds);
 
-        Map<String, RiotAccount> riotAccountMap = createRiotAccountMap(member, chattedRiotAccounts);
-        List<RecentlySummonersEntry> recentlySummoners = matchSummoners(recentMemberInfo, riotAccountMap);
-        List<RecentlySummonersEntry> recentlySummonersFlex = matchSummoners(recentMemberInfoFlex, riotAccountMap);
+		Map<String, RiotAccount> riotAccountMap = createRiotAccountMap(member, chattedRiotAccounts);
+		List<RecentlySummonersEntry> recentlySummoners = matchSummoners(recentMemberInfo, riotAccountMap);
+		List<RecentlySummonersEntry> recentlySummonersFlex = matchSummoners(recentMemberInfoFlex, riotAccountMap);
 
-        return RecentlySummonersServiceResponse.builder()
-            .recentlySummoners(recentlySummoners)
-            .recentlySummonersFlex(recentlySummonersFlex)
-            .build();
-    }
+		return RecentlySummonersServiceResponse.builder()
+			.recentlySummoners(recentlySummoners)
+			.recentlySummonersFlex(recentlySummonersFlex)
+			.build();
+	}
 
-    private List<RiotAccount> getChattedRiotAccounts(List<Long> chattedMemberIds) {
-        return chattedMemberIds.stream()
-            .map(riotAccountReadService::findMainAccountByMemberId)
-            .toList();
-    }
+	private List<RiotAccount> getChattedRiotAccounts(List<Long> chattedMemberIds) {
+		return chattedMemberIds.stream()
+			.map(riotAccountReadService::findMainAccountByMemberId)
+			.toList();
+	}
 
-    private List<RecentlySummonersEntry> matchSummoners(
-        RecentMemberInfo recentMemberInfo,
-        Map<String, RiotAccount> riotAccountMap
-    ) {
-        return recentMemberInfo.getRecentMembers()
-            .stream()
-            .filter(rm -> riotAccountMap.containsKey(rm.getPuuid()))
-            .map(rm -> RecentlySummonersEntry.of(rm, riotAccountMap.get(rm.getPuuid())))
-            .collect(Collectors.toList());
-    }
+	private List<RecentlySummonersEntry> matchSummoners(
+		RecentMemberInfo recentMemberInfo,
+		Map<String, RiotAccount> riotAccountMap
+	) {
+		return recentMemberInfo.getRecentMembers()
+			.stream()
+			.filter(rm -> riotAccountMap.containsKey(rm.getPuuid()))
+			.map(rm -> RecentlySummonersEntry.of(rm, riotAccountMap.get(rm.getPuuid())))
+			.collect(Collectors.toList());
+	}
 
-    private RecentMemberInfo getRecentMemberInfo(String internalTagName, GameMode gameMode) {
-        return webClientWrapper.get()
-            .uri("https://gnimty.kro.kr/statistics/summoners/together/" + internalTagName + "?queue_type="
-                + gameMode.name())
-            .retrieve()
-            .bodyToMono(RecentMemberInfo.class)
-            .block();
-    }
+	private RecentMemberInfo getRecentMemberInfo(String internalTagName, GameMode gameMode) {
+		return webClientWrapper.get()
+			.uri("https://gnimty.kro.kr/statistics/summoners/together/" + internalTagName + "?queue_type="
+				+ gameMode.name())
+			.retrieve()
+			.bodyToMono(RecentMemberInfo.class)
+			.block();
+	}
 
-    private Map<String, RiotAccount> createRiotAccountMap(Member member, List<RiotAccount> chattedRiotAccounts) {
-        return chattedRiotAccounts.stream()
-            .filter(riotAccount -> !memberLikeReadService
-                .existsBySourceAndTarget(member, riotAccount.getMember()))
-            .collect(Collectors.toMap(RiotAccount::getPuuid, ra -> ra));
-    }
+	private Map<String, RiotAccount> createRiotAccountMap(Member member, List<RiotAccount> chattedRiotAccounts) {
+		return chattedRiotAccounts.stream()
+			.filter(riotAccount -> !memberLikeReadService
+				.existsBySourceAndTarget(member, riotAccount.getMember()))
+			.collect(Collectors.toMap(RiotAccount::getPuuid, ra -> ra));
+	}
 
-    @Getter
-    public static class RecentMemberInfo {
+	@Getter
+	public static class RecentMemberInfo {
 
-        private Integer count;
-        private List<RecentMemberDto> recentMembers;
-    }
+		private Integer count;
+		private List<RecentMemberDto> recentMembers;
+	}
 
-    @Getter
-    public static class RecentMemberDto {
+	@Getter
+	public static class RecentMemberDto {
 
-        private String puuid;
-        private Integer totalPlay;
-        private Integer totalWin;
-        private Integer totalDefeat;
-        private Double winRate;
-    }
+		private String puuid;
+		private Integer totalPlay;
+		private Integer totalWin;
+		private Integer totalDefeat;
+		private Double winRate;
+	}
 }

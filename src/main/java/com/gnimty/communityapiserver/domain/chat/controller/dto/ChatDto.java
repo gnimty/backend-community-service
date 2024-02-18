@@ -13,16 +13,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ChatDto {
 
-    private Long senderId;
-    private String message;
-    private OffsetDateTime sendDate;
-    private Integer readCnt;
+	private Long senderId;
+	private String message;
+	private OffsetDateTime sendDate;
+	private Integer readCnt;
 
-    @Builder
-    public ChatDto(Chat chat) {
-        this.senderId = chat.getSenderId();
-        this.message = chat.getMessage();
-        this.sendDate = chat.getSendDate();
-        this.readCnt = chat.getReadCnt();
-    }
+	@Builder
+	public ChatDto(Chat chat) {
+		this.senderId = chat.getSenderId();
+		this.message = chat.getMessage();
+		this.sendDate = chat.getSendDate();
+		this.readCnt = chat.getReadCnt();
+	}
 }

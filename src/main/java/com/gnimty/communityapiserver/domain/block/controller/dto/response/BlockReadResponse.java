@@ -10,12 +10,12 @@ import lombok.Getter;
 @Getter
 public class BlockReadResponse {
 
-    @Schema(description = "차단 정보")
-    private final List<BlockEntry> blocks;
+	@Schema(description = "차단 정보")
+	private final List<BlockEntry> blocks;
 
-    public static BlockReadResponse from(BlockReadServiceResponse response) {
-        return BlockReadResponse.builder()
-            .blocks(response.getBlocks())
-            .build();
-    }
+	public static BlockReadResponse from(BlockReadServiceResponse response) {
+		return BlockReadResponse.builder()
+			.blocks(response.getBlocks())
+			.build();
+	}
 }

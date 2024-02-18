@@ -7,5 +7,5 @@ import lombok.Getter;
 @Getter
 public class PasswordEmailVerifyServiceResponse {
 
-    private String uuid;
+	private String uuid;
 }

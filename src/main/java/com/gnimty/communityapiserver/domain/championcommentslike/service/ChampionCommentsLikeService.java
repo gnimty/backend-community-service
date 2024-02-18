@@ -22,67 +22,67 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ChampionCommentsLikeService {
 
-    private final ChampionCommentsLikeRepository championCommentsLikeRepository;
-    private final ChampionCommentsLikeReadService championCommentsLikeReadService;
-    private final ChampionCommentsReadService championCommentsReadService;
+	private final ChampionCommentsLikeRepository championCommentsLikeRepository;
+	private final ChampionCommentsLikeReadService championCommentsLikeReadService;
+	private final ChampionCommentsReadService championCommentsReadService;
 
-    public void doChampionCommentsLike(Long championId, Long commentsId, ChampionCommentsLikeServiceRequest request) {
-        Member member = MemberThreadLocal.get();
+	public void doChampionCommentsLike(Long championId, Long commentsId, ChampionCommentsLikeServiceRequest request) {
+		Member member = MemberThreadLocal.get();
 
-        if (!member.getRsoLinked()) {
-            throw new BaseException(NOT_LINKED_RSO);
-        }
-        ChampionComments championComments = championCommentsReadService.findById(commentsId);
-        checkValidation(championId, championComments);
+		if (!member.getRsoLinked()) {
+			throw new BaseException(NOT_LINKED_RSO);
+		}
+		ChampionComments championComments = championCommentsReadService.findById(commentsId);
+		checkValidation(championId, championComments);
 
-        if (!request.getCancel()) {
-            championCommentsLike(request, member, championComments);
-        } else {
-            cancelChampionCommentsLike(member, championComments);
-        }
-    }
+		if (!request.getCancel()) {
+			championCommentsLike(request, member, championComments);
+		} else {
+			cancelChampionCommentsLike(member, championComments);
+		}
+	}
 
-    private void cancelChampionCommentsLike(Member member, ChampionComments championComments) {
-        ChampionCommentsLike championCommentsLike = championCommentsLikeReadService
-            .findByMemberAndChampionComments(member, championComments);
-        championCommentsLikeRepository.delete(championCommentsLike);
-    }
+	private void cancelChampionCommentsLike(Member member, ChampionComments championComments) {
+		ChampionCommentsLike championCommentsLike = championCommentsLikeReadService
+			.findByMemberAndChampionComments(member, championComments);
+		championCommentsLikeRepository.delete(championCommentsLike);
+	}
 
-    private void championCommentsLike(
-        ChampionCommentsLikeServiceRequest request,
-        Member member,
-        ChampionComments championComments
-    ) {
-        if (championCommentsLikeReadService.existsByMemberAndChampionComments(member, championComments)) {
-            throw new BaseException(ALREADY_CHAMPION_COMMENTS_LIKE);
-        }
-        championCommentsLikeRepository.save(createChampionCommentsLike(request, member, championComments));
-        updateReactionCount(request.getLikeOrNot(), championComments);
-    }
+	private void championCommentsLike(
+		ChampionCommentsLikeServiceRequest request,
+		Member member,
+		ChampionComments championComments
+	) {
+		if (championCommentsLikeReadService.existsByMemberAndChampionComments(member, championComments)) {
+			throw new BaseException(ALREADY_CHAMPION_COMMENTS_LIKE);
+		}
+		championCommentsLikeRepository.save(createChampionCommentsLike(request, member, championComments));
+		updateReactionCount(request.getLikeOrNot(), championComments);
+	}
 
-    private void updateReactionCount(Boolean likeOrNot, ChampionComments championComments) {
-        if (likeOrNot) {
-            championComments.increaseUpCount();
-        } else {
-            championComments.increaseDownCount();
-        }
-    }
+	private void updateReactionCount(Boolean likeOrNot, ChampionComments championComments) {
+		if (likeOrNot) {
+			championComments.increaseUpCount();
+		} else {
+			championComments.increaseDownCount();
+		}
+	}
 
-    private ChampionCommentsLike createChampionCommentsLike(
-        ChampionCommentsLikeServiceRequest request,
-        Member member,
-        ChampionComments championComments
-    ) {
-        return ChampionCommentsLike.builder()
-            .likeOrNot(request.getLikeOrNot())
-            .member(member)
-            .championComments(championComments)
-            .build();
-    }
+	private ChampionCommentsLike createChampionCommentsLike(
+		ChampionCommentsLikeServiceRequest request,
+		Member member,
+		ChampionComments championComments
+	) {
+		return ChampionCommentsLike.builder()
+			.likeOrNot(request.getLikeOrNot())
+			.member(member)
+			.championComments(championComments)
+			.build();
+	}
 
-    private void checkValidation(Long championId, ChampionComments championComments) {
-        if (!Objects.equals(championComments.getChampionId(), championId)) {
-            throw new BaseException(COMMENTS_ID_AND_CHAMPION_ID_INVALID);
-        }
-    }
+	private void checkValidation(Long championId, ChampionComments championComments) {
+		if (!Objects.equals(championComments.getChampionId(), championId)) {
+			throw new BaseException(COMMENTS_ID_AND_CHAMPION_ID_INVALID);
+		}
+	}
 }

@@ -14,33 +14,33 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @RequiredArgsConstructor
 public class WebConfiguration implements WebMvcConfigurer {
 
-    private final TokenAuthInterceptor tokenAuthInterceptor;
+	private final TokenAuthInterceptor tokenAuthInterceptor;
 
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-            .allowedOrigins("https://gnimty.kro.kr", "http://localhost:3000")
-            .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE")
-            .allowCredentials(true)
-            .allowedHeaders("*");
-    }
+	@Override
+	public void addCorsMappings(CorsRegistry registry) {
+		registry.addMapping("/**")
+			.allowedOrigins("https://gnimty.kro.kr", "http://localhost:3000")
+			.allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE")
+			.allowCredentials(true)
+			.allowedHeaders("*");
+	}
 
-    @Override
-    public void addFormatters(FormatterRegistry registry) {
-        registry.addConverterFactory(new StringToEnumConverterFactory());
-    }
+	@Override
+	public void addFormatters(FormatterRegistry registry) {
+		registry.addConverterFactory(new StringToEnumConverterFactory());
+	}
 
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry
-            .addInterceptor(tokenAuthInterceptor)
-            .addPathPatterns("/**")
-            .excludePathPatterns("/swagger-ui/**", "/swagger-resources/**", "/v3/api-docs/**")
-            .excludePathPatterns("/auth/**", "/oauth/**")
-            .excludePathPatterns("/members/password/**")
-            .excludePathPatterns(
-                "/css/**", "/*.ico"
-                , "/error", "/error-page/**"
-            );
-    }
+	@Override
+	public void addInterceptors(InterceptorRegistry registry) {
+		registry
+			.addInterceptor(tokenAuthInterceptor)
+			.addPathPatterns("/**")
+			.excludePathPatterns("/swagger-ui/**", "/swagger-resources/**", "/v3/api-docs/**")
+			.excludePathPatterns("/auth/**", "/oauth/**")
+			.excludePathPatterns("/members/password/**")
+			.excludePathPatterns(
+				"/css/**", "/*.ico"
+				, "/error", "/error-page/**"
+			);
+	}
 }

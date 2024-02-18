@@ -37,109 +37,109 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 @Slf4j
 public class ChatController {
 
-    private final StompService stompService;
-    private final ChatService chatService;
-    private final ChatRoomService chatRoomService;
-    private final UserService userService;
-    private final MemberService memberService;
-    private final BlockReadService blockReadService;
-    private final WebSocketSessionManager webSocketSessionManager;
+	private final StompService stompService;
+	private final ChatService chatService;
+	private final ChatRoomService chatRoomService;
+	private final UserService userService;
+	private final MemberService memberService;
+	private final BlockReadService blockReadService;
+	private final WebSocketSessionManager webSocketSessionManager;
 
 
-    // 채팅의 모든 조회
-    @SubscribeMapping("/init_chat")
-    public List<ChatRoomDto> getTotalChatRoomsAndChatsAndOtherUserInfo(
-        @Header("simpSessionId") String sessionId) {
-        User user = getUserBySessionId(sessionId);
-        return stompService.getChatRoomsJoined(user);
-    }
+	// 채팅의 모든 조회
+	@SubscribeMapping("/init_chat")
+	public List<ChatRoomDto> getTotalChatRoomsAndChatsAndOtherUserInfo(
+		@Header("simpSessionId") String sessionId) {
+		User user = getUserBySessionId(sessionId);
+		return stompService.getChatRoomsJoined(user);
+	}
 
 
-    // 채팅방 구독 유도
-    // 이미 채팅방이 존재한다면 채팅방 정보만 넘겨주고 상대방 구독유도는 하지 않기 -> Front 1차 처리, Back 2차 처리
-    @MessageMapping("/user/{otherUserId}")
-    public void createChatRoomAndDerive(@DestinationVariable("otherUserId") Long otherUserId,
-        @Header("simpSessionId") String sessionId) {
+	// 채팅방 구독 유도
+	// 이미 채팅방이 존재한다면 채팅방 정보만 넘겨주고 상대방 구독유도는 하지 않기 -> Front 1차 처리, Back 2차 처리
+	@MessageMapping("/user/{otherUserId}")
+	public void createChatRoomAndDerive(@DestinationVariable("otherUserId") Long otherUserId,
+		@Header("simpSessionId") String sessionId) {
 
-        User me = getUserBySessionId(sessionId);
-        User other = userService.getUser(otherUserId);
+		User me = getUserBySessionId(sessionId);
+		User other = userService.getUser(otherUserId);
 
-        Boolean isMeBlock = blockReadService.existsByBlockerIdAndBlockedId(me.getActualUserId(),
-            other.getActualUserId());
-        Boolean isOtherBlock = blockReadService.existsByBlockerIdAndBlockedId(
-            other.getActualUserId(), me.getActualUserId());
+		Boolean isMeBlock = blockReadService.existsByBlockerIdAndBlockedId(me.getActualUserId(),
+			other.getActualUserId());
+		Boolean isOtherBlock = blockReadService.existsByBlockerIdAndBlockedId(
+			other.getActualUserId(), me.getActualUserId());
 
-        ChatRoomDto chatRoomDto = stompService.getOrCreateChatRoomDto(
-            new UserWithBlockDto(me, isMeBlock.equals(true) ? Blocked.BLOCK : Blocked.UNBLOCK),
-            new UserWithBlockDto(other, isOtherBlock.equals(true) ? Blocked.BLOCK : Blocked.UNBLOCK)
-        );
+		ChatRoomDto chatRoomDto = stompService.getOrCreateChatRoomDto(
+			new UserWithBlockDto(me, isMeBlock.equals(true) ? Blocked.BLOCK : Blocked.UNBLOCK),
+			new UserWithBlockDto(other, isOtherBlock.equals(true) ? Blocked.BLOCK : Blocked.UNBLOCK)
+		);
 
-        // getchatRoomNo를 호출하기 X
-        // chatRoom을 먼저 생성 또는 조회 후 그 정보를 그대로 보내주거나 DTO로 변환해서 보내주는 게 좋아 보임
-        stompService.sendToUserSubscribers(me.getActualUserId(),
-            new MessageResponse(MessageResponseType.CHATROOM_INFO, chatRoomDto));
+		// getchatRoomNo를 호출하기 X
+		// chatRoom을 먼저 생성 또는 조회 후 그 정보를 그대로 보내주거나 DTO로 변환해서 보내주는 게 좋아 보임
+		stompService.sendToUserSubscribers(me.getActualUserId(),
+			new MessageResponse(MessageResponseType.CHATROOM_INFO, chatRoomDto));
 
-        if (!isOtherBlock) {
-            stompService.sendToUserSubscribers(other.getActualUserId(), new MessageResponse(
-                MessageResponseType.CHATROOM_INFO, chatRoomDto));
-        }
-    }
-
-
-    @MessageMapping("/chatRoom/{chatRoomNo}")
-    public void sendMessage(@DestinationVariable("chatRoomNo") Long chatRoomNo,
-        @Header("simpSessionId") String sessionId,
-        final @Valid MessageRequest request) {
-        User user = getUserBySessionId(sessionId);
-        ChatRoom chatRoom = chatRoomService.getChatRoom(chatRoomNo);
-
-        if (request.getType() == MessageRequestType.CHAT) {
-            ChatDto chatDto = stompService.saveChat(user, chatRoom, request.getData());
-            stompService.sendToChatRoomSubscribers(chatRoomNo,
-                new MessageResponse(MessageResponseType.CHAT_MESSAGE, chatDto));
-        } else if (request.getType() == MessageRequestType.READ) {
-            stompService.readOtherChats(user, chatRoom);
-            stompService.sendToUserSubscribers(user.getActualUserId(),
-                new MessageResponse(MessageResponseType.READ_CHATS, chatRoomNo));
-        } else {
-            stompService.exitChatRoom(user, chatRoomService.getChatRoom(chatRoomNo));
-        }
-    }
+		if (!isOtherBlock) {
+			stompService.sendToUserSubscribers(other.getActualUserId(), new MessageResponse(
+				MessageResponseType.CHATROOM_INFO, chatRoomDto));
+		}
+	}
 
 
-    @EventListener
-    public void onClientConnect(SessionConnectedEvent event) {
-        String sessionId = String.valueOf(event.getMessage().getHeaders().get("simpSessionId"));
-        User user = getUserBySessionId(sessionId);
-        log.info("[Connect] userId: {}", user.getActualUserId());
-        if (!isMultipleUser(user.getActualUserId())) {
-            stompService.updateConnStatus(user, user.getSelectedStatus(), false);
-            memberService.updateStatus(user.getSelectedStatus(), user.getActualUserId());
-        }
-    }
+	@MessageMapping("/chatRoom/{chatRoomNo}")
+	public void sendMessage(@DestinationVariable("chatRoomNo") Long chatRoomNo,
+		@Header("simpSessionId") String sessionId,
+		final @Valid MessageRequest request) {
+		User user = getUserBySessionId(sessionId);
+		ChatRoom chatRoom = chatRoomService.getChatRoom(chatRoomNo);
 
-    @EventListener
-    public void onClientDisconnect(SessionDisconnectEvent event) {
-        User user = getUserBySessionId(event.getSessionId());
-        log.info("[DisConnect] userId: {}", user.getActualUserId());
-        if (!isMultipleUser(user.getActualUserId())) {
-            stompService.updateConnStatus(user, Status.OFFLINE, false);
-            memberService.updateStatus(Status.OFFLINE, user.getActualUserId());
-        }
-        webSocketSessionManager.deleteSession(event.getSessionId());
-    }
+		if (request.getType() == MessageRequestType.CHAT) {
+			ChatDto chatDto = stompService.saveChat(user, chatRoom, request.getData());
+			stompService.sendToChatRoomSubscribers(chatRoomNo,
+				new MessageResponse(MessageResponseType.CHAT_MESSAGE, chatDto));
+		} else if (request.getType() == MessageRequestType.READ) {
+			stompService.readOtherChats(user, chatRoom);
+			stompService.sendToUserSubscribers(user.getActualUserId(),
+				new MessageResponse(MessageResponseType.READ_CHATS, chatRoomNo));
+		} else {
+			stompService.exitChatRoom(user, chatRoomService.getChatRoom(chatRoomNo));
+		}
+	}
 
 
-    private User getUserBySessionId(String sessionId) {
-        Long actualUserId = webSocketSessionManager.getMemberId(sessionId);
-        return userService.getUser(actualUserId);
-    }
+	@EventListener
+	public void onClientConnect(SessionConnectedEvent event) {
+		String sessionId = String.valueOf(event.getMessage().getHeaders().get("simpSessionId"));
+		User user = getUserBySessionId(sessionId);
+		log.info("[Connect] userId: {}", user.getActualUserId());
+		if (!isMultipleUser(user.getActualUserId())) {
+			stompService.updateConnStatus(user, user.getSelectedStatus(), false);
+			memberService.updateStatus(user.getSelectedStatus(), user.getActualUserId());
+		}
+	}
+
+	@EventListener
+	public void onClientDisconnect(SessionDisconnectEvent event) {
+		User user = getUserBySessionId(event.getSessionId());
+		log.info("[DisConnect] userId: {}", user.getActualUserId());
+		if (!isMultipleUser(user.getActualUserId())) {
+			stompService.updateConnStatus(user, Status.OFFLINE, false);
+			memberService.updateStatus(Status.OFFLINE, user.getActualUserId());
+		}
+		webSocketSessionManager.deleteSession(event.getSessionId());
+	}
 
 
-    private boolean isMultipleUser(Long memberId) {
-        int cnt = webSocketSessionManager.getSessionCountByMemberId(memberId);
-        log.info("isMultipleUser.cnt: {}", cnt);
-        return webSocketSessionManager.getSessionCountByMemberId(memberId) > 1;
-    }
+	private User getUserBySessionId(String sessionId) {
+		Long actualUserId = webSocketSessionManager.getMemberId(sessionId);
+		return userService.getUser(actualUserId);
+	}
+
+
+	private boolean isMultipleUser(Long memberId) {
+		int cnt = webSocketSessionManager.getSessionCountByMemberId(memberId);
+		log.info("isMultipleUser.cnt: {}", cnt);
+		return webSocketSessionManager.getSessionCountByMemberId(memberId) > 1;
+	}
 
 }
