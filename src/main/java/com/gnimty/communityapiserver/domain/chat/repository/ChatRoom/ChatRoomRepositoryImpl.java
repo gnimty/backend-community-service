@@ -12,7 +12,6 @@ import com.gnimty.communityapiserver.domain.chat.entity.User;
 import com.mongodb.client.result.UpdateResult;
 
 import java.time.OffsetDateTime;
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;

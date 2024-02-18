@@ -77,11 +77,6 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
-tasks.withType(JavaCompile) {
-    options.compilerArgs += ["--add-opens", "java.base/java.time=ALL-UNNAMED"]
-}
-
-
 //querydsl 추가 시작
 def querydslDir = "$buildDir/generated/querydsl"
 querydsl {

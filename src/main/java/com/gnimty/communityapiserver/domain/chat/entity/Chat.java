@@ -1,10 +1,8 @@
 package com.gnimty.communityapiserver.domain.chat.entity;
 
-import java.time.Instant;
+
 import java.time.OffsetDateTime;
-import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

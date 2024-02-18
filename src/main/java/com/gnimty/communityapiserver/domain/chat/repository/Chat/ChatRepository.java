@@ -4,7 +4,6 @@ package com.gnimty.communityapiserver.domain.chat.repository.Chat;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatDto;
 import com.gnimty.communityapiserver.domain.chat.entity.Chat;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 import org.springframework.data.mongodb.repository.MongoRepository;
 

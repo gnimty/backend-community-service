@@ -2,10 +2,7 @@ package com.gnimty.communityapiserver.domain.chat.controller.dto;
 
 import com.gnimty.communityapiserver.domain.chat.entity.Chat;
 
-import java.time.Instant;
 import java.time.OffsetDateTime;
-import java.time.ZonedDateTime;
-import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
