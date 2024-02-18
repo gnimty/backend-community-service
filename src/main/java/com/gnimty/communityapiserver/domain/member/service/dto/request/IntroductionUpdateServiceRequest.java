@@ -9,5 +9,5 @@ import lombok.Getter;
 @Builder
 public class IntroductionUpdateServiceRequest {
 
-	private List<IntroductionEntry> introductions;
+    private List<IntroductionEntry> introductions;
 }

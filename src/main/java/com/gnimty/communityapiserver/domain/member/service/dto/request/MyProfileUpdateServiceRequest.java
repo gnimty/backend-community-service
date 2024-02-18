@@ -12,8 +12,8 @@ import lombok.Getter;
 @Getter
 public class MyProfileUpdateServiceRequest {
 
-	private Status status;
-	private List<IntroductionEntry> introductions;
-	private List<PreferGameModeEntry> preferGameModes;
-	private List<ScheduleEntry> schedules;
+    private Status status;
+    private List<IntroductionEntry> introductions;
+    private List<PreferGameModeEntry> preferGameModes;
+    private List<ScheduleEntry> schedules;
 }

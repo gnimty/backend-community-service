@@ -22,53 +22,53 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class MemberQueryRepository {
 
-	private final JPAQueryFactory queryFactory;
+    private final JPAQueryFactory queryFactory;
 
-	public Boolean existsByEmail(String email) {
-		return queryFactory
-			.selectOne()
-			.from(member)
-			.where(member.email.eq(email))
-			.fetchFirst() != null;
-	}
+    public Boolean existsByEmail(String email) {
+        return queryFactory
+            .selectOne()
+            .from(member)
+            .where(member.email.eq(email))
+            .fetchFirst() != null;
+    }
 
-	public Boolean existsById(Long id) {
-		return queryFactory
-			.selectOne()
-			.from(member)
-			.where(member.id.eq(id))
-			.fetchFirst() != null;
-	}
+    public Boolean existsById(Long id) {
+        return queryFactory
+            .selectOne()
+            .from(member)
+            .where(member.id.eq(id))
+            .fetchFirst() != null;
+    }
 
-	public OtherProfileServiceResponse findOtherById(Long id) {
-		List<Schedule> schedules = queryFactory
-			.selectFrom(schedule)
-			.join(schedule.member, member).on(schedule.member.id.eq(member.id))
-			.where(schedule.member.id.eq(id))
-			.fetch();
-		Optional<Introduction> mainIntroduction = Optional.ofNullable(queryFactory
-			.selectFrom(introduction)
-			.join(introduction.member)
-			.where(introduction.member.id.eq(id), isMainIntroduction())
-			.fetchFirst());
-		List<PreferGameMode> preferGameModes = queryFactory
-			.selectFrom(preferGameMode)
-			.join(preferGameMode.member)
-			.where(preferGameMode.member.id.eq(id))
-			.fetch();
+    public OtherProfileServiceResponse findOtherById(Long id) {
+        List<Schedule> schedules = queryFactory
+            .selectFrom(schedule)
+            .join(schedule.member, member).on(schedule.member.id.eq(member.id))
+            .where(schedule.member.id.eq(id))
+            .fetch();
+        Optional<Introduction> mainIntroduction = Optional.ofNullable(queryFactory
+            .selectFrom(introduction)
+            .join(introduction.member)
+            .where(introduction.member.id.eq(id), isMainIntroduction())
+            .fetchFirst());
+        List<PreferGameMode> preferGameModes = queryFactory
+            .selectFrom(preferGameMode)
+            .join(preferGameMode.member)
+            .where(preferGameMode.member.id.eq(id))
+            .fetch();
 
-		return OtherProfileServiceResponse.builder()
-			.schedules(schedules.stream()
-				.map(ScheduleEntry::from)
-				.toList())
-			.mainIntroduction(mainIntroduction.map(Introduction::getContent).orElse(null))
-			.preferGameModes(preferGameModes.stream()
-				.map(PreferGameModeEntry::from)
-				.toList())
-			.build();
-	}
+        return OtherProfileServiceResponse.builder()
+            .schedules(schedules.stream()
+                .map(ScheduleEntry::from)
+                .toList())
+            .mainIntroduction(mainIntroduction.map(Introduction::getContent).orElse(null))
+            .preferGameModes(preferGameModes.stream()
+                .map(PreferGameModeEntry::from)
+                .toList())
+            .build();
+    }
 
-	private BooleanExpression isMainIntroduction() {
-		return introduction.isMain.eq(true);
-	}
+    private BooleanExpression isMainIntroduction() {
+        return introduction.isMain.eq(true);
+    }
 }

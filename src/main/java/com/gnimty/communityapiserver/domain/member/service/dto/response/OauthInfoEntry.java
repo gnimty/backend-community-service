@@ -10,15 +10,15 @@ import lombok.Getter;
 @Getter
 public class OauthInfoEntry {
 
-	@Schema(example = "email@kakao.com", description = "연동된 email")
-	private String email;
-	@Schema(example = "KAKAO", description = "서비스 제공자")
-	private Provider provider;
+    @Schema(example = "email@kakao.com", description = "연동된 email")
+    private String email;
+    @Schema(example = "KAKAO", description = "서비스 제공자")
+    private Provider provider;
 
-	public static OauthInfoEntry from(OauthInfo oauthInfo) {
-		return OauthInfoEntry.builder()
-			.email(oauthInfo.getEmail())
-			.provider(oauthInfo.getProvider())
-			.build();
-	}
+    public static OauthInfoEntry from(OauthInfo oauthInfo) {
+        return OauthInfoEntry.builder()
+            .email(oauthInfo.getEmail())
+            .provider(oauthInfo.getProvider())
+            .build();
+    }
 }

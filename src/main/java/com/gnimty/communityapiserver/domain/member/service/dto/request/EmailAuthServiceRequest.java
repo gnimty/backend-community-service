@@ -7,5 +7,5 @@ import lombok.Getter;
 @Getter
 public class EmailAuthServiceRequest {
 
-	private String email;
+    private String email;
 }
