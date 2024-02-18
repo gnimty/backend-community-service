@@ -7,6 +7,6 @@ import lombok.Getter;
 @Getter
 public class EmailVerifyServiceRequest {
 
-	private String email;
-	private String code;
+    private String email;
+    private String code;
 }

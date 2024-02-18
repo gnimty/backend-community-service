@@ -4,12 +4,13 @@ import com.gnimty.communityapiserver.domain.member.service.dto.request.MyProfile
 import com.gnimty.communityapiserver.domain.member.service.dto.response.IntroductionEntry;
 import com.gnimty.communityapiserver.global.constant.Status;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.List;
-import javax.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import javax.validation.Valid;
+import java.util.List;
 
 @Getter
 @Builder
@@ -17,19 +18,19 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class MyProfileMainUpdateRequest {
 
-	@Schema(example = "변경할 메인 소환사 id")
-	private Long mainRiotAccountId;
-	@Schema(example = "변경할 상태")
-	private Status status;
-	@Schema(example = "변경할 소개글 정보")
-	@Valid
-	private List<IntroductionEntry> introductions;
+    @Schema(example = "변경할 메인 소환사 id")
+    private Long mainRiotAccountId;
+    @Schema(example = "변경할 상태")
+    private Status status;
+    @Schema(example = "변경할 소개글 정보")
+    @Valid
+    private List<IntroductionEntry> introductions;
 
-	public MyProfileUpdateMainServiceRequest toServiceRequest() {
-		return MyProfileUpdateMainServiceRequest.builder()
-			.mainRiotAccountId(mainRiotAccountId)
-			.status(status)
-			.introductions(introductions)
-			.build();
-	}
+    public MyProfileUpdateMainServiceRequest toServiceRequest() {
+        return MyProfileUpdateMainServiceRequest.builder()
+            .mainRiotAccountId(mainRiotAccountId)
+            .status(status)
+            .introductions(introductions)
+            .build();
+    }
 }

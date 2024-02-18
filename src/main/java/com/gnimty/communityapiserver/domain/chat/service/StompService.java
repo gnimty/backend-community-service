@@ -1,10 +1,6 @@
 package com.gnimty.communityapiserver.domain.chat.service;
 
-import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatDto;
-import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatRoomDto;
-import com.gnimty.communityapiserver.domain.chat.controller.dto.MessageResponse;
-import com.gnimty.communityapiserver.domain.chat.controller.dto.UserConnStatusDto;
-import com.gnimty.communityapiserver.domain.chat.controller.dto.UserDto;
+import com.gnimty.communityapiserver.domain.chat.controller.dto.*;
 import com.gnimty.communityapiserver.domain.chat.entity.Blocked;
 import com.gnimty.communityapiserver.domain.chat.entity.Chat;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
@@ -16,15 +12,14 @@ import com.gnimty.communityapiserver.global.constant.MessageResponseType;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
-
-import java.time.*;
-import java.util.List;
-import java.util.Optional;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

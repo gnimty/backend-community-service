@@ -1,15 +1,15 @@
 package com.gnimty.communityapiserver.domain.chat.entity;
 
 
-import java.time.OffsetDateTime;
-import java.time.temporal.ChronoUnit;
-
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
 
 @Document("chat")
 @Getter

@@ -15,30 +15,30 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class MemberReadService {
 
-	private final MemberRepository memberRepository;
-	private final MemberQueryRepository memberQueryRepository;
+    private final MemberRepository memberRepository;
+    private final MemberQueryRepository memberQueryRepository;
 
-	public void throwIfExistByEmail(String email) {
-		if (memberQueryRepository.existsByEmail(email)) {
-			throw new BaseException(ErrorCode.ALREADY_REGISTERED_EMAIL);
-		}
-	}
+    public void throwIfExistByEmail(String email) {
+        if (memberQueryRepository.existsByEmail(email)) {
+            throw new BaseException(ErrorCode.ALREADY_REGISTERED_EMAIL);
+        }
+    }
 
-	public Member findByEmailOrElseThrow(String email, BaseException exception) {
-		return memberRepository.findByEmail(email)
-			.orElseThrow(() -> exception);
-	}
+    public Member findByEmailOrElseThrow(String email, BaseException exception) {
+        return memberRepository.findByEmail(email)
+            .orElseThrow(() -> exception);
+    }
 
-	public Member findById(Long id) {
-		return memberRepository.findById(id)
-			.orElseThrow(() -> new BaseException(ErrorCode.MEMBER_NOT_FOUND));
-	}
+    public Member findById(Long id) {
+        return memberRepository.findById(id)
+            .orElseThrow(() -> new BaseException(ErrorCode.MEMBER_NOT_FOUND));
+    }
 
-	public Boolean existsById(Long id) {
-		return memberQueryRepository.existsById(id);
-	}
+    public Boolean existsById(Long id) {
+        return memberQueryRepository.existsById(id);
+    }
 
-	public OtherProfileServiceResponse findOtherById(Long id) {
-		return memberQueryRepository.findOtherById(id);
-	}
+    public OtherProfileServiceResponse findOtherById(Long id) {
+        return memberQueryRepository.findOtherById(id);
+    }
 }

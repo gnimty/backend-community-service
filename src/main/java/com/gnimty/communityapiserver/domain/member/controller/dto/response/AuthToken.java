@@ -8,8 +8,8 @@ import lombok.Getter;
 @Getter
 public class AuthToken {
 
-	@Schema(example = "access token", description = "access token")
-	private String accessToken;
-	@Schema(example = "refresh token", description = "refresh token")
-	private String refreshToken;
+    @Schema(example = "access token", description = "access token")
+    private String accessToken;
+    @Schema(example = "refresh token", description = "refresh token")
+    private String refreshToken;
 }

@@ -11,74 +11,75 @@ import com.gnimty.communityapiserver.domain.schedule.entity.Schedule;
 import com.gnimty.communityapiserver.global.constant.GameMode;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class RiotAccountReadService {
 
-	private final RiotAccountRepository riotAccountRepository;
-	private final RiotAccountQueryRepository riotAccountQueryRepository;
+    private final RiotAccountRepository riotAccountRepository;
+    private final RiotAccountQueryRepository riotAccountQueryRepository;
 
-	public void throwIfExistsByPuuid(String puuid) {
-		if (riotAccountQueryRepository.existsByPuuid(puuid)) {
-			throw new BaseException(ErrorCode.ALREADY_LINKED_SUMMONER);
-		}
-	}
+    public void throwIfExistsByPuuid(String puuid) {
+        if (riotAccountQueryRepository.existsByPuuid(puuid)) {
+            throw new BaseException(ErrorCode.ALREADY_LINKED_SUMMONER);
+        }
+    }
 
-	public Boolean existsByMemberId(Member member) {
-		return riotAccountQueryRepository.existsByMember(member);
-	}
+    public Boolean existsByMemberId(Member member) {
+        return riotAccountQueryRepository.existsByMember(member);
+    }
 
-	public List<RiotAccount> findByMember(Member member) {
-		return riotAccountRepository.findByMember(member);
-	}
+    public List<RiotAccount> findByMember(Member member) {
+        return riotAccountRepository.findByMember(member);
+    }
 
-	public RiotAccount findMainAccountByMember(Member member) {
-		return riotAccountRepository.findByMemberAndIsMain(member, true)
-			.orElseThrow(() -> new BaseException(ErrorCode.NOT_LINKED_RSO));
-	}
+    public RiotAccount findMainAccountByMember(Member member) {
+        return riotAccountRepository.findByMemberAndIsMain(member, true)
+            .orElseThrow(() -> new BaseException(ErrorCode.NOT_LINKED_RSO));
+    }
 
-	public RiotAccount findById(Long id) {
-		return riotAccountRepository.findById(id)
-			.orElseThrow(() -> new BaseException(ErrorCode.RIOT_ACCOUNT_NOT_FOUND));
-	}
+    public RiotAccount findById(Long id) {
+        return riotAccountRepository.findById(id)
+            .orElseThrow(() -> new BaseException(ErrorCode.RIOT_ACCOUNT_NOT_FOUND));
+    }
 
-	public List<RiotAccount> findByPuuids(List<String> puuids) {
-		return riotAccountRepository.findByPuuids(puuids);
-	}
+    public List<RiotAccount> findByPuuids(List<String> puuids) {
+        return riotAccountRepository.findByPuuids(puuids);
+    }
 
-	public Boolean existsByPuuid(String puuid) {
-		return riotAccountQueryRepository.existsByPuuid(puuid);
-	}
+    public Boolean existsByPuuid(String puuid) {
+        return riotAccountQueryRepository.existsByPuuid(puuid);
+    }
 
-	public RecommendedSummonersServiceResponse getRecommendedSummoners(
-		RecommendedSummonersServiceRequest request,
-		RiotAccount mainRiotAccount,
-		List<Schedule> schedules
-	) {
-		List<RecommendedSummonersEntry> content = riotAccountQueryRepository
-			.findSummonersByConditions(Pageable.ofSize(request.getPageSize()), request, mainRiotAccount, schedules)
-			.getContent();
-		return RecommendedSummonersServiceResponse.builder()
-			.recommendedSummoners(content)
-			.build();
-	}
+    public RecommendedSummonersServiceResponse getRecommendedSummoners(
+        RecommendedSummonersServiceRequest request,
+        RiotAccount mainRiotAccount,
+        List<Schedule> schedules
+    ) {
+        List<RecommendedSummonersEntry> content = riotAccountQueryRepository
+            .findSummonersByConditions(Pageable.ofSize(request.getPageSize()), request, mainRiotAccount, schedules)
+            .getContent();
+        return RecommendedSummonersServiceResponse.builder()
+            .recommendedSummoners(content)
+            .build();
+    }
 
-	public RecommendedSummonersServiceResponse getMainSummoners(Member member, GameMode gameMode) {
-		List<RecommendedSummonersEntry> result = riotAccountQueryRepository.findMainSummonersByMember(member, gameMode);
-		return RecommendedSummonersServiceResponse.builder()
-			.recommendedSummoners(result)
-			.build();
-	}
+    public RecommendedSummonersServiceResponse getMainSummoners(Member member, GameMode gameMode) {
+        List<RecommendedSummonersEntry> result = riotAccountQueryRepository.findMainSummonersByMember(member, gameMode);
+        return RecommendedSummonersServiceResponse.builder()
+            .recommendedSummoners(result)
+            .build();
+    }
 
-	public RiotAccount findMainAccountByMemberId(Long memberId) {
-		return riotAccountRepository.findByMemberIdAndIsMain(memberId, true)
-			.orElseThrow(() -> new BaseException(ErrorCode.NOT_LINKED_RSO));
-	}
+    public RiotAccount findMainAccountByMemberId(Long memberId) {
+        return riotAccountRepository.findByMemberIdAndIsMain(memberId, true)
+            .orElseThrow(() -> new BaseException(ErrorCode.NOT_LINKED_RSO));
+    }
 }

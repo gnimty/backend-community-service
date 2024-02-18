@@ -2,9 +2,6 @@ package com.gnimty.communityapiserver.domain.chat.repository.User;
 
 import com.gnimty.communityapiserver.domain.chat.entity.User;
 import com.mongodb.bulk.BulkWriteResult;
-
-import java.util.List;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.BulkOperations;
@@ -13,6 +10,8 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+
+import java.util.List;
 
 
 @RequiredArgsConstructor
