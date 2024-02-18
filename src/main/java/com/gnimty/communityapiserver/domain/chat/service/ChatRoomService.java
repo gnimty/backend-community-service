@@ -68,7 +68,7 @@ public class ChatRoomService {
                 Participant.builder().user(me.getUser()).blockedStatus(me.getStatus())
                         .build(),
                 Participant.builder().user(other.getUser()).blockedStatus(other.getStatus())
-						.build()
+                        .build()
         );
 
         return chatRoomRepository.save(participants);

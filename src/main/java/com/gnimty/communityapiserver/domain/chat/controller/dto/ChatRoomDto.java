@@ -5,22 +5,23 @@ import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 public class ChatRoomDto {
 
-	private Long chatRoomNo;
-	private OffsetDateTime lastModified;
-	private UserDto otherUser;
-	private List<ChatDto> chats;
+    private Long chatRoomNo;
+    private OffsetDateTime lastModified;
+    private UserDto otherUser;
+    private List<ChatDto> chats;
 
-	@Builder
-	public ChatRoomDto(ChatRoom chatRoom, UserDto other, List<ChatDto> chats) {
-		this.chatRoomNo = chatRoom.getChatRoomNo();
-		this.lastModified = chatRoom.getLastModifiedDate();
-		this.otherUser = other;
-		this.chats = chats;
-	}
+    @Builder
+    public ChatRoomDto(ChatRoom chatRoom, UserDto other, List<ChatDto> chats) {
+        this.chatRoomNo = chatRoom.getChatRoomNo();
+        this.lastModified = chatRoom.getLastModifiedDate();
+        this.otherUser = other;
+        this.chats = chats;
+    }
 }

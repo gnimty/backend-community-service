@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.AfterEach;
@@ -184,8 +185,8 @@ public class StompServiceTest {
             chatRoom = ChatRoom.builder()
                     .chatRoomNo(1L)
                     .participants(
-                    Arrays.asList(new Participant(userA, Blocked.UNBLOCK),
-                            new Participant(userB, Blocked.UNBLOCK)))
+                            Arrays.asList(new Participant(userA, Blocked.UNBLOCK),
+                                    new Participant(userB, Blocked.UNBLOCK)))
                     .build();
             chatRoomRepository.save(chatRoom);
         }
