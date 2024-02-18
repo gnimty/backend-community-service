@@ -1,10 +1,11 @@
 package com.gnimty.communityapiserver.domain.chat.controller.dto;
 
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
+
 import lombok.Builder;
 import lombok.Data;
-
 import java.time.OffsetDateTime;
+
 import java.util.List;
 
 @Data
