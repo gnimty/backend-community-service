@@ -13,9 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class ScheduleReadService {
 
-	private final ScheduleRepository scheduleRepository;
+    private final ScheduleRepository scheduleRepository;
 
-	public List<Schedule> findByMember(Member member) {
-		return scheduleRepository.findByMember(member);
-	}
+    public List<Schedule> findByMember(Member member) {
+        return scheduleRepository.findByMember(member);
+    }
 }

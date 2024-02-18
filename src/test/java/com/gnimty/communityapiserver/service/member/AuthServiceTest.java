@@ -1,10 +1,31 @@
 package com.gnimty.communityapiserver.service.member;
 
+import static com.gnimty.communityapiserver.global.constant.Auth.BEARER;
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.ALREADY_REGISTERED_EMAIL;
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.INVALID_EMAIL_AUTH_CODE;
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.INVALID_LOGIN;
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.TOKEN_INVALID;
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.UNAUTHORIZED_EMAIL;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.BDDMockito.willThrow;
+import static org.mockito.Mockito.times;
+
 import com.gnimty.communityapiserver.domain.member.controller.dto.response.AuthToken;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.domain.member.service.AuthService;
 import com.gnimty.communityapiserver.domain.member.service.MemberReadService;
-import com.gnimty.communityapiserver.domain.member.service.dto.request.*;
+import com.gnimty.communityapiserver.domain.member.service.dto.request.EmailAuthServiceRequest;
+import com.gnimty.communityapiserver.domain.member.service.dto.request.EmailVerifyServiceRequest;
+import com.gnimty.communityapiserver.domain.member.service.dto.request.LoginServiceRequest;
+import com.gnimty.communityapiserver.domain.member.service.dto.request.OauthLoginServiceRequest;
+import com.gnimty.communityapiserver.domain.member.service.dto.request.SignupServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.utils.GoogleOauthUtil;
 import com.gnimty.communityapiserver.domain.member.service.utils.KakaoOauthUtil;
 import com.gnimty.communityapiserver.domain.member.service.utils.MailSenderUtil;
@@ -16,6 +37,8 @@ import com.gnimty.communityapiserver.global.constant.Provider;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.service.ServiceTestSupport;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -27,17 +50,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-
-import static com.gnimty.communityapiserver.global.constant.Auth.BEARER;
-import static com.gnimty.communityapiserver.global.exception.ErrorCode.*;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.times;
 
 public class AuthServiceTest extends ServiceTestSupport {
 

@@ -17,23 +17,23 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @EqualsAndHashCode(exclude = "_id")
 public class Chat {
 
-	@Id
-	private String id;
-	private Long chatRoomNo;
-	private Long senderId;
-	private String message;
-	private OffsetDateTime sendDate;
-	private Integer readCnt = 1;
+    @Id
+    private String id;
+    private Long chatRoomNo;
+    private Long senderId;
+    private String message;
+    private OffsetDateTime sendDate;
+    private Integer readCnt = 1;
 
-	@Builder
-	public Chat(Long chatRoomNo, Long senderId, String message) {
-		this.chatRoomNo = chatRoomNo;
-		this.senderId = senderId;
-		this.message = message;
-		this.sendDate = OffsetDateTime.now().truncatedTo(ChronoUnit.MILLIS);
-	}
+    @Builder
+    public Chat(Long chatRoomNo, Long senderId, String message) {
+        this.chatRoomNo = chatRoomNo;
+        this.senderId = senderId;
+        this.message = message;
+        this.sendDate = OffsetDateTime.now().truncatedTo(ChronoUnit.MILLIS);
+    }
 
-	public void readByAllUser() {
-		this.readCnt = 0;
-	}
+    public void readByAllUser() {
+        this.readCnt = 0;
+    }
 }

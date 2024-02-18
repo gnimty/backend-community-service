@@ -16,19 +16,19 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class MemberLikeReadService {
 
-	private final MemberLikeRepository memberLikeRepository;
-	private final MemberLikeQueryRepository memberLikeQueryRepository;
+    private final MemberLikeRepository memberLikeRepository;
+    private final MemberLikeQueryRepository memberLikeQueryRepository;
 
-	public MemberLike findBySourceAndTarget(Member source, Member target) {
-		return memberLikeRepository.findBySourceMemberAndTargetMember(source, target)
-			.orElseThrow(() -> new BaseException(ErrorCode.MEMBER_LIKE_NOT_FOUND));
-	}
+    public MemberLike findBySourceAndTarget(Member source, Member target) {
+        return memberLikeRepository.findBySourceMemberAndTargetMember(source, target)
+            .orElseThrow(() -> new BaseException(ErrorCode.MEMBER_LIKE_NOT_FOUND));
+    }
 
-	public Boolean existsBySourceAndTarget(Member source, Member target) {
-		return memberLikeQueryRepository.existsBySourceMemberAndTargetMember(source, target);
-	}
+    public Boolean existsBySourceAndTarget(Member source, Member target) {
+        return memberLikeQueryRepository.existsBySourceMemberAndTargetMember(source, target);
+    }
 
-	public List<MemberLike> findBySourceMember(Member source) {
-		return memberLikeRepository.findBySourceMember(source);
-	}
+    public List<MemberLike> findBySourceMember(Member source) {
+        return memberLikeRepository.findBySourceMember(source);
+    }
 }

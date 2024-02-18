@@ -23,62 +23,62 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @EqualsAndHashCode
 public class ChatRoom {
 
-	// AutoIncrementSequence에서 ChatRoom을 위한 독립적인 SEQUENCE SCOPE로 작동
-	@Transient
-	public static final String SEQUENCE_NAME = "chatroom_sequence";
+    // AutoIncrementSequence에서 ChatRoom을 위한 독립적인 SEQUENCE SCOPE로 작동
+    @Transient
+    public static final String SEQUENCE_NAME = "chatroom_sequence";
 
-	@Id
-	private String id;
+    @Id
+    private String id;
 
-	@Indexed(unique = true)
-	private Long chatRoomNo;
-	private List<Participant> participants;
-	private OffsetDateTime createdDate;
-	private OffsetDateTime lastModifiedDate;
+    @Indexed(unique = true)
+    private Long chatRoomNo;
+    private List<Participant> participants;
+    private OffsetDateTime createdDate;
+    private OffsetDateTime lastModifiedDate;
 
-	@Builder
-	public ChatRoom(Long chatRoomNo, List<Participant> participants) {
-		this.chatRoomNo = chatRoomNo;
-		this.participants = participants;
+    @Builder
+    public ChatRoom(Long chatRoomNo, List<Participant> participants) {
+        this.chatRoomNo = chatRoomNo;
+        this.participants = participants;
 
-		OffsetDateTime now = OffsetDateTime.now().truncatedTo(ChronoUnit.MILLIS);
-		this.createdDate = now;
-		this.lastModifiedDate = now;
-	}
+        OffsetDateTime now = OffsetDateTime.now().truncatedTo(ChronoUnit.MILLIS);
+        this.createdDate = now;
+        this.lastModifiedDate = now;
+    }
 
-	public void refreshModifiedDate(OffsetDateTime date) {
-		this.lastModifiedDate = date.truncatedTo(ChronoUnit.MILLIS);
-	}
+    public void refreshModifiedDate(OffsetDateTime date) {
+        this.lastModifiedDate = date.truncatedTo(ChronoUnit.MILLIS);
+    }
 
-	public void updateParticipants(List<Participant> participants) {
-		this.participants = participants;
-	}
+    public void updateParticipants(List<Participant> participants) {
+        this.participants = participants;
+    }
 
-	@Getter
-	@AllArgsConstructor
-	@ToString
-	@EqualsAndHashCode
-	@NoArgsConstructor
-	public static class Participant {
+    @Getter
+    @AllArgsConstructor
+    @ToString
+    @EqualsAndHashCode
+    @NoArgsConstructor
+    public static class Participant {
 
-		@DBRef
-		private User user;
-		private OffsetDateTime exitDate;
-		private Blocked blockedStatus;
+        @DBRef
+        private User user;
+        private OffsetDateTime exitDate;
+        private Blocked blockedStatus;
 
-		@Builder
-		public Participant(User user, Blocked blockedStatus) {
-			this.user = user;
-			this.blockedStatus = blockedStatus;
-			this.exitDate = null;
-		}
+        @Builder
+        public Participant(User user, Blocked blockedStatus) {
+            this.user = user;
+            this.blockedStatus = blockedStatus;
+            this.exitDate = null;
+        }
 
-		public void outChatRoom() {
-			this.exitDate = OffsetDateTime.now().truncatedTo(ChronoUnit.MILLIS);
-		}
+        public void outChatRoom() {
+            this.exitDate = OffsetDateTime.now().truncatedTo(ChronoUnit.MILLIS);
+        }
 
-		public void updateBlockedStatus(Blocked blockedStatus) {
-			this.blockedStatus = blockedStatus;
-		}
-	}
+        public void updateBlockedStatus(Blocked blockedStatus) {
+            this.blockedStatus = blockedStatus;
+        }
+    }
 }

@@ -8,6 +8,6 @@ import lombok.Getter;
 @Builder
 public class MemberLikeResponse {
 
-	@Schema(example = "100", description = "up count")
-	private Long upCount;
+    @Schema(example = "100", description = "up count")
+    private Long upCount;
 }

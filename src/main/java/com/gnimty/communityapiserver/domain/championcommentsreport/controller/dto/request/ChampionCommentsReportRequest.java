@@ -20,17 +20,17 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ChampionCommentsReportRequest {
 
-	@Schema(example = "[ABUSE, OTHER]", description = "신고 타입, not null")
-	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
-	private List<ReportType> reportType;
-	@Schema(example = "comment", description = "신고 상세 내용, 최대 1000자")
-	@Size(max = MAX_REPORT_COMMENT_SIZE)
-	private String reportComment;
+    @Schema(example = "[ABUSE, OTHER]", description = "신고 타입, not null")
+    @NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+    private List<ReportType> reportType;
+    @Schema(example = "comment", description = "신고 상세 내용, 최대 1000자")
+    @Size(max = MAX_REPORT_COMMENT_SIZE)
+    private String reportComment;
 
-	public ChampionCommentsReportServiceRequest toServiceRequest() {
-		return ChampionCommentsReportServiceRequest.builder()
-			.reportType(reportType)
-			.reportComment(reportComment)
-			.build();
-	}
+    public ChampionCommentsReportServiceRequest toServiceRequest() {
+        return ChampionCommentsReportServiceRequest.builder()
+            .reportType(reportType)
+            .reportComment(reportComment)
+            .build();
+    }
 }

@@ -14,13 +14,13 @@ import javax.validation.Payload;
 @Constraint(validatedBy = ChildCommentsValidator.class)
 public @interface IsChildComments {
 
-	String message() default ErrorMessage.INVALID_INPUT_VALUE;
+    String message() default ErrorMessage.INVALID_INPUT_VALUE;
 
-	Class<?>[] groups() default {};
+    Class<?>[] groups() default {};
 
-	Class<? extends Payload>[] payload() default {};
+    Class<? extends Payload>[] payload() default {};
 
-	String parentChampionCommentsId();
+    String parentChampionCommentsId();
 
-	String depth();
+    String depth();
 }

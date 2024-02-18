@@ -14,16 +14,16 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RecentlySummonersResponse {
 
-	@Schema(description = "솔로랭크 최근 정보")
-	private List<RecentlySummonersEntry> recentlySummoners;
-	@Schema(description = "자유랭크 최근 정보")
-	private List<RecentlySummonersEntry> recentlySummonersFlex;
+    @Schema(description = "솔로랭크 최근 정보")
+    private List<RecentlySummonersEntry> recentlySummoners;
+    @Schema(description = "자유랭크 최근 정보")
+    private List<RecentlySummonersEntry> recentlySummonersFlex;
 
-	public static RecentlySummonersResponse from(RecentlySummonersServiceResponse response) {
-		return RecentlySummonersResponse.builder()
-			.recentlySummoners(response.getRecentlySummoners())
-			.recentlySummonersFlex(response.getRecentlySummonersFlex())
-			.build();
-	}
+    public static RecentlySummonersResponse from(RecentlySummonersServiceResponse response) {
+        return RecentlySummonersResponse.builder()
+            .recentlySummoners(response.getRecentlySummoners())
+            .recentlySummonersFlex(response.getRecentlySummonersFlex())
+            .build();
+    }
 
 }

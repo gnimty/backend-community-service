@@ -19,27 +19,27 @@ import org.springframework.data.mongodb.core.query.Update;
 @Slf4j
 public class ChatRepositoryImpl implements ChatRepositoryCustom {
 
-	@Autowired
-	private final MongoTemplate mongoTemplate;
+    @Autowired
+    private final MongoTemplate mongoTemplate;
 
-	@Override
-	public void reduceReadCntToZero(ChatRoom chatRoom, User user) {
-		Query query = new Query();
-		query.addCriteria(Criteria.where("chatRoomNo").is(chatRoom.getChatRoomNo()));
-		query.addCriteria(Criteria.where("senderId").is(user.getActualUserId()));
+    @Override
+    public void reduceReadCntToZero(ChatRoom chatRoom, User user) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("chatRoomNo").is(chatRoom.getChatRoomNo()));
+        query.addCriteria(Criteria.where("senderId").is(user.getActualUserId()));
 
-		Update update = new Update()
-			.set("readCnt", 0);
+        Update update = new Update()
+            .set("readCnt", 0);
 
-		mongoTemplate.updateMulti(query, update, Chat.class);
-	}
+        mongoTemplate.updateMulti(query, update, Chat.class);
+    }
 
-	@Override
-	public List<ChatDto> findByChatRoom(ChatRoom chatRoom, OffsetDateTime exitDate) {
-		Query query = new Query(Criteria.where("chatRoomNo").is(chatRoom.getChatRoomNo()));
-		if (exitDate != null) {
-			query.addCriteria(Criteria.where("sendDate").gte(exitDate));
-		}
-		return mongoTemplate.find(query, ChatDto.class, "chat");
-	}
+    @Override
+    public List<ChatDto> findByChatRoom(ChatRoom chatRoom, OffsetDateTime exitDate) {
+        Query query = new Query(Criteria.where("chatRoomNo").is(chatRoom.getChatRoomNo()));
+        if (exitDate != null) {
+            query.addCriteria(Criteria.where("sendDate").gte(exitDate));
+        }
+        return mongoTemplate.find(query, ChatDto.class, "chat");
+    }
 }

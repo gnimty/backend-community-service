@@ -9,14 +9,14 @@ import java.util.Optional;
 
 public interface ChatRoomRepositoryCustom {
 
-	//    ChatRoom save(ChatRoom chatRoom);
-	List<ChatRoom> findByUser(User user);
+    //    ChatRoom save(ChatRoom chatRoom);
+    List<ChatRoom> findByUser(User user);
 
-	List<ChatRoom> findUnBlockByUser(User user);
+    List<ChatRoom> findUnBlockByUser(User user);
 
-	Optional<ChatRoom> findByUsers(User user1, User user2);
+    Optional<ChatRoom> findByUsers(User user1, User user2);
 
-	ChatRoom save(List<Participant> participants);
+    ChatRoom save(List<Participant> participants);
 
-	UpdateResult update(ChatRoom chatRoom);
+    UpdateResult update(ChatRoom chatRoom);
 }

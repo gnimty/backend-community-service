@@ -1,5 +1,9 @@
 package com.gnimty.communityapiserver.service.championcomments;
 
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.CHAMPION_COMMENTS_NOT_FOUND;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import com.gnimty.communityapiserver.domain.block.entity.Block;
 import com.gnimty.communityapiserver.domain.championcomments.entity.ChampionComments;
 import com.gnimty.communityapiserver.domain.championcomments.service.ChampionCommentsReadService;
@@ -13,17 +17,12 @@ import com.gnimty.communityapiserver.global.constant.CommentsType;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.service.ServiceTestSupport;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
-
-import static com.gnimty.communityapiserver.global.exception.ErrorCode.CHAMPION_COMMENTS_NOT_FOUND;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class ChampionCommentsReadServiceTest extends ServiceTestSupport {
 

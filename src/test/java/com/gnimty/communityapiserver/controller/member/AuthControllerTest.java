@@ -1,23 +1,8 @@
 package com.gnimty.communityapiserver.controller.member;
 
-import com.gnimty.communityapiserver.controller.ControllerTestSupport;
-import com.gnimty.communityapiserver.domain.member.controller.dto.request.*;
-import com.gnimty.communityapiserver.domain.member.controller.dto.response.AuthToken;
-import com.gnimty.communityapiserver.domain.member.service.dto.request.*;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.http.MediaType;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.nio.charset.StandardCharsets;
-
-import static com.gnimty.communityapiserver.global.constant.ResponseMessage.*;
+import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_SEND_EMAIL_AUTH_CODE;
+import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_SIGN_UP;
+import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_VERIFY_EMAIL;
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage.HEADER_NOT_FOUND;
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage.INVALID_INPUT_VALUE;
 import static org.mockito.ArgumentMatchers.any;
@@ -27,6 +12,30 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.gnimty.communityapiserver.controller.ControllerTestSupport;
+import com.gnimty.communityapiserver.domain.member.controller.dto.request.EmailAuthRequest;
+import com.gnimty.communityapiserver.domain.member.controller.dto.request.EmailVerifyRequest;
+import com.gnimty.communityapiserver.domain.member.controller.dto.request.LoginRequest;
+import com.gnimty.communityapiserver.domain.member.controller.dto.request.OauthLoginRequest;
+import com.gnimty.communityapiserver.domain.member.controller.dto.request.SignupRequest;
+import com.gnimty.communityapiserver.domain.member.controller.dto.response.AuthToken;
+import com.gnimty.communityapiserver.domain.member.service.dto.request.EmailAuthServiceRequest;
+import com.gnimty.communityapiserver.domain.member.service.dto.request.EmailVerifyServiceRequest;
+import com.gnimty.communityapiserver.domain.member.service.dto.request.LoginServiceRequest;
+import com.gnimty.communityapiserver.domain.member.service.dto.request.OauthLoginServiceRequest;
+import com.gnimty.communityapiserver.domain.member.service.dto.request.SignupServiceRequest;
+import java.nio.charset.StandardCharsets;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.http.MediaType;
 
 public class AuthControllerTest extends ControllerTestSupport {
 

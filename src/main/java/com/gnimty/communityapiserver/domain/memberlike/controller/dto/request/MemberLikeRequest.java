@@ -15,17 +15,17 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class MemberLikeRequest {
 
-	@Schema(example = "1", description = "대상 회원 id, not null")
-	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
-	private Long targetMemberId;
-	@Schema(example = "true", description = "좋아요 취소 여부, not null")
-	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
-	private Boolean cancel;
+    @Schema(example = "1", description = "대상 회원 id, not null")
+    @NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+    private Long targetMemberId;
+    @Schema(example = "true", description = "좋아요 취소 여부, not null")
+    @NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+    private Boolean cancel;
 
-	public MemberLikeServiceRequest toServiceRequest() {
-		return MemberLikeServiceRequest.builder()
-			.targetMemberId(targetMemberId)
-			.cancel(cancel)
-			.build();
-	}
+    public MemberLikeServiceRequest toServiceRequest() {
+        return MemberLikeServiceRequest.builder()
+            .targetMemberId(targetMemberId)
+            .cancel(cancel)
+            .build();
+    }
 }

@@ -1,23 +1,5 @@
 package com.gnimty.communityapiserver.controller.championcommentsreport;
 
-import com.gnimty.communityapiserver.controller.ControllerTestSupport;
-import com.gnimty.communityapiserver.domain.block.service.dto.request.BlockServiceRequest;
-import com.gnimty.communityapiserver.domain.championcommentsreport.controller.dto.request.ChampionCommentsReportRequest;
-import com.gnimty.communityapiserver.domain.championcommentsreport.service.dto.request.ChampionCommentsReportServiceRequest;
-import com.gnimty.communityapiserver.domain.chat.entity.Blocked;
-import com.gnimty.communityapiserver.domain.member.entity.Member;
-import com.gnimty.communityapiserver.global.constant.ReportType;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.springframework.http.MediaType;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-
 import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_COMMENTS_REPORT;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -25,6 +7,23 @@ import static org.mockito.BDDMockito.willDoNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.gnimty.communityapiserver.controller.ControllerTestSupport;
+import com.gnimty.communityapiserver.domain.block.service.dto.request.BlockServiceRequest;
+import com.gnimty.communityapiserver.domain.championcommentsreport.controller.dto.request.ChampionCommentsReportRequest;
+import com.gnimty.communityapiserver.domain.championcommentsreport.service.dto.request.ChampionCommentsReportServiceRequest;
+import com.gnimty.communityapiserver.domain.chat.entity.Blocked;
+import com.gnimty.communityapiserver.domain.member.entity.Member;
+import com.gnimty.communityapiserver.global.constant.ReportType;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.MediaType;
 
 public class ChampionCommentsReportControllerTest extends ControllerTestSupport {
 

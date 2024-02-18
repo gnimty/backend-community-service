@@ -25,42 +25,42 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ChampionCommentsReportService {
 
-	private final ChampionCommentsReportRepository championCommentsReportRepository;
-	private final ChampionCommentsReadService championCommentsReadService;
-	private final ChampionCommentsReportQueryRepository championCommentsReportQueryRepository;
+    private final ChampionCommentsReportRepository championCommentsReportRepository;
+    private final ChampionCommentsReadService championCommentsReadService;
+    private final ChampionCommentsReportQueryRepository championCommentsReportQueryRepository;
 
-	public void doReport(Long championId, Long commentsId, ChampionCommentsReportServiceRequest request) {
-		Member member = MemberThreadLocal.get();
-		validationReport(request, member);
-		ChampionComments championComments = championCommentsReadService.findById(commentsId);
-		if (championCommentsReportQueryRepository.existsByMemberAndChampionComments(member, championComments)) {
-			throw new BaseException(DUPLICATED_REPORT);
-		}
-		if (!Objects.equals(championId, championComments.getChampionId())) {
-			throw new BaseException(COMMENTS_ID_AND_CHAMPION_ID_INVALID);
-		}
-		request.getReportType().forEach(
-			reportType -> championCommentsReportRepository.save(
-				ChampionCommentsReport.builder()
-					.championComments(championComments)
-					.reportType(reportType)
-					.reportComment(request.getReportComment())
-					.member(member)
-					.build())
-		);
-	}
+    public void doReport(Long championId, Long commentsId, ChampionCommentsReportServiceRequest request) {
+        Member member = MemberThreadLocal.get();
+        validationReport(request, member);
+        ChampionComments championComments = championCommentsReadService.findById(commentsId);
+        if (championCommentsReportQueryRepository.existsByMemberAndChampionComments(member, championComments)) {
+            throw new BaseException(DUPLICATED_REPORT);
+        }
+        if (!Objects.equals(championId, championComments.getChampionId())) {
+            throw new BaseException(COMMENTS_ID_AND_CHAMPION_ID_INVALID);
+        }
+        request.getReportType().forEach(
+            reportType -> championCommentsReportRepository.save(
+                ChampionCommentsReport.builder()
+                    .championComments(championComments)
+                    .reportType(reportType)
+                    .reportComment(request.getReportComment())
+                    .member(member)
+                    .build())
+        );
+    }
 
-	private void validationReport(ChampionCommentsReportServiceRequest request, Member member) {
-		if (!member.getRsoLinked()) {
-			throw new BaseException(NOT_LINKED_RSO);
-		}
-		if (isInvalidReportRelation(request)) {
-			throw new BaseException(OTHER_TYPE_MUST_CONTAIN_COMMENT);
-		}
-	}
+    private void validationReport(ChampionCommentsReportServiceRequest request, Member member) {
+        if (!member.getRsoLinked()) {
+            throw new BaseException(NOT_LINKED_RSO);
+        }
+        if (isInvalidReportRelation(request)) {
+            throw new BaseException(OTHER_TYPE_MUST_CONTAIN_COMMENT);
+        }
+    }
 
-	private boolean isInvalidReportRelation(ChampionCommentsReportServiceRequest request) {
-		return (request.getReportType().contains(ReportType.OTHER) && request.getReportComment() == null)
-			|| (!request.getReportType().contains(ReportType.OTHER) && request.getReportComment() != null);
-	}
+    private boolean isInvalidReportRelation(ChampionCommentsReportServiceRequest request) {
+        return (request.getReportType().contains(ReportType.OTHER) && request.getReportComment() == null)
+            || (!request.getReportType().contains(ReportType.OTHER) && request.getReportComment() != null);
+    }
 }

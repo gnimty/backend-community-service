@@ -1,5 +1,15 @@
 package com.gnimty.communityapiserver.service.block;
 
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.ALREADY_BLOCKED_MEMBER;
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.BLOCK_NOT_FOUND;
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.NOT_ALLOWED_SELF_BLOCK;
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.NO_PERMISSION;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+
 import com.gnimty.communityapiserver.domain.block.entity.Block;
 import com.gnimty.communityapiserver.domain.block.service.BlockReadService;
 import com.gnimty.communityapiserver.domain.block.service.BlockService;
@@ -16,13 +26,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-
-import static com.gnimty.communityapiserver.global.exception.ErrorCode.*;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
 
 public class BlockServiceTest extends ServiceTestSupport {
 

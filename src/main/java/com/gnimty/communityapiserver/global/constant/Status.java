@@ -8,30 +8,30 @@ import java.util.stream.Stream;
 import lombok.Getter;
 
 @Schema(
-	enumAsRef = true,
-	description = """
-		ONLINE - 온라인
-		OFFLINE - 오프라인
-		AWAY - 자리비움
-		""")
+    enumAsRef = true,
+    description = """
+        ONLINE - 온라인
+        OFFLINE - 오프라인
+        AWAY - 자리비움
+        """)
 @Getter
 public enum Status {
 
-	ONLINE("온라인"),
-	OFFLINE("오프라인"),
-	AWAY("자리비움");
+    ONLINE("온라인"),
+    OFFLINE("오프라인"),
+    AWAY("자리비움");
 
-	private final String status;
+    private final String status;
 
-	Status(String status) {
-		this.status = status;
-	}
+    Status(String status) {
+        this.status = status;
+    }
 
-	@JsonCreator(mode = JsonCreator.Mode.DELEGATING)
-	public static Status findByInput(String input) {
-		return Stream.of(Status.values())
-			.filter(c -> c.name().equals(input))
-			.findFirst()
-			.orElseThrow(() -> new BaseException(ErrorCode.INVALID_ENUM_VALUE));
-	}
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+    public static Status findByInput(String input) {
+        return Stream.of(Status.values())
+            .filter(c -> c.name().equals(input))
+            .findFirst()
+            .orElseThrow(() -> new BaseException(ErrorCode.INVALID_ENUM_VALUE));
+    }
 }

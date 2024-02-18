@@ -7,5 +7,5 @@ import lombok.Getter;
 @Getter
 public class BlockClearServiceRequest {
 
-	private Long id;
+    private Long id;
 }

@@ -1,5 +1,11 @@
 package com.gnimty.communityapiserver.service.block;
 
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.BLOCK_NOT_FOUND;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mockStatic;
+
 import com.gnimty.communityapiserver.domain.block.entity.Block;
 import com.gnimty.communityapiserver.domain.block.service.BlockReadService;
 import com.gnimty.communityapiserver.domain.block.service.dto.response.BlockReadServiceResponse;
@@ -14,12 +20,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import static com.gnimty.communityapiserver.global.exception.ErrorCode.BLOCK_NOT_FOUND;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mockStatic;
 
 public class BlockReadServiceTest extends ServiceTestSupport {
 

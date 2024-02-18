@@ -1,6 +1,10 @@
 package com.gnimty.communityapiserver.domain.chat.service;
 
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatDto;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatRoomDto;
 import com.gnimty.communityapiserver.domain.chat.entity.Blocked;
@@ -21,23 +25,19 @@ import com.gnimty.communityapiserver.global.constant.Tier;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
 import com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.*;
-
-import org.junit.jupiter.api.Test;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 
 @Slf4j
@@ -91,7 +91,8 @@ public class StompServiceTest {
             // given
             ChatRoom chatRoom = ChatRoom.builder()
                 .chatRoomNo(1L)
-                .participants(Arrays.asList(new Participant(userA, Blocked.UNBLOCK), new Participant(userB, Blocked.UNBLOCK)))
+                .participants(
+                    Arrays.asList(new Participant(userA, Blocked.UNBLOCK), new Participant(userB, Blocked.UNBLOCK)))
                 .build();
             chatRoomRepository.save(chatRoom);
 
@@ -449,7 +450,7 @@ public class StompServiceTest {
     }
 
     private void saveChatRoomWithBlocked(Long chatRoomNo, User user1, User user2,
-                                         Blocked user1Blocked, Blocked user2Blocked) {
+        Blocked user1Blocked, Blocked user2Blocked) {
         ChatRoom chatRoom = ChatRoom.builder()
             .chatRoomNo(chatRoomNo)
             .participants(Arrays.asList(new Participant(user1, user1Blocked),
@@ -712,7 +713,6 @@ public class StompServiceTest {
                 .forEach(participant -> participant.outChatRoom());
             chatRoomRepository.save(chatRoom);
             Thread.sleep(10);
-
 
             // when
             stompService.updateBlockStatus(userA, userB, Blocked.BLOCK);

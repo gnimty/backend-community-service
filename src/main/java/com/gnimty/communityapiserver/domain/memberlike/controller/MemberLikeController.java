@@ -29,23 +29,23 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/members/me/like")
 public class MemberLikeController {
 
-	private final MemberLikeService memberLikeService;
+    private final MemberLikeService memberLikeService;
 
-	@Operation(summary = READ_MEMBER_LIKE, description = ApiDescription.READ_MEMBER_LIKE)
-	@Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token", required = true)
-	@GetMapping
-	public CommonResponse<MemberLikeResponse> readMemberLike() {
-		MemberLikeResponse response = MemberLikeResponse.builder()
-			.upCount(MemberThreadLocal.get().getUpCount())
-			.build();
-		return CommonResponse.success(response);
-	}
+    @Operation(summary = READ_MEMBER_LIKE, description = ApiDescription.READ_MEMBER_LIKE)
+    @Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token", required = true)
+    @GetMapping
+    public CommonResponse<MemberLikeResponse> readMemberLike() {
+        MemberLikeResponse response = MemberLikeResponse.builder()
+            .upCount(MemberThreadLocal.get().getUpCount())
+            .build();
+        return CommonResponse.success(response);
+    }
 
-	@Operation(summary = DO_MEMBER_LIKE, description = ApiDescription.DO_MEMBER_LIKE)
-	@Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token", required = true)
-	@PostMapping
-	public CommonResponse<Void> doMemberLike(@RequestBody @Valid MemberLikeRequest request) {
-		memberLikeService.doMemberLike(request.toServiceRequest());
-		return CommonResponse.success(SUCCESS_MEMBER_LIKE, OK);
-	}
+    @Operation(summary = DO_MEMBER_LIKE, description = ApiDescription.DO_MEMBER_LIKE)
+    @Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token", required = true)
+    @PostMapping
+    public CommonResponse<Void> doMemberLike(@RequestBody @Valid MemberLikeRequest request) {
+        memberLikeService.doMemberLike(request.toServiceRequest());
+        return CommonResponse.success(SUCCESS_MEMBER_LIKE, OK);
+    }
 }

@@ -1,22 +1,5 @@
 package com.gnimty.communityapiserver.controller.memberlike;
 
-import com.gnimty.communityapiserver.controller.ControllerTestSupport;
-import com.gnimty.communityapiserver.domain.member.entity.Member;
-import com.gnimty.communityapiserver.domain.memberlike.controller.dto.request.MemberLikeRequest;
-import com.gnimty.communityapiserver.domain.memberlike.service.dto.request.MemberLikeServiceRequest;
-import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
-import org.springframework.http.MediaType;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.nio.charset.StandardCharsets;
-
 import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_MEMBER_LIKE;
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage.INVALID_INPUT_VALUE;
 import static org.mockito.ArgumentMatchers.any;
@@ -26,6 +9,22 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.gnimty.communityapiserver.controller.ControllerTestSupport;
+import com.gnimty.communityapiserver.domain.member.entity.Member;
+import com.gnimty.communityapiserver.domain.memberlike.controller.dto.request.MemberLikeRequest;
+import com.gnimty.communityapiserver.domain.memberlike.service.dto.request.MemberLikeServiceRequest;
+import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
+import java.nio.charset.StandardCharsets;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.springframework.http.MediaType;
 
 public class MemberLikeControllerTest extends ControllerTestSupport {
 

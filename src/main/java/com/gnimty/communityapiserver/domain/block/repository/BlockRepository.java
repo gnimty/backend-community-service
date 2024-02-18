@@ -10,9 +10,9 @@ import org.springframework.data.repository.query.Param;
 
 public interface BlockRepository extends JpaRepository<Block, Long> {
 
-	List<Block> findByBlocker(Member blocker);
+    List<Block> findByBlocker(Member blocker);
 
-	@Query("delete from Block b where b.blocker.id = :id or b.blocked.id = :id")
-	@Modifying
-	void deleteAllFromMember(@Param("id") Long id);
+    @Query("delete from Block b where b.blocker.id = :id or b.blocked.id = :id")
+    @Modifying
+    void deleteAllFromMember(@Param("id") Long id);
 }

@@ -15,12 +15,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ChampionCommentsResponse {
 
-	@Schema(description = "챔피언 운용법 정보")
-	List<ChampionCommentsEntry> championComments;
+    @Schema(description = "챔피언 운용법 정보")
+    List<ChampionCommentsEntry> championComments;
 
-	public static ChampionCommentsResponse of(ChampionCommentsServiceResponse response) {
-		return ChampionCommentsResponse.builder()
-			.championComments(response.getChampionComments())
-			.build();
-	}
+    public static ChampionCommentsResponse of(ChampionCommentsServiceResponse response) {
+        return ChampionCommentsResponse.builder()
+            .championComments(response.getChampionComments())
+            .build();
+    }
 }

@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MessageRequest {
 
-	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
-	private MessageRequestType type;
+    @NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+    private MessageRequestType type;
 
-	private String data;
+    private String data;
 }

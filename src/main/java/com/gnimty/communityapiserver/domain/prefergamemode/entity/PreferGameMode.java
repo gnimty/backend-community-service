@@ -26,26 +26,26 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PreferGameMode extends BaseEntity {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "prefer_game_mode_id", columnDefinition = "BIGINT", nullable = false, updatable = false)
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "prefer_game_mode_id", columnDefinition = "BIGINT", nullable = false, updatable = false)
+    private Long id;
 
-	@Enumerated(EnumType.STRING)
-	@NotNull
-	@Column(name = "game_mode", columnDefinition = "VARCHAR(20)")
-	private GameMode gameMode;
+    @Enumerated(EnumType.STRING)
+    @NotNull
+    @Column(name = "game_mode", columnDefinition = "VARCHAR(20)")
+    private GameMode gameMode;
 
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(name = "member_id", updatable = false)
-	private Member member;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "member_id", updatable = false)
+    private Member member;
 
-	@Builder
-	public PreferGameMode(
-		GameMode gameMode,
-		Member member
-	) {
-		this.gameMode = gameMode;
-		this.member = member;
-	}
+    @Builder
+    public PreferGameMode(
+        GameMode gameMode,
+        Member member
+    ) {
+        this.gameMode = gameMode;
+        this.member = member;
+    }
 }

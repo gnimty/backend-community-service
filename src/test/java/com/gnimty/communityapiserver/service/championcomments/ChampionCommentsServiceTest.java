@@ -1,5 +1,14 @@
 package com.gnimty.communityapiserver.service.championcomments;
 
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.INVALID_CHILD_COMMENTS;
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.INVALID_VERSION;
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.MEMBER_NOT_FOUND;
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.NOT_LINKED_RSO;
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.NO_PERMISSION;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.BDDMockito.given;
+
 import com.gnimty.communityapiserver.domain.championcomments.entity.ChampionComments;
 import com.gnimty.communityapiserver.domain.championcomments.service.ChampionCommentsService;
 import com.gnimty.communityapiserver.domain.championcomments.service.ChampionCommentsService.VersionData;
@@ -14,6 +23,7 @@ import com.gnimty.communityapiserver.global.constant.Lane;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.service.ServiceTestSupport;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -22,13 +32,6 @@ import org.mockito.Answers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-
-import static com.gnimty.communityapiserver.global.exception.ErrorCode.*;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.BDDMockito.given;
 
 public class ChampionCommentsServiceTest extends ServiceTestSupport {
 
@@ -176,7 +179,7 @@ public class ChampionCommentsServiceTest extends ServiceTestSupport {
         }
 
         private ChampionCommentsServiceRequest createRequest(Lane lane, int depth, Long parentCommentsId,
-                                                             Long mentionedMemberId) {
+            Long mentionedMemberId) {
             return ChampionCommentsServiceRequest.builder()
                 .depth(depth)
                 .contents("contents")

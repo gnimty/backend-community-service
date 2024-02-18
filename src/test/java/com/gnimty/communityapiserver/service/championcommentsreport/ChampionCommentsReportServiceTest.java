@@ -1,5 +1,11 @@
 package com.gnimty.communityapiserver.service.championcommentsreport;
 
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.DUPLICATED_REPORT;
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.NOT_LINKED_RSO;
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.OTHER_TYPE_MUST_CONTAIN_COMMENT;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import com.gnimty.communityapiserver.domain.championcomments.entity.ChampionComments;
 import com.gnimty.communityapiserver.domain.championcommentsreport.entity.ChampionCommentsReport;
 import com.gnimty.communityapiserver.domain.championcommentsreport.service.ChampionCommentsReportService;
@@ -11,17 +17,12 @@ import com.gnimty.communityapiserver.global.constant.ReportType;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.service.ServiceTestSupport;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
-
-import static com.gnimty.communityapiserver.global.exception.ErrorCode.*;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class ChampionCommentsReportServiceTest extends ServiceTestSupport {
 

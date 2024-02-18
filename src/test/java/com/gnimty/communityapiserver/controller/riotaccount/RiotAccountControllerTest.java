@@ -1,5 +1,19 @@
 package com.gnimty.communityapiserver.controller.riotaccount;
 
+import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_UPDATE_SUMMONERS;
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage.INVALID_INPUT_VALUE;
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage.MISSING_REQUEST_PARAMETER;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.Mockito.mock;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.gnimty.communityapiserver.controller.ControllerTestSupport;
 import com.gnimty.communityapiserver.domain.block.service.dto.request.BlockServiceRequest;
 import com.gnimty.communityapiserver.domain.chat.entity.Blocked;
@@ -12,7 +26,17 @@ import com.gnimty.communityapiserver.domain.riotaccount.service.dto.request.Reco
 import com.gnimty.communityapiserver.domain.riotaccount.service.dto.response.RecentlySummonersServiceResponse;
 import com.gnimty.communityapiserver.domain.riotaccount.service.dto.response.RecommendedSummonersServiceResponse;
 import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
-import com.gnimty.communityapiserver.global.constant.*;
+import com.gnimty.communityapiserver.global.constant.GameMode;
+import com.gnimty.communityapiserver.global.constant.Lane;
+import com.gnimty.communityapiserver.global.constant.SortBy;
+import com.gnimty.communityapiserver.global.constant.Status;
+import com.gnimty.communityapiserver.global.constant.Tier;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Stream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -22,25 +46,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.http.MediaType;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Stream;
-
-import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_UPDATE_SUMMONERS;
-import static com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage.INVALID_INPUT_VALUE;
-import static com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage.MISSING_REQUEST_PARAMETER;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willDoNothing;
-import static org.mockito.Mockito.mock;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class RiotAccountControllerTest extends ControllerTestSupport {
 

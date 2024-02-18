@@ -1,5 +1,7 @@
 package com.gnimty.communityapiserver.service.schedule;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.domain.member.repository.MemberRepository;
 import com.gnimty.communityapiserver.domain.schedule.entity.Schedule;
@@ -8,16 +10,13 @@ import com.gnimty.communityapiserver.domain.schedule.service.ScheduleReadService
 import com.gnimty.communityapiserver.global.constant.DayOfWeek;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.service.ServiceTestSupport;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class ScheduleReadServiceTest extends ServiceTestSupport {
 

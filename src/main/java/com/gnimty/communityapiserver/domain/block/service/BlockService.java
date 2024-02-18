@@ -18,34 +18,34 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class BlockService {
 
-	private final MemberReadService memberReadService;
-	private final BlockRepository blockRepository;
-	private final BlockReadService blockReadService;
+    private final MemberReadService memberReadService;
+    private final BlockRepository blockRepository;
+    private final BlockReadService blockReadService;
 
-	public void doBlock(Member member, BlockServiceRequest request) {
-		if (Objects.equals(request.getId(), member.getId())) {
-			throw new BaseException(ErrorCode.NOT_ALLOWED_SELF_BLOCK);
-		}
-		Member blocked = memberReadService.findById(request.getId());
-		if (blockReadService.existsByBlockerAndBlocked(member, blocked)) {
-			throw new BaseException(ErrorCode.ALREADY_BLOCKED_MEMBER);
-		}
-		blockRepository.save(createBlockEntity(request, member, blocked));
-	}
+    public void doBlock(Member member, BlockServiceRequest request) {
+        if (Objects.equals(request.getId(), member.getId())) {
+            throw new BaseException(ErrorCode.NOT_ALLOWED_SELF_BLOCK);
+        }
+        Member blocked = memberReadService.findById(request.getId());
+        if (blockReadService.existsByBlockerAndBlocked(member, blocked)) {
+            throw new BaseException(ErrorCode.ALREADY_BLOCKED_MEMBER);
+        }
+        blockRepository.save(createBlockEntity(request, member, blocked));
+    }
 
-	public void clearBlock(Member member, BlockClearServiceRequest request) {
-		Block block = blockReadService.findById(request.getId());
-		if (!Objects.equals(block.getBlocker().getId(), member.getId())) {
-			throw new BaseException(ErrorCode.NO_PERMISSION);
-		}
-		blockRepository.delete(block);
-	}
+    public void clearBlock(Member member, BlockClearServiceRequest request) {
+        Block block = blockReadService.findById(request.getId());
+        if (!Objects.equals(block.getBlocker().getId(), member.getId())) {
+            throw new BaseException(ErrorCode.NO_PERMISSION);
+        }
+        blockRepository.delete(block);
+    }
 
-	private Block createBlockEntity(BlockServiceRequest request, Member member, Member blocked) {
-		return Block.builder()
-			.blocker(member)
-			.blocked(blocked)
-			.memo(request.getMemo())
-			.build();
-	}
+    private Block createBlockEntity(BlockServiceRequest request, Member member, Member blocked) {
+        return Block.builder()
+            .blocker(member)
+            .blocked(blocked)
+            .memo(request.getMemo())
+            .build();
+    }
 }

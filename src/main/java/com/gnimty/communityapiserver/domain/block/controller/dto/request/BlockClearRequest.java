@@ -15,13 +15,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class BlockClearRequest {
 
-	@Schema(example = "1", description = "차단 해제할 \"차단 정보 id\", not null")
-	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
-	private Long id;
+    @Schema(example = "1", description = "차단 해제할 \"차단 정보 id\", not null")
+    @NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+    private Long id;
 
-	public BlockClearServiceRequest toServiceRequest() {
-		return BlockClearServiceRequest.builder()
-			.id(id)
-			.build();
-	}
+    public BlockClearServiceRequest toServiceRequest() {
+        return BlockClearServiceRequest.builder()
+            .id(id)
+            .build();
+    }
 }

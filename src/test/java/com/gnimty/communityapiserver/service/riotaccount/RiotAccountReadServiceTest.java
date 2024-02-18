@@ -1,5 +1,10 @@
 package com.gnimty.communityapiserver.service.riotaccount;
 
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.NOT_LINKED_RSO;
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.RIOT_ACCOUNT_NOT_FOUND;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.domain.prefergamemode.entity.PreferGameMode;
 import com.gnimty.communityapiserver.domain.riotaccount.controller.dto.response.RecommendedSummonersEntry;
@@ -8,22 +13,21 @@ import com.gnimty.communityapiserver.domain.riotaccount.service.RiotAccountReadS
 import com.gnimty.communityapiserver.domain.riotaccount.service.dto.request.RecommendedSummonersServiceRequest;
 import com.gnimty.communityapiserver.domain.schedule.entity.Schedule;
 import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
-import com.gnimty.communityapiserver.global.constant.*;
+import com.gnimty.communityapiserver.global.constant.DayOfWeek;
+import com.gnimty.communityapiserver.global.constant.GameMode;
+import com.gnimty.communityapiserver.global.constant.Lane;
+import com.gnimty.communityapiserver.global.constant.SortBy;
+import com.gnimty.communityapiserver.global.constant.Status;
+import com.gnimty.communityapiserver.global.constant.Tier;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.service.ServiceTestSupport;
+import java.util.Collections;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.Collections;
-import java.util.List;
-
-import static com.gnimty.communityapiserver.global.exception.ErrorCode.NOT_LINKED_RSO;
-import static com.gnimty.communityapiserver.global.exception.ErrorCode.RIOT_ACCOUNT_NOT_FOUND;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class RiotAccountReadServiceTest extends ServiceTestSupport {
 

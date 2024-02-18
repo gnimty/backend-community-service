@@ -1,5 +1,8 @@
 package com.gnimty.communityapiserver.service.championcommentslike;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import com.gnimty.communityapiserver.domain.championcomments.entity.ChampionComments;
 import com.gnimty.communityapiserver.domain.championcommentslike.entity.ChampionCommentsLike;
 import com.gnimty.communityapiserver.domain.championcommentslike.service.ChampionCommentsLikeReadService;
@@ -15,9 +18,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class ChampionCommentsLikeReadServiceTest extends ServiceTestSupport {
 

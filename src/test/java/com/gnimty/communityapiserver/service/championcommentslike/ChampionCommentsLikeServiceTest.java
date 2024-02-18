@@ -1,5 +1,11 @@
 package com.gnimty.communityapiserver.service.championcommentslike;
 
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.ALREADY_CHAMPION_COMMENTS_LIKE;
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.CHAMPION_COMMENTS_LIKE_NOT_FOUND;
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.NOT_LINKED_RSO;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import com.gnimty.communityapiserver.domain.championcomments.entity.ChampionComments;
 import com.gnimty.communityapiserver.domain.championcommentslike.entity.ChampionCommentsLike;
 import com.gnimty.communityapiserver.domain.championcommentslike.service.ChampionCommentsLikeService;
@@ -10,6 +16,7 @@ import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.service.ServiceTestSupport;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -17,12 +24,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
-
-import static com.gnimty.communityapiserver.global.exception.ErrorCode.*;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class ChampionCommentsLikeServiceTest extends ServiceTestSupport {
 

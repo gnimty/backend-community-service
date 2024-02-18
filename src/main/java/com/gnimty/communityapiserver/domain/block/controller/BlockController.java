@@ -39,38 +39,38 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/members/me/block")
 public class BlockController {
 
-	private final BlockReadService blockReadService;
-	private final BlockService blockService;
-	private final StompService stompService;
-	private final UserService userService;
+    private final BlockReadService blockReadService;
+    private final BlockService blockService;
+    private final StompService stompService;
+    private final UserService userService;
 
-	@Operation(summary = READ_BLOCKS, description = ApiDescription.READ_BLOCKS)
-	@Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token", required = true)
-	@GetMapping
-	public CommonResponse<BlockReadResponse> readBlocks() {
-		BlockReadServiceResponse response = blockReadService.readBlocks();
-		return CommonResponse.success(BlockReadResponse.from(response));
-	}
+    @Operation(summary = READ_BLOCKS, description = ApiDescription.READ_BLOCKS)
+    @Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token", required = true)
+    @GetMapping
+    public CommonResponse<BlockReadResponse> readBlocks() {
+        BlockReadServiceResponse response = blockReadService.readBlocks();
+        return CommonResponse.success(BlockReadResponse.from(response));
+    }
 
-	@Operation(summary = DO_BLOCK, description = ApiDescription.DO_BLOCK)
-	@Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token", required = true)
-	@PostMapping
-	public CommonResponse<Void> doBlock(@RequestBody @Valid BlockRequest request) {
-		Member member = MemberThreadLocal.get();
-		blockService.doBlock(member, request.toServiceRequest());
-		stompService.updateBlockStatus(userService.getUser(member.getId()),
-			userService.getUser(request.getId()), Blocked.BLOCK);
-		return CommonResponse.success(SUCCESS_BLOCK, OK);
-	}
+    @Operation(summary = DO_BLOCK, description = ApiDescription.DO_BLOCK)
+    @Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token", required = true)
+    @PostMapping
+    public CommonResponse<Void> doBlock(@RequestBody @Valid BlockRequest request) {
+        Member member = MemberThreadLocal.get();
+        blockService.doBlock(member, request.toServiceRequest());
+        stompService.updateBlockStatus(userService.getUser(member.getId()),
+            userService.getUser(request.getId()), Blocked.BLOCK);
+        return CommonResponse.success(SUCCESS_BLOCK, OK);
+    }
 
-	@Operation(summary = CLEAR_BLOCK, description = ApiDescription.CLEAR_BLOCK)
-	@Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token", required = true)
-	@DeleteMapping
-	public CommonResponse<Void> clearBlock(@RequestBody @Valid BlockClearRequest request) {
-		Member member = MemberThreadLocal.get();
-		blockService.clearBlock(member, request.toServiceRequest());
-		stompService.updateBlockStatus(userService.getUser(member.getId()),
-			userService.getUser(request.getId()), Blocked.UNBLOCK);
-		return CommonResponse.success(SUCCESS_CLEAR_BLOCK, OK);
-	}
+    @Operation(summary = CLEAR_BLOCK, description = ApiDescription.CLEAR_BLOCK)
+    @Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token", required = true)
+    @DeleteMapping
+    public CommonResponse<Void> clearBlock(@RequestBody @Valid BlockClearRequest request) {
+        Member member = MemberThreadLocal.get();
+        blockService.clearBlock(member, request.toServiceRequest());
+        stompService.updateBlockStatus(userService.getUser(member.getId()),
+            userService.getUser(request.getId()), Blocked.UNBLOCK);
+        return CommonResponse.success(SUCCESS_CLEAR_BLOCK, OK);
+    }
 }

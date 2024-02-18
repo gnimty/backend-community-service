@@ -10,11 +10,11 @@ import org.springframework.data.repository.query.Param;
 
 public interface PreferGameModeRepository extends JpaRepository<PreferGameMode, Long> {
 
-	List<PreferGameMode> findByMember(Member member);
+    List<PreferGameMode> findByMember(Member member);
 
-	void deleteByMember(Member member);
+    void deleteByMember(Member member);
 
-	@Query("delete from PreferGameMode p where p.member.id = :id")
-	@Modifying
-	void deleteAllFromMember(@Param("id") Long id);
+    @Query("delete from PreferGameMode p where p.member.id = :id")
+    @Modifying
+    void deleteAllFromMember(@Param("id") Long id);
 }

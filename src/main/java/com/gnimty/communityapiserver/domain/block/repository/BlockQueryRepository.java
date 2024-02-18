@@ -11,23 +11,23 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class BlockQueryRepository {
 
-	private final JPAQueryFactory queryFactory;
+    private final JPAQueryFactory queryFactory;
 
-	public Boolean existsByBlockerAndBlocked(Member blocker, Member blocked) {
-		return queryFactory
-			.selectOne()
-			.from(block)
-			.where(block.blocker.id.eq(blocker.getId())
-				.and(block.blocked.id.eq(blocked.getId())))
-			.fetchFirst() != null;
-	}
+    public Boolean existsByBlockerAndBlocked(Member blocker, Member blocked) {
+        return queryFactory
+            .selectOne()
+            .from(block)
+            .where(block.blocker.id.eq(blocker.getId())
+                .and(block.blocked.id.eq(blocked.getId())))
+            .fetchFirst() != null;
+    }
 
-	public Boolean existsByBlockerAndBlocked(Long blockerId, Long blockedId) {
-		return queryFactory
-			.selectOne()
-			.from(block)
-			.where(block.blocker.id.eq(blockerId)
-				.and(block.blocked.id.eq(blockedId)))
-			.fetchFirst() != null;
-	}
+    public Boolean existsByBlockerAndBlocked(Long blockerId, Long blockedId) {
+        return queryFactory
+            .selectOne()
+            .from(block)
+            .where(block.blocker.id.eq(blockerId)
+                .and(block.blocked.id.eq(blockedId)))
+            .fetchFirst() != null;
+    }
 }

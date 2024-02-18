@@ -8,12 +8,12 @@ import lombok.Getter;
 @Getter
 public class ScheduleRequest {
 
-	@Valid
-	private List<ScheduleEntry> schedules;
+    @Valid
+    private List<ScheduleEntry> schedules;
 
-	public ScheduleServiceRequest toServiceRequest() {
-		return ScheduleServiceRequest.builder()
-			.schedules(schedules)
-			.build();
-	}
+    public ScheduleServiceRequest toServiceRequest() {
+        return ScheduleServiceRequest.builder()
+            .schedules(schedules)
+            .build();
+    }
 }

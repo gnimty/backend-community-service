@@ -7,6 +7,6 @@ import lombok.Getter;
 @Getter
 public class ChampionCommentsLikeServiceRequest {
 
-	private Boolean likeOrNot;
-	private Boolean cancel;
+    private Boolean likeOrNot;
+    private Boolean cancel;
 }

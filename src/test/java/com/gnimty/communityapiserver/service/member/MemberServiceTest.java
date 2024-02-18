@@ -1,12 +1,31 @@
 package com.gnimty.communityapiserver.service.member;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.mock;
+import static org.mockito.BDDMockito.mockStatic;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.times;
+import static org.mockito.BDDMockito.when;
+import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.BDDMockito.willThrow;
+
 import com.gnimty.communityapiserver.domain.block.entity.Block;
 import com.gnimty.communityapiserver.domain.introduction.entity.Introduction;
 import com.gnimty.communityapiserver.domain.introduction.service.IntroductionReadService;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.domain.member.service.MemberReadService;
 import com.gnimty.communityapiserver.domain.member.service.MemberService;
-import com.gnimty.communityapiserver.domain.member.service.dto.request.*;
+import com.gnimty.communityapiserver.domain.member.service.dto.request.MyProfileUpdateMainServiceRequest;
+import com.gnimty.communityapiserver.domain.member.service.dto.request.OauthLoginServiceRequest;
+import com.gnimty.communityapiserver.domain.member.service.dto.request.PasswordEmailVerifyServiceRequest;
+import com.gnimty.communityapiserver.domain.member.service.dto.request.PasswordResetServiceRequest;
+import com.gnimty.communityapiserver.domain.member.service.dto.request.PasswordUpdateServiceRequest;
+import com.gnimty.communityapiserver.domain.member.service.dto.request.SendEmailServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.IntroductionEntry;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.MyProfileServiceResponse;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.PasswordEmailVerifyServiceResponse;
@@ -25,10 +44,19 @@ import com.gnimty.communityapiserver.domain.schedule.controller.dto.request.Sche
 import com.gnimty.communityapiserver.domain.schedule.entity.Schedule;
 import com.gnimty.communityapiserver.domain.schedule.service.ScheduleReadService;
 import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
-import com.gnimty.communityapiserver.global.constant.*;
+import com.gnimty.communityapiserver.global.constant.DayOfWeek;
+import com.gnimty.communityapiserver.global.constant.GameMode;
+import com.gnimty.communityapiserver.global.constant.Lane;
+import com.gnimty.communityapiserver.global.constant.Provider;
+import com.gnimty.communityapiserver.global.constant.Status;
+import com.gnimty.communityapiserver.global.constant.Tier;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
 import com.gnimty.communityapiserver.service.ServiceTestSupport;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -43,18 +71,8 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.*;
-
 public class MemberServiceTest extends ServiceTestSupport {
+
     @Autowired
     private MemberService memberService;
     @MockBean
@@ -299,7 +317,7 @@ public class MemberServiceTest extends ServiceTestSupport {
         }
 
         private void assertPreferGameMode(PreferGameMode preferGameMode,
-                                          MyProfileServiceResponse response) {
+            MyProfileServiceResponse response) {
             assertThat(response.getRiotDependentInfo().getPreferGameModes().get(0).getGameMode())
                 .isEqualTo(preferGameMode.getGameMode());
         }
@@ -1088,7 +1106,7 @@ public class MemberServiceTest extends ServiceTestSupport {
     }
 
     public RiotAccount createRiotAccount(Member member, String summonerName, String puuid,
-                                         Boolean isMain) {
+        Boolean isMain) {
         return RiotAccount.builder()
             .name(summonerName)
             .tagLine("tagLine")

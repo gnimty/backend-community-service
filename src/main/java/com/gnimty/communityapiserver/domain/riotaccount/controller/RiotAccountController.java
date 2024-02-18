@@ -44,48 +44,48 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/summoners")
 public class RiotAccountController {
 
-	private final RiotAccountService riotAccountService;
-	private final StompService stompService;
-	private final UserService userService;
+    private final RiotAccountService riotAccountService;
+    private final StompService stompService;
+    private final UserService userService;
 
-	@Operation(summary = UPDATE_SUMMONERS, description = ApiDescription.UPDATE_SUMMONERS)
-	@PatchMapping
-	public CommonResponse<Void> updateSummoners(@RequestBody @Valid SummonerUpdateRequest request) {
-		List<RiotAccount> riotAccounts = riotAccountService.updateSummoners(request.toServiceRequest());
-		if (!riotAccounts.isEmpty()) {
-			stompService.createOrUpdateUser(riotAccounts);
-		}
-		return CommonResponse.success(SUCCESS_UPDATE_SUMMONERS, OK);
-	}
+    @Operation(summary = UPDATE_SUMMONERS, description = ApiDescription.UPDATE_SUMMONERS)
+    @PatchMapping
+    public CommonResponse<Void> updateSummoners(@RequestBody @Valid SummonerUpdateRequest request) {
+        List<RiotAccount> riotAccounts = riotAccountService.updateSummoners(request.toServiceRequest());
+        if (!riotAccounts.isEmpty()) {
+            stompService.createOrUpdateUser(riotAccounts);
+        }
+        return CommonResponse.success(SUCCESS_UPDATE_SUMMONERS, OK);
+    }
 
-	@Operation(summary = GET_RECOMMENDED_SUMMONERS, description = ApiDescription.GET_RECOMMENDED_SUMMONERS)
-	@Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token", required = true)
-	@GetMapping
-	public CommonResponse<RecommendedSummonersResponse> getRecommendedSummoners(
-		@ModelAttribute @Valid RecommendedSummonersRequest request
-	) {
-		RecommendedSummonersServiceResponse response = riotAccountService.getRecommendedSummoners(
-			request.toServiceRequest());
-		return CommonResponse.success(RecommendedSummonersResponse.from(response));
-	}
+    @Operation(summary = GET_RECOMMENDED_SUMMONERS, description = ApiDescription.GET_RECOMMENDED_SUMMONERS)
+    @Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token", required = true)
+    @GetMapping
+    public CommonResponse<RecommendedSummonersResponse> getRecommendedSummoners(
+        @ModelAttribute @Valid RecommendedSummonersRequest request
+    ) {
+        RecommendedSummonersServiceResponse response = riotAccountService.getRecommendedSummoners(
+            request.toServiceRequest());
+        return CommonResponse.success(RecommendedSummonersResponse.from(response));
+    }
 
-	@Operation(summary = GET_MAIN_SUMMONERS, description = ApiDescription.GET_MAIN_SUMMONERS)
-	@Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token")
-	@GetMapping("/main")
-	public CommonResponse<RecommendedSummonersResponse> getMainSummoners(
-		@Schema(example = "RANK_SOLO", description = "조회하려는 게임 모드, not null") @RequestParam("game-mode") GameMode gameMode
-	) {
-		RecommendedSummonersServiceResponse response = riotAccountService.getMainSummoners(gameMode);
-		return CommonResponse.success(RecommendedSummonersResponse.from(response));
-	}
+    @Operation(summary = GET_MAIN_SUMMONERS, description = ApiDescription.GET_MAIN_SUMMONERS)
+    @Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token")
+    @GetMapping("/main")
+    public CommonResponse<RecommendedSummonersResponse> getMainSummoners(
+        @Schema(example = "RANK_SOLO", description = "조회하려는 게임 모드, not null") @RequestParam("game-mode") GameMode gameMode
+    ) {
+        RecommendedSummonersServiceResponse response = riotAccountService.getMainSummoners(gameMode);
+        return CommonResponse.success(RecommendedSummonersResponse.from(response));
+    }
 
-	@Operation(summary = GET_RECENTLY_SUMMONERS, description = ApiDescription.GET_RECENTLY_SUMMONERS)
-	@Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token", required = true)
-	@GetMapping("/recently")
-	public CommonResponse<RecentlySummonersResponse> getRecentlySummoners() {
-		Member member = MemberThreadLocal.get();
-		List<Long> chattedMemberIds = stompService.getChattedMemberIds(userService.getUser(member.getId()));
-		RecentlySummonersServiceResponse response = riotAccountService.getRecentlySummoners(member, chattedMemberIds);
-		return CommonResponse.success(RecentlySummonersResponse.from(response));
-	}
+    @Operation(summary = GET_RECENTLY_SUMMONERS, description = ApiDescription.GET_RECENTLY_SUMMONERS)
+    @Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token", required = true)
+    @GetMapping("/recently")
+    public CommonResponse<RecentlySummonersResponse> getRecentlySummoners() {
+        Member member = MemberThreadLocal.get();
+        List<Long> chattedMemberIds = stompService.getChattedMemberIds(userService.getUser(member.getId()));
+        RecentlySummonersServiceResponse response = riotAccountService.getRecentlySummoners(member, chattedMemberIds);
+        return CommonResponse.success(RecentlySummonersResponse.from(response));
+    }
 }

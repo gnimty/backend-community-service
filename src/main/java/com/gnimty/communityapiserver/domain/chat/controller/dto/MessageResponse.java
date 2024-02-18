@@ -6,11 +6,11 @@ import lombok.Data;
 @Data
 public class MessageResponse {
 
-	private MessageResponseType type;
-	private Object data;
+    private MessageResponseType type;
+    private Object data;
 
-	public MessageResponse(MessageResponseType type, Object data) {
-		this.type = type;
-		this.data = data;
-	}
+    public MessageResponse(MessageResponseType type, Object data) {
+        this.type = type;
+        this.data = data;
+    }
 }

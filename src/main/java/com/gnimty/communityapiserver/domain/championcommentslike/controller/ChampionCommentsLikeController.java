@@ -27,17 +27,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/champions/{champion_id}/comments/{comments_id}/like")
 public class ChampionCommentsLikeController {
 
-	private final ChampionCommentsLikeService championCommentsLikeService;
+    private final ChampionCommentsLikeService championCommentsLikeService;
 
-	@Operation(summary = DO_CHAMPION_COMMENTS_LIKE, description = ApiDescription.DO_CHAMPION_COMMENTS_LIKE)
-	@Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token", required = true)
-	@PostMapping
-	public CommonResponse<Void> doChampionCommentsLike(
-		@Schema(example = "1", description = "조회하려는 챔피언 id") @PathVariable("champion_id") Long championId,
-		@Schema(example = "1", description = "좋아요하려는 댓글 id") @PathVariable("comments_id") Long commentsId,
-		@RequestBody @Valid ChampionCommentsLikeRequest request
-	) {
-		championCommentsLikeService.doChampionCommentsLike(championId, commentsId, request.toServiceRequest());
-		return CommonResponse.success(SUCCESS_CHAMPION_COMMENTS_LIKE, CREATED);
-	}
+    @Operation(summary = DO_CHAMPION_COMMENTS_LIKE, description = ApiDescription.DO_CHAMPION_COMMENTS_LIKE)
+    @Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token", required = true)
+    @PostMapping
+    public CommonResponse<Void> doChampionCommentsLike(
+        @Schema(example = "1", description = "조회하려는 챔피언 id") @PathVariable("champion_id") Long championId,
+        @Schema(example = "1", description = "좋아요하려는 댓글 id") @PathVariable("comments_id") Long commentsId,
+        @RequestBody @Valid ChampionCommentsLikeRequest request
+    ) {
+        championCommentsLikeService.doChampionCommentsLike(championId, commentsId, request.toServiceRequest());
+        return CommonResponse.success(SUCCESS_CHAMPION_COMMENTS_LIKE, CREATED);
+    }
 }
