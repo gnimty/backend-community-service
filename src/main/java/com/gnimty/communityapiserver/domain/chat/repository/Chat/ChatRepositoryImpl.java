@@ -6,6 +6,8 @@ import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
 
 import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +38,7 @@ public class ChatRepositoryImpl implements ChatRepositoryCustom {
 	}
 
 	@Override
-	public List<ChatDto> findByChatRoom(ChatRoom chatRoom, Instant exitDate) {
+	public List<ChatDto> findByChatRoom(ChatRoom chatRoom, OffsetDateTime exitDate) {
 		Query query = new Query(Criteria.where("chatRoomNo").is(chatRoom.getChatRoomNo()));
 		if (exitDate != null) {
 			query.addCriteria(Criteria.where("sendDate").gte(exitDate));

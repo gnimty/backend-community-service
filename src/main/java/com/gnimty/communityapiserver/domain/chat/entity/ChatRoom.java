@@ -1,14 +1,13 @@
 package com.gnimty.communityapiserver.domain.chat.entity;
 
-import java.time.Instant;
-import java.util.Date;
+import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -21,7 +20,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-@Builder
 @EqualsAndHashCode
 public class ChatRoom {
 
@@ -35,29 +33,52 @@ public class ChatRoom {
 	@Indexed(unique = true)
 	private Long chatRoomNo;
 	private List<Participant> participants;
-	private Instant createdDate;
+	private OffsetDateTime createdDate;
+	private OffsetDateTime lastModifiedDate;
 
-	@Getter
-	@Setter
-	@AllArgsConstructor
-	@ToString
 	@Builder
-	@EqualsAndHashCode
-	public static class Participant {
+	public ChatRoom(Long chatRoomNo, List<Participant> participants) {
+		this.chatRoomNo = chatRoomNo;
+		this.participants = participants;
 
-		@DBRef
-		private User user;
-		private Instant exitDate;
-		private Blocked blockedStatus;
+		OffsetDateTime now = OffsetDateTime.now().truncatedTo(ChronoUnit.MILLIS);
+		this.createdDate = now;
+		this.lastModifiedDate = now;
 	}
 
-	private Instant lastModifiedDate;
-
-	public void refreshModifiedDate(Instant date) {
-		this.lastModifiedDate = date;
+	public void refreshModifiedDate(OffsetDateTime date) {
+		this.lastModifiedDate = date.truncatedTo(ChronoUnit.MILLIS);
 	}
 
 	public void updateParticipants(List<Participant> participants) {
 		this.participants = participants;
+	}
+
+	@Getter
+	@AllArgsConstructor
+	@ToString
+	@EqualsAndHashCode
+	@NoArgsConstructor
+	public static class Participant {
+
+		@DBRef
+		private User user;
+		private OffsetDateTime exitDate;
+		private Blocked blockedStatus;
+
+		@Builder
+		public Participant(User user, Blocked blockedStatus) {
+			this.user = user;
+			this.blockedStatus = blockedStatus;
+			this.exitDate = null;
+		}
+
+		public void outChatRoom() {
+			this.exitDate = OffsetDateTime.now().truncatedTo(ChronoUnit.MILLIS);
+		}
+
+		public void updateBlockedStatus(Blocked blockedStatus) {
+			this.blockedStatus = blockedStatus;
+		}
 	}
 }

@@ -17,9 +17,7 @@ import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
 
-import java.time.Clock;
-import java.time.Instant;
-import java.time.ZoneId;
+import java.time.*;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -107,7 +105,7 @@ public class StompService {
 		// (상대방이 채팅방 나가지 않은 상황) lastModifiedDate가 상대의 exitDate 이후일 때 : exitDate update
 		//      -> chatRoomRepository.updateExitDate(me);
 		else {
-			mine.setExitDate(InstantKoreaTimeUtil.getNow());
+			mine.outChatRoom();
 			chatRoomService.update(chatRoom);
 		}
 	}
@@ -171,7 +169,7 @@ public class StompService {
 	public void updateBlockStatus(User me, User other, Blocked status) {
 		Optional<ChatRoom> findChatRoom = chatRoomService.findChatRoom(me, other);
 		if (findChatRoom.isPresent()) {
-			extractParticipant(me, findChatRoom.get().getParticipants(), true).setBlockedStatus(
+			extractParticipant(me, findChatRoom.get().getParticipants(), true).updateBlockedStatus(
 				status);
 			chatRoomService.update(findChatRoom.get());
 			if (status == Blocked.BLOCK) {
@@ -197,11 +195,10 @@ public class StompService {
 
 	// TODO janguni: 채팅 저장
 	public ChatDto saveChat(User user, ChatRoom chatRoom, String message) {
-		Instant now = InstantKoreaTimeUtil.getNow();
 
-		Chat savedChat = chatService.save(user, chatRoom, message, now);
+		Chat savedChat = chatService.save(user, chatRoom, message);
 
-		chatRoom.refreshModifiedDate(now);
+		chatRoom.refreshModifiedDate(savedChat.getSendDate());
 		chatRoomService.update(chatRoom);
 
 		return new ChatDto(savedChat);
@@ -248,14 +245,14 @@ public class StompService {
 		return participant.getUser();
 	}
 
-	private List<ChatDto> getChatDtoAfterExitDate(List<Chat> totalChats, Instant exitDate) {
+	private List<ChatDto> getChatDtoAfterExitDate(List<Chat> totalChats, OffsetDateTime exitDate) {
 		return totalChats.stream()
 			.filter(chat -> exitDate == null || chat.getSendDate().isAfter(exitDate))
 			.map(ChatDto::new)
 			.toList();
 	}
 
-	private Instant getExitDate(ChatRoom chatRoom, User user) {
+	private OffsetDateTime getExitDate(ChatRoom chatRoom, User user) {
 		return extractParticipant(user, chatRoom.getParticipants(), true)
 			.getExitDate();
 	}

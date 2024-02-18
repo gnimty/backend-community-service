@@ -7,6 +7,7 @@ import com.gnimty.communityapiserver.domain.chat.entity.Blocked;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom.Participant;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
+import com.gnimty.communityapiserver.domain.chat.repository.Chat.ChatRepository;
 import com.gnimty.communityapiserver.domain.chat.repository.ChatRoom.ChatRoomRepository;
 import com.gnimty.communityapiserver.domain.chat.repository.User.UserRepository;
 import com.gnimty.communityapiserver.domain.chat.service.dto.UserWithBlockDto;
@@ -16,12 +17,11 @@ import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
 import com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage;
 
-import java.time.Instant;
+import java.time.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import com.gnimty.communityapiserver.global.utils.InstantKoreaTimeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -44,6 +44,9 @@ class ChatRoomServiceTest {
 	private ChatRoomRepository chatRoomRepository;
 
 	@Autowired
+	private ChatRepository chatRepository;
+
+	@Autowired
 	private ChatRoomService chatRoomService;
 
 	@AfterEach
@@ -61,16 +64,13 @@ class ChatRoomServiceTest {
 		@Test
 		void successToGetChatRoomListIncludingUser() {
 			// given
-            Instant now = InstantKoreaTimeUtil.getNow();
             User user = createUser("uni", 1L);
 			userRepository.save(user);
 
 			for (Integer i = 0; i < 5; i++) {
 				chatRoomRepository.save(ChatRoom.builder()
 					.chatRoomNo(i.longValue())
-					.lastModifiedDate(now)
-					.participants(Arrays.asList(new Participant(user, now, Blocked.UNBLOCK)))
-					.createdDate(now)
+					.participants(Arrays.asList(new Participant(user, Blocked.UNBLOCK)))
 					.build());
 			}
 
@@ -107,13 +107,10 @@ class ChatRoomServiceTest {
 			// given
 			User user = createUser("uni", 1L);
 			userRepository.save(user);
-            Instant now = InstantKoreaTimeUtil.getNow();
 
 			ChatRoom chatRoom = ChatRoom.builder()
 				.chatRoomNo(1L)
-				.lastModifiedDate(now)
-				.participants(Arrays.asList(new Participant(user, now, Blocked.UNBLOCK)))
-				.createdDate(now)
+				.participants(Arrays.asList(new Participant(user, Blocked.UNBLOCK)))
 				.build();
 			chatRoomRepository.save(chatRoom);
 
@@ -157,14 +154,10 @@ class ChatRoomServiceTest {
 			User userB = createUser("inu", 2L);
 			userRepository.save(userB);
 
-            Instant now = InstantKoreaTimeUtil.getNow();
-
-            ChatRoom chatRoom = ChatRoom.builder()
+			ChatRoom chatRoom = ChatRoom.builder()
 				.chatRoomNo(1L)
-				.lastModifiedDate(now)
 				.participants(Arrays.asList(new Participant(userA, null, Blocked.UNBLOCK),
 					new Participant(userB, null, Blocked.UNBLOCK)))
-				.createdDate(now)
 				.build();
 			chatRoomRepository.save(chatRoom);
 
@@ -210,14 +203,10 @@ class ChatRoomServiceTest {
 			User userB = createUser("inu", 2L);
 			userRepository.save(userB);
 
-            Instant now = InstantKoreaTimeUtil.getNow();
-
 			ChatRoom chatRoom = ChatRoom.builder()
 				.chatRoomNo(1L)
-				.lastModifiedDate(now)
 				.participants(Arrays.asList(new Participant(userA, null, Blocked.UNBLOCK),
 					new Participant(userB, null, Blocked.UNBLOCK)))
-				.createdDate(now)
 				.build();
 			chatRoomRepository.save(chatRoom);
 
@@ -280,14 +269,10 @@ class ChatRoomServiceTest {
 			User userB = createUser("inu", 2L);
 			userRepository.save(userB);
 
-            Instant now = InstantKoreaTimeUtil.getNow();
-
 			ChatRoom chatRoom = ChatRoom.builder()
 				.chatRoomNo(1L)
-				.lastModifiedDate(now)
 				.participants(Arrays.asList(new Participant(userA, null, Blocked.UNBLOCK),
 					new Participant(userB, null, Blocked.UNBLOCK)))
-				.createdDate(now)
 				.build();
 			chatRoomRepository.save(chatRoom);
 
@@ -318,19 +303,15 @@ class ChatRoomServiceTest {
 			User userB = createUser("inu", 2L);
 			userRepository.save(userB);
 
-            Instant now = InstantKoreaTimeUtil.getNow();
-
 			ChatRoom chatRoom = ChatRoom.builder()
 				.chatRoomNo(1L)
-				.lastModifiedDate(now)
 				.participants(Arrays.asList(new Participant(userA, null, Blocked.UNBLOCK),
 					new Participant(userB, null, Blocked.UNBLOCK)))
-				.createdDate(now)
 				.build();
 			chatRoomRepository.save(chatRoom);
 
 			// when
-            Instant after = InstantKoreaTimeUtil.getNow();
+			OffsetDateTime after = OffsetDateTime.now();
 			chatRoom.refreshModifiedDate(after);
 			chatRoomService.update(chatRoom);
 
@@ -349,21 +330,17 @@ class ChatRoomServiceTest {
 			User userB = createUser("inu", 2L);
 			userRepository.save(userB);
 
-            Instant now = InstantKoreaTimeUtil.getNow();
-
 			ChatRoom chatRoom = ChatRoom.builder()
 				.chatRoomNo(1L)
-				.lastModifiedDate(now)
 				.participants(Arrays.asList(new Participant(userA, null, Blocked.UNBLOCK),
 					new Participant(userB, null, Blocked.UNBLOCK)))
-				.createdDate(now)
 				.build();
 			chatRoomRepository.save(chatRoom);
 
 			// when
 			chatRoom.updateParticipants(
-				Arrays.asList(new Participant(userA, now, Blocked.UNBLOCK),
-					new Participant(userB, now, Blocked.BLOCK)));
+				Arrays.asList(new Participant(userA, Blocked.UNBLOCK),
+					new Participant(userB, Blocked.BLOCK)));
 			chatRoomService.update(chatRoom);
 
 			//then
@@ -383,13 +360,10 @@ class ChatRoomServiceTest {
 			User user = createUser("uni", 1L);
 			userRepository.save(user);
 
-            Instant now = InstantKoreaTimeUtil.getNow();
 
 			ChatRoom chatRoom = ChatRoom.builder()
 				.chatRoomNo(1L)
-				.lastModifiedDate(now)
 				.participants(Arrays.asList(new Participant(user, null, Blocked.UNBLOCK)))
-				.createdDate(now)
 				.build();
 			chatRoomRepository.save(chatRoom);
 
@@ -411,5 +385,4 @@ class ChatRoomServiceTest {
 			.nowStatus(Status.ONLINE).lp(3L)
 			.build();
 	}
-
 }

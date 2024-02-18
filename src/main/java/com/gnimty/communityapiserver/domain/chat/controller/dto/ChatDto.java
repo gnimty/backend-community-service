@@ -3,6 +3,8 @@ package com.gnimty.communityapiserver.domain.chat.controller.dto;
 import com.gnimty.communityapiserver.domain.chat.entity.Chat;
 
 import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,7 +19,7 @@ public class ChatDto {
 
 	private Long senderId;
 	private String message;
-	private Instant sendDate;
+	private OffsetDateTime sendDate;
 	private Integer readCnt;
 
 	@Builder
