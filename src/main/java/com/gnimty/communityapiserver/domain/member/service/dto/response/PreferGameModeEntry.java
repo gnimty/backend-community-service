@@ -17,13 +17,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PreferGameModeEntry {
 
-    @Schema(example = "RANK_SOLO", description = "선호 게임 모드, not null")
-    @NotNull(message = INVALID_INPUT_VALUE)
-    private GameMode gameMode;
+	@Schema(example = "RANK_SOLO", description = "선호 게임 모드, not null")
+	@NotNull(message = INVALID_INPUT_VALUE)
+	private GameMode gameMode;
 
-    public static PreferGameModeEntry from(PreferGameMode preferGameMode) {
-        return PreferGameModeEntry.builder()
-            .gameMode(preferGameMode.getGameMode())
-            .build();
-    }
+	public static PreferGameModeEntry from(PreferGameMode preferGameMode) {
+		return PreferGameModeEntry.builder()
+			.gameMode(preferGameMode.getGameMode())
+			.build();
+	}
 }

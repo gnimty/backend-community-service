@@ -17,17 +17,17 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ChampionCommentsUpdateRequest {
 
-    @Schema(example = "1", description = "언급하려는 회원 id")
-    private Long mentionedMemberId;
-    @Schema(example = "content", description = "댓글 내용, not null, 최대 1000자")
-    @NotNull
-    @Size(max = MAX_CONTENTS_SIZE)
-    private String contents;
+	@Schema(example = "1", description = "언급하려는 회원 id")
+	private Long mentionedMemberId;
+	@Schema(example = "content", description = "댓글 내용, not null, 최대 1000자")
+	@NotNull
+	@Size(max = MAX_CONTENTS_SIZE)
+	private String contents;
 
-    public ChampionCommentsUpdateServiceRequest toServiceRequest() {
-        return ChampionCommentsUpdateServiceRequest.builder()
-            .mentionedMemberId(mentionedMemberId)
-            .contents(contents)
-            .build();
-    }
+	public ChampionCommentsUpdateServiceRequest toServiceRequest() {
+		return ChampionCommentsUpdateServiceRequest.builder()
+			.mentionedMemberId(mentionedMemberId)
+			.contents(contents)
+			.build();
+	}
 }

@@ -49,210 +49,210 @@ import org.springframework.http.MediaType;
 
 public class RiotAccountControllerTest extends ControllerTestSupport {
 
-    @BeforeEach
-    void setUp() {
-        given(tokenAuthInterceptor.preHandle(
-            any(HttpServletRequest.class),
-            any(HttpServletResponse.class),
-            any()))
-            .willReturn(true);
-        willDoNothing()
-            .given(blockService)
-            .doBlock(any(Member.class), any(BlockServiceRequest.class));
-        willDoNothing()
-            .given(stompService)
-            .updateBlockStatus(any(), any(), any(Blocked.class));
-    }
+	@BeforeEach
+	void setUp() {
+		given(tokenAuthInterceptor.preHandle(
+			any(HttpServletRequest.class),
+			any(HttpServletResponse.class),
+			any()))
+			.willReturn(true);
+		willDoNothing()
+			.given(blockService)
+			.doBlock(any(Member.class), any(BlockServiceRequest.class));
+		willDoNothing()
+			.given(stompService)
+			.updateBlockStatus(any(), any(), any(Blocked.class));
+	}
 
-    @DisplayName("bulk update 시")
-    @Nested
-    class UpdateSummoners {
+	@DisplayName("bulk update 시")
+	@Nested
+	class UpdateSummoners {
 
-        public static final String REQUEST_URL = "/summoners";
+		public static final String REQUEST_URL = "/summoners";
 
-        @DisplayName("올바른 요청을 보내면 성공한다.")
-        @Test
-        void should_success_when_validRequest() throws Exception {
-            SummonerUpdateRequest request = createRequest();
+		@DisplayName("올바른 요청을 보내면 성공한다.")
+		@Test
+		void should_success_when_validRequest() throws Exception {
+			SummonerUpdateRequest request = createRequest();
 
-            given(riotAccountService.updateSummoners(any(SummonerUpdateServiceRequest.class)))
-                .willReturn(Collections.emptyList());
+			given(riotAccountService.updateSummoners(any(SummonerUpdateServiceRequest.class)))
+				.willReturn(Collections.emptyList());
 
-            mockMvc.perform(patch(REQUEST_URL)
-                    .content(om.writeValueAsString(request))
-                    .characterEncoding(StandardCharsets.UTF_8)
-                    .contentType(MediaType.APPLICATION_JSON))
-                .andExpectAll(
-                    status().isOk(),
-                    jsonPath("$.status.message").value(SUCCESS_UPDATE_SUMMONERS.getMessage())
-                );
-        }
+			mockMvc.perform(patch(REQUEST_URL)
+					.content(om.writeValueAsString(request))
+					.characterEncoding(StandardCharsets.UTF_8)
+					.contentType(MediaType.APPLICATION_JSON))
+				.andExpectAll(
+					status().isOk(),
+					jsonPath("$.status.message").value(SUCCESS_UPDATE_SUMMONERS.getMessage())
+				);
+		}
 
-        private SummonerUpdateRequest createRequest() {
-            return SummonerUpdateRequest.builder()
-                .summonerUpdates(List.of(SummonerUpdateEntry.builder()
-                    .name("name")
-                    .internalTagName("name#tag")
-                    .tagLine("tag")
-                    .puuid("puuid")
-                    .tier(Tier.bronze)
-                    .division(1)
-                    .lp(100L)
-                    .mmr(100L)
-                    .mostLanes(List.of(Lane.JUNGLE))
-                    .mostChampionIds(List.of(1L, 2L, 3L))
-                    .iconId(1L)
-                    .tierFlex(Tier.bronze)
-                    .lpFlex(100L)
-                    .mmrFlex(100L)
-                    .mostLanesFlex(List.of(Lane.JUNGLE))
-                    .mostChampionIdsFlex(List.of(1L, 2L, 3L))
-                    .build()))
-                .build();
-        }
-    }
+		private SummonerUpdateRequest createRequest() {
+			return SummonerUpdateRequest.builder()
+				.summonerUpdates(List.of(SummonerUpdateEntry.builder()
+					.name("name")
+					.internalTagName("name#tag")
+					.tagLine("tag")
+					.puuid("puuid")
+					.tier(Tier.bronze)
+					.division(1)
+					.lp(100L)
+					.mmr(100L)
+					.mostLanes(List.of(Lane.JUNGLE))
+					.mostChampionIds(List.of(1L, 2L, 3L))
+					.iconId(1L)
+					.tierFlex(Tier.bronze)
+					.lpFlex(100L)
+					.mmrFlex(100L)
+					.mostLanesFlex(List.of(Lane.JUNGLE))
+					.mostChampionIdsFlex(List.of(1L, 2L, 3L))
+					.build()))
+				.build();
+		}
+	}
 
-    @DisplayName("듀오 추천 소환사 조회 시")
-    @Nested
-    class GetRecommendedSummoners {
+	@DisplayName("듀오 추천 소환사 조회 시")
+	@Nested
+	class GetRecommendedSummoners {
 
-        public static final String REQUEST_URL = "/summoners";
+		public static final String REQUEST_URL = "/summoners";
 
-        @DisplayName("올바른 요청을 보내면 성공한다.")
-        @ParameterizedTest
-        @MethodSource({"recommendedRequestArguments"})
-        void should_success_when_validRequest(SortBy sortBy, String name, Long mmr, Long upCount) throws Exception {
-            RecommendedSummonersServiceResponse response = RecommendedSummonersServiceResponse.builder()
-                .recommendedSummoners(Collections.emptyList())
-                .build();
-            given(riotAccountService.getRecommendedSummoners(any(RecommendedSummonersServiceRequest.class)))
-                .willReturn(response);
+		@DisplayName("올바른 요청을 보내면 성공한다.")
+		@ParameterizedTest
+		@MethodSource({"recommendedRequestArguments"})
+		void should_success_when_validRequest(SortBy sortBy, String name, Long mmr, Long upCount) throws Exception {
+			RecommendedSummonersServiceResponse response = RecommendedSummonersServiceResponse.builder()
+				.recommendedSummoners(Collections.emptyList())
+				.build();
+			given(riotAccountService.getRecommendedSummoners(any(RecommendedSummonersServiceRequest.class)))
+				.willReturn(response);
 
-            mockMvc.perform(get(REQUEST_URL)
-                    .param("gameMode", String.valueOf(GameMode.RANK_SOLO))
-                    .param("status", String.valueOf(Status.ONLINE))
-                    .param("sortBy", String.valueOf(sortBy))
-                    .param("lastSummonerId", String.valueOf(1L))
-                    .param("lastName", name)
-                    .param("lastSummonerMmr", mmr == null ? null : String.valueOf(mmr))
-                    .param("lastSummonerUpCount", upCount == null ? null : String.valueOf(upCount))
-                    .param("pageSize", "10"))
-                .andExpectAll(
-                    status().isOk()
-                );
-        }
+			mockMvc.perform(get(REQUEST_URL)
+					.param("gameMode", String.valueOf(GameMode.RANK_SOLO))
+					.param("status", String.valueOf(Status.ONLINE))
+					.param("sortBy", String.valueOf(sortBy))
+					.param("lastSummonerId", String.valueOf(1L))
+					.param("lastName", name)
+					.param("lastSummonerMmr", mmr == null ? null : String.valueOf(mmr))
+					.param("lastSummonerUpCount", upCount == null ? null : String.valueOf(upCount))
+					.param("pageSize", "10"))
+				.andExpectAll(
+					status().isOk()
+				);
+		}
 
-        @DisplayName("id가 null이면 실패한다.")
-        @Test
-        void should_fail_when_idIsNull() throws Exception {
-            RecommendedSummonersServiceResponse response = RecommendedSummonersServiceResponse.builder()
-                .recommendedSummoners(Collections.emptyList())
-                .build();
-            given(riotAccountService.getRecommendedSummoners(any(RecommendedSummonersServiceRequest.class)))
-                .willReturn(response);
+		@DisplayName("id가 null이면 실패한다.")
+		@Test
+		void should_fail_when_idIsNull() throws Exception {
+			RecommendedSummonersServiceResponse response = RecommendedSummonersServiceResponse.builder()
+				.recommendedSummoners(Collections.emptyList())
+				.build();
+			given(riotAccountService.getRecommendedSummoners(any(RecommendedSummonersServiceRequest.class)))
+				.willReturn(response);
 
-            mockMvc.perform(get(REQUEST_URL)
-                    .param("gameMode", String.valueOf(GameMode.RANK_SOLO))
-                    .param("status", String.valueOf(Status.ONLINE))
-                    .param("sortBy", String.valueOf(SortBy.RECOMMEND))
-                    .param("lastSummonerUpCount", "100")
-                    .param("pageSize", "10"))
-                .andExpectAll(
-                    status().isBadRequest(),
-                    jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
-                );
-        }
+			mockMvc.perform(get(REQUEST_URL)
+					.param("gameMode", String.valueOf(GameMode.RANK_SOLO))
+					.param("status", String.valueOf(Status.ONLINE))
+					.param("sortBy", String.valueOf(SortBy.RECOMMEND))
+					.param("lastSummonerUpCount", "100")
+					.param("pageSize", "10"))
+				.andExpectAll(
+					status().isBadRequest(),
+					jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
+				);
+		}
 
-        @DisplayName("validateCursor를 통과하지 못하면 실패한다.")
-        @ParameterizedTest
-        @EnumSource(value = SortBy.class)
-        void should_fail_when_failValidateCursor(SortBy sortBy) throws Exception {
-            RecommendedSummonersServiceResponse response = RecommendedSummonersServiceResponse.builder()
-                .recommendedSummoners(Collections.emptyList())
-                .build();
-            given(riotAccountService.getRecommendedSummoners(any(RecommendedSummonersServiceRequest.class)))
-                .willReturn(response);
+		@DisplayName("validateCursor를 통과하지 못하면 실패한다.")
+		@ParameterizedTest
+		@EnumSource(value = SortBy.class)
+		void should_fail_when_failValidateCursor(SortBy sortBy) throws Exception {
+			RecommendedSummonersServiceResponse response = RecommendedSummonersServiceResponse.builder()
+				.recommendedSummoners(Collections.emptyList())
+				.build();
+			given(riotAccountService.getRecommendedSummoners(any(RecommendedSummonersServiceRequest.class)))
+				.willReturn(response);
 
-            mockMvc.perform(get(REQUEST_URL)
-                    .param("gameMode", String.valueOf(GameMode.RANK_SOLO))
-                    .param("status", String.valueOf(Status.ONLINE))
-                    .param("sortBy", sortBy.name())
-                    .param("pageSize", "10"))
-                .andExpectAll(
-                    status().isBadRequest(),
-                    jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
-                );
-        }
+			mockMvc.perform(get(REQUEST_URL)
+					.param("gameMode", String.valueOf(GameMode.RANK_SOLO))
+					.param("status", String.valueOf(Status.ONLINE))
+					.param("sortBy", sortBy.name())
+					.param("pageSize", "10"))
+				.andExpectAll(
+					status().isBadRequest(),
+					jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
+				);
+		}
 
-        private static Stream<Arguments> recommendedRequestArguments() {
-            return Stream.of(
-                Arguments.arguments(SortBy.RECOMMEND, null, null, 10L),
-                Arguments.arguments(SortBy.ATOZ, "name", null, null),
-                Arguments.arguments(SortBy.TIER, null, 10L, null)
-            );
-        }
-    }
+		private static Stream<Arguments> recommendedRequestArguments() {
+			return Stream.of(
+				Arguments.arguments(SortBy.RECOMMEND, null, null, 10L),
+				Arguments.arguments(SortBy.ATOZ, "name", null, null),
+				Arguments.arguments(SortBy.TIER, null, 10L, null)
+			);
+		}
+	}
 
-    @DisplayName("메인 화면에서 추천 소환사 조회 시")
-    @Nested
-    class GetMainSummoners {
+	@DisplayName("메인 화면에서 추천 소환사 조회 시")
+	@Nested
+	class GetMainSummoners {
 
-        public static final String REQUEST_URL = "/summoners/main";
+		public static final String REQUEST_URL = "/summoners/main";
 
-        @DisplayName("올바른 요청을 보내면 성공한다.")
-        @Test
-        void should_success_when_validRequest() throws Exception {
+		@DisplayName("올바른 요청을 보내면 성공한다.")
+		@Test
+		void should_success_when_validRequest() throws Exception {
 
-            RecommendedSummonersServiceResponse response = mock(RecommendedSummonersServiceResponse.class);
-            given(riotAccountService.getMainSummoners(any(GameMode.class)))
-                .willReturn(response);
+			RecommendedSummonersServiceResponse response = mock(RecommendedSummonersServiceResponse.class);
+			given(riotAccountService.getMainSummoners(any(GameMode.class)))
+				.willReturn(response);
 
-            mockMvc.perform(get(REQUEST_URL)
-                    .param("game-mode", GameMode.RANK_SOLO.name()))
-                .andExpectAll(
-                    status().isOk()
-                );
-        }
+			mockMvc.perform(get(REQUEST_URL)
+					.param("game-mode", GameMode.RANK_SOLO.name()))
+				.andExpectAll(
+					status().isOk()
+				);
+		}
 
-        @DisplayName("game mode가 null이면 실패한다")
-        @Test
-        void should_fail_when_gameModeIsnull() throws Exception {
+		@DisplayName("game mode가 null이면 실패한다")
+		@Test
+		void should_fail_when_gameModeIsnull() throws Exception {
 
-            RecommendedSummonersServiceResponse response = mock(RecommendedSummonersServiceResponse.class);
-            given(riotAccountService.getMainSummoners(any(GameMode.class)))
-                .willReturn(response);
+			RecommendedSummonersServiceResponse response = mock(RecommendedSummonersServiceResponse.class);
+			given(riotAccountService.getMainSummoners(any(GameMode.class)))
+				.willReturn(response);
 
-            mockMvc.perform(get(REQUEST_URL))
-                .andExpectAll(
-                    status().isNotFound(),
-                    jsonPath("$.status.message").value(String.format(MISSING_REQUEST_PARAMETER, "game-mode"))
-                );
-        }
-    }
+			mockMvc.perform(get(REQUEST_URL))
+				.andExpectAll(
+					status().isNotFound(),
+					jsonPath("$.status.message").value(String.format(MISSING_REQUEST_PARAMETER, "game-mode"))
+				);
+		}
+	}
 
-    @DisplayName("최근 같이 플레이한 소환사 조회 시")
-    @Nested
-    class GetRecentlySummoners {
+	@DisplayName("최근 같이 플레이한 소환사 조회 시")
+	@Nested
+	class GetRecentlySummoners {
 
-        public static final String REQUEST_URL = "/summoners/recently";
+		public static final String REQUEST_URL = "/summoners/recently";
 
-        @DisplayName("올바른 요청을 보내면 성공한다.")
-        @Test
-        void should_success_when_validRequest() throws Exception {
-            Member member = mock(Member.class);
-            MemberThreadLocal.set(member);
-            User user = mock(User.class);
-            RecentlySummonersServiceResponse response = mock(RecentlySummonersServiceResponse.class);
+		@DisplayName("올바른 요청을 보내면 성공한다.")
+		@Test
+		void should_success_when_validRequest() throws Exception {
+			Member member = mock(Member.class);
+			MemberThreadLocal.set(member);
+			User user = mock(User.class);
+			RecentlySummonersServiceResponse response = mock(RecentlySummonersServiceResponse.class);
 
-            given(member.getId()).willReturn(1L);
-            given(stompService.getChattedMemberIds(any(User.class))).willReturn(Collections.emptyList());
-            given(userService.getUser(anyLong())).willReturn(user);
-            given(riotAccountService.getRecentlySummoners(any(Member.class), anyList())).willReturn(response);
+			given(member.getId()).willReturn(1L);
+			given(stompService.getChattedMemberIds(any(User.class))).willReturn(Collections.emptyList());
+			given(userService.getUser(anyLong())).willReturn(user);
+			given(riotAccountService.getRecentlySummoners(any(Member.class), anyList())).willReturn(response);
 
-            mockMvc.perform(get(REQUEST_URL))
-                .andExpectAll(
-                    status().isOk()
-                );
-        }
-    }
+			mockMvc.perform(get(REQUEST_URL))
+				.andExpectAll(
+					status().isOk()
+				);
+		}
+	}
 }

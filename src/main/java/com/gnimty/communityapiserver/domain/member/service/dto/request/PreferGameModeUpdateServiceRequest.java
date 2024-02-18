@@ -9,5 +9,5 @@ import lombok.Getter;
 @Getter
 public class PreferGameModeUpdateServiceRequest {
 
-    private List<PreferGameModeEntry> preferGameModes;
+	private List<PreferGameModeEntry> preferGameModes;
 }

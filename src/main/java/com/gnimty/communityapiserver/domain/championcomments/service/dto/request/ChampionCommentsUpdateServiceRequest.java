@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 public class ChampionCommentsUpdateServiceRequest {
 
-    private Long mentionedMemberId;
-    private String contents;
+	private Long mentionedMemberId;
+	private String contents;
 
 }

@@ -9,5 +9,5 @@ import lombok.Getter;
 @Getter
 public class RecommendedSummonersServiceResponse {
 
-    List<RecommendedSummonersEntry> recommendedSummoners;
+	List<RecommendedSummonersEntry> recommendedSummoners;
 }

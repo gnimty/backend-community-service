@@ -19,25 +19,25 @@ import lombok.Getter;
 @BeforeEndTime(startTime = "startTime", endTime = "endTime")
 public class ScheduleEntry {
 
-    @Schema(example = "MONDAY", description = "요일")
-    @NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
-    private DayOfWeek dayOfWeek;
-    @Schema(example = "0", description = "시작 시간, not null, 최소 0, 최대 24")
-    @NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
-    @Min(value = MIN_HOUR, message = ErrorMessage.INVALID_INPUT_VALUE)
-    @Max(value = MAX_HOUR, message = ErrorMessage.INVALID_INPUT_VALUE)
-    private Integer startTime;
-    @Schema(example = "0", description = "종료 시간, not null, 최소 0, 최대 24")
-    @NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
-    @Min(value = MIN_HOUR, message = ErrorMessage.INVALID_INPUT_VALUE)
-    @Max(value = MAX_HOUR, message = ErrorMessage.INVALID_INPUT_VALUE)
-    private Integer endTime;
+	@Schema(example = "MONDAY", description = "요일")
+	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+	private DayOfWeek dayOfWeek;
+	@Schema(example = "0", description = "시작 시간, not null, 최소 0, 최대 24")
+	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+	@Min(value = MIN_HOUR, message = ErrorMessage.INVALID_INPUT_VALUE)
+	@Max(value = MAX_HOUR, message = ErrorMessage.INVALID_INPUT_VALUE)
+	private Integer startTime;
+	@Schema(example = "0", description = "종료 시간, not null, 최소 0, 최대 24")
+	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+	@Min(value = MIN_HOUR, message = ErrorMessage.INVALID_INPUT_VALUE)
+	@Max(value = MAX_HOUR, message = ErrorMessage.INVALID_INPUT_VALUE)
+	private Integer endTime;
 
-    public static ScheduleEntry from(Schedule schedule) {
-        return ScheduleEntry.builder()
-            .dayOfWeek(schedule.getDayOfWeek())
-            .startTime(schedule.getStartTime())
-            .endTime(schedule.getEndTime())
-            .build();
-    }
+	public static ScheduleEntry from(Schedule schedule) {
+		return ScheduleEntry.builder()
+			.dayOfWeek(schedule.getDayOfWeek())
+			.startTime(schedule.getStartTime())
+			.endTime(schedule.getEndTime())
+			.build();
+	}
 }

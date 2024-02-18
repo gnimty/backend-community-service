@@ -15,17 +15,17 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ChampionCommentsLikeRequest {
 
-    @Schema(example = "true", description = "좋아요 또는 싫어요 여부, not null")
-    @NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
-    private Boolean likeOrNot;
-    @Schema(example = "true", description = "취소 여부, not null")
-    @NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
-    private Boolean cancel;
+	@Schema(example = "true", description = "좋아요 또는 싫어요 여부, not null")
+	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+	private Boolean likeOrNot;
+	@Schema(example = "true", description = "취소 여부, not null")
+	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+	private Boolean cancel;
 
-    public ChampionCommentsLikeServiceRequest toServiceRequest() {
-        return ChampionCommentsLikeServiceRequest.builder()
-            .likeOrNot(likeOrNot)
-            .cancel(cancel)
-            .build();
-    }
+	public ChampionCommentsLikeServiceRequest toServiceRequest() {
+		return ChampionCommentsLikeServiceRequest.builder()
+			.likeOrNot(likeOrNot)
+			.cancel(cancel)
+			.build();
+	}
 }

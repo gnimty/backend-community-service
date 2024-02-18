@@ -17,19 +17,19 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PasswordUpdateRequest {
 
-    @Schema(example = "Abc1234***", description = "현재 비밀번호, not null, password pattern")
-    @NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
-    @Pattern(regexp = RequestPattern.PASSWORD_PATTERN, message = ErrorMessage.INVALID_INPUT_VALUE)
-    private String currentPassword;
-    @Schema(example = "Abc12345**", description = "변경할 비밀번호, not null, password pattern")
-    @NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
-    @Pattern(regexp = RequestPattern.PASSWORD_PATTERN, message = ErrorMessage.INVALID_INPUT_VALUE)
-    private String newPassword;
+	@Schema(example = "Abc1234***", description = "현재 비밀번호, not null, password pattern")
+	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+	@Pattern(regexp = RequestPattern.PASSWORD_PATTERN, message = ErrorMessage.INVALID_INPUT_VALUE)
+	private String currentPassword;
+	@Schema(example = "Abc12345**", description = "변경할 비밀번호, not null, password pattern")
+	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+	@Pattern(regexp = RequestPattern.PASSWORD_PATTERN, message = ErrorMessage.INVALID_INPUT_VALUE)
+	private String newPassword;
 
-    public PasswordUpdateServiceRequest toServiceRequest() {
-        return PasswordUpdateServiceRequest.builder()
-            .currentPassword(currentPassword)
-            .newPassword(newPassword)
-            .build();
-    }
+	public PasswordUpdateServiceRequest toServiceRequest() {
+		return PasswordUpdateServiceRequest.builder()
+			.currentPassword(currentPassword)
+			.newPassword(newPassword)
+			.build();
+	}
 }

@@ -14,22 +14,22 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @Slf4j
 public class RiotAccountAsyncConfiguration implements AsyncConfigurer {
 
-    @Override
-    @Bean(name = "riotAccountExecutor")
-    public Executor getAsyncExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(2);
-        executor.setMaxPoolSize(5);
-        executor.setQueueCapacity(10);
-        executor.setThreadNamePrefix("RiotAccountExecutor-");
-        executor.initialize();
-        return executor;
-    }
+	@Override
+	@Bean(name = "riotAccountExecutor")
+	public Executor getAsyncExecutor() {
+		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+		executor.setCorePoolSize(2);
+		executor.setMaxPoolSize(5);
+		executor.setQueueCapacity(10);
+		executor.setThreadNamePrefix("RiotAccountExecutor-");
+		executor.initialize();
+		return executor;
+	}
 
-    @Override
-    public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
-        return (ex, method, params) ->
-            log.error("Exception handler for async method '" + method.toGenericString()
-                + "' threw unexpected exception itself", ex);
-    }
+	@Override
+	public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
+		return (ex, method, params) ->
+			log.error("Exception handler for async method '" + method.toGenericString()
+				+ "' threw unexpected exception itself", ex);
+	}
 }

@@ -41,253 +41,253 @@ import org.springframework.http.MediaType;
 
 public class ChampionCommentsControllerTest extends ControllerTestSupport {
 
-    @BeforeEach
-    void setUp() {
-        given(tokenAuthInterceptor.preHandle(
-            any(HttpServletRequest.class),
-            any(HttpServletResponse.class),
-            any()))
-            .willReturn(true);
-        willDoNothing()
-            .given(blockService)
-            .doBlock(any(Member.class), any(BlockServiceRequest.class));
-        willDoNothing()
-            .given(stompService)
-            .updateBlockStatus(any(), any(), any(Blocked.class));
-    }
+	@BeforeEach
+	void setUp() {
+		given(tokenAuthInterceptor.preHandle(
+			any(HttpServletRequest.class),
+			any(HttpServletResponse.class),
+			any()))
+			.willReturn(true);
+		willDoNothing()
+			.given(blockService)
+			.doBlock(any(Member.class), any(BlockServiceRequest.class));
+		willDoNothing()
+			.given(stompService)
+			.updateBlockStatus(any(), any(), any(Blocked.class));
+	}
 
-    @Nested
-    @DisplayName("챔피언 운용법 조회 시")
-    class ReadChampionComments {
+	@Nested
+	@DisplayName("챔피언 운용법 조회 시")
+	class ReadChampionComments {
 
-        private static final String REQUEST_URL = "/champions/{champion_id}/comments";
+		private static final String REQUEST_URL = "/champions/{champion_id}/comments";
 
-        @DisplayName("올바른 championID를 요청하면 성공한다.")
-        @Test
-        void should_success_when_requestValidChampionId() throws Exception {
+		@DisplayName("올바른 championID를 요청하면 성공한다.")
+		@Test
+		void should_success_when_requestValidChampionId() throws Exception {
 
-            ChampionCommentsServiceResponse response = createResponse();
+			ChampionCommentsServiceResponse response = createResponse();
 
-            given(championCommentsReadService.findByChampionId(any(Long.class)))
-                .willReturn(response);
+			given(championCommentsReadService.findByChampionId(any(Long.class)))
+				.willReturn(response);
 
-            String responsePath = "$.data.championComments[0].";
-            mockMvc.perform(get(REQUEST_URL, 1))
-                .andExpectAll(
-                    status().isOk(),
-                    jsonPath(responsePath + "id").value(response.getChampionComments().get(0).getId()),
-                    jsonPath(responsePath + "depth").value(response.getChampionComments().get(0).getDepth()),
-                    jsonPath(responsePath + "name").value(response.getChampionComments().get(0).getName()),
-                    jsonPath(responsePath + "like").value(response.getChampionComments().get(0).getLike())
-                );
-        }
+			String responsePath = "$.data.championComments[0].";
+			mockMvc.perform(get(REQUEST_URL, 1))
+				.andExpectAll(
+					status().isOk(),
+					jsonPath(responsePath + "id").value(response.getChampionComments().get(0).getId()),
+					jsonPath(responsePath + "depth").value(response.getChampionComments().get(0).getDepth()),
+					jsonPath(responsePath + "name").value(response.getChampionComments().get(0).getName()),
+					jsonPath(responsePath + "like").value(response.getChampionComments().get(0).getLike())
+				);
+		}
 
-        @DisplayName("championID의 타입이 올바르지 않으면 실패한다.")
-        @Test
-        void should_fail_when_championIDTypeIsInvalid() throws Exception {
+		@DisplayName("championID의 타입이 올바르지 않으면 실패한다.")
+		@Test
+		void should_fail_when_championIDTypeIsInvalid() throws Exception {
 
-            ChampionCommentsServiceResponse response = createResponse();
+			ChampionCommentsServiceResponse response = createResponse();
 
-            given(championCommentsReadService.findByChampionId(any(Long.class)))
-                .willReturn(response);
+			given(championCommentsReadService.findByChampionId(any(Long.class)))
+				.willReturn(response);
 
-            mockMvc.perform(get(REQUEST_URL, "a"))
-                .andExpectAll(
-                    status().isBadRequest()
-                );
-        }
+			mockMvc.perform(get(REQUEST_URL, "a"))
+				.andExpectAll(
+					status().isBadRequest()
+				);
+		}
 
-        private ChampionCommentsServiceResponse createResponse() {
-            return ChampionCommentsServiceResponse.builder()
-                .championComments(List.of(ChampionCommentsEntry.builder()
-                    .id(1L)
-                    .lane(Lane.MIDDLE)
-                    .opponentChampionId(2L)
-                    .depth(1)
-                    .mentionedMemberId(2L)
-                    .contents("contents")
-                    .commentsType(CommentsType.QUESTION)
-                    .upCount(1L)
-                    .downCount(1L)
-                    .version("1.1.1")
-                    .createdAt(LocalDateTime.now())
-                    .updatedAt(LocalDateTime.now())
-                    .deleted(false)
-                    .blocked(false)
-                    .memberId(1L)
-                    .name("name")
-                    .tagLine("tag")
-                    .like(true)
-                    .build()))
-                .build();
-        }
-    }
+		private ChampionCommentsServiceResponse createResponse() {
+			return ChampionCommentsServiceResponse.builder()
+				.championComments(List.of(ChampionCommentsEntry.builder()
+					.id(1L)
+					.lane(Lane.MIDDLE)
+					.opponentChampionId(2L)
+					.depth(1)
+					.mentionedMemberId(2L)
+					.contents("contents")
+					.commentsType(CommentsType.QUESTION)
+					.upCount(1L)
+					.downCount(1L)
+					.version("1.1.1")
+					.createdAt(LocalDateTime.now())
+					.updatedAt(LocalDateTime.now())
+					.deleted(false)
+					.blocked(false)
+					.memberId(1L)
+					.name("name")
+					.tagLine("tag")
+					.like(true)
+					.build()))
+				.build();
+		}
+	}
 
-    @Nested
-    @DisplayName("챔피언 운용법 추가 시")
-    class AddChampionComments {
+	@Nested
+	@DisplayName("챔피언 운용법 추가 시")
+	class AddChampionComments {
 
-        private static final String REQUEST_URL = "/champions/{champion_id}/comments";
+		private static final String REQUEST_URL = "/champions/{champion_id}/comments";
 
-        @BeforeEach
-        void setUp() {
-            willDoNothing()
-                .given(championCommentsService)
-                .addComments(any(Long.TYPE), any(ChampionCommentsServiceRequest.class));
-        }
+		@BeforeEach
+		void setUp() {
+			willDoNothing()
+				.given(championCommentsService)
+				.addComments(any(Long.TYPE), any(ChampionCommentsServiceRequest.class));
+		}
 
-        @DisplayName("올바른 champion_id, request를 요청하면 성공한다.")
-        @Test
-        void should_success_when_validRequest() throws Exception {
+		@DisplayName("올바른 champion_id, request를 요청하면 성공한다.")
+		@Test
+		void should_success_when_validRequest() throws Exception {
 
-            ChampionCommentsRequest request = createRequest(0, "con", null);
+			ChampionCommentsRequest request = createRequest(0, "con", null);
 
-            mockMvc.perform(post(REQUEST_URL, 1L)
-                    .content(om.writeValueAsString(request))
-                    .characterEncoding(StandardCharsets.UTF_8)
-                    .contentType(MediaType.APPLICATION_JSON))
-                .andExpectAll(
-                    status().isCreated(),
-                    jsonPath("$.status.message").value(SUCCESS_ADD_CHAMPION_COMMENTS.getMessage())
-                );
-        }
+			mockMvc.perform(post(REQUEST_URL, 1L)
+					.content(om.writeValueAsString(request))
+					.characterEncoding(StandardCharsets.UTF_8)
+					.contentType(MediaType.APPLICATION_JSON))
+				.andExpectAll(
+					status().isCreated(),
+					jsonPath("$.status.message").value(SUCCESS_ADD_CHAMPION_COMMENTS.getMessage())
+				);
+		}
 
-        @DisplayName("depth의 크기가 올바르지 않으면 실패한다.")
-        @ParameterizedTest
-        @ValueSource(ints = {-1, 2, 3, 4, 55})
-        void should_fail_when_invalidDepth(int depth) throws Exception {
-            ChampionCommentsRequest request = createRequest(depth, "con", null);
+		@DisplayName("depth의 크기가 올바르지 않으면 실패한다.")
+		@ParameterizedTest
+		@ValueSource(ints = {-1, 2, 3, 4, 55})
+		void should_fail_when_invalidDepth(int depth) throws Exception {
+			ChampionCommentsRequest request = createRequest(depth, "con", null);
 
-            mockMvc.perform(post(REQUEST_URL, 1L)
-                    .content(om.writeValueAsString(request))
-                    .characterEncoding(StandardCharsets.UTF_8)
-                    .contentType(MediaType.APPLICATION_JSON))
-                .andExpectAll(
-                    status().isBadRequest(),
-                    jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
-                );
-        }
+			mockMvc.perform(post(REQUEST_URL, 1L)
+					.content(om.writeValueAsString(request))
+					.characterEncoding(StandardCharsets.UTF_8)
+					.contentType(MediaType.APPLICATION_JSON))
+				.andExpectAll(
+					status().isBadRequest(),
+					jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
+				);
+		}
 
-        @DisplayName("contents의 크기가 올바르지 않으면 실패한다.")
-        @Test
-        void should_fail_when_invalidContents() throws Exception {
-            ChampionCommentsRequest request = createRequest(0, "a".repeat(1001), null);
+		@DisplayName("contents의 크기가 올바르지 않으면 실패한다.")
+		@Test
+		void should_fail_when_invalidContents() throws Exception {
+			ChampionCommentsRequest request = createRequest(0, "a".repeat(1001), null);
 
-            mockMvc.perform(post(REQUEST_URL, 1L)
-                    .content(om.writeValueAsString(request))
-                    .characterEncoding(StandardCharsets.UTF_8)
-                    .contentType(MediaType.APPLICATION_JSON))
-                .andExpectAll(
-                    status().isBadRequest(),
-                    jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
-                );
-        }
+			mockMvc.perform(post(REQUEST_URL, 1L)
+					.content(om.writeValueAsString(request))
+					.characterEncoding(StandardCharsets.UTF_8)
+					.contentType(MediaType.APPLICATION_JSON))
+				.andExpectAll(
+					status().isBadRequest(),
+					jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
+				);
+		}
 
-        @DisplayName("depth와 parentChampionCommentsId의 관계가 올바르지 않으면 실패한다.")
-        @Test
-        void should_fail_when_invalidDepthAndParentChampionCommentsId() throws Exception {
-            ChampionCommentsRequest request = createRequest(0, "con", 1L);
+		@DisplayName("depth와 parentChampionCommentsId의 관계가 올바르지 않으면 실패한다.")
+		@Test
+		void should_fail_when_invalidDepthAndParentChampionCommentsId() throws Exception {
+			ChampionCommentsRequest request = createRequest(0, "con", 1L);
 
-            mockMvc.perform(post(REQUEST_URL, 1L)
-                    .content(om.writeValueAsString(request))
-                    .characterEncoding(StandardCharsets.UTF_8)
-                    .contentType(MediaType.APPLICATION_JSON))
-                .andExpectAll(
-                    status().isBadRequest(),
-                    jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
-                );
-        }
+			mockMvc.perform(post(REQUEST_URL, 1L)
+					.content(om.writeValueAsString(request))
+					.characterEncoding(StandardCharsets.UTF_8)
+					.contentType(MediaType.APPLICATION_JSON))
+				.andExpectAll(
+					status().isBadRequest(),
+					jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
+				);
+		}
 
-        private ChampionCommentsRequest createRequest(
-            Integer depth,
-            String contents,
-            Long parentChampionCommentsId
-        ) {
-            return ChampionCommentsRequest.builder()
-                .lane(Lane.MIDDLE)
-                .opponentChampionId(1L)
-                .depth(depth)
-                .mentionedMemberId(1L)
-                .contents(contents)
-                .commentsType(CommentsType.QUESTION)
-                .parentChampionCommentsId(parentChampionCommentsId)
-                .build();
-        }
-    }
+		private ChampionCommentsRequest createRequest(
+			Integer depth,
+			String contents,
+			Long parentChampionCommentsId
+		) {
+			return ChampionCommentsRequest.builder()
+				.lane(Lane.MIDDLE)
+				.opponentChampionId(1L)
+				.depth(depth)
+				.mentionedMemberId(1L)
+				.contents(contents)
+				.commentsType(CommentsType.QUESTION)
+				.parentChampionCommentsId(parentChampionCommentsId)
+				.build();
+		}
+	}
 
-    @Nested
-    @DisplayName("챔피언 운용법 수정 시")
-    class UpdateChampionComments {
+	@Nested
+	@DisplayName("챔피언 운용법 수정 시")
+	class UpdateChampionComments {
 
-        private static final String REQUEST_URL = "/champions/{champion_id}/comments/{comments_id}";
+		private static final String REQUEST_URL = "/champions/{champion_id}/comments/{comments_id}";
 
-        @BeforeEach
-        void setUp() {
-            willDoNothing()
-                .given(championCommentsService)
-                .updateComments(any(Long.TYPE), any(Long.TYPE), any(ChampionCommentsUpdateServiceRequest.class));
-        }
+		@BeforeEach
+		void setUp() {
+			willDoNothing()
+				.given(championCommentsService)
+				.updateComments(any(Long.TYPE), any(Long.TYPE), any(ChampionCommentsUpdateServiceRequest.class));
+		}
 
-        @DisplayName("올바른 요청을 보내면 성공한다.")
-        @Test
-        void should_success_when_validRequest() throws Exception {
-            ChampionCommentsUpdateRequest request = createRequest("contents");
+		@DisplayName("올바른 요청을 보내면 성공한다.")
+		@Test
+		void should_success_when_validRequest() throws Exception {
+			ChampionCommentsUpdateRequest request = createRequest("contents");
 
-            mockMvc.perform(patch(REQUEST_URL, 1L, 1L)
-                    .content(om.writeValueAsString(request))
-                    .characterEncoding(StandardCharsets.UTF_8)
-                    .contentType(MediaType.APPLICATION_JSON))
-                .andExpectAll(
-                    status().isOk(),
-                    jsonPath("$.status.message").value(SUCCESS_UPDATE_CHAMPION_COMMENTS.getMessage())
-                );
-        }
+			mockMvc.perform(patch(REQUEST_URL, 1L, 1L)
+					.content(om.writeValueAsString(request))
+					.characterEncoding(StandardCharsets.UTF_8)
+					.contentType(MediaType.APPLICATION_JSON))
+				.andExpectAll(
+					status().isOk(),
+					jsonPath("$.status.message").value(SUCCESS_UPDATE_CHAMPION_COMMENTS.getMessage())
+				);
+		}
 
-        @DisplayName("contents의 크기가 올바르지 않으면 실패한다.")
-        @Test
-        void should_fail_when_invalidContentsSize() throws Exception {
-            ChampionCommentsUpdateRequest request = createRequest("a".repeat(1001));
+		@DisplayName("contents의 크기가 올바르지 않으면 실패한다.")
+		@Test
+		void should_fail_when_invalidContentsSize() throws Exception {
+			ChampionCommentsUpdateRequest request = createRequest("a".repeat(1001));
 
-            mockMvc.perform(patch(REQUEST_URL, 1L, 1L)
-                    .content(om.writeValueAsString(request))
-                    .characterEncoding(StandardCharsets.UTF_8)
-                    .contentType(MediaType.APPLICATION_JSON))
-                .andExpectAll(
-                    status().isBadRequest(),
-                    jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
-                );
-        }
+			mockMvc.perform(patch(REQUEST_URL, 1L, 1L)
+					.content(om.writeValueAsString(request))
+					.characterEncoding(StandardCharsets.UTF_8)
+					.contentType(MediaType.APPLICATION_JSON))
+				.andExpectAll(
+					status().isBadRequest(),
+					jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
+				);
+		}
 
-        private ChampionCommentsUpdateRequest createRequest(String contents) {
-            return ChampionCommentsUpdateRequest.builder()
-                .mentionedMemberId(1L)
-                .contents(contents)
-                .build();
-        }
-    }
+		private ChampionCommentsUpdateRequest createRequest(String contents) {
+			return ChampionCommentsUpdateRequest.builder()
+				.mentionedMemberId(1L)
+				.contents(contents)
+				.build();
+		}
+	}
 
-    @Nested
-    @DisplayName("챔피언 운용법 삭제 시")
-    class DeleteChampionComments {
+	@Nested
+	@DisplayName("챔피언 운용법 삭제 시")
+	class DeleteChampionComments {
 
-        private static final String REQUEST_URL = "/champions/{champion_id}/comments/{comments_id}";
+		private static final String REQUEST_URL = "/champions/{champion_id}/comments/{comments_id}";
 
-        @BeforeEach
-        void setUp() {
-            willDoNothing()
-                .given(championCommentsService)
-                .deleteComments(any(Long.TYPE), any(Long.TYPE));
-        }
+		@BeforeEach
+		void setUp() {
+			willDoNothing()
+				.given(championCommentsService)
+				.deleteComments(any(Long.TYPE), any(Long.TYPE));
+		}
 
-        @DisplayName("올바른 요청을 보내면 성공한다.")
-        @Test
-        void should_success_when_validRequest() throws Exception {
+		@DisplayName("올바른 요청을 보내면 성공한다.")
+		@Test
+		void should_success_when_validRequest() throws Exception {
 
-            mockMvc.perform(delete(REQUEST_URL, 1L, 1L))
-                .andExpectAll(
-                    status().isOk(),
-                    jsonPath("$.status.message").value(SUCCESS_DELETE_CHAMPION_COMMENTS.getMessage())
-                );
-        }
-    }
+			mockMvc.perform(delete(REQUEST_URL, 1L, 1L))
+				.andExpectAll(
+					status().isOk(),
+					jsonPath("$.status.message").value(SUCCESS_DELETE_CHAMPION_COMMENTS.getMessage())
+				);
+		}
+	}
 }

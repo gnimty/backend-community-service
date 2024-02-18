@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface UserRepositoryCustom {
 
-    BulkWriteResult bulkUpdate(List<User> users);
+	BulkWriteResult bulkUpdate(List<User> users);
 }

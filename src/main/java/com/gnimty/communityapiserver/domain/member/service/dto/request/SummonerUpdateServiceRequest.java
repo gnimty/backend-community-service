@@ -9,5 +9,5 @@ import lombok.Getter;
 @Getter
 public class SummonerUpdateServiceRequest {
 
-    private List<SummonerUpdateEntry> summonerUpdates;
+	private List<SummonerUpdateEntry> summonerUpdates;
 }

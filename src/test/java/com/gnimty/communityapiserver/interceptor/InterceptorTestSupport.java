@@ -12,15 +12,15 @@ import org.springframework.web.servlet.ModelAndView;
 @ActiveProfiles("test")
 public class InterceptorTestSupport {
 
-    @Mock
-    private HttpServletRequest request;
+	@Mock
+	private HttpServletRequest request;
 
-    @Mock
-    private HttpServletResponse response;
+	@Mock
+	private HttpServletResponse response;
 
-    @Mock
-    private Object handler;
+	@Mock
+	private Object handler;
 
-    @Mock
-    private ModelAndView mav;
+	@Mock
+	private ModelAndView mav;
 }

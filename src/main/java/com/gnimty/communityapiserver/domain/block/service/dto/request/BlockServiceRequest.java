@@ -7,6 +7,6 @@ import lombok.Getter;
 @Getter
 public class BlockServiceRequest {
 
-    private Long id;
-    private String memo;
+	private Long id;
+	private String memo;
 }

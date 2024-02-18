@@ -18,19 +18,19 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class EmailVerifyRequest {
 
-    @Schema(example = "email@email.com", description = "이메일, not null, email pattern")
-    @NotNull(message = INVALID_INPUT_VALUE)
-    @Pattern(regexp = RequestPattern.EMAIL_PATTERN, message = INVALID_INPUT_VALUE)
-    private String email;
-    @Schema(example = "ABC123", description = "이메일 인증 코드, not null, auth code pattern")
-    @NotNull(message = INVALID_INPUT_VALUE)
-    @Pattern(regexp = RequestPattern.EMAIL_AUTH_CODE_PATTERN, message = INVALID_INPUT_VALUE)
-    private String code;
+	@Schema(example = "email@email.com", description = "이메일, not null, email pattern")
+	@NotNull(message = INVALID_INPUT_VALUE)
+	@Pattern(regexp = RequestPattern.EMAIL_PATTERN, message = INVALID_INPUT_VALUE)
+	private String email;
+	@Schema(example = "ABC123", description = "이메일 인증 코드, not null, auth code pattern")
+	@NotNull(message = INVALID_INPUT_VALUE)
+	@Pattern(regexp = RequestPattern.EMAIL_AUTH_CODE_PATTERN, message = INVALID_INPUT_VALUE)
+	private String code;
 
-    public EmailVerifyServiceRequest toServiceRequest() {
-        return EmailVerifyServiceRequest.builder()
-            .email(email)
-            .code(code)
-            .build();
-    }
+	public EmailVerifyServiceRequest toServiceRequest() {
+		return EmailVerifyServiceRequest.builder()
+			.email(email)
+			.code(code)
+			.build();
+	}
 }

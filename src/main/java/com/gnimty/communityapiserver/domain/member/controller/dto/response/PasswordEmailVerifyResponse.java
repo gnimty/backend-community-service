@@ -9,12 +9,12 @@ import lombok.Getter;
 @Getter
 public class PasswordEmailVerifyResponse {
 
-    @Schema(example = "alksdfkljalsjd-flskdnflk", description = "uuid")
-    private String uuid;
+	@Schema(example = "alksdfkljalsjd-flskdnflk", description = "uuid")
+	private String uuid;
 
-    public static PasswordEmailVerifyResponse from(PasswordEmailVerifyServiceResponse response) {
-        return PasswordEmailVerifyResponse.builder()
-            .uuid(response.getUuid())
-            .build();
-    }
+	public static PasswordEmailVerifyResponse from(PasswordEmailVerifyServiceResponse response) {
+		return PasswordEmailVerifyResponse.builder()
+			.uuid(response.getUuid())
+			.build();
+	}
 }

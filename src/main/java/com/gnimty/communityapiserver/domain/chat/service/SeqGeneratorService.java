@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class SeqGeneratorService {
 
-    private final MongoOperations mongoOperations;
+	private final MongoOperations mongoOperations;
 
 
 }

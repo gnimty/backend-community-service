@@ -28,87 +28,87 @@ import org.springframework.http.MediaType;
 
 public class MemberLikeControllerTest extends ControllerTestSupport {
 
-    @BeforeEach
-    void setUp() {
-        given(tokenAuthInterceptor.preHandle(
-            any(HttpServletRequest.class),
-            any(HttpServletResponse.class),
-            any(Object.class)))
-            .willReturn(true);
-    }
+	@BeforeEach
+	void setUp() {
+		given(tokenAuthInterceptor.preHandle(
+			any(HttpServletRequest.class),
+			any(HttpServletResponse.class),
+			any(Object.class)))
+			.willReturn(true);
+	}
 
-    @DisplayName("회원 좋아요 조회 시")
-    @Nested
-    class ReadMemberLike {
+	@DisplayName("회원 좋아요 조회 시")
+	@Nested
+	class ReadMemberLike {
 
-        private static final String REQUEST_URL = "/members/me/like";
+		private static final String REQUEST_URL = "/members/me/like";
 
-        @DisplayName("현재 회원의 좋아요 수가 반환된다.")
-        @Test
-        void should_returnUpCount_when_invokeMethod() throws Exception {
-            MemberThreadLocal.set(Member.builder().upCount(1L).build());
+		@DisplayName("현재 회원의 좋아요 수가 반환된다.")
+		@Test
+		void should_returnUpCount_when_invokeMethod() throws Exception {
+			MemberThreadLocal.set(Member.builder().upCount(1L).build());
 
-            mockMvc.perform(get(REQUEST_URL))
-                .andExpectAll(
-                    status().isOk(),
-                    jsonPath("$.data.upCount").value(MemberThreadLocal.get().getUpCount())
-                );
-            MemberThreadLocal.remove();
-        }
-    }
+			mockMvc.perform(get(REQUEST_URL))
+				.andExpectAll(
+					status().isOk(),
+					jsonPath("$.data.upCount").value(MemberThreadLocal.get().getUpCount())
+				);
+			MemberThreadLocal.remove();
+		}
+	}
 
-    @DisplayName("회원 좋아요 시")
-    @Nested
-    class DoMemberLike {
+	@DisplayName("회원 좋아요 시")
+	@Nested
+	class DoMemberLike {
 
-        private static final String REQUEST_URL = "/members/me/like";
+		private static final String REQUEST_URL = "/members/me/like";
 
-        @DisplayName("올바른 요청을 하면 성공한다.")
-        @Test
-        void should_success_when_validRequest() throws Exception {
-            MemberLikeRequest request = MemberLikeRequest.builder()
-                .targetMemberId(1L)
-                .cancel(false)
-                .build();
+		@DisplayName("올바른 요청을 하면 성공한다.")
+		@Test
+		void should_success_when_validRequest() throws Exception {
+			MemberLikeRequest request = MemberLikeRequest.builder()
+				.targetMemberId(1L)
+				.cancel(false)
+				.build();
 
-            willDoNothing()
-                .given(memberLikeService)
-                .doMemberLike(any(MemberLikeServiceRequest.class));
+			willDoNothing()
+				.given(memberLikeService)
+				.doMemberLike(any(MemberLikeServiceRequest.class));
 
-            mockMvc.perform(post(REQUEST_URL)
-                    .content(om.writeValueAsString(request))
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .characterEncoding(StandardCharsets.UTF_8))
-                .andExpectAll(
-                    status().isOk(),
-                    jsonPath("$.status.message").value(SUCCESS_MEMBER_LIKE.getMessage())
-                );
-        }
+			mockMvc.perform(post(REQUEST_URL)
+					.content(om.writeValueAsString(request))
+					.contentType(MediaType.APPLICATION_JSON)
+					.characterEncoding(StandardCharsets.UTF_8))
+				.andExpectAll(
+					status().isOk(),
+					jsonPath("$.status.message").value(SUCCESS_MEMBER_LIKE.getMessage())
+				);
+		}
 
-        @DisplayName("targetMemberId 또는 cancel이 null이면 실패한다.")
-        @ParameterizedTest
-        @CsvSource({"null,1", "false,null"})
-        void should_fail_when_fieldIsNull(String targetMemberIdStr, String cancelStr) throws Exception {
-            Long targetMemberId = targetMemberIdStr.equals("null") ? null : 1L;
-            Boolean cancel = cancelStr.equals("null") ? null : false;
+		@DisplayName("targetMemberId 또는 cancel이 null이면 실패한다.")
+		@ParameterizedTest
+		@CsvSource({"null,1", "false,null"})
+		void should_fail_when_fieldIsNull(String targetMemberIdStr, String cancelStr) throws Exception {
+			Long targetMemberId = targetMemberIdStr.equals("null") ? null : 1L;
+			Boolean cancel = cancelStr.equals("null") ? null : false;
 
-            MemberLikeRequest request = MemberLikeRequest.builder()
-                .targetMemberId(targetMemberId)
-                .cancel(cancel)
-                .build();
+			MemberLikeRequest request = MemberLikeRequest.builder()
+				.targetMemberId(targetMemberId)
+				.cancel(cancel)
+				.build();
 
-            willDoNothing()
-                .given(memberLikeService)
-                .doMemberLike(any(MemberLikeServiceRequest.class));
+			willDoNothing()
+				.given(memberLikeService)
+				.doMemberLike(any(MemberLikeServiceRequest.class));
 
-            mockMvc.perform(post(REQUEST_URL)
-                    .content(om.writeValueAsString(request))
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .characterEncoding(StandardCharsets.UTF_8))
-                .andExpectAll(
-                    status().isBadRequest(),
-                    jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
-                );
-        }
-    }
+			mockMvc.perform(post(REQUEST_URL)
+					.content(om.writeValueAsString(request))
+					.contentType(MediaType.APPLICATION_JSON)
+					.characterEncoding(StandardCharsets.UTF_8))
+				.andExpectAll(
+					status().isBadRequest(),
+					jsonPath("$.status.message").value(INVALID_INPUT_VALUE)
+				);
+		}
+	}
 }

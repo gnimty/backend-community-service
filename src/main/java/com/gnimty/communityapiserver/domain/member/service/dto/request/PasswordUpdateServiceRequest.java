@@ -7,6 +7,6 @@ import lombok.Getter;
 @Getter
 public class PasswordUpdateServiceRequest {
 
-    private String currentPassword;
-    private String newPassword;
+	private String currentPassword;
+	private String newPassword;
 }

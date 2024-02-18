@@ -27,46 +27,46 @@ import org.springframework.test.context.ActiveProfiles;
 @ExtendWith(RedisTestConfig.class)
 public abstract class ServiceTestSupport {
 
-    @LocalServerPort
-    public int port;
-    @Autowired
-    protected RiotAccountRepository riotAccountRepository;
-    @Autowired
-    protected OauthInfoRepository oauthInfoRepository;
-    @Autowired
-    protected MemberRepository memberRepository;
-    @Autowired
-    protected PreferGameModeRepository preferGameModeRepository;
-    @Autowired
-    protected MemberLikeRepository memberLikeRepository;
-    @Autowired
-    protected BlockRepository blockRepository;
-    @Autowired
-    protected ScheduleRepository scheduleRepository;
-    @Autowired
-    protected ChampionCommentsRepository championCommentsRepository;
-    @Autowired
-    protected ChampionCommentsLikeRepository championCommentsLikeRepository;
-    @Autowired
-    protected IntroductionRepository introductionRepository;
-    @Autowired
-    protected ChampionCommentsReportRepository championCommentsReportRepository;
-    @Autowired
-    protected RiotAccountQueryRepository riotAccountQueryRepository;
+	@LocalServerPort
+	public int port;
+	@Autowired
+	protected RiotAccountRepository riotAccountRepository;
+	@Autowired
+	protected OauthInfoRepository oauthInfoRepository;
+	@Autowired
+	protected MemberRepository memberRepository;
+	@Autowired
+	protected PreferGameModeRepository preferGameModeRepository;
+	@Autowired
+	protected MemberLikeRepository memberLikeRepository;
+	@Autowired
+	protected BlockRepository blockRepository;
+	@Autowired
+	protected ScheduleRepository scheduleRepository;
+	@Autowired
+	protected ChampionCommentsRepository championCommentsRepository;
+	@Autowired
+	protected ChampionCommentsLikeRepository championCommentsLikeRepository;
+	@Autowired
+	protected IntroductionRepository introductionRepository;
+	@Autowired
+	protected ChampionCommentsReportRepository championCommentsReportRepository;
+	@Autowired
+	protected RiotAccountQueryRepository riotAccountQueryRepository;
 
-    @AfterEach
-    void tearDown() {
-        introductionRepository.deleteAllInBatch();
-        preferGameModeRepository.deleteAllInBatch();
-        scheduleRepository.deleteAllInBatch();
-        blockRepository.deleteAllInBatch();
-        oauthInfoRepository.deleteAllInBatch();
-        memberLikeRepository.deleteAllInBatch();
-        riotAccountRepository.deleteAllInBatch();
-        championCommentsLikeRepository.deleteAllInBatch();
-        championCommentsReportRepository.deleteAllInBatch();
-        championCommentsRepository.deleteAllInBatch();
-        memberRepository.deleteAllInBatch();
-        MemberThreadLocal.remove();
-    }
+	@AfterEach
+	void tearDown() {
+		introductionRepository.deleteAllInBatch();
+		preferGameModeRepository.deleteAllInBatch();
+		scheduleRepository.deleteAllInBatch();
+		blockRepository.deleteAllInBatch();
+		oauthInfoRepository.deleteAllInBatch();
+		memberLikeRepository.deleteAllInBatch();
+		riotAccountRepository.deleteAllInBatch();
+		championCommentsLikeRepository.deleteAllInBatch();
+		championCommentsReportRepository.deleteAllInBatch();
+		championCommentsRepository.deleteAllInBatch();
+		memberRepository.deleteAllInBatch();
+		MemberThreadLocal.remove();
+	}
 }

@@ -13,9 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class PreferGameModeReadService {
 
-    private final PreferGameModeRepository preferGameModeRepository;
+	private final PreferGameModeRepository preferGameModeRepository;
 
-    public List<PreferGameMode> findByMember(Member member) {
-        return preferGameModeRepository.findByMember(member);
-    }
+	public List<PreferGameMode> findByMember(Member member) {
+		return preferGameModeRepository.findByMember(member);
+	}
 }

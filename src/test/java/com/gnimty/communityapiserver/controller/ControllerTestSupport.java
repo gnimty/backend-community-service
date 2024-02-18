@@ -38,53 +38,53 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @ActiveProfiles("test")
 @WebMvcTest(controllers = {MemberController.class, AuthController.class, BlockController.class,
-    ChampionCommentsController.class, ChampionCommentsLikeController.class, ChampionCommentsReportController.class,
-    MemberLikeController.class, RiotAccountController.class})
+	ChampionCommentsController.class, ChampionCommentsLikeController.class, ChampionCommentsReportController.class,
+	MemberLikeController.class, RiotAccountController.class})
 @MockBean(JpaMetamodelMappingContext.class)
 public abstract class ControllerTestSupport {
 
-    @Autowired
-    protected MockMvc mockMvc;
-    @Autowired
-    protected ObjectMapper om;
-    @MockBean
-    protected BlockService blockService;
-    @MockBean
-    protected BlockReadService blockReadService;
-    @MockBean
-    protected IntroductionReadService introductionReadService;
-    @MockBean
-    protected MemberService memberService;
-    @MockBean
-    protected MemberReadService memberReadService;
-    @MockBean
-    protected AuthService authService;
-    @MockBean
-    protected OauthInfoReadService oauthInfoReadService;
-    @MockBean
-    protected PreferGameModeReadService preferGameModeReadService;
-    @MockBean
-    protected RiotAccountService riotAccountService;
-    @MockBean
-    protected RiotAccountReadService riotAccountReadService;
-    @MockBean
-    protected ScheduleReadService scheduleReadService;
-    @MockBean
-    protected JwtProvider jwtProvider;
-    @MockBean
-    protected TokenAuthInterceptor tokenAuthInterceptor;
-    @MockBean
-    protected StompService stompService;
-    @MockBean
-    protected UserService userService;
-    @MockBean
-    protected ChampionCommentsService championCommentsService;
-    @MockBean
-    protected ChampionCommentsReadService championCommentsReadService;
-    @MockBean
-    protected ChampionCommentsLikeService championCommentsLikeService;
-    @MockBean
-    protected ChampionCommentsReportService championCommentsReportService;
-    @MockBean
-    protected MemberLikeService memberLikeService;
+	@Autowired
+	protected MockMvc mockMvc;
+	@Autowired
+	protected ObjectMapper om;
+	@MockBean
+	protected BlockService blockService;
+	@MockBean
+	protected BlockReadService blockReadService;
+	@MockBean
+	protected IntroductionReadService introductionReadService;
+	@MockBean
+	protected MemberService memberService;
+	@MockBean
+	protected MemberReadService memberReadService;
+	@MockBean
+	protected AuthService authService;
+	@MockBean
+	protected OauthInfoReadService oauthInfoReadService;
+	@MockBean
+	protected PreferGameModeReadService preferGameModeReadService;
+	@MockBean
+	protected RiotAccountService riotAccountService;
+	@MockBean
+	protected RiotAccountReadService riotAccountReadService;
+	@MockBean
+	protected ScheduleReadService scheduleReadService;
+	@MockBean
+	protected JwtProvider jwtProvider;
+	@MockBean
+	protected TokenAuthInterceptor tokenAuthInterceptor;
+	@MockBean
+	protected StompService stompService;
+	@MockBean
+	protected UserService userService;
+	@MockBean
+	protected ChampionCommentsService championCommentsService;
+	@MockBean
+	protected ChampionCommentsReadService championCommentsReadService;
+	@MockBean
+	protected ChampionCommentsLikeService championCommentsLikeService;
+	@MockBean
+	protected ChampionCommentsReportService championCommentsReportService;
+	@MockBean
+	protected MemberLikeService memberLikeService;
 }

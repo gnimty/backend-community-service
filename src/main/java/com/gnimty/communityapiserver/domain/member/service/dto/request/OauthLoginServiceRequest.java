@@ -7,6 +7,6 @@ import lombok.Getter;
 @Builder
 public class OauthLoginServiceRequest {
 
-    private String authCode;
-    private String redirectUri;
+	private String authCode;
+	private String redirectUri;
 }

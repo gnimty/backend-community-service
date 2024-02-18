@@ -23,102 +23,102 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class MemberLikeServiceTest extends ServiceTestSupport {
 
-    @Autowired
-    private MemberLikeService memberLikeService;
+	@Autowired
+	private MemberLikeService memberLikeService;
 
-    @DisplayName("회원 좋아요 시")
-    @Nested
-    class DoMemberLike {
+	@DisplayName("회원 좋아요 시")
+	@Nested
+	class DoMemberLike {
 
-        private Member member;
-        private Member member2;
+		private Member member;
+		private Member member2;
 
-        @BeforeEach
-        void setUp() {
-            member = memberRepository.save(Member.builder()
-                .upCount(0L)
-                .status(Status.ONLINE)
-                .nickname("nickname")
-                .rsoLinked(true)
-                .build());
-            member2 = memberRepository.save(Member.builder()
-                .upCount(0L)
-                .status(Status.ONLINE)
-                .nickname("nickname2")
-                .rsoLinked(true)
-                .build());
-            MemberThreadLocal.set(member);
-        }
+		@BeforeEach
+		void setUp() {
+			member = memberRepository.save(Member.builder()
+				.upCount(0L)
+				.status(Status.ONLINE)
+				.nickname("nickname")
+				.rsoLinked(true)
+				.build());
+			member2 = memberRepository.save(Member.builder()
+				.upCount(0L)
+				.status(Status.ONLINE)
+				.nickname("nickname2")
+				.rsoLinked(true)
+				.build());
+			MemberThreadLocal.set(member);
+		}
 
-        @DisplayName("좋아요를 하지 않은 상태에서 좋아요 시 성공한다.")
-        @Test
-        void should_success_when_notLikeOrNot() {
-            MemberLikeServiceRequest request = createRequest(member2.getId(), false);
+		@DisplayName("좋아요를 하지 않은 상태에서 좋아요 시 성공한다.")
+		@Test
+		void should_success_when_notLikeOrNot() {
+			MemberLikeServiceRequest request = createRequest(member2.getId(), false);
 
-            memberLikeService.doMemberLike(request);
+			memberLikeService.doMemberLike(request);
 
-            List<MemberLike> memberLikes = memberLikeRepository.findAll();
+			List<MemberLike> memberLikes = memberLikeRepository.findAll();
 
-            assertThat(memberLikes).hasSize(1);
-            assertThat(memberLikes.get(0).getSourceMember().getId()).isEqualTo(member.getId());
-            assertThat(memberLikes.get(0).getTargetMember().getId()).isEqualTo(member2.getId());
-        }
+			assertThat(memberLikes).hasSize(1);
+			assertThat(memberLikes.get(0).getSourceMember().getId()).isEqualTo(member.getId());
+			assertThat(memberLikes.get(0).getTargetMember().getId()).isEqualTo(member2.getId());
+		}
 
-        @DisplayName("좋아요를 한 상태에서 좋아요 시 실패한다.")
-        @Test
-        void should_fail_when_likeOrNot() {
-            memberLikeRepository.save(MemberLike.builder()
-                .sourceMember(member)
-                .targetMember(member2)
-                .build());
-            MemberLikeServiceRequest request = createRequest(member2.getId(), false);
+		@DisplayName("좋아요를 한 상태에서 좋아요 시 실패한다.")
+		@Test
+		void should_fail_when_likeOrNot() {
+			memberLikeRepository.save(MemberLike.builder()
+				.sourceMember(member)
+				.targetMember(member2)
+				.build());
+			MemberLikeServiceRequest request = createRequest(member2.getId(), false);
 
-            BaseException exception = new BaseException(ALREADY_MEMBER_LIKE);
-            assertThatThrownBy(() -> memberLikeService.doMemberLike(request))
-                .isInstanceOf(exception.getClass())
-                .hasMessage(exception.getMessage());
-        }
+			BaseException exception = new BaseException(ALREADY_MEMBER_LIKE);
+			assertThatThrownBy(() -> memberLikeService.doMemberLike(request))
+				.isInstanceOf(exception.getClass())
+				.hasMessage(exception.getMessage());
+		}
 
-        @DisplayName("나 자신을 좋아요 할 시 예외를 반환한다.")
-        @Test
-        void should_fail_when_selfLike() {
-            MemberLikeServiceRequest request = createRequest(member.getId(), false);
+		@DisplayName("나 자신을 좋아요 할 시 예외를 반환한다.")
+		@Test
+		void should_fail_when_selfLike() {
+			MemberLikeServiceRequest request = createRequest(member.getId(), false);
 
-            BaseException exception = new BaseException(NOT_ALLOWED_SELF_LIKE);
-            assertThatThrownBy(() -> memberLikeService.doMemberLike(request))
-                .isInstanceOf(exception.getClass())
-                .hasMessage(exception.getMessage());
-        }
+			BaseException exception = new BaseException(NOT_ALLOWED_SELF_LIKE);
+			assertThatThrownBy(() -> memberLikeService.doMemberLike(request))
+				.isInstanceOf(exception.getClass())
+				.hasMessage(exception.getMessage());
+		}
 
-        @DisplayName("좋아요를 한 상태에서 좋아요 삭제 시 성공한다.")
-        @Test
-        void should_successDelete_when_like() {
-            memberLikeRepository.save(MemberLike.builder()
-                .sourceMember(member)
-                .targetMember(member2)
-                .build());
-            MemberLikeServiceRequest request = createRequest(member2.getId(), true);
+		@DisplayName("좋아요를 한 상태에서 좋아요 삭제 시 성공한다.")
+		@Test
+		void should_successDelete_when_like() {
+			memberLikeRepository.save(MemberLike.builder()
+				.sourceMember(member)
+				.targetMember(member2)
+				.build());
+			MemberLikeServiceRequest request = createRequest(member2.getId(), true);
 
-            memberLikeService.doMemberLike(request);
+			memberLikeService.doMemberLike(request);
 
-            assertThat(memberLikeRepository.findAll()).isEmpty();
-        }
+			assertThat(memberLikeRepository.findAll()).isEmpty();
+		}
 
-        @DisplayName("좋아요를 하지 않은 상태에서 좋아요 삭제 시 실패한다.")
-        @Test
-        void should_failDelete_when_notLike() {
-            MemberLikeServiceRequest request = createRequest(member2.getId(), true);
-            BaseException exception = new BaseException(MEMBER_LIKE_NOT_FOUND);
-            assertThatThrownBy(() -> memberLikeService.doMemberLike(request))
-                .isInstanceOf(exception.getClass())
-                .hasMessage(exception.getMessage());
-        }
+		@DisplayName("좋아요를 하지 않은 상태에서 좋아요 삭제 시 실패한다.")
+		@Test
+		void should_failDelete_when_notLike() {
+			MemberLikeServiceRequest request = createRequest(member2.getId(), true);
+			BaseException exception = new BaseException(MEMBER_LIKE_NOT_FOUND);
+			assertThatThrownBy(() -> memberLikeService.doMemberLike(request))
+				.isInstanceOf(exception.getClass())
+				.hasMessage(exception.getMessage());
+		}
 
-        private MemberLikeServiceRequest createRequest(Long targetMemberId, Boolean cancel) {
-            return MemberLikeServiceRequest.builder()
-                .targetMemberId(targetMemberId)
-                .cancel(cancel)
-                .build();
-        }
-    }
+		private MemberLikeServiceRequest createRequest(Long targetMemberId, Boolean cancel) {
+			return MemberLikeServiceRequest.builder()
+				.targetMemberId(targetMemberId)
+				.cancel(cancel)
+				.build();
+		}
+	}
 }

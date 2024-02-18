@@ -9,11 +9,11 @@ import lombok.Getter;
 @Getter
 public class RecommendedSummonersResponse {
 
-    private List<RecommendedSummonersEntry> recommendedSummoners;
+	private List<RecommendedSummonersEntry> recommendedSummoners;
 
-    public static RecommendedSummonersResponse from(RecommendedSummonersServiceResponse response) {
-        return RecommendedSummonersResponse.builder()
-            .recommendedSummoners(response.getRecommendedSummoners())
-            .build();
-    }
+	public static RecommendedSummonersResponse from(RecommendedSummonersServiceResponse response) {
+		return RecommendedSummonersResponse.builder()
+			.recommendedSummoners(response.getRecommendedSummoners())
+			.build();
+	}
 }

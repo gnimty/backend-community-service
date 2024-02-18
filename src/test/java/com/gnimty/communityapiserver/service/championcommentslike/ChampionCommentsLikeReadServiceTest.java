@@ -21,130 +21,130 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class ChampionCommentsLikeReadServiceTest extends ServiceTestSupport {
 
-    @Autowired
-    private ChampionCommentsLikeReadService championCommentsLikeReadService;
+	@Autowired
+	private ChampionCommentsLikeReadService championCommentsLikeReadService;
 
-    @DisplayName("좋아요/싫어요 존재 여부 판단 시")
-    @Nested
-    class ExistsByMemberAndChampionComments {
+	@DisplayName("좋아요/싫어요 존재 여부 판단 시")
+	@Nested
+	class ExistsByMemberAndChampionComments {
 
-        private Member member;
-        private ChampionComments championComments;
+		private Member member;
+		private ChampionComments championComments;
 
-        @BeforeEach
-        void setUp() {
-            member = memberRepository.save(Member.builder()
-                .upCount(0L)
-                .status(Status.ONLINE)
-                .nickname("nickname")
-                .rsoLinked(true)
-                .build());
-            championComments = championCommentsRepository.save(ChampionComments.builder()
-                .upCount(0L)
-                .downCount(0L)
-                .championId(1L)
-                .contents("contents")
-                .member(member)
-                .depth(0)
-                .version("1.1")
-                .build());
-            riotAccountRepository.save(RiotAccount.builder()
-                .member(member)
-                .name("name")
-                .tagLine("tag")
-                .internalTagName("name#tag")
-                .isMain(true)
-                .puuid("puuid")
-                .level(0L)
-                .build());
-            MemberThreadLocal.set(member);
-        }
+		@BeforeEach
+		void setUp() {
+			member = memberRepository.save(Member.builder()
+				.upCount(0L)
+				.status(Status.ONLINE)
+				.nickname("nickname")
+				.rsoLinked(true)
+				.build());
+			championComments = championCommentsRepository.save(ChampionComments.builder()
+				.upCount(0L)
+				.downCount(0L)
+				.championId(1L)
+				.contents("contents")
+				.member(member)
+				.depth(0)
+				.version("1.1")
+				.build());
+			riotAccountRepository.save(RiotAccount.builder()
+				.member(member)
+				.name("name")
+				.tagLine("tag")
+				.internalTagName("name#tag")
+				.isMain(true)
+				.puuid("puuid")
+				.level(0L)
+				.build());
+			MemberThreadLocal.set(member);
+		}
 
-        @DisplayName("좋아요/싫어요를 하지 않았으면 false가 반환된다")
-        @Test
-        void should_returnFalse_when_didntReaction() {
-            assertThat(
-                championCommentsLikeReadService.existsByMemberAndChampionComments(member, championComments)).isFalse();
-        }
+		@DisplayName("좋아요/싫어요를 하지 않았으면 false가 반환된다")
+		@Test
+		void should_returnFalse_when_didntReaction() {
+			assertThat(
+				championCommentsLikeReadService.existsByMemberAndChampionComments(member, championComments)).isFalse();
+		}
 
-        @DisplayName("좋아요/싫어요를 한 댓글이라면 true가 반환된다.")
-        @Test
-        void should_returnTrue_when_didReaction() {
-            championCommentsLikeRepository.save(ChampionCommentsLike.builder()
-                .likeOrNot(true)
-                .member(member)
-                .championComments(championComments)
-                .build());
+		@DisplayName("좋아요/싫어요를 한 댓글이라면 true가 반환된다.")
+		@Test
+		void should_returnTrue_when_didReaction() {
+			championCommentsLikeRepository.save(ChampionCommentsLike.builder()
+				.likeOrNot(true)
+				.member(member)
+				.championComments(championComments)
+				.build());
 
-            assertThat(
-                championCommentsLikeReadService.existsByMemberAndChampionComments(member, championComments)).isTrue();
-        }
-    }
+			assertThat(
+				championCommentsLikeReadService.existsByMemberAndChampionComments(member, championComments)).isTrue();
+		}
+	}
 
-    @DisplayName("챔피언 운용법 좋아요 조회 시")
-    @Nested
-    class FindByMemberAndChampionComments {
+	@DisplayName("챔피언 운용법 좋아요 조회 시")
+	@Nested
+	class FindByMemberAndChampionComments {
 
-        private Member member;
-        private ChampionComments championComments;
+		private Member member;
+		private ChampionComments championComments;
 
-        @BeforeEach
-        void setUp() {
-            member = memberRepository.save(Member.builder()
-                .upCount(0L)
-                .status(Status.ONLINE)
-                .nickname("nickname")
-                .rsoLinked(true)
-                .build());
-            championComments = championCommentsRepository.save(ChampionComments.builder()
-                .upCount(0L)
-                .downCount(0L)
-                .championId(1L)
-                .contents("contents")
-                .member(member)
-                .depth(0)
-                .version("1.1")
-                .build());
-            riotAccountRepository.save(RiotAccount.builder()
-                .member(member)
-                .name("name")
-                .tagLine("tag")
-                .internalTagName("name#tag")
-                .isMain(true)
-                .puuid("puuid")
-                .level(0L)
-                .build());
-            MemberThreadLocal.set(member);
-        }
+		@BeforeEach
+		void setUp() {
+			member = memberRepository.save(Member.builder()
+				.upCount(0L)
+				.status(Status.ONLINE)
+				.nickname("nickname")
+				.rsoLinked(true)
+				.build());
+			championComments = championCommentsRepository.save(ChampionComments.builder()
+				.upCount(0L)
+				.downCount(0L)
+				.championId(1L)
+				.contents("contents")
+				.member(member)
+				.depth(0)
+				.version("1.1")
+				.build());
+			riotAccountRepository.save(RiotAccount.builder()
+				.member(member)
+				.name("name")
+				.tagLine("tag")
+				.internalTagName("name#tag")
+				.isMain(true)
+				.puuid("puuid")
+				.level(0L)
+				.build());
+			MemberThreadLocal.set(member);
+		}
 
-        @DisplayName("내가 좋아요/싫어요 한 정보가 조회되어야 한다.")
-        @Test
-        void should_readInfoLiked_when_invokeMethod() {
-            ChampionCommentsLike championCommentsLike = championCommentsLikeRepository.save(
-                ChampionCommentsLike.builder()
-                    .championComments(championComments)
-                    .likeOrNot(true)
-                    .member(member)
-                    .build());
+		@DisplayName("내가 좋아요/싫어요 한 정보가 조회되어야 한다.")
+		@Test
+		void should_readInfoLiked_when_invokeMethod() {
+			ChampionCommentsLike championCommentsLike = championCommentsLikeRepository.save(
+				ChampionCommentsLike.builder()
+					.championComments(championComments)
+					.likeOrNot(true)
+					.member(member)
+					.build());
 
-            ChampionCommentsLike byMemberAndChampionComments = championCommentsLikeReadService.findByMemberAndChampionComments(
-                member, championComments);
+			ChampionCommentsLike byMemberAndChampionComments = championCommentsLikeReadService.findByMemberAndChampionComments(
+				member, championComments);
 
-            assertThat(byMemberAndChampionComments.getChampionComments().getId()).isEqualTo(championComments.getId());
-            assertThat(byMemberAndChampionComments.getMember().getId()).isEqualTo(member.getId());
-            assertThat(byMemberAndChampionComments.getId()).isEqualTo(championCommentsLike.getId());
-        }
+			assertThat(byMemberAndChampionComments.getChampionComments().getId()).isEqualTo(championComments.getId());
+			assertThat(byMemberAndChampionComments.getMember().getId()).isEqualTo(member.getId());
+			assertThat(byMemberAndChampionComments.getId()).isEqualTo(championCommentsLike.getId());
+		}
 
-        @DisplayName("내가 좋아요/싫어요 한 기록이 없다면 예외를 반환한다.")
-        @Test
-        void should_throwException_when_didNotLiked() {
+		@DisplayName("내가 좋아요/싫어요 한 기록이 없다면 예외를 반환한다.")
+		@Test
+		void should_throwException_when_didNotLiked() {
 
-            BaseException exception = new BaseException(ErrorCode.CHAMPION_COMMENTS_LIKE_NOT_FOUND);
-            assertThatThrownBy(
-                () -> championCommentsLikeReadService.findByMemberAndChampionComments(member, championComments))
-                .isInstanceOf(exception.getClass())
-                .hasMessage(exception.getMessage());
-        }
+			BaseException exception = new BaseException(ErrorCode.CHAMPION_COMMENTS_LIKE_NOT_FOUND);
+			assertThatThrownBy(
+				() -> championCommentsLikeReadService.findByMemberAndChampionComments(member, championComments))
+				.isInstanceOf(exception.getClass())
+				.hasMessage(exception.getMessage());
+		}
 
-    }
+	}
 }
