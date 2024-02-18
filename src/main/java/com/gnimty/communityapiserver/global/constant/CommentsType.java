@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
 import io.swagger.v3.oas.annotations.media.Schema;
-
 import java.util.stream.Stream;
 
 @Schema(

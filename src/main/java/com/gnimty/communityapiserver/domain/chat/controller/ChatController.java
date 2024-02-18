@@ -18,6 +18,8 @@ import com.gnimty.communityapiserver.global.connect.WebSocketSessionManager;
 import com.gnimty.communityapiserver.global.constant.MessageRequestType;
 import com.gnimty.communityapiserver.global.constant.MessageResponseType;
 import com.gnimty.communityapiserver.global.constant.Status;
+import java.util.List;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -28,9 +30,6 @@ import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.socket.messaging.SessionConnectedEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
-
-import javax.validation.Valid;
-import java.util.List;
 
 
 @RestController
@@ -60,7 +59,7 @@ public class ChatController {
     // 이미 채팅방이 존재한다면 채팅방 정보만 넘겨주고 상대방 구독유도는 하지 않기 -> Front 1차 처리, Back 2차 처리
     @MessageMapping("/user/{otherUserId}")
     public void createChatRoomAndDerive(@DestinationVariable("otherUserId") Long otherUserId,
-                                        @Header("simpSessionId") String sessionId) {
+        @Header("simpSessionId") String sessionId) {
 
         User me = getUserBySessionId(sessionId);
         User other = userService.getUser(otherUserId);
@@ -89,8 +88,8 @@ public class ChatController {
 
     @MessageMapping("/chatRoom/{chatRoomNo}")
     public void sendMessage(@DestinationVariable("chatRoomNo") Long chatRoomNo,
-                            @Header("simpSessionId") String sessionId,
-                            final @Valid MessageRequest request) {
+        @Header("simpSessionId") String sessionId,
+        final @Valid MessageRequest request) {
         User user = getUserBySessionId(sessionId);
         ChatRoom chatRoom = chatRoomService.getChatRoom(chatRoomNo);
 

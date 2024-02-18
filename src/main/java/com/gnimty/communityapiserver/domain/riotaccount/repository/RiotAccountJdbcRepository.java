@@ -2,13 +2,12 @@ package com.gnimty.communityapiserver.domain.riotaccount.repository;
 
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.SummonerUpdateEntry;
 import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
+import java.sql.PreparedStatement;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.sql.PreparedStatement;
-import java.util.List;
 
 @RequiredArgsConstructor
 @Repository

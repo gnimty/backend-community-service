@@ -5,13 +5,17 @@ import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
 import com.gnimty.communityapiserver.global.constant.Lane;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.constant.Tier;
-import lombok.*;
+import java.util.Optional;
+import javax.persistence.Id;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import javax.persistence.Id;
-import java.util.Optional;
 
 @Document(collection = "user")
 @Getter

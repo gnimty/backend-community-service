@@ -1,17 +1,16 @@
 package com.gnimty.communityapiserver.domain.introduction.service;
 
+import static com.gnimty.communityapiserver.global.constant.Bound.MAIN_CONTENT_COUNT;
+
 import com.gnimty.communityapiserver.domain.introduction.entity.Introduction;
 import com.gnimty.communityapiserver.domain.introduction.repository.IntroductionRepository;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-
-import static com.gnimty.communityapiserver.global.constant.Bound.MAIN_CONTENT_COUNT;
 
 @Service
 @RequiredArgsConstructor

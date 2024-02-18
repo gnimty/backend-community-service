@@ -1,5 +1,15 @@
 package com.gnimty.communityapiserver.domain.championcomments.controller;
 
+import static com.gnimty.communityapiserver.global.constant.ApiSummary.ADD_CHAMPION_COMMENTS;
+import static com.gnimty.communityapiserver.global.constant.ApiSummary.DELETE_CHAMPION_COMMENTS;
+import static com.gnimty.communityapiserver.global.constant.ApiSummary.READ_CHAMPION_COMMENTS;
+import static com.gnimty.communityapiserver.global.constant.ApiSummary.UPDATE_CHAMPION_COMMENTS;
+import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_ADD_CHAMPION_COMMENTS;
+import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_DELETE_CHAMPION_COMMENTS;
+import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_UPDATE_CHAMPION_COMMENTS;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
+
 import com.gnimty.communityapiserver.domain.championcomments.controller.dto.request.ChampionCommentsRequest;
 import com.gnimty.communityapiserver.domain.championcomments.controller.dto.request.ChampionCommentsUpdateRequest;
 import com.gnimty.communityapiserver.domain.championcomments.controller.dto.response.ChampionCommentsResponse;
@@ -13,15 +23,17 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
-
 import javax.validation.Valid;
-
-import static com.gnimty.communityapiserver.global.constant.ApiSummary.*;
-import static com.gnimty.communityapiserver.global.constant.ResponseMessage.*;
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.OK;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "/champions/{champion_id}/comments", description = "챔피언 운용법 관련 컨트롤러")
 @RestController

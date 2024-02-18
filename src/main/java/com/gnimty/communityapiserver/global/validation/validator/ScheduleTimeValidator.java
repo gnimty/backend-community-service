@@ -3,10 +3,9 @@ package com.gnimty.communityapiserver.global.validation.validator;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
 import com.gnimty.communityapiserver.global.validation.annotation.BeforeEndTime;
-
+import java.lang.reflect.Field;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import java.lang.reflect.Field;
 
 public class ScheduleTimeValidator implements ConstraintValidator<BeforeEndTime, Object> {
 

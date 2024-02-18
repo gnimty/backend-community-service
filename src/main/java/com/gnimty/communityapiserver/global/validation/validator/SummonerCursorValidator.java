@@ -4,10 +4,9 @@ import com.gnimty.communityapiserver.global.constant.SortBy;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
 import com.gnimty.communityapiserver.global.validation.annotation.ValidateCursor;
-
+import java.lang.reflect.Field;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import java.lang.reflect.Field;
 
 public class SummonerCursorValidator implements ConstraintValidator<ValidateCursor, Object> {
 

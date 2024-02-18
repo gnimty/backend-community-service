@@ -1,5 +1,7 @@
 package com.gnimty.communityapiserver.domain.member.service.utils;
 
+import static com.gnimty.communityapiserver.global.constant.Auth.BEARER;
+
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
 import lombok.Getter;
@@ -12,8 +14,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-
-import static com.gnimty.communityapiserver.global.constant.Auth.BEARER;
 
 @Service
 @RequiredArgsConstructor

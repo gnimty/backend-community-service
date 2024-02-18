@@ -1,13 +1,38 @@
 package com.gnimty.communityapiserver.domain.member.service;
 
+import static com.gnimty.communityapiserver.global.constant.Bound.INITIAL_COUNT;
+import static com.gnimty.communityapiserver.global.constant.Bound.MAIN_INTRODUCTION_COUNT;
+import static com.gnimty.communityapiserver.global.constant.Bound.MAX_HOUR;
+import static com.gnimty.communityapiserver.global.constant.Bound.MAX_INTRODUCTION_COUNT;
+import static com.gnimty.communityapiserver.global.constant.Bound.MIN_HOUR;
+import static com.gnimty.communityapiserver.global.constant.Bound.RANDOM_CODE_LENGTH;
+import static com.gnimty.communityapiserver.global.constant.CommonStringType.PASSWORD_EMAIL_BANNER;
+import static com.gnimty.communityapiserver.global.constant.CommonStringType.PASSWORD_EMAIL_TEMPLATE;
+import static com.gnimty.communityapiserver.global.constant.CommonStringType.TAG_SPLITTER;
+import static com.gnimty.communityapiserver.global.constant.KeyPrefix.PASSWORD;
+import static com.gnimty.communityapiserver.global.constant.KeyPrefix.REFRESH;
+import static com.gnimty.communityapiserver.global.constant.KeyPrefix.UPDATE_PASSWORD;
+
 import com.gnimty.communityapiserver.domain.block.repository.BlockRepository;
 import com.gnimty.communityapiserver.domain.introduction.entity.Introduction;
 import com.gnimty.communityapiserver.domain.introduction.repository.IntroductionRepository;
 import com.gnimty.communityapiserver.domain.introduction.service.IntroductionReadService;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.domain.member.repository.MemberRepository;
-import com.gnimty.communityapiserver.domain.member.service.dto.request.*;
-import com.gnimty.communityapiserver.domain.member.service.dto.response.*;
+import com.gnimty.communityapiserver.domain.member.service.dto.request.MyProfileUpdateMainServiceRequest;
+import com.gnimty.communityapiserver.domain.member.service.dto.request.MyProfileUpdateServiceRequest;
+import com.gnimty.communityapiserver.domain.member.service.dto.request.OauthLoginServiceRequest;
+import com.gnimty.communityapiserver.domain.member.service.dto.request.PasswordEmailVerifyServiceRequest;
+import com.gnimty.communityapiserver.domain.member.service.dto.request.PasswordResetServiceRequest;
+import com.gnimty.communityapiserver.domain.member.service.dto.request.PasswordUpdateServiceRequest;
+import com.gnimty.communityapiserver.domain.member.service.dto.request.SendEmailServiceRequest;
+import com.gnimty.communityapiserver.domain.member.service.dto.response.IntroductionEntry;
+import com.gnimty.communityapiserver.domain.member.service.dto.response.MyProfileServiceResponse;
+import com.gnimty.communityapiserver.domain.member.service.dto.response.OauthInfoEntry;
+import com.gnimty.communityapiserver.domain.member.service.dto.response.PasswordEmailVerifyServiceResponse;
+import com.gnimty.communityapiserver.domain.member.service.dto.response.PreferGameModeEntry;
+import com.gnimty.communityapiserver.domain.member.service.dto.response.RiotAccountEntry;
+import com.gnimty.communityapiserver.domain.member.service.dto.response.RiotDependentInfo;
 import com.gnimty.communityapiserver.domain.member.service.utils.GoogleOauthUtil;
 import com.gnimty.communityapiserver.domain.member.service.utils.KakaoOauthUtil;
 import com.gnimty.communityapiserver.domain.member.service.utils.MailSenderUtil;
@@ -31,25 +56,25 @@ import com.gnimty.communityapiserver.domain.schedule.entity.Schedule;
 import com.gnimty.communityapiserver.domain.schedule.repository.ScheduleRepository;
 import com.gnimty.communityapiserver.domain.schedule.service.ScheduleReadService;
 import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
-import com.gnimty.communityapiserver.global.constant.*;
+import com.gnimty.communityapiserver.global.constant.Auth;
+import com.gnimty.communityapiserver.global.constant.DayOfWeek;
+import com.gnimty.communityapiserver.global.constant.GameMode;
+import com.gnimty.communityapiserver.global.constant.KeyPrefix;
+import com.gnimty.communityapiserver.global.constant.Provider;
+import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
 import com.gnimty.communityapiserver.global.utils.RandomCodeGenerator;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-
-import static com.gnimty.communityapiserver.global.constant.Bound.*;
-import static com.gnimty.communityapiserver.global.constant.CommonStringType.*;
-import static com.gnimty.communityapiserver.global.constant.KeyPrefix.*;
 
 @Service
 @RequiredArgsConstructor

@@ -1,11 +1,11 @@
 package com.gnimty.communityapiserver.domain.block.repository;
 
+import static com.gnimty.communityapiserver.domain.block.entity.QBlock.block;
+
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-
-import static com.gnimty.communityapiserver.domain.block.entity.QBlock.block;
 
 @Repository
 @RequiredArgsConstructor

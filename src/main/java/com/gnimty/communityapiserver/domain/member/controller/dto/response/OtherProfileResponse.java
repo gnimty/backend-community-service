@@ -4,10 +4,9 @@ import com.gnimty.communityapiserver.domain.member.service.dto.response.OtherPro
 import com.gnimty.communityapiserver.domain.member.service.dto.response.PreferGameModeEntry;
 import com.gnimty.communityapiserver.domain.schedule.controller.dto.request.ScheduleEntry;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.List;
 
 @Builder
 @Getter

@@ -2,13 +2,12 @@ package com.gnimty.communityapiserver.domain.member.controller.dto.request;
 
 import com.gnimty.communityapiserver.domain.member.service.dto.request.IntroductionUpdateServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.IntroductionEntry;
+import java.util.List;
+import javax.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import javax.validation.Valid;
-import java.util.List;
 
 @Getter
 @Builder

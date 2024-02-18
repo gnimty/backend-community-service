@@ -1,5 +1,7 @@
 package com.gnimty.communityapiserver.domain.riotaccount.service;
 
+import static com.gnimty.communityapiserver.global.constant.CommonStringType.URL_TAG_SPLITTER;
+
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.SummonerUpdateEntry;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.SummonerUpdateServiceRequest;
@@ -15,16 +17,13 @@ import com.gnimty.communityapiserver.domain.schedule.service.ScheduleReadService
 import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
 import com.gnimty.communityapiserver.global.config.WebClientWrapper;
 import com.gnimty.communityapiserver.global.constant.GameMode;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import static com.gnimty.communityapiserver.global.constant.CommonStringType.URL_TAG_SPLITTER;
 
 @Service
 @RequiredArgsConstructor

@@ -1,15 +1,14 @@
 package com.gnimty.communityapiserver.domain.member.service.dto.response;
 
+import static com.gnimty.communityapiserver.global.constant.Bound.MAX_INTRODUCTION_CONTENT_SIZE;
+
 import com.gnimty.communityapiserver.domain.introduction.entity.Introduction;
 import com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
-import lombok.Getter;
-
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
-import static com.gnimty.communityapiserver.global.constant.Bound.MAX_INTRODUCTION_CONTENT_SIZE;
+import lombok.Builder;
+import lombok.Getter;
 
 @Builder
 @Getter

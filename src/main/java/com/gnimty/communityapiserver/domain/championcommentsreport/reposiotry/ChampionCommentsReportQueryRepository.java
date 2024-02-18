@@ -1,13 +1,13 @@
 package com.gnimty.communityapiserver.domain.championcommentsreport.reposiotry;
 
+import static com.gnimty.communityapiserver.domain.championcommentsreport.entity.QChampionCommentsReport.championCommentsReport;
+
 import com.gnimty.communityapiserver.domain.championcomments.entity.ChampionComments;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-
-import static com.gnimty.communityapiserver.domain.championcommentsreport.entity.QChampionCommentsReport.championCommentsReport;
 
 @RequiredArgsConstructor
 @Repository

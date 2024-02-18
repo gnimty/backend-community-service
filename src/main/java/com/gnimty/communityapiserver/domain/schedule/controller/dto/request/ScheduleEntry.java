@@ -1,19 +1,18 @@
 package com.gnimty.communityapiserver.domain.schedule.controller.dto.request;
 
+import static com.gnimty.communityapiserver.global.constant.Bound.MAX_HOUR;
+import static com.gnimty.communityapiserver.global.constant.Bound.MIN_HOUR;
+
 import com.gnimty.communityapiserver.domain.schedule.entity.Schedule;
 import com.gnimty.communityapiserver.global.constant.DayOfWeek;
 import com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage;
 import com.gnimty.communityapiserver.global.validation.annotation.BeforeEndTime;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
-import lombok.Getter;
-
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-
-import static com.gnimty.communityapiserver.global.constant.Bound.MAX_HOUR;
-import static com.gnimty.communityapiserver.global.constant.Bound.MIN_HOUR;
+import lombok.Builder;
+import lombok.Getter;
 
 @Builder
 @Getter

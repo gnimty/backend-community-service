@@ -1,14 +1,13 @@
 package com.gnimty.communityapiserver.global.validation.validator;
 
+import static com.gnimty.communityapiserver.global.constant.Bound.PARENT_COMMENTS_DEPTH;
+
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
 import com.gnimty.communityapiserver.global.validation.annotation.IsChildComments;
-
+import java.lang.reflect.Field;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import java.lang.reflect.Field;
-
-import static com.gnimty.communityapiserver.global.constant.Bound.PARENT_COMMENTS_DEPTH;
 
 public class ChildCommentsValidator implements ConstraintValidator<IsChildComments, Object> {
 

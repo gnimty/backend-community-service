@@ -3,12 +3,11 @@ package com.gnimty.communityapiserver.domain.championcomments.service.dto.respon
 import com.gnimty.communityapiserver.global.constant.CommentsType;
 import com.gnimty.communityapiserver.global.constant.Lane;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 @Data
 @Builder

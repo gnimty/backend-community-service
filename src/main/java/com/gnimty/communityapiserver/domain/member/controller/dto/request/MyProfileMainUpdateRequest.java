@@ -4,13 +4,12 @@ import com.gnimty.communityapiserver.domain.member.service.dto.request.MyProfile
 import com.gnimty.communityapiserver.domain.member.service.dto.response.IntroductionEntry;
 import com.gnimty.communityapiserver.global.constant.Status;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
+import javax.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import javax.validation.Valid;
-import java.util.List;
 
 @Getter
 @Builder

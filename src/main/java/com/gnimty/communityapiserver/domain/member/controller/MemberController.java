@@ -1,8 +1,40 @@
 package com.gnimty.communityapiserver.domain.member.controller;
 
+import static com.gnimty.communityapiserver.global.constant.ApiSummary.DELETE_OAUTH_INFO;
+import static com.gnimty.communityapiserver.global.constant.ApiSummary.GET_MY_PROFILE;
+import static com.gnimty.communityapiserver.global.constant.ApiSummary.GET_OTHER_PROFILE;
+import static com.gnimty.communityapiserver.global.constant.ApiSummary.GOOGLE_ADDITIONAL_LINK;
+import static com.gnimty.communityapiserver.global.constant.ApiSummary.KAKAO_ADDITIONAL_LINK;
+import static com.gnimty.communityapiserver.global.constant.ApiSummary.LOGOUT;
+import static com.gnimty.communityapiserver.global.constant.ApiSummary.RESET_PASSWORD;
+import static com.gnimty.communityapiserver.global.constant.ApiSummary.SEND_PASSWORD_EMAIL_AUTH_CODE;
+import static com.gnimty.communityapiserver.global.constant.ApiSummary.SUMMONER_ACCOUNT_LINK;
+import static com.gnimty.communityapiserver.global.constant.ApiSummary.UPDATE_MY_PROFILE;
+import static com.gnimty.communityapiserver.global.constant.ApiSummary.UPDATE_MY_PROFILE_MAIN;
+import static com.gnimty.communityapiserver.global.constant.ApiSummary.UPDATE_PASSWORD;
+import static com.gnimty.communityapiserver.global.constant.ApiSummary.VERIFY_PASSWORD_EMAIL_AUTH_CODE;
+import static com.gnimty.communityapiserver.global.constant.ApiSummary.WITHDRAWAL;
+import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_DISCONNECT_OAUTH;
+import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_GOOGLE_LINK;
+import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_KAKAO_LINK;
+import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_LOGOUT;
+import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_SEND_EMAIL_AUTH_CODE;
+import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_SUMMONER_LINK;
+import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_UPDATE_PASSWORD;
+import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_UPDATE_PROFILE;
+import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_WITHDRAWAL;
+import static org.springframework.http.HttpStatus.ACCEPTED;
+import static org.springframework.http.HttpStatus.OK;
+
 import com.gnimty.communityapiserver.domain.chat.service.StompService;
 import com.gnimty.communityapiserver.domain.chat.service.UserService;
-import com.gnimty.communityapiserver.domain.member.controller.dto.request.*;
+import com.gnimty.communityapiserver.domain.member.controller.dto.request.MyProfileMainUpdateRequest;
+import com.gnimty.communityapiserver.domain.member.controller.dto.request.MyProfileUpdateRequest;
+import com.gnimty.communityapiserver.domain.member.controller.dto.request.OauthLoginRequest;
+import com.gnimty.communityapiserver.domain.member.controller.dto.request.PasswordEmailVerifyRequest;
+import com.gnimty.communityapiserver.domain.member.controller.dto.request.PasswordResetRequest;
+import com.gnimty.communityapiserver.domain.member.controller.dto.request.PasswordUpdateRequest;
+import com.gnimty.communityapiserver.domain.member.controller.dto.request.SendEmailRequest;
 import com.gnimty.communityapiserver.domain.member.controller.dto.response.MyProfileResponse;
 import com.gnimty.communityapiserver.domain.member.controller.dto.response.OtherProfileResponse;
 import com.gnimty.communityapiserver.domain.member.controller.dto.response.PasswordEmailVerifyResponse;
@@ -22,15 +54,18 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
-
 import javax.validation.Valid;
-
-import static com.gnimty.communityapiserver.global.constant.ApiSummary.*;
-import static com.gnimty.communityapiserver.global.constant.ResponseMessage.*;
-import static org.springframework.http.HttpStatus.ACCEPTED;
-import static org.springframework.http.HttpStatus.OK;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "/members", description = "회원 정보 관련 컨트롤러")
 @RestController

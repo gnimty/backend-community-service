@@ -1,22 +1,23 @@
 package com.gnimty.communityapiserver.domain.championcomments.controller.dto.request;
 
+import static com.gnimty.communityapiserver.global.constant.Bound.MAX_CONTENTS_SIZE;
+import static com.gnimty.communityapiserver.global.constant.Bound.MAX_DEPTH_SIZE;
+import static com.gnimty.communityapiserver.global.constant.Bound.MIN_DEPTH_SIZE;
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage.INVALID_INPUT_VALUE;
+
 import com.gnimty.communityapiserver.domain.championcomments.service.dto.request.ChampionCommentsServiceRequest;
 import com.gnimty.communityapiserver.global.constant.CommentsType;
 import com.gnimty.communityapiserver.global.constant.Lane;
 import com.gnimty.communityapiserver.global.validation.annotation.IsChildComments;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
-import static com.gnimty.communityapiserver.global.constant.Bound.*;
-import static com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage.INVALID_INPUT_VALUE;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Builder

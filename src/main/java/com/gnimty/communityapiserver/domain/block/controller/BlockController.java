@@ -1,5 +1,12 @@
 package com.gnimty.communityapiserver.domain.block.controller;
 
+import static com.gnimty.communityapiserver.global.constant.ApiSummary.CLEAR_BLOCK;
+import static com.gnimty.communityapiserver.global.constant.ApiSummary.DO_BLOCK;
+import static com.gnimty.communityapiserver.global.constant.ApiSummary.READ_BLOCKS;
+import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_BLOCK;
+import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_CLEAR_BLOCK;
+import static org.springframework.http.HttpStatus.OK;
+
 import com.gnimty.communityapiserver.domain.block.controller.dto.request.BlockClearRequest;
 import com.gnimty.communityapiserver.domain.block.controller.dto.request.BlockRequest;
 import com.gnimty.communityapiserver.domain.block.controller.dto.response.BlockReadResponse;
@@ -17,15 +24,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
-
 import javax.validation.Valid;
-
-import static com.gnimty.communityapiserver.global.constant.ApiSummary.*;
-import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_BLOCK;
-import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_CLEAR_BLOCK;
-import static org.springframework.http.HttpStatus.OK;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "/members/me/block", description = "회원 차단 관련 컨트롤러")
 @RestController

@@ -4,11 +4,7 @@ package com.gnimty.communityapiserver.domain.chat.repository.Chat;
 import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatDto;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
-
-import java.time.Instant;
 import java.time.OffsetDateTime;
-import java.time.ZonedDateTime;
-import java.util.Date;
 import java.util.List;
 
 public interface ChatRepositoryCustom {

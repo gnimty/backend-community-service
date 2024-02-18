@@ -1,27 +1,39 @@
 package com.gnimty.communityapiserver.global.auth;
 
 
+import static com.gnimty.communityapiserver.global.constant.Auth.ACCESS_TOKEN_EXPIRATION;
+import static com.gnimty.communityapiserver.global.constant.Auth.AUTHORIZATION;
+import static com.gnimty.communityapiserver.global.constant.Auth.AUTH_TYPE;
+import static com.gnimty.communityapiserver.global.constant.Auth.BEARER;
+import static com.gnimty.communityapiserver.global.constant.Auth.ID_PAYLOAD_NAME;
+import static com.gnimty.communityapiserver.global.constant.Auth.JWT_TYPE;
+import static com.gnimty.communityapiserver.global.constant.Auth.REFRESH_TOKEN_EXPIRATION;
+import static com.gnimty.communityapiserver.global.constant.Auth.SUBJECT_ACCESS_TOKEN;
+import static com.gnimty.communityapiserver.global.constant.Auth.SUBJECT_REFRESH_TOKEN;
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.TOKEN_EXPIRED;
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.TOKEN_INVALID;
+
 import com.gnimty.communityapiserver.domain.member.controller.dto.response.AuthToken;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.domain.member.service.MemberReadService;
 import com.gnimty.communityapiserver.global.constant.KeyPrefix;
 import com.gnimty.communityapiserver.global.exception.BaseException;
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.SignatureException;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
+import java.util.Optional;
+import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
-
-import javax.servlet.http.HttpServletRequest;
-import java.nio.charset.StandardCharsets;
-import java.util.Date;
-import java.util.Optional;
-
-import static com.gnimty.communityapiserver.global.constant.Auth.*;
-import static com.gnimty.communityapiserver.global.exception.ErrorCode.TOKEN_EXPIRED;
-import static com.gnimty.communityapiserver.global.exception.ErrorCode.TOKEN_INVALID;
 
 @RequiredArgsConstructor
 @Component

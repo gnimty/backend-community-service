@@ -1,5 +1,10 @@
 package com.gnimty.communityapiserver.domain.memberlike.controller;
 
+import static com.gnimty.communityapiserver.global.constant.ApiSummary.DO_MEMBER_LIKE;
+import static com.gnimty.communityapiserver.global.constant.ApiSummary.READ_MEMBER_LIKE;
+import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_MEMBER_LIKE;
+import static org.springframework.http.HttpStatus.OK;
+
 import com.gnimty.communityapiserver.domain.memberlike.controller.dto.request.MemberLikeRequest;
 import com.gnimty.communityapiserver.domain.memberlike.controller.dto.response.MemberLikeResponse;
 import com.gnimty.communityapiserver.domain.memberlike.service.MemberLikeService;
@@ -10,15 +15,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
-
 import javax.validation.Valid;
-
-import static com.gnimty.communityapiserver.global.constant.ApiSummary.DO_MEMBER_LIKE;
-import static com.gnimty.communityapiserver.global.constant.ApiSummary.READ_MEMBER_LIKE;
-import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_MEMBER_LIKE;
-import static org.springframework.http.HttpStatus.OK;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "/members/me/like", description = "회원 좋아요 관련 컨트롤러")
 @RestController

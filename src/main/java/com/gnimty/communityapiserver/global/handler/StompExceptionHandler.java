@@ -1,5 +1,7 @@
 package com.gnimty.communityapiserver.global.handler;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageDeliveryException;
@@ -10,9 +12,6 @@ import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.socket.messaging.StompSubProtocolErrorHandler;
-
-import java.nio.charset.StandardCharsets;
-import java.util.Objects;
 
 @Component
 public class StompExceptionHandler extends StompSubProtocolErrorHandler {
@@ -25,7 +24,7 @@ public class StompExceptionHandler extends StompSubProtocolErrorHandler {
 
     @Override
     public Message<byte[]> handleClientMessageProcessingError(Message<byte[]> clientMessage,
-                                                              Throwable ex) {
+        Throwable ex) {
 
         final Throwable exception = converterTrowException(ex);
 
@@ -45,14 +44,14 @@ public class StompExceptionHandler extends StompSubProtocolErrorHandler {
     }
 
     private Message<byte[]> handleUnauthorizedException(Message<byte[]> clientMessage,
-                                                        Throwable ex) {
+        Throwable ex) {
 
         return prepareErrorMessage(clientMessage, ex.getMessage(), HttpStatus.UNAUTHORIZED.name());
 
     }
 
     private Message<byte[]> prepareErrorMessage(final Message<byte[]> clientMessage,
-                                                final String message, final String errorCode) {
+        final String message, final String errorCode) {
 
         final StompHeaderAccessor accessor = StompHeaderAccessor.create(StompCommand.ERROR);
         accessor.setMessage(errorCode);
@@ -67,7 +66,7 @@ public class StompExceptionHandler extends StompSubProtocolErrorHandler {
     }
 
     private void setReceiptIdForClient(final Message<byte[]> clientMessage,
-                                       final StompHeaderAccessor accessor) {
+        final StompHeaderAccessor accessor) {
 
         if (Objects.isNull(clientMessage)) {
             return;
@@ -87,7 +86,7 @@ public class StompExceptionHandler extends StompSubProtocolErrorHandler {
     //2
     @Override
     protected Message<byte[]> handleInternal(StompHeaderAccessor errorHeaderAccessor,
-                                             byte[] errorPayload, Throwable cause, StompHeaderAccessor clientHeaderAccessor) {
+        byte[] errorPayload, Throwable cause, StompHeaderAccessor clientHeaderAccessor) {
 
         return MessageBuilder.createMessage(errorPayload, errorHeaderAccessor.getMessageHeaders());
 

@@ -6,11 +6,10 @@ import com.gnimty.communityapiserver.domain.memberlike.repository.MemberLikeQuer
 import com.gnimty.communityapiserver.domain.memberlike.repository.MemberLikeRepository;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Transactional(readOnly = true)
 @Service

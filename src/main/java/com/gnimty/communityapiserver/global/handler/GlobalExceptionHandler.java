@@ -1,9 +1,17 @@
 package com.gnimty.communityapiserver.global.handler;
 
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage;
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.HEADER_NOT_FOUND;
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.MEDIA_TYPE_NOT_SUPPORTED;
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.METHOD_NOT_ALLOWED;
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.MISSING_REQUEST_PARAMETER;
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.URL_NOT_FOUND;
+
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
-import com.gnimty.communityapiserver.global.exception.ErrorCode.*;
 import com.gnimty.communityapiserver.global.response.CommonResponse;
+import java.util.Arrays;
+import javax.validation.Path;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -20,11 +28,6 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
-
-import javax.validation.Path;
-import java.util.Arrays;
-
-import static com.gnimty.communityapiserver.global.exception.ErrorCode.*;
 
 @RestControllerAdvice
 @Slf4j
@@ -75,7 +78,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BindException.class)
     public ResponseEntity<CommonResponse<CustomFieldError>> BindExceptionHandler(BindException ex,
-                                                                                 BindingResult result) {
+        BindingResult result) {
         if (result.getFieldErrors().isEmpty()) {
             ObjectError err = result.getAllErrors().stream().findFirst().get();
             return new ResponseEntity<>(CommonResponse.fail(

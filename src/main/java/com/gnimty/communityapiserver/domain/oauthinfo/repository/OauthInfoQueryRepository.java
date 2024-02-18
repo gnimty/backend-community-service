@@ -1,12 +1,12 @@
 package com.gnimty.communityapiserver.domain.oauthinfo.repository;
 
+import static com.gnimty.communityapiserver.domain.oauthinfo.entity.QOauthInfo.oauthInfo;
+
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.global.constant.Provider;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-
-import static com.gnimty.communityapiserver.domain.oauthinfo.entity.QOauthInfo.oauthInfo;
 
 @Repository
 @RequiredArgsConstructor

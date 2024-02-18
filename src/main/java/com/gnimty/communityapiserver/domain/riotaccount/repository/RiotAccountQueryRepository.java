@@ -1,12 +1,22 @@
 package com.gnimty.communityapiserver.domain.riotaccount.repository;
 
+import static com.gnimty.communityapiserver.domain.introduction.entity.QIntroduction.introduction;
+import static com.gnimty.communityapiserver.domain.member.entity.QMember.member;
+import static com.gnimty.communityapiserver.domain.prefergamemode.entity.QPreferGameMode.preferGameMode;
+import static com.gnimty.communityapiserver.domain.riotaccount.entity.QRiotAccount.riotAccount;
+import static com.gnimty.communityapiserver.domain.schedule.entity.QSchedule.schedule;
+
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.domain.riotaccount.controller.dto.response.RecommendedSummonersEntry;
 import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
 import com.gnimty.communityapiserver.domain.riotaccount.service.dto.request.RecommendedSummonersServiceRequest;
 import com.gnimty.communityapiserver.domain.schedule.entity.Schedule;
 import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
-import com.gnimty.communityapiserver.global.constant.*;
+import com.gnimty.communityapiserver.global.constant.GameMode;
+import com.gnimty.communityapiserver.global.constant.Lane;
+import com.gnimty.communityapiserver.global.constant.SortBy;
+import com.gnimty.communityapiserver.global.constant.Status;
+import com.gnimty.communityapiserver.global.constant.Tier;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
@@ -15,19 +25,12 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
-
-import static com.gnimty.communityapiserver.domain.introduction.entity.QIntroduction.introduction;
-import static com.gnimty.communityapiserver.domain.member.entity.QMember.member;
-import static com.gnimty.communityapiserver.domain.prefergamemode.entity.QPreferGameMode.preferGameMode;
-import static com.gnimty.communityapiserver.domain.riotaccount.entity.QRiotAccount.riotAccount;
-import static com.gnimty.communityapiserver.domain.schedule.entity.QSchedule.schedule;
 
 @RequiredArgsConstructor
 @Repository
@@ -343,15 +346,9 @@ public class RiotAccountQueryRepository {
     }
 
     /**
-     * IV		III		II		I
-     * 아이언		LP+0	LP+100	LP+200	LP+300
-     * 브론즈		LP+400	LP+500	LP+600	LP+700
-     * 실버		LP+800	LP+900	LP+1000	LP+1100
-     * 골드		LP+1200	LP+1300	LP+1400	LP+1500
-     * 플레티넘	LP+1600	LP+1700	LP+1800	LP+1900
-     * 에메랄드	LP+2000	LP+2100	LP+2200	LP+2300
-     * 다이아몬드	LP+2400	LP+2500	LP+2600	LP+2700
-     * 마스터 /그랜드마스터 / 챌린저	LP+2800
+     * IV		III		II		I 아이언		LP+0	LP+100	LP+200	LP+300 브론즈		LP+400	LP+500	LP+600	LP+700 실버		LP+800	LP+900	LP+1000	LP+1100
+     * 골드		LP+1200	LP+1300	LP+1400	LP+1500 플레티넘	LP+1600	LP+1700	LP+1800	LP+1900 에메랄드	LP+2000	LP+2100	LP+2200	LP+2300
+     * 다이아몬드	LP+2400	LP+2500	LP+2600	LP+2700 마스터 /그랜드마스터 / 챌린저	LP+2800
      */
     private Long getMmrByTierAndDivision(Tier tier, Integer division) {
         if (tier.getWeight() >= Tier.master.getWeight()) {

@@ -1,16 +1,15 @@
 package com.gnimty.communityapiserver.domain.member.service.dto.response;
 
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage.INVALID_INPUT_VALUE;
+
 import com.gnimty.communityapiserver.domain.prefergamemode.entity.PreferGameMode;
 import com.gnimty.communityapiserver.global.constant.GameMode;
 import io.swagger.v3.oas.annotations.media.Schema;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import javax.validation.constraints.NotNull;
-
-import static com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage.INVALID_INPUT_VALUE;
 
 @Builder
 @Getter

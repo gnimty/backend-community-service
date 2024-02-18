@@ -1,9 +1,8 @@
 package com.gnimty.communityapiserver.global.utils;
 
+import java.security.SecureRandom;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-
-import java.security.SecureRandom;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class RandomCodeGenerator {

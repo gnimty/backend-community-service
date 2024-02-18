@@ -4,7 +4,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.gnimty.communityapiserver.global.constant.ResponseMessage;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
 import com.gnimty.communityapiserver.global.handler.GlobalExceptionHandler.CustomFieldError;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 @Getter

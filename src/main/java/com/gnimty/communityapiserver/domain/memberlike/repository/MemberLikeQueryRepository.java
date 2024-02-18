@@ -1,11 +1,11 @@
 package com.gnimty.communityapiserver.domain.memberlike.repository;
 
+import static com.gnimty.communityapiserver.domain.memberlike.entity.QMemberLike.memberLike;
+
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-
-import static com.gnimty.communityapiserver.domain.memberlike.entity.QMemberLike.memberLike;
 
 @Repository
 @RequiredArgsConstructor

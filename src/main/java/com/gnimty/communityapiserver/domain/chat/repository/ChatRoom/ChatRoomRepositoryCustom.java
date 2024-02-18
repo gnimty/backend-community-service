@@ -4,7 +4,6 @@ import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom.Participant;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
 import com.mongodb.client.result.UpdateResult;
-
 import java.util.List;
 import java.util.Optional;
 

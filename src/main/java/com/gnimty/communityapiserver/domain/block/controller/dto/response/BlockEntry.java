@@ -3,10 +3,9 @@ package com.gnimty.communityapiserver.domain.block.controller.dto.response;
 import com.gnimty.communityapiserver.domain.block.entity.Block;
 import com.gnimty.communityapiserver.global.constant.Status;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDate;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.time.LocalDate;
 
 @Builder
 @Getter

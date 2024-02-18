@@ -1,9 +1,20 @@
 package com.gnimty.communityapiserver.domain.member.service;
 
+import static com.gnimty.communityapiserver.global.constant.Bound.INITIAL_COUNT;
+import static com.gnimty.communityapiserver.global.constant.Bound.RANDOM_CODE_LENGTH;
+import static com.gnimty.communityapiserver.global.constant.CommonStringType.EMPTY;
+import static com.gnimty.communityapiserver.global.constant.CommonStringType.SIGNUP_EMAIL_BANNER;
+import static com.gnimty.communityapiserver.global.constant.CommonStringType.SIGNUP_EMAIL_TEMPLATE;
+import static com.gnimty.communityapiserver.global.constant.CommonStringType.VERIFY_SIGNUP;
+
 import com.gnimty.communityapiserver.domain.member.controller.dto.response.AuthToken;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.domain.member.repository.MemberRepository;
-import com.gnimty.communityapiserver.domain.member.service.dto.request.*;
+import com.gnimty.communityapiserver.domain.member.service.dto.request.EmailAuthServiceRequest;
+import com.gnimty.communityapiserver.domain.member.service.dto.request.EmailVerifyServiceRequest;
+import com.gnimty.communityapiserver.domain.member.service.dto.request.LoginServiceRequest;
+import com.gnimty.communityapiserver.domain.member.service.dto.request.OauthLoginServiceRequest;
+import com.gnimty.communityapiserver.domain.member.service.dto.request.SignupServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.utils.GoogleOauthUtil;
 import com.gnimty.communityapiserver.domain.member.service.utils.KakaoOauthUtil;
 import com.gnimty.communityapiserver.domain.member.service.utils.MailSenderUtil;
@@ -17,18 +28,13 @@ import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
 import com.gnimty.communityapiserver.global.utils.RandomCodeGenerator;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.concurrent.TimeUnit;
-
-import static com.gnimty.communityapiserver.global.constant.Bound.INITIAL_COUNT;
-import static com.gnimty.communityapiserver.global.constant.Bound.RANDOM_CODE_LENGTH;
-import static com.gnimty.communityapiserver.global.constant.CommonStringType.*;
 
 @Service
 @RequiredArgsConstructor

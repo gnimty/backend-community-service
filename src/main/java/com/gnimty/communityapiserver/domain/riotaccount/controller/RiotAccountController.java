@@ -1,5 +1,12 @@
 package com.gnimty.communityapiserver.domain.riotaccount.controller;
 
+import static com.gnimty.communityapiserver.global.constant.ApiSummary.GET_MAIN_SUMMONERS;
+import static com.gnimty.communityapiserver.global.constant.ApiSummary.GET_RECENTLY_SUMMONERS;
+import static com.gnimty.communityapiserver.global.constant.ApiSummary.GET_RECOMMENDED_SUMMONERS;
+import static com.gnimty.communityapiserver.global.constant.ApiSummary.UPDATE_SUMMONERS;
+import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_UPDATE_SUMMONERS;
+import static org.springframework.http.HttpStatus.OK;
+
 import com.gnimty.communityapiserver.domain.chat.service.StompService;
 import com.gnimty.communityapiserver.domain.chat.service.UserService;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.SummonerUpdateRequest;
@@ -20,15 +27,16 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
 import java.util.List;
-
-import static com.gnimty.communityapiserver.global.constant.ApiSummary.*;
-import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_UPDATE_SUMMONERS;
-import static org.springframework.http.HttpStatus.OK;
+import javax.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "/summoners", description = "라이엇 소환사 계정 관련 컨트롤러")
 @RestController

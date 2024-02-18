@@ -1,5 +1,10 @@
 package com.gnimty.communityapiserver.domain.member.repository;
 
+import static com.gnimty.communityapiserver.domain.introduction.entity.QIntroduction.introduction;
+import static com.gnimty.communityapiserver.domain.member.entity.QMember.member;
+import static com.gnimty.communityapiserver.domain.prefergamemode.entity.QPreferGameMode.preferGameMode;
+import static com.gnimty.communityapiserver.domain.schedule.entity.QSchedule.schedule;
+
 import com.gnimty.communityapiserver.domain.introduction.entity.Introduction;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.OtherProfileServiceResponse;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.PreferGameModeEntry;
@@ -8,16 +13,10 @@ import com.gnimty.communityapiserver.domain.schedule.controller.dto.request.Sche
 import com.gnimty.communityapiserver.domain.schedule.entity.Schedule;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
-
 import java.util.List;
 import java.util.Optional;
-
-import static com.gnimty.communityapiserver.domain.introduction.entity.QIntroduction.introduction;
-import static com.gnimty.communityapiserver.domain.member.entity.QMember.member;
-import static com.gnimty.communityapiserver.domain.prefergamemode.entity.QPreferGameMode.preferGameMode;
-import static com.gnimty.communityapiserver.domain.schedule.entity.QSchedule.schedule;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor

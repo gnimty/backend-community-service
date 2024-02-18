@@ -1,5 +1,9 @@
 package com.gnimty.communityapiserver.domain.championcommentslike.controller;
 
+import static com.gnimty.communityapiserver.global.constant.ApiSummary.DO_CHAMPION_COMMENTS_LIKE;
+import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_CHAMPION_COMMENTS_LIKE;
+import static org.springframework.http.HttpStatus.CREATED;
+
 import com.gnimty.communityapiserver.domain.championcommentslike.controller.dto.request.ChampionCommentsLikeRequest;
 import com.gnimty.communityapiserver.domain.championcommentslike.service.ChampionCommentsLikeService;
 import com.gnimty.communityapiserver.global.constant.ApiDescription;
@@ -9,14 +13,13 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
-
 import javax.validation.Valid;
-
-import static com.gnimty.communityapiserver.global.constant.ApiSummary.DO_CHAMPION_COMMENTS_LIKE;
-import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_CHAMPION_COMMENTS_LIKE;
-import static org.springframework.http.HttpStatus.CREATED;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "/champions/{champion_id}/comments/{comments_id}/like", description = "챔피언 운용법 좋아요 관련 컨트롤러")
 @RestController

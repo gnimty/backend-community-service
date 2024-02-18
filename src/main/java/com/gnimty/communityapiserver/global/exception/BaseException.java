@@ -1,8 +1,7 @@
 package com.gnimty.communityapiserver.global.exception;
 
-import lombok.Getter;
-
 import java.io.Serial;
+import lombok.Getter;
 
 @Getter
 public class BaseException extends RuntimeException {

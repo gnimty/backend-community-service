@@ -4,11 +4,10 @@ import com.gnimty.communityapiserver.global.constant.Lane;
 import com.gnimty.communityapiserver.global.constant.Tier;
 import com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
+import javax.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
-
-import javax.validation.constraints.NotNull;
-import java.util.List;
 
 @Getter
 @Builder

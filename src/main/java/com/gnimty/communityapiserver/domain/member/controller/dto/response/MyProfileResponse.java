@@ -4,10 +4,9 @@ import com.gnimty.communityapiserver.domain.member.service.dto.response.MyProfil
 import com.gnimty.communityapiserver.domain.member.service.dto.response.OauthInfoEntry;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.RiotDependentInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.List;
 
 @Builder
 @Getter

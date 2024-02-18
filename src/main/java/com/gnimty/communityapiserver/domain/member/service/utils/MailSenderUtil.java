@@ -2,6 +2,10 @@ package com.gnimty.communityapiserver.domain.member.service.utils;
 
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
+import java.util.HashMap;
+import java.util.Map;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -10,11 +14,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
-
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-import java.util.HashMap;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor

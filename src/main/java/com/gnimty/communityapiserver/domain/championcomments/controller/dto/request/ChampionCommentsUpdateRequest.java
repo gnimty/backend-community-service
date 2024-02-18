@@ -1,16 +1,15 @@
 package com.gnimty.communityapiserver.domain.championcomments.controller.dto.request;
 
+import static com.gnimty.communityapiserver.global.constant.Bound.MAX_CONTENTS_SIZE;
+
 import com.gnimty.communityapiserver.domain.championcomments.service.dto.request.ChampionCommentsUpdateServiceRequest;
 import io.swagger.v3.oas.annotations.media.Schema;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
-import static com.gnimty.communityapiserver.global.constant.Bound.MAX_CONTENTS_SIZE;
 
 @Getter
 @Builder

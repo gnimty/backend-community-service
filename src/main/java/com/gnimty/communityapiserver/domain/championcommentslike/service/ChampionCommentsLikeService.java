@@ -1,5 +1,9 @@
 package com.gnimty.communityapiserver.domain.championcommentslike.service;
 
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.ALREADY_CHAMPION_COMMENTS_LIKE;
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.COMMENTS_ID_AND_CHAMPION_ID_INVALID;
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.NOT_LINKED_RSO;
+
 import com.gnimty.communityapiserver.domain.championcomments.entity.ChampionComments;
 import com.gnimty.communityapiserver.domain.championcomments.service.ChampionCommentsReadService;
 import com.gnimty.communityapiserver.domain.championcommentslike.entity.ChampionCommentsLike;
@@ -8,13 +12,10 @@ import com.gnimty.communityapiserver.domain.championcommentslike.service.dto.req
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
 import com.gnimty.communityapiserver.global.exception.BaseException;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Objects;
-
-import static com.gnimty.communityapiserver.global.exception.ErrorCode.*;
 
 @Service
 @Transactional

@@ -1,5 +1,11 @@
 package com.gnimty.communityapiserver.domain.championcomments.repository;
 
+import static com.gnimty.communityapiserver.domain.block.entity.QBlock.block;
+import static com.gnimty.communityapiserver.domain.championcomments.entity.QChampionComments.championComments;
+import static com.gnimty.communityapiserver.domain.championcommentslike.entity.QChampionCommentsLike.championCommentsLike;
+import static com.gnimty.communityapiserver.domain.member.entity.QMember.member;
+import static com.gnimty.communityapiserver.domain.riotaccount.entity.QRiotAccount.riotAccount;
+
 import com.gnimty.communityapiserver.domain.championcomments.service.dto.response.ChampionCommentsEntry;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
@@ -7,16 +13,9 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.QBean;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
-
-import static com.gnimty.communityapiserver.domain.block.entity.QBlock.block;
-import static com.gnimty.communityapiserver.domain.championcomments.entity.QChampionComments.championComments;
-import static com.gnimty.communityapiserver.domain.championcommentslike.entity.QChampionCommentsLike.championCommentsLike;
-import static com.gnimty.communityapiserver.domain.member.entity.QMember.member;
-import static com.gnimty.communityapiserver.domain.riotaccount.entity.QRiotAccount.riotAccount;
 
 @RequiredArgsConstructor
 @Repository

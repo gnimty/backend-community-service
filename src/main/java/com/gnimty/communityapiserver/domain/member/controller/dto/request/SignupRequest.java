@@ -1,19 +1,18 @@
 package com.gnimty.communityapiserver.domain.member.controller.dto.request;
 
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage.AGREE_TERMS_MUST_BE_TRUE;
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage.INVALID_INPUT_VALUE;
+
 import com.gnimty.communityapiserver.domain.member.service.dto.request.SignupServiceRequest;
 import com.gnimty.communityapiserver.global.constant.RequestPattern;
 import io.swagger.v3.oas.annotations.media.Schema;
+import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import javax.validation.constraints.AssertTrue;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-
-import static com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage.AGREE_TERMS_MUST_BE_TRUE;
-import static com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage.INVALID_INPUT_VALUE;
 
 @Getter
 @Builder

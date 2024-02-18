@@ -1,5 +1,11 @@
 package com.gnimty.communityapiserver.domain.championcomments.service;
 
+import static com.gnimty.communityapiserver.global.constant.Bound.CHILD_COMMENTS_DEPTH;
+import static com.gnimty.communityapiserver.global.constant.Bound.INITIAL_COUNT;
+import static com.gnimty.communityapiserver.global.constant.Bound.PARENT_COMMENTS_DEPTH;
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.COMMENTS_ID_AND_CHAMPION_ID_INVALID;
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.NO_PERMISSION;
+
 import com.gnimty.communityapiserver.domain.championcomments.entity.ChampionComments;
 import com.gnimty.communityapiserver.domain.championcomments.repository.ChampionCommentsRepository;
 import com.gnimty.communityapiserver.domain.championcomments.service.dto.request.ChampionCommentsServiceRequest;
@@ -10,17 +16,12 @@ import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
 import com.gnimty.communityapiserver.global.config.WebClientWrapper;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
+import java.util.Objects;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-
-import java.util.Objects;
-
-import static com.gnimty.communityapiserver.global.constant.Bound.*;
-import static com.gnimty.communityapiserver.global.exception.ErrorCode.COMMENTS_ID_AND_CHAMPION_ID_INVALID;
-import static com.gnimty.communityapiserver.global.exception.ErrorCode.NO_PERMISSION;
 
 @Service
 @RequiredArgsConstructor

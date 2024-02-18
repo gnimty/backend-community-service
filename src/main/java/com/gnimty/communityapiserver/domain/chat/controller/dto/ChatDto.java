@@ -1,7 +1,6 @@
 package com.gnimty.communityapiserver.domain.chat.controller.dto;
 
 import com.gnimty.communityapiserver.domain.chat.entity.Chat;
-
 import java.time.OffsetDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

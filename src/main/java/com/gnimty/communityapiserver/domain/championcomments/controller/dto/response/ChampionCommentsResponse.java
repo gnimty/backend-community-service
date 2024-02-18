@@ -3,12 +3,11 @@ package com.gnimty.communityapiserver.domain.championcomments.controller.dto.res
 import com.gnimty.communityapiserver.domain.championcomments.service.dto.response.ChampionCommentsEntry;
 import com.gnimty.communityapiserver.domain.championcomments.service.dto.response.ChampionCommentsServiceResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Builder
 @Getter

@@ -1,9 +1,8 @@
 package com.gnimty.communityapiserver.domain.chat.repository.ChatRoom;
 
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
-import org.springframework.data.mongodb.repository.MongoRepository;
-
 import java.util.Optional;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface ChatRoomRepository extends MongoRepository<ChatRoom, String>, ChatRoomRepositoryCustom {
 
