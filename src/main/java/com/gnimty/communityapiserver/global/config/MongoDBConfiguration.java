@@ -20,8 +20,8 @@ public class MongoDBConfiguration {
     @Bean
     public MongoCustomConversions mongoCustomConversions() {
         return new MongoCustomConversions(Arrays.asList(
-                new MongoOffsetDateTimeWriter(),
-                new MongoOffsetDateTimeReader()
+            new MongoOffsetDateTimeWriter(),
+            new MongoOffsetDateTimeReader()
         ));
     }
 

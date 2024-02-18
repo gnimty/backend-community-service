@@ -36,10 +36,10 @@ public class ChatService {
 
     public Chat save(User user, ChatRoom chatRoom, String message) {
         Chat chat = Chat.builder()
-                .senderId(user.getActualUserId())
-                .chatRoomNo(chatRoom.getChatRoomNo())
-                .message(message)
-                .build();
+            .senderId(user.getActualUserId())
+            .chatRoomNo(chatRoom.getChatRoomNo())
+            .message(message)
+            .build();
 
         return chatRepository.save(chat);
     }

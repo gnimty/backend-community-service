@@ -69,9 +69,9 @@ class ChatRoomServiceTest {
 
             for (Integer i = 0; i < 5; i++) {
                 chatRoomRepository.save(ChatRoom.builder()
-                        .chatRoomNo(i.longValue())
-                        .participants(Arrays.asList(new Participant(user, Blocked.UNBLOCK)))
-                        .build());
+                    .chatRoomNo(i.longValue())
+                    .participants(Arrays.asList(new Participant(user, Blocked.UNBLOCK)))
+                    .build());
             }
 
             // when
@@ -109,9 +109,9 @@ class ChatRoomServiceTest {
             userRepository.save(user);
 
             ChatRoom chatRoom = ChatRoom.builder()
-                    .chatRoomNo(1L)
-                    .participants(Arrays.asList(new Participant(user, Blocked.UNBLOCK)))
-                    .build();
+                .chatRoomNo(1L)
+                .participants(Arrays.asList(new Participant(user, Blocked.UNBLOCK)))
+                .build();
             chatRoomRepository.save(chatRoom);
 
             // when
@@ -131,12 +131,12 @@ class ChatRoomServiceTest {
 
             // when & then
             assertThatThrownBy(() -> chatRoomService.getChatRoom(1L))
-                    .isInstanceOf(BaseException.class)
-                    .satisfies(exception -> {
-                        assertThat(((BaseException) exception).getErrorCode()).isEqualTo(
-                                ErrorCode.NOT_FOUND_CHAT_ROOM);
-                    })
-                    .hasMessageContaining(ErrorMessage.NOT_FOUND_CHAT_ROOM);
+                .isInstanceOf(BaseException.class)
+                .satisfies(exception -> {
+                    assertThat(((BaseException) exception).getErrorCode()).isEqualTo(
+                        ErrorCode.NOT_FOUND_CHAT_ROOM);
+                })
+                .hasMessageContaining(ErrorMessage.NOT_FOUND_CHAT_ROOM);
         }
     }
 
@@ -155,10 +155,10 @@ class ChatRoomServiceTest {
             userRepository.save(userB);
 
             ChatRoom chatRoom = ChatRoom.builder()
-                    .chatRoomNo(1L)
-                    .participants(Arrays.asList(new Participant(userA, null, Blocked.UNBLOCK),
-                            new Participant(userB, null, Blocked.UNBLOCK)))
-                    .build();
+                .chatRoomNo(1L)
+                .participants(Arrays.asList(new Participant(userA, null, Blocked.UNBLOCK),
+                    new Participant(userB, null, Blocked.UNBLOCK)))
+                .build();
             chatRoomRepository.save(chatRoom);
 
             // when
@@ -180,12 +180,12 @@ class ChatRoomServiceTest {
 
             // when & then
             assertThatThrownBy(() -> chatRoomService.getChatRoom(userA, userB))
-                    .isInstanceOf(BaseException.class)
-                    .satisfies(exception -> {
-                        assertThat(((BaseException) exception).getErrorCode()).isEqualTo(
-                                ErrorCode.NOT_FOUND_CHAT_ROOM);
-                    })
-                    .hasMessageContaining(ErrorMessage.NOT_FOUND_CHAT_ROOM_BY_USERS);
+                .isInstanceOf(BaseException.class)
+                .satisfies(exception -> {
+                    assertThat(((BaseException) exception).getErrorCode()).isEqualTo(
+                        ErrorCode.NOT_FOUND_CHAT_ROOM);
+                })
+                .hasMessageContaining(ErrorMessage.NOT_FOUND_CHAT_ROOM_BY_USERS);
         }
     }
 
@@ -204,10 +204,10 @@ class ChatRoomServiceTest {
             userRepository.save(userB);
 
             ChatRoom chatRoom = ChatRoom.builder()
-                    .chatRoomNo(1L)
-                    .participants(Arrays.asList(new Participant(userA, null, Blocked.UNBLOCK),
-                            new Participant(userB, null, Blocked.UNBLOCK)))
-                    .build();
+                .chatRoomNo(1L)
+                .participants(Arrays.asList(new Participant(userA, null, Blocked.UNBLOCK),
+                    new Participant(userB, null, Blocked.UNBLOCK)))
+                .build();
             chatRoomRepository.save(chatRoom);
 
             // when
@@ -253,7 +253,7 @@ class ChatRoomServiceTest {
 
             // when
             chatRoomService.save(new UserWithBlockDto(userA, Blocked.UNBLOCK),
-                    new UserWithBlockDto(userB, Blocked.BLOCK));
+                new UserWithBlockDto(userB, Blocked.BLOCK));
 
             //then
             assertThat(chatRoomRepository.findByUsers(userA, userB)).isNotEmpty();
@@ -270,22 +270,22 @@ class ChatRoomServiceTest {
             userRepository.save(userB);
 
             ChatRoom chatRoom = ChatRoom.builder()
-                    .chatRoomNo(1L)
-                    .participants(Arrays.asList(new Participant(userA, null, Blocked.UNBLOCK),
-                            new Participant(userB, null, Blocked.UNBLOCK)))
-                    .build();
+                .chatRoomNo(1L)
+                .participants(Arrays.asList(new Participant(userA, null, Blocked.UNBLOCK),
+                    new Participant(userB, null, Blocked.UNBLOCK)))
+                .build();
             chatRoomRepository.save(chatRoom);
 
             // when & then
             assertThatThrownBy(
-                    () -> chatRoomService.save(new UserWithBlockDto(userA, Blocked.UNBLOCK),
-                            new UserWithBlockDto(userB, Blocked.BLOCK)))
-                    .isInstanceOf(BaseException.class)
-                    .satisfies(exception -> {
-                        assertThat(((BaseException) exception).getErrorCode()).isEqualTo(
-                                ErrorCode.CHATROOM_ALREADY_EXISTS);
-                    })
-                    .hasMessageContaining(ErrorMessage.CHATROOM_ALREADY_EXISTS);
+                () -> chatRoomService.save(new UserWithBlockDto(userA, Blocked.UNBLOCK),
+                    new UserWithBlockDto(userB, Blocked.BLOCK)))
+                .isInstanceOf(BaseException.class)
+                .satisfies(exception -> {
+                    assertThat(((BaseException) exception).getErrorCode()).isEqualTo(
+                        ErrorCode.CHATROOM_ALREADY_EXISTS);
+                })
+                .hasMessageContaining(ErrorMessage.CHATROOM_ALREADY_EXISTS);
         }
     }
 
@@ -304,10 +304,10 @@ class ChatRoomServiceTest {
             userRepository.save(userB);
 
             ChatRoom chatRoom = ChatRoom.builder()
-                    .chatRoomNo(1L)
-                    .participants(Arrays.asList(new Participant(userA, null, Blocked.UNBLOCK),
-                            new Participant(userB, null, Blocked.UNBLOCK)))
-                    .build();
+                .chatRoomNo(1L)
+                .participants(Arrays.asList(new Participant(userA, null, Blocked.UNBLOCK),
+                    new Participant(userB, null, Blocked.UNBLOCK)))
+                .build();
             chatRoomRepository.save(chatRoom);
 
             // when
@@ -331,16 +331,16 @@ class ChatRoomServiceTest {
             userRepository.save(userB);
 
             ChatRoom chatRoom = ChatRoom.builder()
-                    .chatRoomNo(1L)
-                    .participants(Arrays.asList(new Participant(userA, null, Blocked.UNBLOCK),
-                            new Participant(userB, null, Blocked.UNBLOCK)))
-                    .build();
+                .chatRoomNo(1L)
+                .participants(Arrays.asList(new Participant(userA, null, Blocked.UNBLOCK),
+                    new Participant(userB, null, Blocked.UNBLOCK)))
+                .build();
             chatRoomRepository.save(chatRoom);
 
             // when
             chatRoom.updateParticipants(
-                    Arrays.asList(new Participant(userA, Blocked.UNBLOCK),
-                            new Participant(userB, Blocked.BLOCK)));
+                Arrays.asList(new Participant(userA, Blocked.UNBLOCK),
+                    new Participant(userB, Blocked.BLOCK)));
             chatRoomService.update(chatRoom);
 
             //then
@@ -362,9 +362,9 @@ class ChatRoomServiceTest {
 
 
             ChatRoom chatRoom = ChatRoom.builder()
-                    .chatRoomNo(1L)
-                    .participants(Arrays.asList(new Participant(user, null, Blocked.UNBLOCK)))
-                    .build();
+                .chatRoomNo(1L)
+                .participants(Arrays.asList(new Participant(user, null, Blocked.UNBLOCK)))
+                .build();
             chatRoomRepository.save(chatRoom);
 
             // when
@@ -377,12 +377,12 @@ class ChatRoomServiceTest {
 
     public User createUser(String name, Long actualUserId) {
         return User.builder()
-                .actualUserId(actualUserId)
-                .tier(Tier.gold)
-                .division(3)
-                .name(name)
-                .tagLine("tagLine")
-                .nowStatus(Status.ONLINE).lp(3L)
-                .build();
+            .actualUserId(actualUserId)
+            .tier(Tier.gold)
+            .division(3)
+            .name(name)
+            .tagLine("tagLine")
+            .nowStatus(Status.ONLINE).lp(3L)
+            .build();
     }
 }

@@ -48,13 +48,13 @@ public class ChatRoomService {
 
     public ChatRoom getChatRoom(Long chatRoomNo) {
         return findChatRoom(chatRoomNo)
-                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_ROOM));
+            .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_ROOM));
     }
 
     public ChatRoom getChatRoom(User me, User other) {
         return findChatRoom(me, other)
-                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_ROOM,
-                        ErrorMessage.NOT_FOUND_CHAT_ROOM_BY_USERS));
+            .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_ROOM,
+                ErrorMessage.NOT_FOUND_CHAT_ROOM_BY_USERS));
     }
 
     public ChatRoom save(UserWithBlockDto me, UserWithBlockDto other) {
@@ -65,10 +65,10 @@ public class ChatRoomService {
         }
 
         List<Participant> participants = List.of(
-                Participant.builder().user(me.getUser()).blockedStatus(me.getStatus())
-                        .build(),
-                Participant.builder().user(other.getUser()).blockedStatus(other.getStatus())
-                        .build()
+            Participant.builder().user(me.getUser()).blockedStatus(me.getStatus())
+                .build(),
+            Participant.builder().user(other.getUser()).blockedStatus(other.getStatus())
+                .build()
         );
 
         return chatRoomRepository.save(participants);

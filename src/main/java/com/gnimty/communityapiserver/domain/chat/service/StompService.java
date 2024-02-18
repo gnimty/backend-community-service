@@ -60,12 +60,12 @@ public class StompService {
         }
 
         ChatRoom chatRoom = chatRoomService.findChatRoom(me.getUser(), other.getUser())
-                .orElseGet(() -> chatRoomService.save(me, other));
+            .orElseGet(() -> chatRoomService.save(me, other));
 
         return ChatRoomDto.builder()
-                .chatRoom(chatRoom)
-                .other(new UserDto(other.getUser()))
-                .build();
+            .chatRoom(chatRoom)
+            .other(new UserDto(other.getUser()))
+            .build();
     }
 
 
@@ -76,12 +76,12 @@ public class StompService {
         List<ChatRoom> chatRooms = chatRoomService.findUnBlockChatRoom(me);
 
         return chatRooms.stream().map(chatRoom ->
-                ChatRoomDto.builder()
-                        .chats(getChatList(me, chatRoom))
-                        .chatRoom(chatRoom)
-                        .other(new UserDto(
-                                extractParticipant(me, chatRoom.getParticipants(), false).getUser()))
-                        .build()
+            ChatRoomDto.builder()
+                .chats(getChatList(me, chatRoom))
+                .chatRoom(chatRoom)
+                .other(new UserDto(
+                    extractParticipant(me, chatRoom.getParticipants(), false).getUser()))
+                .build()
         ).toList();
     }
 
@@ -96,8 +96,8 @@ public class StompService {
         // (상대방이 채팅방 나간 상황) lastModifiedDate가 상대의 exitDate 이전일 때 : flush
         //      -> flushAllChats() + chatRoomRepository.deleteByChatRoomNo()
         if ((other.getExitDate() != null && chatRoom.getLastModifiedDate()
-                .isBefore(other.getExitDate()))
-                || other.getBlockedStatus() == Blocked.BLOCK) {
+            .isBefore(other.getExitDate()))
+            || other.getBlockedStatus() == Blocked.BLOCK) {
             destroyChatRoomAndChat(chatRoom);
         }
         // (상대방이 채팅방 나가지 않은 상황) lastModifiedDate가 상대의 exitDate 이후일 때 : exitDate update
@@ -115,9 +115,9 @@ public class StompService {
         List<ChatRoom> chatRooms = chatRoomService.findChatRoom(user);
         if (!chatRooms.isEmpty()) {
             MessageResponse response = new MessageResponse(MessageResponseType.USER_INFO,
-                    new UserDto(user));
+                new UserDto(user));
             chatRooms.forEach(
-                    chatRoom -> sendToChatRoomSubscribers(chatRoom.getChatRoomNo(), response));
+                chatRoom -> sendToChatRoomSubscribers(chatRoom.getChatRoomNo(), response));
         }
     }
 
@@ -127,12 +127,12 @@ public class StompService {
         if (findUser.isPresent()) {
             userService.delete(findUser.get());
             chatRoomService.findChatRoom(findUser.get())
-                    .forEach(chatRoom -> {
-                        destroyChatRoomAndChat(chatRoom);
-                        sendToChatRoomSubscribers(chatRoom.getChatRoomNo(),
-                                new MessageResponse(MessageResponseType.DELETED_CHATROOM,
-                                        chatRoom.getId()));
-                    });
+                .forEach(chatRoom -> {
+                    destroyChatRoomAndChat(chatRoom);
+                    sendToChatRoomSubscribers(chatRoom.getChatRoomNo(),
+                        new MessageResponse(MessageResponseType.DELETED_CHATROOM,
+                            chatRoom.getId()));
+                });
         }
     }
 
@@ -145,9 +145,9 @@ public class StompService {
     public void createOrUpdateUser(List<RiotAccount> accounts) {
         if (!accounts.isEmpty()) {
             accounts.stream()
-                    .filter(riotAccount ->
-                            userService.findUser(riotAccount.getMember().getId()).isEmpty())
-                    .forEach(userService::save);
+                .filter(riotAccount ->
+                    userService.findUser(riotAccount.getMember().getId()).isEmpty())
+                .forEach(userService::save);
             userService.updateMany(accounts.stream().map(User::toUser).toList());
         }
     }
@@ -161,14 +161,14 @@ public class StompService {
         // 2. chatRoom에 속해 있는 모든 other participants 정보 검색하여 Id 추출
         // 3. return
         return chatRooms.stream().map(chatRoom ->
-                getOther(user, chatRoom).getActualUserId()).toList();
+            getOther(user, chatRoom).getActualUserId()).toList();
     }
 
     public void updateBlockStatus(User me, User other, Blocked status) {
         Optional<ChatRoom> findChatRoom = chatRoomService.findChatRoom(me, other);
         if (findChatRoom.isPresent()) {
             extractParticipant(me, findChatRoom.get().getParticipants(), true).updateBlockedStatus(
-                    status);
+                status);
             chatRoomService.update(findChatRoom.get());
             if (status == Blocked.BLOCK) {
                 exitChatRoom(me, findChatRoom.get());
@@ -215,10 +215,10 @@ public class StompService {
 
         List<ChatRoom> chatRooms = chatRoomService.findChatRoom(user);
         MessageResponse response = new MessageResponse(MessageResponseType.CONNECT_STATUS,
-                new UserConnStatusDto(user.getActualUserId(), connectStatus));
+            new UserConnStatusDto(user.getActualUserId(), connectStatus));
 
         chatRooms.forEach(chatRoom ->
-                sendToChatRoomSubscribers(chatRoom.getChatRoomNo(), response));
+            sendToChatRoomSubscribers(chatRoom.getChatRoomNo(), response));
     }
 
     // TODO janguni: 채팅방에 있는 상대방이 보낸 채팅의 readCount update
@@ -245,14 +245,14 @@ public class StompService {
 
     private List<ChatDto> getChatDtoAfterExitDate(List<Chat> totalChats, OffsetDateTime exitDate) {
         return totalChats.stream()
-                .filter(chat -> exitDate == null || chat.getSendDate().isAfter(exitDate))
-                .map(ChatDto::new)
-                .toList();
+            .filter(chat -> exitDate == null || chat.getSendDate().isAfter(exitDate))
+            .map(ChatDto::new)
+            .toList();
     }
 
     private OffsetDateTime getExitDate(ChatRoom chatRoom, User user) {
         return extractParticipant(user, chatRoom.getParticipants(), true)
-                .getExitDate();
+            .getExitDate();
     }
 
 

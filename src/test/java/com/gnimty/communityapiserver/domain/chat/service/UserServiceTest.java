@@ -62,17 +62,17 @@ class UserServiceTest {
         void successGetUserByMember() {
             // given
             Member member = new Member(true, "aaa@naver.com", "asdD12!", 1L, "uni", Status.OFFLINE,
-                    3L);
+                3L);
             memberRepository.save(member);
 
             User user = User.builder()
-                    .actualUserId(member.getId())
-                    .tier(Tier.gold)
-                    .division(3)
-                    .name("uni")
-                    .tagLine("tag")
-                    .nowStatus(Status.ONLINE)
-                    .lp(3L).build();
+                .actualUserId(member.getId())
+                .tier(Tier.gold)
+                .division(3)
+                .name("uni")
+                .tagLine("tag")
+                .nowStatus(Status.ONLINE)
+                .lp(3L).build();
             userRepository.save(user);
 
             // when
@@ -88,17 +88,17 @@ class UserServiceTest {
         void failGetUserByMember() {
             // given
             Member member = new Member(true, "aaa@naver.com", "asdD12!", 1L, "uni2", Status.OFFLINE,
-                    3L);
+                3L);
             memberRepository.save(member);
 
             // when & then
             assertThatThrownBy(() -> userService.getUserByMember(member))
-                    .isInstanceOf(BaseException.class)
-                    .satisfies(exception -> {
-                        assertThat(((BaseException) exception).getErrorCode()).isEqualTo(
-                                ErrorCode.NOT_FOUND_CHAT_USER);
-                    })
-                    .hasMessageContaining(ErrorMessage.NOT_FOUND_CHAT_USER);
+                .isInstanceOf(BaseException.class)
+                .satisfies(exception -> {
+                    assertThat(((BaseException) exception).getErrorCode()).isEqualTo(
+                        ErrorCode.NOT_FOUND_CHAT_USER);
+                })
+                .hasMessageContaining(ErrorMessage.NOT_FOUND_CHAT_USER);
 
         }
     }
@@ -113,17 +113,17 @@ class UserServiceTest {
         void successGetUserByMember() {
             // given
             Member member = new Member(true, "aaa@naver.com", "asdD12!", 1L, "uni", Status.OFFLINE,
-                    3L);
+                3L);
             memberRepository.save(member);
 
             User user = User.builder()
-                    .actualUserId(member.getId())
-                    .tier(Tier.gold)
-                    .division(3)
-                    .name("uni")
-                    .tagLine("tag")
-                    .nowStatus(Status.ONLINE)
-                    .lp(3L).build();
+                .actualUserId(member.getId())
+                .tier(Tier.gold)
+                .division(3)
+                .name("uni")
+                .tagLine("tag")
+                .nowStatus(Status.ONLINE)
+                .lp(3L).build();
             userRepository.save(user);
 
             // when
@@ -138,17 +138,17 @@ class UserServiceTest {
         void failGetUserByMember() {
             // given
             Member member = new Member(true, "aaa@naver.com", "asdD12!", 1L, "uni2", Status.OFFLINE,
-                    3L);
+                3L);
             memberRepository.save(member);
 
             // when & then
             assertThatThrownBy(() -> userService.getUser(member.getId()))
-                    .isInstanceOf(BaseException.class)
-                    .satisfies(exception -> {
-                        assertThat(((BaseException) exception).getErrorCode()).isEqualTo(
-                                ErrorCode.NOT_FOUND_CHAT_USER);
-                    })
-                    .hasMessageContaining(ErrorMessage.NOT_FOUND_CHAT_USER);
+                .isInstanceOf(BaseException.class)
+                .satisfies(exception -> {
+                    assertThat(((BaseException) exception).getErrorCode()).isEqualTo(
+                        ErrorCode.NOT_FOUND_CHAT_USER);
+                })
+                .hasMessageContaining(ErrorMessage.NOT_FOUND_CHAT_USER);
         }
     }
 
@@ -164,15 +164,15 @@ class UserServiceTest {
             List<User> users = new ArrayList<>();
             for (Integer i = 1; i <= 6; i++) {
                 User user = User.builder()
-                        .actualUserId(i.longValue())
-                        .tier(Tier.diamond)
-                        .lp(1L)
-                        .nowStatus(Status.ONLINE)
-                        .name("name" + i)
-                        .tagLine("tag")
-                        .profileIconId(1L)
-                        .division(3)
-                        .build();
+                    .actualUserId(i.longValue())
+                    .tier(Tier.diamond)
+                    .lp(1L)
+                    .nowStatus(Status.ONLINE)
+                    .name("name" + i)
+                    .tagLine("tag")
+                    .profileIconId(1L)
+                    .division(3)
+                    .build();
                 users.add(user);
                 userRepository.save(user);
             }
@@ -195,16 +195,16 @@ class UserServiceTest {
         void createUserByRiotAccount() {
             // given
             Member member = new Member(true, "uni@naver.com", "afD23!", 1L, "uni", Status.ONLINE,
-                    1L);
+                1L);
             memberRepository.save(member);
 
             RiotAccount riotAccount = RiotAccount.builder()
-                    .member(member)
-                    .name("uni")
-                    .tagLine("tagLine")
-                    .internalTagName("uniInternalTagLine")
-                    .puuid("puuid")
-                    .build();
+                .member(member)
+                .name("uni")
+                .tagLine("tagLine")
+                .internalTagName("uniInternalTagLine")
+                .puuid("puuid")
+                .build();
 
             // when
             userService.save(riotAccount);
@@ -212,8 +212,8 @@ class UserServiceTest {
             // then
             Optional<User> optionalUser = userRepository.findByActualUserId(member.getId());
             assertThat(optionalUser)
-                    .isPresent()
-                    .satisfies(findUser -> assertThat(findUser.get().getName()).isEqualTo(riotAccount.getName()));
+                .isPresent()
+                .satisfies(findUser -> assertThat(findUser.get().getName()).isEqualTo(riotAccount.getName()));
         }
 
         @DisplayName("user가 이미 있는 상태에서 riotAccount를 저장하면 기존의 데이터 덮어쓰기")
@@ -221,29 +221,29 @@ class UserServiceTest {
         void updateByRiotAccount() {
             // given
             Member member = new Member(true, "uni@naver.com", "afD23!", 1L, "uni", Status.ONLINE,
-                    1L);
+                1L);
             memberRepository.save(member);
 
             userRepository.save(User.builder()
-                    .actualUserId(member.getId())
-                    .tier(Tier.diamond)
-                    .lp(1L)
-                    .nowStatus(Status.ONLINE)
-                    .name("uni")
-                    .tagLine("tag")
-                    .profileIconId(1L)
-                    .division(3)
-                    .build());
+                .actualUserId(member.getId())
+                .tier(Tier.diamond)
+                .lp(1L)
+                .nowStatus(Status.ONLINE)
+                .name("uni")
+                .tagLine("tag")
+                .profileIconId(1L)
+                .division(3)
+                .build());
 
             // when
             RiotAccount riotAccount = RiotAccount.builder()
-                    .member(member)
-                    .frequentChampionId1(1L)
-                    .frequentChampionId2(2L)
-                    .frequentChampionId3(3L)
-                    .frequentLane1(Lane.BOTTOM)
-                    .frequentLane2(Lane.JUNGLE)
-                    .build();
+                .member(member)
+                .frequentChampionId1(1L)
+                .frequentChampionId2(2L)
+                .frequentChampionId3(3L)
+                .frequentLane1(Lane.BOTTOM)
+                .frequentLane2(Lane.JUNGLE)
+                .build();
             User savedUser = userService.save(riotAccount);
 
             // then
@@ -262,15 +262,15 @@ class UserServiceTest {
         void successUpdateUser() {
             // given
             User user = User.builder()
-                    .actualUserId(1L)
-                    .tier(Tier.diamond)
-                    .lp(1L)
-                    .nowStatus(Status.ONLINE)
-                    .name("uni")
-                    .tagLine("tag")
-                    .profileIconId(1L)
-                    .division(3)
-                    .build();
+                .actualUserId(1L)
+                .tier(Tier.diamond)
+                .lp(1L)
+                .nowStatus(Status.ONLINE)
+                .name("uni")
+                .tagLine("tag")
+                .profileIconId(1L)
+                .division(3)
+                .build();
             userRepository.save(user);
 
             user.updateNowStatus(Status.AWAY);
@@ -290,24 +290,24 @@ class UserServiceTest {
         void failUpdateUser() {
             // given
             User user = User.builder()
-                    .actualUserId(1L)
-                    .tier(Tier.diamond)
-                    .lp(1L)
-                    .nowStatus(Status.ONLINE)
-                    .name("uni")
-                    .tagLine("tag")
-                    .profileIconId(1L)
-                    .division(3)
-                    .build();
+                .actualUserId(1L)
+                .tier(Tier.diamond)
+                .lp(1L)
+                .nowStatus(Status.ONLINE)
+                .name("uni")
+                .tagLine("tag")
+                .profileIconId(1L)
+                .division(3)
+                .build();
 
             // when & then
             assertThatThrownBy(() -> userService.save(user))
-                    .isInstanceOf(BaseException.class)
-                    .satisfies(exception -> {
-                        assertThat(((BaseException) exception).getErrorCode()).isEqualTo(
-                                ErrorCode.NOT_FOUND_CHAT_USER);
-                    })
-                    .hasMessageContaining(ErrorMessage.NOT_FOUND_CHAT_USER);
+                .isInstanceOf(BaseException.class)
+                .satisfies(exception -> {
+                    assertThat(((BaseException) exception).getErrorCode()).isEqualTo(
+                        ErrorCode.NOT_FOUND_CHAT_USER);
+                })
+                .hasMessageContaining(ErrorMessage.NOT_FOUND_CHAT_USER);
         }
     }
 
@@ -410,13 +410,13 @@ class UserServiceTest {
 
     public User createUser(String name, Long actualUserId) {
         return User.builder()
-                .actualUserId(actualUserId)
-                .tier(Tier.gold)
-                .division(3)
-                .name(name)
-                .tagLine("tagLine")
-                .nowStatus(Status.ONLINE).lp(3L)
-                .build();
+            .actualUserId(actualUserId)
+            .tier(Tier.gold)
+            .division(3)
+            .name(name)
+            .tagLine("tagLine")
+            .nowStatus(Status.ONLINE).lp(3L)
+            .build();
     }
 
 

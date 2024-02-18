@@ -41,10 +41,10 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepositoryCustom {
     @Override
     public List<ChatRoom> findUnBlockByUser(User user) {
         Query query = new Query().addCriteria(
-                Criteria.where("participants").elemMatch(
-                        Criteria.where("user").is(user)
-                                .and("blockedStatus").is(Blocked.UNBLOCK)
-                )
+            Criteria.where("participants").elemMatch(
+                Criteria.where("user").is(user)
+                    .and("blockedStatus").is(Blocked.UNBLOCK)
+            )
         );
         List<ChatRoom> chatRooms = mongoTemplate.find(query, ChatRoom.class);
         return chatRooms;
@@ -53,14 +53,14 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepositoryCustom {
     @Override
     public Optional<ChatRoom> findByUsers(User me, User other) {
         Query query = new Query()
-                .addCriteria(new Criteria().andOperator(
-                        Criteria.where("participants").elemMatch(
-                                Criteria.where("user").is(me)
-                        ),
-                        Criteria.where("participants").elemMatch(
-                                Criteria.where("user").is(other)
-                        )
-                ));
+            .addCriteria(new Criteria().andOperator(
+                Criteria.where("participants").elemMatch(
+                    Criteria.where("user").is(me)
+                ),
+                Criteria.where("participants").elemMatch(
+                    Criteria.where("user").is(other)
+                )
+            ));
 
         ChatRoom chatRoom = mongoTemplate.findOne(query, ChatRoom.class);
         return Optional.ofNullable(chatRoom);
@@ -71,17 +71,17 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepositoryCustom {
         // 3. 저장하고 리턴
         OffsetDateTime now = OffsetDateTime.now();
         return mongoTemplate.save(ChatRoom.builder()
-                .chatRoomNo(generateSequence())
-                .participants(participants)
-                .build());
+            .chatRoomNo(generateSequence())
+            .participants(participants)
+            .build());
     }
 
     @Override
     public UpdateResult update(ChatRoom chatRoom) {
         Query query = new Query(Criteria.where("chatRoomNo").is(chatRoom.getChatRoomNo()));
         Update update = new Update()
-                .set("participants", chatRoom.getParticipants())
-                .set("lastModifiedDate", chatRoom.getLastModifiedDate());
+            .set("participants", chatRoom.getParticipants())
+            .set("lastModifiedDate", chatRoom.getLastModifiedDate());
 
         UpdateResult updateResult = mongoTemplate.updateFirst(query, update, ChatRoom.class);
 
@@ -90,9 +90,9 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepositoryCustom {
 
     public Long generateSequence() {
         AutoIncrementSequence counter = mongoTemplate.findAndModify(
-                query(where("_id").is(COL)), new Update().inc("seq", 1),
-                options().returnNew(true).upsert(true),
-                AutoIncrementSequence.class);
+            query(where("_id").is(COL)), new Update().inc("seq", 1),
+            options().returnNew(true).upsert(true),
+            AutoIncrementSequence.class);
 
         return !Objects.isNull(counter) ? counter.getSeq() : 1;
     }

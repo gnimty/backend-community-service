@@ -30,7 +30,7 @@ public class ChatRepositoryImpl implements ChatRepositoryCustom {
         query.addCriteria(Criteria.where("senderId").is(user.getActualUserId()));
 
         Update update = new Update()
-                .set("readCnt", 0);
+            .set("readCnt", 0);
 
         mongoTemplate.updateMulti(query, update, Chat.class);
     }

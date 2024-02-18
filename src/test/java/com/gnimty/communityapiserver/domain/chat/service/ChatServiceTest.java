@@ -59,10 +59,10 @@ class ChatServiceTest {
         void createChat() {
             // given
             Chat chat = Chat.builder()
-                    .message("hi")
-                    .chatRoomNo(1L)
-                    .senderId(1L)
-                    .build();
+                .message("hi")
+                .chatRoomNo(1L)
+                .senderId(1L)
+                .build();
 
             // when
             chatService.save(chat);
@@ -82,10 +82,10 @@ class ChatServiceTest {
         void updateChat() {
             // given
             Chat chat = Chat.builder()
-                    .message("hi")
-                    .chatRoomNo(1L)
-                    .senderId(1L)
-                    .build();
+                .message("hi")
+                .chatRoomNo(1L)
+                .senderId(1L)
+                .build();
             chatService.save(chat);
 
             // when
@@ -111,19 +111,19 @@ class ChatServiceTest {
             void saveByFields() {
                 // given
                 User user = User.builder()
-                        .actualUserId(1L)
-                        .tier(Tier.gold)
-                        .division(3)
-                        .name("uni")
-                        .tagLine("tag")
-                        .nowStatus(Status.ONLINE)
-                        .lp(3L).build();
+                    .actualUserId(1L)
+                    .tier(Tier.gold)
+                    .division(3)
+                    .name("uni")
+                    .tagLine("tag")
+                    .nowStatus(Status.ONLINE)
+                    .lp(3L).build();
                 userRepository.save(user);
 
                 ChatRoom chatRoom = ChatRoom.builder()
-                        .participants(null)
-                        .chatRoomNo(1L)
-                        .build();
+                    .participants(null)
+                    .chatRoomNo(1L)
+                    .build();
                 chatRoomRepository.save(chatRoom);
 
                 // when
@@ -151,16 +151,16 @@ class ChatServiceTest {
             void updateReadCountTo0() {
                 // given
                 ChatRoom chatRoom = ChatRoom.builder()
-                        .participants(null)
-                        .chatRoomNo(1L)
-                        .build();
+                    .participants(null)
+                    .chatRoomNo(1L)
+                    .build();
                 chatRoomRepository.save(chatRoom);
 
                 Chat chat = Chat.builder()
-                        .senderId(1L)
-                        .chatRoomNo(chatRoom.getChatRoomNo())
-                        .message("hi")
-                        .build();
+                    .senderId(1L)
+                    .chatRoomNo(chatRoom.getChatRoomNo())
+                    .message("hi")
+                    .build();
                 chatRepository.save(chat);
 
                 // when
@@ -177,18 +177,18 @@ class ChatServiceTest {
             void deleteAllChatByChatRoom() {
                 // given
                 ChatRoom chatRoom = ChatRoom.builder()
-                        .participants(null)
-                        .chatRoomNo(1L)
-                        .build();
+                    .participants(null)
+                    .chatRoomNo(1L)
+                    .build();
                 chatRoomRepository.save(chatRoom);
 
 
                 for (int i = 0; i < 10; i++) {
                     chatRepository.save(Chat.builder()
-                            .senderId(1L)
-                            .chatRoomNo(chatRoom.getChatRoomNo())
-                            .message("hi")
-                            .build());
+                        .senderId(1L)
+                        .chatRoomNo(chatRoom.getChatRoomNo())
+                        .message("hi")
+                        .build());
                 }
 
                 // when

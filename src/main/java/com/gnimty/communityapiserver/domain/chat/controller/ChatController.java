@@ -51,7 +51,7 @@ public class ChatController {
     // 채팅의 모든 조회
     @SubscribeMapping("/init_chat")
     public List<ChatRoomDto> getTotalChatRoomsAndChatsAndOtherUserInfo(
-            @Header("simpSessionId") String sessionId) {
+        @Header("simpSessionId") String sessionId) {
         User user = getUserBySessionId(sessionId);
         return stompService.getChatRoomsJoined(user);
     }
@@ -67,23 +67,23 @@ public class ChatController {
         User other = userService.getUser(otherUserId);
 
         Boolean isMeBlock = blockReadService.existsByBlockerIdAndBlockedId(me.getActualUserId(),
-                other.getActualUserId());
+            other.getActualUserId());
         Boolean isOtherBlock = blockReadService.existsByBlockerIdAndBlockedId(
-                other.getActualUserId(), me.getActualUserId());
+            other.getActualUserId(), me.getActualUserId());
 
         ChatRoomDto chatRoomDto = stompService.getOrCreateChatRoomDto(
-                new UserWithBlockDto(me, isMeBlock.equals(true) ? Blocked.BLOCK : Blocked.UNBLOCK),
-                new UserWithBlockDto(other, isOtherBlock.equals(true) ? Blocked.BLOCK : Blocked.UNBLOCK)
+            new UserWithBlockDto(me, isMeBlock.equals(true) ? Blocked.BLOCK : Blocked.UNBLOCK),
+            new UserWithBlockDto(other, isOtherBlock.equals(true) ? Blocked.BLOCK : Blocked.UNBLOCK)
         );
 
         // getchatRoomNo를 호출하기 X
         // chatRoom을 먼저 생성 또는 조회 후 그 정보를 그대로 보내주거나 DTO로 변환해서 보내주는 게 좋아 보임
         stompService.sendToUserSubscribers(me.getActualUserId(),
-                new MessageResponse(MessageResponseType.CHATROOM_INFO, chatRoomDto));
+            new MessageResponse(MessageResponseType.CHATROOM_INFO, chatRoomDto));
 
         if (!isOtherBlock) {
             stompService.sendToUserSubscribers(other.getActualUserId(), new MessageResponse(
-                    MessageResponseType.CHATROOM_INFO, chatRoomDto));
+                MessageResponseType.CHATROOM_INFO, chatRoomDto));
         }
     }
 
@@ -98,11 +98,11 @@ public class ChatController {
         if (request.getType() == MessageRequestType.CHAT) {
             ChatDto chatDto = stompService.saveChat(user, chatRoom, request.getData());
             stompService.sendToChatRoomSubscribers(chatRoomNo,
-                    new MessageResponse(MessageResponseType.CHAT_MESSAGE, chatDto));
+                new MessageResponse(MessageResponseType.CHAT_MESSAGE, chatDto));
         } else if (request.getType() == MessageRequestType.READ) {
             stompService.readOtherChats(user, chatRoom);
             stompService.sendToUserSubscribers(user.getActualUserId(),
-                    new MessageResponse(MessageResponseType.READ_CHATS, chatRoomNo));
+                new MessageResponse(MessageResponseType.READ_CHATS, chatRoomNo));
         } else {
             stompService.exitChatRoom(user, chatRoomService.getChatRoom(chatRoomNo));
         }

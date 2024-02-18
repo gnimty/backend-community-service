@@ -33,27 +33,27 @@ public class UserService {
 
     public User getUser(Long actualUserId) {
         return findUser(actualUserId)
-                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_USER));
+            .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_USER));
     }
 
     public User getUserByMember(Member member) {
         return findUser(member.getId())
-                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_USER));
+            .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_USER));
     }
 
     public User save(RiotAccount riotAccount) {
         return userRepository.findByActualUserId(riotAccount.getMember().getId())
-                .map(user -> {
-                    user.updateByRiotAccount(riotAccount);
-                    return userRepository.save(user);
-                })
-                .orElseGet(() -> userRepository.save(User.toUser(riotAccount)));
+            .map(user -> {
+                user.updateByRiotAccount(riotAccount);
+                return userRepository.save(user);
+            })
+            .orElseGet(() -> userRepository.save(User.toUser(riotAccount)));
     }
 
 
     public User save(User updatedUser) {
         findUser(updatedUser.getActualUserId())
-                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_USER));
+            .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CHAT_USER));
         return userRepository.save(updatedUser);
     }
 
