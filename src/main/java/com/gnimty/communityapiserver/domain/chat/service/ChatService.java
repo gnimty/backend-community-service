@@ -6,7 +6,7 @@ import com.gnimty.communityapiserver.domain.chat.entity.Chat;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
 import com.gnimty.communityapiserver.domain.chat.repository.Chat.ChatRepository;
-import java.util.Date;
+import java.time.OffsetDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +20,7 @@ public class ChatService {
 
 	private final ChatRepository chatRepository;
 
-	public List<ChatDto> findChats(ChatRoom chatRoom, Date exitDate) {
+	public List<ChatDto> findChats(ChatRoom chatRoom, OffsetDateTime exitDate) {
 		return chatRepository.findByChatRoom(chatRoom, exitDate);
 	}
 
@@ -32,12 +32,11 @@ public class ChatService {
 		return chatRepository.save(chat);
 	}
 
-	public Chat save(User user, ChatRoom chatRoom, String message, Date sendDate) {
+	public Chat save(User user, ChatRoom chatRoom, String message) {
 		Chat chat = Chat.builder()
 			.senderId(user.getActualUserId())
 			.chatRoomNo(chatRoom.getChatRoomNo())
 			.message(message)
-			.sendDate(sendDate)
 			.build();
 
 		return chatRepository.save(chat);

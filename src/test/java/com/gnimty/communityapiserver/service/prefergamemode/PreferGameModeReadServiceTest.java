@@ -3,15 +3,12 @@ package com.gnimty.communityapiserver.service.prefergamemode;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.gnimty.communityapiserver.domain.member.entity.Member;
-import com.gnimty.communityapiserver.domain.member.repository.MemberRepository;
 import com.gnimty.communityapiserver.domain.prefergamemode.entity.PreferGameMode;
-import com.gnimty.communityapiserver.domain.prefergamemode.repository.PreferGameModeRepository;
 import com.gnimty.communityapiserver.domain.prefergamemode.service.PreferGameModeReadService;
 import com.gnimty.communityapiserver.global.constant.GameMode;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.service.ServiceTestSupport;
 import java.util.List;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

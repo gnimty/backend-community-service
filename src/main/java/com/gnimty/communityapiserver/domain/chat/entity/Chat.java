@@ -1,12 +1,15 @@
 package com.gnimty.communityapiserver.domain.chat.entity;
 
-import java.util.Date;
+
+import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
 
 @Document("chat")
 @Getter
@@ -19,15 +22,15 @@ public class Chat {
 	private Long chatRoomNo;
 	private Long senderId;
 	private String message;
-	private Date sendDate;
+	private OffsetDateTime sendDate;
 	private Integer readCnt = 1;
 
 	@Builder
-	public Chat(Long chatRoomNo, Long senderId, String message, Date sendDate) {
+	public Chat(Long chatRoomNo, Long senderId, String message) {
 		this.chatRoomNo = chatRoomNo;
 		this.senderId = senderId;
 		this.message = message;
-		this.sendDate = sendDate;
+		this.sendDate = OffsetDateTime.now().truncatedTo(ChronoUnit.MILLIS);
 	}
 
 	public void readByAllUser() {

@@ -1,6 +1,7 @@
 package com.gnimty.communityapiserver.global.handler;
 
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.COOKIE_NOT_FOUND;
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage;
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.HEADER_NOT_FOUND;
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.MEDIA_TYPE_NOT_SUPPORTED;
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.METHOD_NOT_ALLOWED;
@@ -9,7 +10,6 @@ import static com.gnimty.communityapiserver.global.exception.ErrorCode.URL_NOT_F
 
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
-import com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage;
 import com.gnimty.communityapiserver.global.response.CommonResponse;
 import java.util.Arrays;
 import javax.validation.Path;

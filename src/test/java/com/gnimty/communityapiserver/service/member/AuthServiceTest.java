@@ -18,7 +18,6 @@ import static org.mockito.Mockito.times;
 
 import com.gnimty.communityapiserver.domain.member.controller.dto.response.AuthToken;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
-import com.gnimty.communityapiserver.domain.member.repository.MemberRepository;
 import com.gnimty.communityapiserver.domain.member.service.AuthService;
 import com.gnimty.communityapiserver.domain.member.service.MemberReadService;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.EmailAuthServiceRequest;
@@ -30,7 +29,6 @@ import com.gnimty.communityapiserver.domain.member.service.utils.GoogleOauthUtil
 import com.gnimty.communityapiserver.domain.member.service.utils.KakaoOauthUtil;
 import com.gnimty.communityapiserver.domain.member.service.utils.MailSenderUtil;
 import com.gnimty.communityapiserver.domain.oauthinfo.entity.OauthInfo;
-import com.gnimty.communityapiserver.domain.oauthinfo.repository.OauthInfoRepository;
 import com.gnimty.communityapiserver.global.auth.JwtProvider;
 import com.gnimty.communityapiserver.global.constant.Auth;
 import com.gnimty.communityapiserver.global.constant.KeyPrefix;
@@ -40,7 +38,6 @@ import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.service.ServiceTestSupport;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

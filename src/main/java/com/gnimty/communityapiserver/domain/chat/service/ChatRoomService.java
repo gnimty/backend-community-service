@@ -63,10 +63,10 @@ public class ChatRoomService {
 		}
 
 		List<Participant> participants = List.of(
-			Participant.builder().user(me.getUser()).exitDate(null).blockedStatus(me.getStatus())
+			Participant.builder().user(me.getUser()).blockedStatus(me.getStatus())
 				.build(),
-			Participant.builder().user(other.getUser()).exitDate(null)
-				.blockedStatus(other.getStatus()).build()
+			Participant.builder().user(other.getUser()).blockedStatus(other.getStatus())
+				.build()
 		);
 
 		return chatRoomRepository.save(participants);

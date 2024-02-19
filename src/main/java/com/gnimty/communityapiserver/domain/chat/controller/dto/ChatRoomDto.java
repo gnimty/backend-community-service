@@ -1,7 +1,7 @@
 package com.gnimty.communityapiserver.domain.chat.controller.dto;
 
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
-import java.util.Date;
+import java.time.OffsetDateTime;
 import java.util.List;
 import lombok.Builder;
 import lombok.Data;
@@ -10,7 +10,7 @@ import lombok.Data;
 public class ChatRoomDto {
 
 	private Long chatRoomNo;
-	private Date lastModified;
+	private OffsetDateTime lastModified;
 	private UserDto otherUser;
 	private List<ChatDto> chats;
 

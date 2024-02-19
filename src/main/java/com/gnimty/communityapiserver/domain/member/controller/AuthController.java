@@ -19,6 +19,7 @@ import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCC
 import static org.springframework.http.HttpStatus.ACCEPTED;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.ResponseCookie.*;
 
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.EmailAuthRequest;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.EmailVerifyRequest;
@@ -117,14 +118,14 @@ public class AuthController {
 	}
 
 	private void setCookie(HttpServletResponse response, AuthToken authToken) {
-		ResponseCookie accessTokenCookie = ResponseCookie.from(SUBJECT_ACCESS_TOKEN.getContent(), authToken.getAccessToken())
+		ResponseCookie accessTokenCookie = from(SUBJECT_ACCESS_TOKEN.getContent(), authToken.getAccessToken())
 			.path("/")
 			.sameSite("Strict")
 			.httpOnly(true)
 			.secure(true)
 			.maxAge((int) (ACCESS_TOKEN_EXPIRATION.getExpiration() / 1000))
 			.build();
-		ResponseCookie refreshTokenCookie = ResponseCookie.from(SUBJECT_REFRESH_TOKEN.getContent(), authToken.getRefreshToken())
+		ResponseCookie refreshTokenCookie = from(SUBJECT_REFRESH_TOKEN.getContent(), authToken.getRefreshToken())
 			.path("/")
 			.sameSite("Strict")
 			.httpOnly(true)

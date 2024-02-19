@@ -1,7 +1,7 @@
 package com.gnimty.communityapiserver.domain.chat.controller.dto;
 
 import com.gnimty.communityapiserver.domain.chat.entity.Chat;
-import java.util.Date;
+import java.time.OffsetDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,7 +15,7 @@ public class ChatDto {
 
 	private Long senderId;
 	private String message;
-	private Date sendDate;
+	private OffsetDateTime sendDate;
 	private Integer readCnt;
 
 	@Builder

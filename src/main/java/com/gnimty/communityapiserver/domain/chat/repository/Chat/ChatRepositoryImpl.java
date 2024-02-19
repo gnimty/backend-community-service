@@ -4,7 +4,7 @@ import com.gnimty.communityapiserver.domain.chat.controller.dto.ChatDto;
 import com.gnimty.communityapiserver.domain.chat.entity.Chat;
 import com.gnimty.communityapiserver.domain.chat.entity.ChatRoom;
 import com.gnimty.communityapiserver.domain.chat.entity.User;
-import java.util.Date;
+import java.time.OffsetDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +13,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+
 
 @RequiredArgsConstructor
 @Slf4j
@@ -34,7 +35,7 @@ public class ChatRepositoryImpl implements ChatRepositoryCustom {
 	}
 
 	@Override
-	public List<ChatDto> findByChatRoom(ChatRoom chatRoom, Date exitDate) {
+	public List<ChatDto> findByChatRoom(ChatRoom chatRoom, OffsetDateTime exitDate) {
 		Query query = new Query(Criteria.where("chatRoomNo").is(chatRoom.getChatRoomNo()));
 		if (exitDate != null) {
 			query.addCriteria(Criteria.where("sendDate").gte(exitDate));

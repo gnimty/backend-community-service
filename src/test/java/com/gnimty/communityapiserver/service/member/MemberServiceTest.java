@@ -6,21 +6,18 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.mock;
+import static org.mockito.BDDMockito.mockStatic;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.times;
+import static org.mockito.BDDMockito.when;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.BDDMockito.willThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.when;
 
 import com.gnimty.communityapiserver.domain.block.entity.Block;
-import com.gnimty.communityapiserver.domain.block.repository.BlockRepository;
 import com.gnimty.communityapiserver.domain.introduction.entity.Introduction;
-import com.gnimty.communityapiserver.domain.introduction.repository.IntroductionRepository;
 import com.gnimty.communityapiserver.domain.introduction.service.IntroductionReadService;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
-import com.gnimty.communityapiserver.domain.member.repository.MemberRepository;
 import com.gnimty.communityapiserver.domain.member.service.MemberReadService;
 import com.gnimty.communityapiserver.domain.member.service.MemberService;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.MyProfileUpdateMainServiceRequest;
@@ -36,22 +33,15 @@ import com.gnimty.communityapiserver.domain.member.service.dto.response.RiotAcco
 import com.gnimty.communityapiserver.domain.member.service.utils.GoogleOauthUtil;
 import com.gnimty.communityapiserver.domain.member.service.utils.KakaoOauthUtil;
 import com.gnimty.communityapiserver.domain.member.service.utils.MailSenderUtil;
-import com.gnimty.communityapiserver.domain.member.service.utils.RiotOauthUtil;
 import com.gnimty.communityapiserver.domain.memberlike.entity.MemberLike;
-import com.gnimty.communityapiserver.domain.memberlike.repository.MemberLikeRepository;
-import com.gnimty.communityapiserver.domain.memberlike.service.MemberLikeReadService;
 import com.gnimty.communityapiserver.domain.oauthinfo.entity.OauthInfo;
-import com.gnimty.communityapiserver.domain.oauthinfo.repository.OauthInfoRepository;
 import com.gnimty.communityapiserver.domain.oauthinfo.service.OauthInfoReadService;
 import com.gnimty.communityapiserver.domain.prefergamemode.entity.PreferGameMode;
-import com.gnimty.communityapiserver.domain.prefergamemode.repository.PreferGameModeRepository;
 import com.gnimty.communityapiserver.domain.prefergamemode.service.PreferGameModeReadService;
 import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
-import com.gnimty.communityapiserver.domain.riotaccount.repository.RiotAccountRepository;
 import com.gnimty.communityapiserver.domain.riotaccount.service.RiotAccountReadService;
 import com.gnimty.communityapiserver.domain.schedule.controller.dto.request.ScheduleEntry;
 import com.gnimty.communityapiserver.domain.schedule.entity.Schedule;
-import com.gnimty.communityapiserver.domain.schedule.repository.ScheduleRepository;
 import com.gnimty.communityapiserver.domain.schedule.service.ScheduleReadService;
 import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
 import com.gnimty.communityapiserver.global.constant.DayOfWeek;
@@ -67,7 +57,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -83,6 +72,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 public class MemberServiceTest extends ServiceTestSupport {
+
 	@Autowired
 	private MemberService memberService;
 	@MockBean

@@ -7,6 +7,7 @@ import lombok.Getter;
 
 @Getter
 public class SummonerTierDto {
+
 	private Tier tier;
 	private Integer division;
 	private Long lp;

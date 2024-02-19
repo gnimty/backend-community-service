@@ -3,7 +3,7 @@ package com.gnimty.communityapiserver.domain.member.repository;
 import static com.gnimty.communityapiserver.domain.introduction.entity.QIntroduction.introduction;
 import static com.gnimty.communityapiserver.domain.member.entity.QMember.member;
 import static com.gnimty.communityapiserver.domain.prefergamemode.entity.QPreferGameMode.preferGameMode;
-import static com.gnimty.communityapiserver.domain.riotaccount.entity.QRiotAccount.*;
+import static com.gnimty.communityapiserver.domain.riotaccount.entity.QRiotAccount.riotAccount;
 import static com.gnimty.communityapiserver.domain.schedule.entity.QSchedule.schedule;
 
 import com.gnimty.communityapiserver.domain.introduction.entity.Introduction;

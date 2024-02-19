@@ -356,6 +356,7 @@ public class RiotAccountQueryRepository {
 	 * 다이아몬드	LP+2400	LP+2500	LP+2600	LP+2700
 	 * 마스터 /그랜드마스터 / 챌린저	LP+2800
 	 */
+
 	private Long getMmrByTierAndDivision(Tier tier, Integer division) {
 		if (tier.getWeight() >= Tier.master.getWeight()) {
 			return MASTER_WEIGHT;
