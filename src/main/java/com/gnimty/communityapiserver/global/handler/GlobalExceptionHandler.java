@@ -1,5 +1,6 @@
 package com.gnimty.communityapiserver.global.handler;
 
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.COOKIE_NOT_FOUND;
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage;
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.HEADER_NOT_FOUND;
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.MEDIA_TYPE_NOT_SUPPORTED;

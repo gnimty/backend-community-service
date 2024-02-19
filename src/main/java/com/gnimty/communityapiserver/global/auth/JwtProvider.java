@@ -2,16 +2,13 @@ package com.gnimty.communityapiserver.global.auth;
 
 
 import static com.gnimty.communityapiserver.global.constant.Auth.AUTH_TYPE;
-import static com.gnimty.communityapiserver.global.constant.Auth.BEARER;
 import static com.gnimty.communityapiserver.global.constant.Auth.ID_PAYLOAD_NAME;
 import static com.gnimty.communityapiserver.global.constant.Auth.JWT_TYPE;
 import static com.gnimty.communityapiserver.global.constant.Auth.SUBJECT_ACCESS_TOKEN;
-import static com.gnimty.communityapiserver.global.constant.Auth.SUBJECT_REFRESH_TOKEN;
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.TOKEN_EXPIRED;
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.TOKEN_INVALID;
 import static org.springframework.http.HttpHeaders.COOKIE;
 
-import com.gnimty.communityapiserver.domain.member.controller.dto.response.AuthToken;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.domain.member.service.MemberReadService;
 import com.gnimty.communityapiserver.global.exception.BaseException;
@@ -22,6 +19,7 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.SignatureException;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Optional;
 import javax.servlet.http.Cookie;

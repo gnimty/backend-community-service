@@ -4,6 +4,7 @@ import lombok.Getter;
 
 @Getter
 public class SummonerDto {
+
 	private Long profileIconId;
 	private Long summonerLevel;
 	private SummonerTierDto soloTierInfo;

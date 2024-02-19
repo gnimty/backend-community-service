@@ -4,5 +4,6 @@ import lombok.Getter;
 
 @Getter
 public class GoogleTokenInfo {
+
 	private String access_token;
 }
