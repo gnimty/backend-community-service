@@ -1,5 +1,6 @@
 package com.gnimty.communityapiserver.domain.championcommentslike.service;
 
+import static com.gnimty.communityapiserver.domain.riotaccount.service.utils.ChampionInfoUtil.validateChampionId;
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.ALREADY_CHAMPION_COMMENTS_LIKE;
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.COMMENTS_ID_AND_CHAMPION_ID_INVALID;
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.NOT_LINKED_RSO;
@@ -27,8 +28,9 @@ public class ChampionCommentsLikeService {
 	private final ChampionCommentsReadService championCommentsReadService;
 
 	public void doChampionCommentsLike(Long championId, Long commentsId, ChampionCommentsLikeServiceRequest request) {
-		Member member = MemberThreadLocal.get();
+		validateChampionId(championId);
 
+		Member member = MemberThreadLocal.get();
 		if (!member.getRsoLinked()) {
 			throw new BaseException(NOT_LINKED_RSO);
 		}

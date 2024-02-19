@@ -26,6 +26,7 @@ public enum WebClientType {
 	GNIMTY_TOGETHER_URI("https://gnimty.kro.kr/statistics/summoners/together/%s?queue_type=%s"),
 	GNIMTY_POST_SUMMONER_URI("https://gnimty.kro.kr/statistics/summoners/%s"),
 	GNIMTY_GET_SUMMONER_URI("https://gnimty.kro.kr/statistics/summoners/%s-%s"),
+	GNIMTY_GET_CHAMPION_INFO("https://gnimty.kro.kr/asset/champion"),
 
 	// COMMON
 	GRANT_TYPE("grant_type"),
