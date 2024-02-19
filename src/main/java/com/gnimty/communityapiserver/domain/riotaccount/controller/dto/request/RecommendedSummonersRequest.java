@@ -9,8 +9,10 @@ import com.gnimty.communityapiserver.global.constant.Tier;
 import com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage;
 import com.gnimty.communityapiserver.global.validation.annotation.ValidateCursor;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.ArrayList;
 import java.util.List;
 import javax.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -18,6 +20,7 @@ import lombok.Getter;
 @Builder
 @ValidateCursor(sortBy = "sortBy", lastName = "lastName",
 	lastSummonerMmr = "lastSummonerMmr", lastSummonerUpCount = "lastSummonerUpCount")
+@AllArgsConstructor
 public class RecommendedSummonersRequest {
 
 	@Schema(example = "RANK_SOLO", description = "조회하려는 게임 모드, not null")
@@ -26,14 +29,16 @@ public class RecommendedSummonersRequest {
 	@Schema(example = "OFFLINE", description = "조회하려는 소환사 상태, not null")
 	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
 	private Status status;
+	@Builder.Default
 	@Schema(example = "[1, 2, 3]", description = "선호 챔피언 id")
-	private List<Long> preferChampionIds;
+	private List<Long> preferChampionIds = new ArrayList<>();
 	@Schema(example = "true", description = "듀오 가능한 소환사만 조회 여부")
 	private Boolean duoable;
 	@Schema(example = "DIAMOND", description = "해당 티어 이상으로 조회")
 	private Tier tier;
+	@Builder.Default
 	@Schema(example = "[TOP, MIDDLE]", description = "조회하려는 라인")
-	private List<Lane> lanes;
+	private List<Lane> lanes = new ArrayList<>();
 	@Schema(example = "RECOMMEND", description = "정렬 기준")
 	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
 	private SortBy sortBy;

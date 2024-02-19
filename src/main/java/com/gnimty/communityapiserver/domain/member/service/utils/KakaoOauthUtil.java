@@ -1,10 +1,22 @@
 package com.gnimty.communityapiserver.domain.member.service.utils;
 
 import static com.gnimty.communityapiserver.global.constant.Auth.BEARER;
+import static com.gnimty.communityapiserver.global.constant.WebClientType.AUTHORIZATION_CODE;
+import static com.gnimty.communityapiserver.global.constant.WebClientType.CLIENT_ID;
+import static com.gnimty.communityapiserver.global.constant.WebClientType.CLIENT_SECRET;
+import static com.gnimty.communityapiserver.global.constant.WebClientType.CODE;
+import static com.gnimty.communityapiserver.global.constant.WebClientType.EMAIL_PROPERTY_KEY;
+import static com.gnimty.communityapiserver.global.constant.WebClientType.GRANT_TYPE;
+import static com.gnimty.communityapiserver.global.constant.WebClientType.KAKAO_ACCOUNT_REQUEST_URI;
+import static com.gnimty.communityapiserver.global.constant.WebClientType.KAKAO_TOKEN_REQUEST_URI;
+import static com.gnimty.communityapiserver.global.constant.WebClientType.PROPERTY_KEYS;
+import static com.gnimty.communityapiserver.global.constant.WebClientType.REDIRECT_URI;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
 
-import com.gnimty.communityapiserver.global.exception.BaseException;
-import com.gnimty.communityapiserver.global.exception.ErrorCode;
-import lombok.Getter;
+import com.gnimty.communityapiserver.global.dto.webclient.KakaoAccountInfo;
+import com.gnimty.communityapiserver.global.dto.webclient.KakaoTokenInfo;
+import com.gnimty.communityapiserver.global.utils.WebClientUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -25,59 +37,27 @@ public class KakaoOauthUtil {
 	private String client_secret;
 
 	public String getKakaoUserEmail(String authCode, String redirectUri) {
-		AccountInfo accountInfo;
-		try {
-			TokenInfo block = getTokenInfo(authCode, redirectUri);
-			accountInfo = getAccountInfo(block);
-		} catch (WebClientResponseException e) {
-			throw new BaseException(ErrorCode.INVALID_AUTH_CODE);
-		}
-		return accountInfo.getKakao_account().getEmail();
+		KakaoTokenInfo kakaoTokenInfo = WebClientUtil.post(KakaoTokenInfo.class, KAKAO_TOKEN_REQUEST_URI.getValue(),
+			APPLICATION_FORM_URLENCODED, getTokenInfoBodyMap(authCode, redirectUri), null);
+		KakaoAccountInfo kakaoAccountInfo = WebClientUtil.post(KakaoAccountInfo.class,
+			KAKAO_ACCOUNT_REQUEST_URI.getValue(), APPLICATION_FORM_URLENCODED, getAccountInfoBodyMap(),
+			httpHeaders -> httpHeaders.set(AUTHORIZATION, BEARER.getContent() + kakaoTokenInfo.getAccess_token()));
+		return kakaoAccountInfo.getKakao_account().getEmail();
 	}
 
-	private AccountInfo getAccountInfo(TokenInfo block) {
-		return WebClient.create("https://kapi.kakao.com")
-			.post()
-			.uri("/v2/user/me")
-			.body(BodyInserters.fromFormData("property_keys", "[\"kakao_account.email\"]"))
-			.header("Authorization", BEARER.getContent() + block.getAccess_token())
-			.retrieve()
-			.bodyToMono(AccountInfo.class)
-			.block();
-	}
-
-	private TokenInfo getTokenInfo(String authCode, String redirectUri) {
+	private MultiValueMap<String, String> getTokenInfoBodyMap(String authCode, String redirectUri) {
 		MultiValueMap<String, String> bodyMap = new LinkedMultiValueMap<>();
-		bodyMap.add("grant_type", "authorization_code");
-		bodyMap.add("client_id", client_id);
-		bodyMap.add("redirect_uri", redirectUri);
-		bodyMap.add("code", authCode);
-		bodyMap.add("client_secret", client_secret);
-		return WebClient.create("https://kauth.kakao.com")
-			.post()
-			.uri("/oauth/token")
-			.contentType(MediaType.APPLICATION_FORM_URLENCODED)
-			.body(BodyInserters.fromFormData(bodyMap))
-			.retrieve()
-			.bodyToMono(TokenInfo.class)
-			.block();
+		bodyMap.add(GRANT_TYPE.getValue(), AUTHORIZATION_CODE.getValue());
+		bodyMap.add(CLIENT_ID.getValue(), client_id);
+		bodyMap.add(REDIRECT_URI.getValue(), redirectUri);
+		bodyMap.add(CODE.getValue(), authCode);
+		bodyMap.add(CLIENT_SECRET.getValue(), client_secret);
+		return bodyMap;
 	}
 
-	@Getter
-	public static class TokenInfo {
-
-		private String access_token;
-	}
-
-	@Getter
-	public static class AccountInfo {
-
-		private KakaoAccount kakao_account;
-	}
-
-	@Getter
-	public static class KakaoAccount {
-
-		private String email;
+	private MultiValueMap<String, String> getAccountInfoBodyMap() {
+		LinkedMultiValueMap<String, String> bodyMap = new LinkedMultiValueMap<>();
+		bodyMap.add(PROPERTY_KEYS.getValue(), EMAIL_PROPERTY_KEY.getValue());
+		return bodyMap;
 	}
 }

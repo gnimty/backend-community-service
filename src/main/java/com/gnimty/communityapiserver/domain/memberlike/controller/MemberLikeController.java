@@ -32,7 +32,7 @@ public class MemberLikeController {
 	private final MemberLikeService memberLikeService;
 
 	@Operation(summary = READ_MEMBER_LIKE, description = ApiDescription.READ_MEMBER_LIKE)
-	@Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token", required = true)
+	@Parameter(in = ParameterIn.COOKIE, name = "accessToken", description = "인증을 위한 Access Token", required = true)
 	@GetMapping
 	public CommonResponse<MemberLikeResponse> readMemberLike() {
 		MemberLikeResponse response = MemberLikeResponse.builder()
@@ -42,7 +42,7 @@ public class MemberLikeController {
 	}
 
 	@Operation(summary = DO_MEMBER_LIKE, description = ApiDescription.DO_MEMBER_LIKE)
-	@Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token", required = true)
+	@Parameter(in = ParameterIn.COOKIE, name = "accessToken", description = "인증을 위한 Access Token", required = true)
 	@PostMapping
 	public CommonResponse<Void> doMemberLike(@RequestBody @Valid MemberLikeRequest request) {
 		memberLikeService.doMemberLike(request.toServiceRequest());

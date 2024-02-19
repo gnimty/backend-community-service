@@ -1,18 +1,23 @@
 package com.gnimty.communityapiserver.domain.member.service.utils;
 
-import com.gnimty.communityapiserver.global.auth.JwtProvider;
-import com.gnimty.communityapiserver.global.exception.BaseException;
-import com.gnimty.communityapiserver.global.exception.ErrorCode;
-import lombok.Getter;
+import static com.gnimty.communityapiserver.global.constant.WebClientType.AUTHORIZATION_CODE;
+import static com.gnimty.communityapiserver.global.constant.WebClientType.CLIENT_ID;
+import static com.gnimty.communityapiserver.global.constant.WebClientType.CLIENT_SECRET;
+import static com.gnimty.communityapiserver.global.constant.WebClientType.CODE;
+import static com.gnimty.communityapiserver.global.constant.WebClientType.GOOGLE_TOKEN_REQUEST_URI;
+import static com.gnimty.communityapiserver.global.constant.WebClientType.GOOGLE_USER_INFO_REQUEST_URI;
+import static com.gnimty.communityapiserver.global.constant.WebClientType.GRANT_TYPE;
+import static com.gnimty.communityapiserver.global.constant.WebClientType.REDIRECT_URI;
+import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
+
+import com.gnimty.communityapiserver.global.dto.webclient.GoogleTokenInfo;
+import com.gnimty.communityapiserver.global.dto.webclient.GoogleUserInfo;
+import com.gnimty.communityapiserver.global.utils.WebClientUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 @Service
 @RequiredArgsConstructor
@@ -22,54 +27,23 @@ public class GoogleOauthUtil {
 	private String client_id;
 	@Value("${oauth.google.client_secret}")
 	private String client_secret;
-	private final JwtProvider jwtProvider;
 
 	public String getGoogleUserEmail(String authCode, String redirectUri) {
-		UserInfo userInfo;
-		try {
-			TokenInfo tokenInfo = getTokenInfo(authCode, redirectUri);
-			userInfo = getUserInfo(tokenInfo.getAccess_token());
-		} catch (WebClientResponseException e) {
-			throw new BaseException(ErrorCode.INVALID_AUTH_CODE);
-		}
+		MultiValueMap<String, String> bodyMap = getTokenInfoBodyMap(authCode, redirectUri);
+		GoogleTokenInfo tokenInfo = WebClientUtil.post(GoogleTokenInfo.class, GOOGLE_TOKEN_REQUEST_URI.getValue(),
+			APPLICATION_FORM_URLENCODED, bodyMap, null);
+		GoogleUserInfo userInfo = WebClientUtil.get(GoogleUserInfo.class,
+			GOOGLE_USER_INFO_REQUEST_URI.getValue() + tokenInfo.getAccess_token(), null);
 		return userInfo.getEmail();
 	}
 
-	private TokenInfo getTokenInfo(String authCode, String redirectUri) {
+	private MultiValueMap<String, String> getTokenInfoBodyMap(String authCode, String redirectUri) {
 		MultiValueMap<String, String> bodyMap = new LinkedMultiValueMap<>();
-		bodyMap.add("grant_type", "authorization_code");
-		bodyMap.add("client_id", client_id);
-		bodyMap.add("client_secret", client_secret);
-		bodyMap.add("redirect_uri", redirectUri);
-		bodyMap.add("code", authCode);
-		return WebClient.create("https://oauth2.googleapis.com")
-			.post()
-			.uri("/token")
-			.contentType(MediaType.APPLICATION_FORM_URLENCODED)
-			.body(BodyInserters.fromFormData(bodyMap))
-			.retrieve()
-			.bodyToMono(TokenInfo.class)
-			.block();
-	}
-
-	private UserInfo getUserInfo(String accessToken) {
-		return WebClient.create("https://www.googleapis.com")
-			.get()
-			.uri("/userinfo/v2/me?access_token=" + accessToken)
-			.retrieve()
-			.bodyToMono(UserInfo.class)
-			.block();
-	}
-
-	@Getter
-	public static class TokenInfo {
-
-		private String access_token;
-	}
-
-	@Getter
-	public static class UserInfo {
-
-		private String email;
+		bodyMap.add(GRANT_TYPE.getValue(), AUTHORIZATION_CODE.getValue());
+		bodyMap.add(CLIENT_ID.getValue(), client_id);
+		bodyMap.add(CLIENT_SECRET.getValue(), client_secret);
+		bodyMap.add(REDIRECT_URI.getValue(), redirectUri);
+		bodyMap.add(CODE.getValue(), authCode);
+		return bodyMap;
 	}
 }

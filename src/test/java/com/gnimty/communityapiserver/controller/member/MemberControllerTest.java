@@ -13,6 +13,7 @@ import static com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMess
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage.MISSING_REQUEST_PARAMETER;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.mockStatic;
@@ -1037,6 +1038,36 @@ public class MemberControllerTest extends ControllerTestSupport {
 						.value(response.getMainIntroduction()),
 					jsonPath("$.data.preferGameModes[0].gameMode")
 						.value(response.getPreferGameModes().get(0).getGameMode().name())
+				);
+		}
+	}
+
+	@DisplayName("puuid로 upCount 조회 시")
+	@Nested
+	class GetUpCountByPuuid {
+
+		private static final String REQUEST_URL = "/members/up-count";
+
+		@DisplayName("올바른 요청일 경우 성공한다.")
+		@Test
+		void should_success_when_validRequest() throws Exception {
+			given(memberReadService.findUpCountByPuuid(anyString()))
+				.willReturn(1L);
+
+			mockMvc.perform(get(REQUEST_URL)
+					.param("puuid", "puuid"))
+				.andExpectAll(
+					status().isOk(),
+					jsonPath("$.data.upCount").value(1)
+				);
+		}
+
+		@DisplayName("puuid가 null일 경우 실패한다.")
+		@Test
+		void should_fail_when_puuidIsNull() throws Exception {
+			mockMvc.perform(get(REQUEST_URL))
+				.andExpectAll(
+					status().isNotFound()
 				);
 		}
 	}

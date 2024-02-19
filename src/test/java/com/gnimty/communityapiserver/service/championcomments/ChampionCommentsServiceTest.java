@@ -7,38 +7,33 @@ import static com.gnimty.communityapiserver.global.exception.ErrorCode.NOT_LINKE
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.NO_PERMISSION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.BDDMockito.given;
 
 import com.gnimty.communityapiserver.domain.championcomments.entity.ChampionComments;
 import com.gnimty.communityapiserver.domain.championcomments.service.ChampionCommentsService;
-import com.gnimty.communityapiserver.domain.championcomments.service.ChampionCommentsService.VersionData;
-import com.gnimty.communityapiserver.domain.championcomments.service.ChampionCommentsService.VersionInfo;
 import com.gnimty.communityapiserver.domain.championcomments.service.dto.request.ChampionCommentsServiceRequest;
 import com.gnimty.communityapiserver.domain.championcomments.service.dto.request.ChampionCommentsUpdateServiceRequest;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
-import com.gnimty.communityapiserver.global.config.WebClientWrapper;
 import com.gnimty.communityapiserver.global.constant.CommentsType;
 import com.gnimty.communityapiserver.global.constant.Lane;
 import com.gnimty.communityapiserver.global.constant.Status;
+import com.gnimty.communityapiserver.global.dto.webclient.VersionData;
+import com.gnimty.communityapiserver.global.dto.webclient.VersionInfo;
 import com.gnimty.communityapiserver.global.exception.BaseException;
+import com.gnimty.communityapiserver.global.utils.WebClientUtil;
 import com.gnimty.communityapiserver.service.ServiceTestSupport;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.Answers;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.transaction.annotation.Transactional;
 
 public class ChampionCommentsServiceTest extends ServiceTestSupport {
 
 	@Autowired
 	private ChampionCommentsService championCommentsService;
-	@MockBean(answer = Answers.RETURNS_DEEP_STUBS)
-	private WebClientWrapper webClientWrapper;
 
 	@Nested
 	@DisplayName("챔피언 운용법 추가 시")
@@ -62,13 +57,6 @@ public class ChampionCommentsServiceTest extends ServiceTestSupport {
 			VersionData versionData = new VersionData();
 			versionData.setVersion("1.1");
 			versionInfo.setData(versionData);
-
-			given(webClientWrapper.get()
-				.uri("/asset/version")
-				.retrieve()
-				.bodyToMono(VersionInfo.class)
-				.block())
-				.willReturn(versionInfo);
 		}
 
 		@DisplayName("최초 댓글 추가 시 부모 댓글로 취급된다.")
@@ -92,9 +80,10 @@ public class ChampionCommentsServiceTest extends ServiceTestSupport {
 		@DisplayName("부모 댓글에 답글을 달 경우 자식 댓글로 취급된다.")
 		@Test
 		void should_willBeChildComments_when_replyParentComments() {
+			VersionInfo version = WebClientUtil.get(VersionInfo.class, "https://gnimty.kro.kr/asset/version", null);
 
 			ChampionComments parent = championCommentsRepository.save(
-				createParentComments(versionInfo.getData().getVersion()));
+				createParentComments(version.getData().getVersion()));
 
 			ChampionCommentsServiceRequest request = createRequest(null, 1, parent.getId(), null);
 

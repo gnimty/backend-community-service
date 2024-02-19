@@ -140,7 +140,7 @@ public class ApiDescription {
 	public static final String GET_MY_PROFILE = """
 		내 정보 조회하는 API입니다.
 
-		Authorization header로 access token을 담아 요청하면 내 정보가 조회됩니다.
+		cookie로 access token을 담아 요청하면 내 정보가 조회됩니다.
 
 		RSO 연동한 계정만 소개글, 선호 플레이 타임, 선호 큐 타입이 조회됩니다.
 
@@ -242,7 +242,7 @@ public class ApiDescription {
 	public static final String GET_OTHER_PROFILE = """
 		다른 회원의 정보를 조회하는 API입니다.
 					
-		Authorization header가 필요하지 않습니다.
+		cookie가 필요하지 않습니다.
 					
 		RSO 연동한 계정만 소개글, 선호 플레이 타임, 선호 큐 타입이 조회됩니다.
 					
@@ -307,5 +307,9 @@ public class ApiDescription {
 		- 최근 20게임에서 같이 한 소환사 목록 불러오기 (최대 80개)
 					
 		- **내 채팅방에 소속된 유저**(+딸려있는 연동 소환사) 목록 불러오기 결과에서 내가 up 안한 사람들 거르기
+		""";
+
+	public static final String GET_UP_COUNT = """
+		해당 전적 검색 아이디가 community 서비스에 회원가입 돼 있지 않은 경우, null을 응답합니다.
 		""";
 }

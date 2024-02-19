@@ -1,22 +1,19 @@
 package com.gnimty.communityapiserver.global.auth;
 
 
-import static com.gnimty.communityapiserver.global.constant.Auth.ACCESS_TOKEN_EXPIRATION;
-import static com.gnimty.communityapiserver.global.constant.Auth.AUTHORIZATION;
 import static com.gnimty.communityapiserver.global.constant.Auth.AUTH_TYPE;
 import static com.gnimty.communityapiserver.global.constant.Auth.BEARER;
 import static com.gnimty.communityapiserver.global.constant.Auth.ID_PAYLOAD_NAME;
 import static com.gnimty.communityapiserver.global.constant.Auth.JWT_TYPE;
-import static com.gnimty.communityapiserver.global.constant.Auth.REFRESH_TOKEN_EXPIRATION;
 import static com.gnimty.communityapiserver.global.constant.Auth.SUBJECT_ACCESS_TOKEN;
 import static com.gnimty.communityapiserver.global.constant.Auth.SUBJECT_REFRESH_TOKEN;
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.TOKEN_EXPIRED;
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.TOKEN_INVALID;
+import static org.springframework.http.HttpHeaders.COOKIE;
 
 import com.gnimty.communityapiserver.domain.member.controller.dto.response.AuthToken;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.domain.member.service.MemberReadService;
-import com.gnimty.communityapiserver.global.constant.KeyPrefix;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -27,11 +24,10 @@ import io.jsonwebtoken.SignatureException;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Optional;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
 
@@ -42,7 +38,6 @@ public class JwtProvider {
 	@Value("${jwt.secret}")
 	private String secret;
 	private final MemberReadService memberReadService;
-	private final StringRedisTemplate redisTemplate;
 
 	public Member findMemberByToken(String token) {
 		return memberReadService.findById(getIdByToken(token));
@@ -62,31 +57,6 @@ public class JwtProvider {
 			.compact();
 	}
 
-	public AuthToken generateTokenByRefreshToken(String refreshToken) {
-		Member member = findMemberByToken(refreshToken);
-
-		if (!checkRefreshTokenEquals(member, refreshToken)) {
-			throw new BaseException(TOKEN_INVALID);
-		}
-
-		String newAccessToken = BEARER.getContent() + generateToken(
-			member.getId(),
-			ACCESS_TOKEN_EXPIRATION.getExpiration(),
-			SUBJECT_ACCESS_TOKEN.getContent()
-		);
-
-		String newRefreshToken = BEARER.getContent() + generateToken(
-			member.getId(),
-			REFRESH_TOKEN_EXPIRATION.getExpiration(),
-			SUBJECT_REFRESH_TOKEN.getContent()
-		);
-
-		return AuthToken.builder()
-			.accessToken(newAccessToken)
-			.refreshToken(newRefreshToken)
-			.build();
-	}
-
 	public void checkValidation(String token) {
 		try {
 			Jwts.parser()
@@ -100,7 +70,14 @@ public class JwtProvider {
 	}
 
 	public Optional<String> resolveToken(HttpServletRequest request) {
-		return Optional.ofNullable(request.getHeader(AUTHORIZATION.getContent()));
+		Cookie[] cookies = request.getCookies();
+		if (cookies == null) {
+			return Optional.empty();
+		}
+		return Arrays.stream(cookies)
+			.filter(cookie -> cookie.getName().equals(SUBJECT_ACCESS_TOKEN.getContent()))
+			.findFirst()
+			.map(Cookie::getValue);
 	}
 
 	public Long getIdByToken(String token) {
@@ -117,25 +94,6 @@ public class JwtProvider {
 		}
 	}
 
-	private boolean checkRefreshTokenEquals(Member member, String refreshToken) {
-		ValueOperations<String, String> stringValueOperations = redisTemplate.opsForValue();
-
-		String key = getRefreshKey(member);
-		String value = stringValueOperations.get(key);
-
-		if (value == null || !value.equals(refreshToken)) {
-			redisTemplate.delete(key);
-			return false;
-		}
-
-		stringValueOperations.set(key, value);
-		return true;
-	}
-
-	private String getRefreshKey(Member member) {
-		return KeyPrefix.REFRESH.getPrefix() + member.getId();
-	}
-
 	private Claims generateClaims(Long id) {
 		Claims claims = Jwts.claims();
 		claims.put(ID_PAYLOAD_NAME.getContent(), id);
@@ -147,6 +105,6 @@ public class JwtProvider {
 	}
 
 	public String extractJwt(final StompHeaderAccessor accessor) {
-		return accessor.getFirstNativeHeader(AUTHORIZATION.getContent());
+		return accessor.getFirstNativeHeader(COOKIE);
 	}
 }

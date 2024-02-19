@@ -54,7 +54,7 @@ public class ChampionCommentsController {
 	}
 
 	@Operation(summary = ADD_CHAMPION_COMMENTS, description = ApiDescription.ADD_CHAMPION_COMMENTS)
-	@Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token", required = true)
+	@Parameter(in = ParameterIn.COOKIE, name = "accessToken", description = "인증을 위한 Access Token", required = true)
 	@PostMapping
 	@ResponseStatus(CREATED)
 	public CommonResponse<Void> addChampionComments(
@@ -66,7 +66,7 @@ public class ChampionCommentsController {
 	}
 
 	@Operation(summary = UPDATE_CHAMPION_COMMENTS, description = ApiDescription.UPDATE_CHAMPION_COMMENTS)
-	@Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token", required = true)
+	@Parameter(in = ParameterIn.COOKIE, name = "accessToken", description = "인증을 위한 Access Token", required = true)
 	@PatchMapping("/{comments_id}")
 	public CommonResponse<Void> updateChampionComments(
 		@Schema(example = "1", description = "조회하려는 챔피언 id") @PathVariable("champion_id") Long championId,
@@ -78,7 +78,7 @@ public class ChampionCommentsController {
 	}
 
 	@Operation(summary = DELETE_CHAMPION_COMMENTS, description = ApiDescription.DELETE_CHAMPION_COMMENTS)
-	@Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "인증을 위한 Access Token", required = true)
+	@Parameter(in = ParameterIn.COOKIE, name = "accessToken", description = "인증을 위한 Access Token", required = true)
 	@DeleteMapping("{comments_id}")
 	public CommonResponse<Void> deleteChampionComments(
 		@Schema(example = "1", description = "조회하려는 챔피언 id") @PathVariable("champion_id") Long championId,

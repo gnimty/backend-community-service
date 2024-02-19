@@ -23,6 +23,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MissingRequestCookieException;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -104,6 +105,12 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<CommonResponse<Void>> missingRequestHeaderExceptionHandler() {
 		CommonResponse<Void> response = CommonResponse.fail(HEADER_NOT_FOUND);
 		return ResponseEntity.status(HEADER_NOT_FOUND.getStatus()).body(response);
+	}
+
+	@ExceptionHandler(MissingRequestCookieException.class)
+	public ResponseEntity<CommonResponse<Void>> missingRequestCookieExceptionHandler() {
+		CommonResponse<Void> response = CommonResponse.fail(COOKIE_NOT_FOUND);
+		return ResponseEntity.status(COOKIE_NOT_FOUND.getStatus()).body(response);
 	}
 
 	@ExceptionHandler(MissingServletRequestParameterException.class)

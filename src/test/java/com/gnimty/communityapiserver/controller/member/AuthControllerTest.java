@@ -3,7 +3,7 @@ package com.gnimty.communityapiserver.controller.member;
 import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_SEND_EMAIL_AUTH_CODE;
 import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_SIGN_UP;
 import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_VERIFY_EMAIL;
-import static com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage.HEADER_NOT_FOUND;
+import static com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage.COOKIE_NOT_FOUND;
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage.INVALID_INPUT_VALUE;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -26,6 +26,7 @@ import com.gnimty.communityapiserver.domain.member.service.dto.request.LoginServ
 import com.gnimty.communityapiserver.domain.member.service.dto.request.OauthLoginServiceRequest;
 import com.gnimty.communityapiserver.domain.member.service.dto.request.SignupServiceRequest;
 import java.nio.charset.StandardCharsets;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
@@ -167,9 +168,7 @@ public class AuthControllerTest extends ControllerTestSupport {
 					.contentType(MediaType.APPLICATION_JSON)
 					.characterEncoding(StandardCharsets.UTF_8))
 				.andExpectAll(
-					status().isOk(),
-					jsonPath("$.data.accessToken").value(authToken.getAccessToken()),
-					jsonPath("$.data.refreshToken").value(authToken.getRefreshToken())
+					status().isOk()
 				);
 		}
 
@@ -209,9 +208,7 @@ public class AuthControllerTest extends ControllerTestSupport {
 					.contentType(MediaType.APPLICATION_JSON)
 					.characterEncoding(StandardCharsets.UTF_8))
 				.andExpectAll(
-					status().isOk(),
-					jsonPath("$.data.accessToken").value(authToken.getAccessToken()),
-					jsonPath("$.data.refreshToken").value(authToken.getRefreshToken())
+					status().isOk()
 				);
 		}
 
@@ -267,9 +264,7 @@ public class AuthControllerTest extends ControllerTestSupport {
 					.contentType(MediaType.APPLICATION_JSON)
 					.characterEncoding(StandardCharsets.UTF_8))
 				.andExpectAll(
-					status().isOk(),
-					jsonPath("$.data.accessToken").value(authToken.getAccessToken()),
-					jsonPath("$.data.refreshToken").value(authToken.getRefreshToken())
+					status().isOk()
 				);
 		}
 
@@ -428,22 +423,20 @@ public class AuthControllerTest extends ControllerTestSupport {
 		void should_success_when_validRefreshToken() throws Exception {
 
 			mockMvc.perform(get(REQUEST_URL)
-					.header("RefreshToken", "token"))
+					.cookie(new Cookie("refreshToken", "token")))
 				.andExpectAll(
-					status().isOk(),
-					jsonPath("$.data.accessToken").value(authToken.getAccessToken()),
-					jsonPath("$.data.refreshToken").value(authToken.getRefreshToken())
+					status().isOk()
 				);
 		}
 
-		@DisplayName("헤더가 없을 시 실패한다.")
+		@DisplayName("쿠키가 없을 시 실패한다.")
 		@Test
 		void should_fail_when_refreshTokenIsNull() throws Exception {
 
 			mockMvc.perform(get(REQUEST_URL))
 				.andExpectAll(
 					status().isBadRequest(),
-					jsonPath("$.status.message").value(HEADER_NOT_FOUND)
+					jsonPath("$.status.message").value(COOKIE_NOT_FOUND)
 				);
 		}
 	}

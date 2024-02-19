@@ -3,6 +3,7 @@ package com.gnimty.communityapiserver.domain.championcomments.service;
 import static com.gnimty.communityapiserver.global.constant.Bound.CHILD_COMMENTS_DEPTH;
 import static com.gnimty.communityapiserver.global.constant.Bound.INITIAL_COUNT;
 import static com.gnimty.communityapiserver.global.constant.Bound.PARENT_COMMENTS_DEPTH;
+import static com.gnimty.communityapiserver.global.constant.WebClientType.GNIMTY_VERSION_URI;
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.COMMENTS_ID_AND_CHAMPION_ID_INVALID;
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.NO_PERMISSION;
 
@@ -13,15 +14,14 @@ import com.gnimty.communityapiserver.domain.championcomments.service.dto.request
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.domain.member.service.MemberReadService;
 import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
-import com.gnimty.communityapiserver.global.config.WebClientWrapper;
+import com.gnimty.communityapiserver.global.dto.webclient.VersionInfo;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
+import com.gnimty.communityapiserver.global.utils.WebClientUtil;
 import java.util.Objects;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +31,6 @@ public class ChampionCommentsService {
 	private final ChampionCommentsReadService championCommentsReadService;
 	private final MemberReadService memberReadService;
 	private final ChampionCommentsRepository championCommentsRepository;
-	private final WebClientWrapper webClientWrapper;
 
 	public void addComments(Long championId, ChampionCommentsServiceRequest request) {
 		Member member = MemberThreadLocal.get();
@@ -41,7 +40,7 @@ public class ChampionCommentsService {
 		}
 		// 해당하는 championId, opponentChampionId가 올바른지 validation
 		throwIfNotFoundMentionedMember(request);
-		VersionInfo versionInfo = getVersion();
+		VersionInfo versionInfo = getVersionInfo();
 		ChampionComments parentComments = findParentComments(request);
 		validateAddRequest(request, parentComments, versionInfo);
 		championCommentsRepository.save(getChampionComments(championId, request, member, parentComments, versionInfo));
@@ -99,16 +98,6 @@ public class ChampionCommentsService {
 			.build();
 	}
 
-	private VersionInfo getVersion() {
-		VersionInfo versionInfo;
-		try {
-			versionInfo = getVersionInfo();
-		} catch (WebClientResponseException e) {
-			throw new BaseException(ErrorCode.SERVICE_UNAVAILABLE);
-		}
-		return versionInfo;
-	}
-
 	private ChampionComments findParentComments(ChampionCommentsServiceRequest request) {
 		if (request.getParentChampionCommentsId() == null) {
 			return null;
@@ -127,12 +116,7 @@ public class ChampionCommentsService {
 	}
 
 	private VersionInfo getVersionInfo() {
-		return webClientWrapper
-			.get()
-			.uri("/asset/version")
-			.retrieve()
-			.bodyToMono(VersionInfo.class)
-			.block();
+		return WebClientUtil.get(VersionInfo.class, GNIMTY_VERSION_URI.getValue(), null);
 	}
 
 	public void updateComments(
@@ -163,17 +147,5 @@ public class ChampionCommentsService {
 			throw new BaseException(COMMENTS_ID_AND_CHAMPION_ID_INVALID);
 		}
 		championComments.delete();
-	}
-
-	@Data
-	public static class VersionInfo {
-
-		private VersionData data;
-	}
-
-	@Data
-	public static class VersionData {
-
-		private String version;
 	}
 }

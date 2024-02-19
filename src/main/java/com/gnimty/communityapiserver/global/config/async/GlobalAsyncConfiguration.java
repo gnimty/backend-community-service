@@ -10,18 +10,26 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 @Configuration
-@EnableAsync
 @Slf4j
-public class MailAsyncConfiguration implements AsyncConfigurer {
+@EnableAsync
+public class GlobalAsyncConfiguration implements AsyncConfigurer {
 
-	@Override
+	@Bean(name = "riotAccountExecutor")
+	public Executor riotAccountExecutor() {
+		return createExecutor("RiotAccountExecutor-");
+	}
+
 	@Bean(name = "mailExecutor")
-	public Executor getAsyncExecutor() {
+	public Executor mailExecutor() {
+		return createExecutor("MailExecutor-");
+	}
+
+	private Executor createExecutor(String threadNamePrefix) {
 		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
 		executor.setCorePoolSize(2);
 		executor.setMaxPoolSize(5);
 		executor.setQueueCapacity(10);
-		executor.setThreadNamePrefix("MailExecutor-");
+		executor.setThreadNamePrefix(threadNamePrefix);
 		executor.initialize();
 		return executor;
 	}

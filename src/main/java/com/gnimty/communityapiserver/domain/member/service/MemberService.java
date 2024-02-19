@@ -37,7 +37,6 @@ import com.gnimty.communityapiserver.domain.member.service.utils.GoogleOauthUtil
 import com.gnimty.communityapiserver.domain.member.service.utils.KakaoOauthUtil;
 import com.gnimty.communityapiserver.domain.member.service.utils.MailSenderUtil;
 import com.gnimty.communityapiserver.domain.member.service.utils.RiotOauthUtil;
-import com.gnimty.communityapiserver.domain.member.service.utils.RiotOauthUtil.RiotAccountInfo;
 import com.gnimty.communityapiserver.domain.memberlike.entity.MemberLike;
 import com.gnimty.communityapiserver.domain.memberlike.repository.MemberLikeRepository;
 import com.gnimty.communityapiserver.domain.memberlike.service.MemberLikeReadService;
@@ -50,18 +49,19 @@ import com.gnimty.communityapiserver.domain.prefergamemode.service.PreferGameMod
 import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
 import com.gnimty.communityapiserver.domain.riotaccount.repository.RiotAccountRepository;
 import com.gnimty.communityapiserver.domain.riotaccount.service.RiotAccountReadService;
-import com.gnimty.communityapiserver.domain.riotaccount.service.utils.RiotAccountUpdateUtil;
 import com.gnimty.communityapiserver.domain.schedule.controller.dto.request.ScheduleEntry;
 import com.gnimty.communityapiserver.domain.schedule.entity.Schedule;
 import com.gnimty.communityapiserver.domain.schedule.repository.ScheduleRepository;
 import com.gnimty.communityapiserver.domain.schedule.service.ScheduleReadService;
 import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
+import com.gnimty.communityapiserver.global.config.async.AfterRiotAccountCommitEvent;
 import com.gnimty.communityapiserver.global.constant.Auth;
 import com.gnimty.communityapiserver.global.constant.DayOfWeek;
 import com.gnimty.communityapiserver.global.constant.GameMode;
 import com.gnimty.communityapiserver.global.constant.KeyPrefix;
 import com.gnimty.communityapiserver.global.constant.Provider;
 import com.gnimty.communityapiserver.global.constant.Status;
+import com.gnimty.communityapiserver.global.dto.webclient.RiotAccountInfo;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
 import com.gnimty.communityapiserver.global.utils.RandomCodeGenerator;
@@ -70,6 +70,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -102,7 +103,7 @@ public class MemberService {
 	private final BlockRepository blockRepository;
 	private final ScheduleRepository scheduleRepository;
 	private final MailSenderUtil mailSenderUtil;
-	private final RiotAccountUpdateUtil riotAccountUpdateUtil;
+	private final ApplicationEventPublisher eventPublisher;
 
 	@Transactional
 	public RiotAccount summonerAccountLink(OauthLoginServiceRequest request) {
@@ -130,7 +131,7 @@ public class MemberService {
 			insertDefaultQueries(member);
 		}
 
-		riotAccountUpdateUtil.updateSummonerInfo(info, riotAccount.getId());
+		eventPublisher.publishEvent(new AfterRiotAccountCommitEvent(info, riotAccount.getId()));
 		return riotAccount;
 	}
 
