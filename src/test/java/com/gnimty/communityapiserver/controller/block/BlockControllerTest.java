@@ -41,10 +41,7 @@ public class BlockControllerTest extends ControllerTestSupport {
 
 	@BeforeEach
 	void setUp() {
-		given(tokenAuthInterceptor.preHandle(
-			any(HttpServletRequest.class),
-			any(HttpServletResponse.class),
-			any()))
+		given(tokenAuthInterceptor.preHandle(any(HttpServletRequest.class), any(HttpServletResponse.class), any()))
 			.willReturn(true);
 		willDoNothing()
 			.given(blockService)

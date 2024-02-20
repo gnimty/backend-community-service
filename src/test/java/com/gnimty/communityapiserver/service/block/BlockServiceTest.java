@@ -7,6 +7,7 @@ import static com.gnimty.communityapiserver.global.exception.ErrorCode.NO_PERMIS
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
@@ -57,7 +58,7 @@ public class BlockServiceTest extends ServiceTestSupport {
 				.memo("트롤")
 				.build();
 
-			given(memberReadService.findById(any(Long.class)))
+			given(memberReadService.findById(anyLong()))
 				.willReturn(blocked);
 			given(blockReadService.existsByBlockerAndBlocked(blocker, blocked))
 				.willReturn(false);
@@ -149,7 +150,7 @@ public class BlockServiceTest extends ServiceTestSupport {
 				.build();
 			BaseException exception = new BaseException(BLOCK_NOT_FOUND);
 
-			given(blockReadService.findById(any(Long.class)))
+			given(blockReadService.findById(anyLong()))
 				.willThrow(exception);
 
 			assertThatThrownBy(() -> blockService.clearBlock(blocker, request))
@@ -169,7 +170,7 @@ public class BlockServiceTest extends ServiceTestSupport {
 			Block anotherBlock = mock(Block.class);
 			given(anotherBlock.getBlocker())
 				.willReturn(anotherMember);
-			given(blockReadService.findById(any(Long.class)))
+			given(blockReadService.findById(anyLong()))
 				.willReturn(anotherBlock);
 
 			assertThatThrownBy(() -> blockService.clearBlock(blocker, request))

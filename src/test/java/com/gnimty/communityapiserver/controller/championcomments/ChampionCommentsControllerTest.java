@@ -5,6 +5,7 @@ import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCC
 import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_UPDATE_CHAMPION_COMMENTS;
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage.INVALID_INPUT_VALUE;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -43,10 +44,7 @@ public class ChampionCommentsControllerTest extends ControllerTestSupport {
 
 	@BeforeEach
 	void setUp() {
-		given(tokenAuthInterceptor.preHandle(
-			any(HttpServletRequest.class),
-			any(HttpServletResponse.class),
-			any()))
+		given(tokenAuthInterceptor.preHandle(any(HttpServletRequest.class), any(HttpServletResponse.class), any()))
 			.willReturn(true);
 		willDoNothing()
 			.given(blockService)
@@ -68,7 +66,7 @@ public class ChampionCommentsControllerTest extends ControllerTestSupport {
 
 			ChampionCommentsServiceResponse response = createResponse();
 
-			given(championCommentsReadService.findByChampionId(any(Long.class)))
+			given(championCommentsReadService.findByChampionId(anyLong()))
 				.willReturn(response);
 
 			String responsePath = "$.data.championComments[0].";
@@ -88,7 +86,7 @@ public class ChampionCommentsControllerTest extends ControllerTestSupport {
 
 			ChampionCommentsServiceResponse response = createResponse();
 
-			given(championCommentsReadService.findByChampionId(any(Long.class)))
+			given(championCommentsReadService.findByChampionId(anyLong()))
 				.willReturn(response);
 
 			mockMvc.perform(get(REQUEST_URL, "a"))
@@ -133,7 +131,7 @@ public class ChampionCommentsControllerTest extends ControllerTestSupport {
 		void setUp() {
 			willDoNothing()
 				.given(championCommentsService)
-				.addComments(any(Long.TYPE), any(ChampionCommentsServiceRequest.class));
+				.addComments(anyLong(), any(ChampionCommentsServiceRequest.class));
 		}
 
 		@DisplayName("올바른 champion_id, request를 요청하면 성공한다.")
@@ -225,7 +223,7 @@ public class ChampionCommentsControllerTest extends ControllerTestSupport {
 		void setUp() {
 			willDoNothing()
 				.given(championCommentsService)
-				.updateComments(any(Long.TYPE), any(Long.TYPE), any(ChampionCommentsUpdateServiceRequest.class));
+				.updateComments(anyLong(), anyLong(), any(ChampionCommentsUpdateServiceRequest.class));
 		}
 
 		@DisplayName("올바른 요청을 보내면 성공한다.")
@@ -276,7 +274,7 @@ public class ChampionCommentsControllerTest extends ControllerTestSupport {
 		void setUp() {
 			willDoNothing()
 				.given(championCommentsService)
-				.deleteComments(any(Long.TYPE), any(Long.TYPE));
+				.deleteComments(anyLong(), anyLong());
 		}
 
 		@DisplayName("올바른 요청을 보내면 성공한다.")

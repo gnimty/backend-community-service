@@ -6,6 +6,7 @@ import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCC
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage.COOKIE_NOT_FOUND;
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage.INVALID_INPUT_VALUE;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -42,10 +43,7 @@ public class AuthControllerTest extends ControllerTestSupport {
 
 	@BeforeEach
 	void setUp() {
-		given(tokenAuthInterceptor.preHandle(
-			any(HttpServletRequest.class),
-			any(HttpServletResponse.class),
-			any(Object.class)))
+		given(tokenAuthInterceptor.preHandle(any(HttpServletRequest.class), any(HttpServletResponse.class), any()))
 			.willReturn(true);
 	}
 
@@ -145,11 +143,10 @@ public class AuthControllerTest extends ControllerTestSupport {
 	class Login {
 
 		private static final String REQUEST_URL = "/auth/login";
-		private AuthToken authToken;
 
 		@BeforeEach
 		void setUp() {
-			authToken = AuthToken.builder()
+			AuthToken authToken = AuthToken.builder()
 				.accessToken("accessToken")
 				.refreshToken("refreshToken")
 				.build();
@@ -185,11 +182,10 @@ public class AuthControllerTest extends ControllerTestSupport {
 	class KakaoLogin {
 
 		private static final String REQUEST_URL = "/oauth/kakao";
-		private AuthToken authToken;
 
 		@BeforeEach
 		void setUp() {
-			authToken = AuthToken.builder()
+			AuthToken authToken = AuthToken.builder()
 				.accessToken("accessToken")
 				.refreshToken("refreshToken")
 				.build();
@@ -241,11 +237,10 @@ public class AuthControllerTest extends ControllerTestSupport {
 	class GoogleLogin {
 
 		private static final String REQUEST_URL = "/oauth/google";
-		private AuthToken authToken;
 
 		@BeforeEach
 		void setUp() {
-			authToken = AuthToken.builder()
+			AuthToken authToken = AuthToken.builder()
 				.accessToken("accessToken")
 				.refreshToken("refreshToken")
 				.build();
@@ -406,15 +401,14 @@ public class AuthControllerTest extends ControllerTestSupport {
 	class TokenRefresh {
 
 		private static final String REQUEST_URL = "/auth/refresh";
-		private AuthToken authToken;
 
 		@BeforeEach
 		void setUp() {
-			authToken = AuthToken.builder()
+			AuthToken authToken = AuthToken.builder()
 				.accessToken("accessToken")
 				.refreshToken("refreshToken")
 				.build();
-			given(authService.tokenRefresh(any(String.class)))
+			given(authService.tokenRefresh(anyString()))
 				.willReturn(authToken);
 		}
 
