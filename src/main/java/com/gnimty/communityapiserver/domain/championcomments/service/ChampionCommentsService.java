@@ -1,5 +1,6 @@
 package com.gnimty.communityapiserver.domain.championcomments.service;
 
+import static com.gnimty.communityapiserver.domain.riotaccount.service.utils.ChampionInfoUtil.validateChampionId;
 import static com.gnimty.communityapiserver.global.constant.Bound.CHILD_COMMENTS_DEPTH;
 import static com.gnimty.communityapiserver.global.constant.Bound.INITIAL_COUNT;
 import static com.gnimty.communityapiserver.global.constant.Bound.PARENT_COMMENTS_DEPTH;
@@ -34,16 +35,49 @@ public class ChampionCommentsService {
 
 	public void addComments(Long championId, ChampionCommentsServiceRequest request) {
 		Member member = MemberThreadLocal.get();
-
 		if (!member.getRsoLinked()) {
 			throw new BaseException(ErrorCode.NOT_LINKED_RSO);
 		}
-		// 해당하는 championId, opponentChampionId가 올바른지 validation
+
+		validateChampionId(championId);
+		validateChampionId(request.getOpponentChampionId());
 		throwIfNotFoundMentionedMember(request);
 		VersionInfo versionInfo = getVersionInfo();
 		ChampionComments parentComments = findParentComments(request);
 		validateAddRequest(request, parentComments, versionInfo);
 		championCommentsRepository.save(getChampionComments(championId, request, member, parentComments, versionInfo));
+	}
+
+	public void updateComments(
+		Long championId,
+		Long commentsId,
+		ChampionCommentsUpdateServiceRequest request
+	) {
+		validateChampionId(championId);
+		Member member = MemberThreadLocal.get();
+		ChampionComments championComments = championCommentsReadService.findById(commentsId);
+		if (!Objects.equals(championComments.getMember().getId(), member.getId())) {
+			throw new BaseException(NO_PERMISSION);
+		}
+		if (!Objects.equals(championComments.getChampionId(), championId)) {
+			throw new BaseException(COMMENTS_ID_AND_CHAMPION_ID_INVALID);
+		}
+
+		championComments.updateMentionedMemberId(request.getMentionedMemberId());
+		championComments.updateContents(request.getContents());
+	}
+
+	public void deleteComments(Long championId, Long commentsId) {
+		validateChampionId(championId);
+		Member member = MemberThreadLocal.get();
+		ChampionComments championComments = championCommentsReadService.findById(commentsId);
+		if (!Objects.equals(championComments.getMember().getId(), member.getId())) {
+			throw new BaseException(NO_PERMISSION);
+		}
+		if (!Objects.equals(championComments.getChampionId(), championId)) {
+			throw new BaseException(COMMENTS_ID_AND_CHAMPION_ID_INVALID);
+		}
+		championComments.delete();
 	}
 
 	private void validateAddRequest(
@@ -117,35 +151,5 @@ public class ChampionCommentsService {
 
 	private VersionInfo getVersionInfo() {
 		return WebClientUtil.get(VersionInfo.class, GNIMTY_VERSION_URI.getValue(), null);
-	}
-
-	public void updateComments(
-		Long championId,
-		Long commentsId,
-		ChampionCommentsUpdateServiceRequest request
-	) {
-		Member member = MemberThreadLocal.get();
-		ChampionComments championComments = championCommentsReadService.findById(commentsId);
-		if (!Objects.equals(championComments.getMember().getId(), member.getId())) {
-			throw new BaseException(NO_PERMISSION);
-		}
-		if (!Objects.equals(championComments.getChampionId(), championId)) {
-			throw new BaseException(COMMENTS_ID_AND_CHAMPION_ID_INVALID);
-		}
-
-		championComments.updateMentionedMemberId(request.getMentionedMemberId());
-		championComments.updateContents(request.getContents());
-	}
-
-	public void deleteComments(Long championId, Long commentsId) {
-		Member member = MemberThreadLocal.get();
-		ChampionComments championComments = championCommentsReadService.findById(commentsId);
-		if (!Objects.equals(championComments.getMember().getId(), member.getId())) {
-			throw new BaseException(NO_PERMISSION);
-		}
-		if (!Objects.equals(championComments.getChampionId(), championId)) {
-			throw new BaseException(COMMENTS_ID_AND_CHAMPION_ID_INVALID);
-		}
-		championComments.delete();
 	}
 }
