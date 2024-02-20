@@ -70,6 +70,7 @@ public enum ErrorCode {
 	OTHER_TYPE_MUST_CONTAIN_COMMENT(BAD_REQUEST, ErrorMessage.OTHER_TYPE_MUST_CONTAIN_COMMENT),
 	WEBCLIENT_CLIENT_ERROR(BAD_REQUEST, null),
 	COOKIE_NOT_FOUND(BAD_REQUEST, ErrorMessage.COOKIE_NOT_FOUND),
+	CHAMPION_ID_INVALID(BAD_REQUEST, ErrorMessage.CHAMPION_ID_INVALID),
 
 	// server
 	INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Server Error");
@@ -139,5 +140,6 @@ public enum ErrorCode {
 		public static final String DUPLICATED_REPORT = "한 댓글에 한 번의 신고만 허용됩니다.";
 		public static final String OTHER_TYPE_MUST_CONTAIN_COMMENT = "기타 타입의 신고 사유는 상세 신고 사유를 반드시 작성해야 하며, 기타 타입의 신고 사유가 아닌 경우 상세 신고 사유는 작성할 수 없습니다.";
 		public static final String COOKIE_NOT_FOUND = "요청에 필요한 cookie가 존재하지 않습니다.";
+		public static final String CHAMPION_ID_INVALID = "champion id가 올바르지 않습니다.";
 	}
 }

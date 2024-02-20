@@ -1,5 +1,7 @@
 package com.gnimty.communityapiserver.domain.championcomments.service;
 
+import static com.gnimty.communityapiserver.domain.riotaccount.service.utils.ChampionInfoUtil.validateChampionId;
+
 import com.gnimty.communityapiserver.domain.championcomments.entity.ChampionComments;
 import com.gnimty.communityapiserver.domain.championcomments.repository.ChampionCommentsQueryRepository;
 import com.gnimty.communityapiserver.domain.championcomments.repository.ChampionCommentsRepository;
@@ -26,6 +28,7 @@ public class ChampionCommentsReadService {
 	}
 
 	public ChampionCommentsServiceResponse findByChampionId(Long championId) {
+		validateChampionId(championId);
 		List<ChampionCommentsEntry> contents = championCommentsQueryRepository.findByChampionId(championId);
 		return ChampionCommentsServiceResponse.builder()
 			.championComments(contents)
