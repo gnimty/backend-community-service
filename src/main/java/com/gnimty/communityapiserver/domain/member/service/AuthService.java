@@ -1,17 +1,23 @@
 package com.gnimty.communityapiserver.domain.member.service;
 
 import static com.gnimty.communityapiserver.global.constant.Auth.ACCESS_TOKEN_EXPIRATION;
-import static com.gnimty.communityapiserver.global.constant.Auth.EMAIL_CODE_EXPIRATION;
 import static com.gnimty.communityapiserver.global.constant.Auth.EMAIL_SUBJECT;
 import static com.gnimty.communityapiserver.global.constant.Auth.REFRESH_TOKEN_EXPIRATION;
-import static com.gnimty.communityapiserver.global.constant.Auth.SIGNUP_EXPIRATION;
 import static com.gnimty.communityapiserver.global.constant.Auth.SUBJECT_ACCESS_TOKEN;
 import static com.gnimty.communityapiserver.global.constant.Auth.SUBJECT_REFRESH_TOKEN;
 import static com.gnimty.communityapiserver.global.constant.Bound.INITIAL_COUNT;
 import static com.gnimty.communityapiserver.global.constant.Bound.RANDOM_CODE_LENGTH;
+import static com.gnimty.communityapiserver.global.constant.CacheType.REFRESH_TOKEN;
+import static com.gnimty.communityapiserver.global.constant.CacheType.SIGNUP_EMAIL_CODE;
+import static com.gnimty.communityapiserver.global.constant.CacheType.SIGNUP_VERIFIED;
 import static com.gnimty.communityapiserver.global.constant.CommonStringType.SIGNUP_EMAIL_BANNER;
 import static com.gnimty.communityapiserver.global.constant.CommonStringType.SIGNUP_EMAIL_TEMPLATE;
 import static com.gnimty.communityapiserver.global.constant.CommonStringType.VERIFY_SIGNUP;
+import static com.gnimty.communityapiserver.global.constant.KeyPrefix.EMAIL;
+import static com.gnimty.communityapiserver.global.constant.KeyPrefix.NICKNAME;
+import static com.gnimty.communityapiserver.global.constant.KeyPrefix.REFRESH;
+import static com.gnimty.communityapiserver.global.constant.KeyPrefix.SIGNUP;
+import static com.gnimty.communityapiserver.global.utils.CacheService.getCacheKey;
 
 import com.gnimty.communityapiserver.domain.member.controller.dto.response.AuthToken;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
@@ -27,16 +33,14 @@ import com.gnimty.communityapiserver.domain.member.service.utils.MailSenderUtil;
 import com.gnimty.communityapiserver.domain.oauthinfo.entity.OauthInfo;
 import com.gnimty.communityapiserver.domain.oauthinfo.repository.OauthInfoRepository;
 import com.gnimty.communityapiserver.global.auth.JwtProvider;
-import com.gnimty.communityapiserver.global.constant.KeyPrefix;
 import com.gnimty.communityapiserver.global.constant.Provider;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
+import com.gnimty.communityapiserver.global.utils.CacheService;
 import com.gnimty.communityapiserver.global.utils.RandomCodeGenerator;
-import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,6 +48,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class AuthService {
 
 	private final MemberRepository memberRepository;
@@ -51,15 +56,14 @@ public class AuthService {
 	private final MemberReadService memberReadService;
 	private final PasswordEncoder passwordEncoder;
 	private final JwtProvider jwtProvider;
-	private final StringRedisTemplate redisTemplate;
 	private final KakaoOauthUtil kakaoOauthUtil;
 	private final GoogleOauthUtil googleOauthUtil;
 	private final MailSenderUtil mailSenderUtil;
+	private final CacheService cacheService;
 
 	public void signup(SignupServiceRequest request) {
 		memberReadService.throwIfExistByEmail(request.getEmail());
-		ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
-		String verify = valueOperations.get(getRedisKey(KeyPrefix.SIGNUP, request.getEmail()));
+		String verify = cacheService.get(SIGNUP_VERIFIED, getCacheKey(SIGNUP, request.getEmail()));
 		if (verify == null) {
 			throw new BaseException(ErrorCode.UNAUTHORIZED_EMAIL);
 		}
@@ -76,7 +80,7 @@ public class AuthService {
 		memberRepository.save(member);
 		member.updateNickname(generateTemporaryNickname(member.getId()));
 
-		redisTemplate.delete(getRedisKey(KeyPrefix.SIGNUP, request.getEmail()));
+		cacheService.evict(SIGNUP_VERIFIED, getCacheKey(SIGNUP, request.getEmail()));
 	}
 
 	public AuthToken login(LoginServiceRequest request) {
@@ -85,10 +89,7 @@ public class AuthService {
 		throwIfMismatchPassword(request.getPassword(), member.getPassword());
 
 		AuthToken authToken = generateTokenPair(member.getId());
-		saveInRedis(
-			getRedisKey(KeyPrefix.REFRESH, String.valueOf(member.getId())),
-			authToken.getRefreshToken(),
-			REFRESH_TOKEN_EXPIRATION.getExpiration());
+		cacheService.put(REFRESH_TOKEN, getCacheKey(REFRESH, member.getId().toString()), authToken.getRefreshToken());
 		return authToken;
 	}
 
@@ -99,10 +100,7 @@ public class AuthService {
 			.map(OauthInfo::getMember)
 			.orElseGet(() -> createMemberByEmail(userEmail, Provider.KAKAO));
 		AuthToken authToken = generateTokenPair(member.getId());
-		saveInRedis(
-			getRedisKey(KeyPrefix.REFRESH, String.valueOf(member.getId())),
-			authToken.getRefreshToken(),
-			REFRESH_TOKEN_EXPIRATION.getExpiration());
+		cacheService.put(REFRESH_TOKEN, getCacheKey(REFRESH, member.getId().toString()), authToken.getRefreshToken());
 		member.updateNickname(generateTemporaryNickname(member.getId()));
 		return authToken;
 	}
@@ -114,10 +112,7 @@ public class AuthService {
 			.map(OauthInfo::getMember)
 			.orElseGet(() -> createMemberByEmail(googleUserEmail, Provider.GOOGLE));
 		AuthToken authToken = generateTokenPair(member.getId());
-		saveInRedis(
-			getRedisKey(KeyPrefix.REFRESH, String.valueOf(member.getId())),
-			authToken.getRefreshToken(),
-			REFRESH_TOKEN_EXPIRATION.getExpiration());
+		cacheService.put(REFRESH_TOKEN, getCacheKey(REFRESH, member.getId().toString()), authToken.getRefreshToken());
 		member.updateNickname(generateTemporaryNickname(member.getId()));
 		return authToken;
 	}
@@ -126,40 +121,32 @@ public class AuthService {
 		String code = RandomCodeGenerator.generateCodeByLength(RANDOM_CODE_LENGTH.getValue());
 		mailSenderUtil.sendEmail(EMAIL_SUBJECT.getContent(), request.getEmail(), code,
 			SIGNUP_EMAIL_TEMPLATE.getValue(), SIGNUP_EMAIL_BANNER.getValue());
-		String key = getRedisKey(KeyPrefix.EMAIL, request.getEmail());
-		saveInRedis(key, code, EMAIL_CODE_EXPIRATION.getExpiration());
+		cacheService.put(SIGNUP_EMAIL_CODE, getCacheKey(EMAIL, request.getEmail()), code);
 	}
 
 	public void verifyEmailAuthCode(EmailVerifyServiceRequest request) {
-		ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
-
-		String emailAuthKey = getRedisKey(KeyPrefix.EMAIL, request.getEmail());
-		String signupKey = getRedisKey(KeyPrefix.SIGNUP, request.getEmail());
-		String savedCode = valueOperations.get(emailAuthKey);
+		String emailAuthKey = getCacheKey(EMAIL, request.getEmail());
+		String signupKey = getCacheKey(SIGNUP, request.getEmail());
+		String savedCode = cacheService.get(SIGNUP_EMAIL_CODE, emailAuthKey);
 
 		if (!request.getCode().equals(savedCode)) {
 			throw new BaseException(ErrorCode.INVALID_EMAIL_AUTH_CODE);
 		}
 
-		saveInRedis(signupKey, VERIFY_SIGNUP.getValue(), SIGNUP_EXPIRATION.getExpiration());
-		redisTemplate.delete(emailAuthKey);
+		cacheService.put(SIGNUP_VERIFIED, signupKey, VERIFY_SIGNUP.getValue());
+		cacheService.evict(SIGNUP_EMAIL_CODE, emailAuthKey);
 	}
 
 	public AuthToken tokenRefresh(String refreshToken) {
-		Long idByToken = jwtProvider.getIdByToken(refreshToken);
-		throwIfInvalidToken(refreshToken, idByToken);
-		AuthToken authToken = generateTokenPair(idByToken);
-		saveInRedis(
-			getRedisKey(KeyPrefix.REFRESH, String.valueOf(idByToken)),
-			authToken.getRefreshToken(),
-			REFRESH_TOKEN_EXPIRATION.getExpiration()
-		);
+		Long id = jwtProvider.getIdByToken(refreshToken);
+		throwIfInvalidToken(refreshToken, id);
+		AuthToken authToken = generateTokenPair(id);
+		cacheService.put(REFRESH_TOKEN, getCacheKey(REFRESH, id.toString()), authToken.getRefreshToken());
 		return authToken;
 	}
 
-	private void throwIfInvalidToken(String refreshToken, Long idByToken) {
-		ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
-		String savedToken = valueOperations.get(getRedisKey(KeyPrefix.REFRESH, String.valueOf(idByToken)));
+	private void throwIfInvalidToken(String refreshToken, Long id) {
+		String savedToken = cacheService.get(REFRESH_TOKEN, getCacheKey(REFRESH, id.toString()));
 
 		if (savedToken == null || !savedToken.equals(refreshToken)) {
 			throw new BaseException(ErrorCode.TOKEN_INVALID);
@@ -185,7 +172,7 @@ public class AuthService {
 	}
 
 	private String generateTemporaryNickname(Long id) {
-		return KeyPrefix.NICKNAME.getPrefix() + id;
+		return NICKNAME.getPrefix() + id;
 	}
 
 	private String encodePassword(String rawPassword) {
@@ -208,16 +195,5 @@ public class AuthService {
 			.accessToken(accessToken)
 			.refreshToken(refreshToken)
 			.build();
-	}
-
-	private void saveInRedis(String key, String value, long timeout) {
-		ValueOperations<String, String> stringValueOperations = redisTemplate.opsForValue();
-
-		stringValueOperations.set(key, value);
-		redisTemplate.expire(key, timeout, TimeUnit.MILLISECONDS);
-	}
-
-	private String getRedisKey(KeyPrefix prefix, String key) {
-		return prefix.getPrefix() + key;
 	}
 }
