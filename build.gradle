@@ -34,7 +34,6 @@ dependencies {
     runtimeOnly 'com.mysql:mysql-connector-j'
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     runtimeOnly 'com.h2database:h2'
 
 
@@ -56,6 +55,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.webjars:stomp-websocket:2.3.3-1'
 
+    //cache
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'com.github.ben-manes.caffeine:caffeine:3.1.5'
+    testImplementation 'com.google.guava:guava-testlib:33.0.0-jre'
 
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springdoc:springdoc-openapi-ui:1.7.0'
