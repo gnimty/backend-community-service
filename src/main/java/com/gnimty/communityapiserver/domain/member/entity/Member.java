@@ -11,6 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
+import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -56,6 +57,9 @@ public class Member extends BaseEntity {
 	@Column(name = "up_count", columnDefinition = "BIGINT")
 	@NotNull
 	private Long upCount;
+
+	@Version
+	private Long lockVersion;
 
 	@Builder
 	public Member(
