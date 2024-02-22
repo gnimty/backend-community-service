@@ -11,6 +11,7 @@ import com.gnimty.communityapiserver.domain.championcommentslike.entity.Champion
 import com.gnimty.communityapiserver.domain.championcommentslike.repository.ChampionCommentsLikeRepository;
 import com.gnimty.communityapiserver.domain.championcommentslike.service.dto.request.ChampionCommentsLikeServiceRequest;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
+import com.gnimty.communityapiserver.global.aop.Retry;
 import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import java.util.Objects;
@@ -27,6 +28,7 @@ public class ChampionCommentsLikeService {
 	private final ChampionCommentsLikeReadService championCommentsLikeReadService;
 	private final ChampionCommentsReadService championCommentsReadService;
 
+	@Retry
 	public void doChampionCommentsLike(Long championId, Long commentsId, ChampionCommentsLikeServiceRequest request) {
 		validateChampionId(championId);
 
@@ -34,7 +36,7 @@ public class ChampionCommentsLikeService {
 		if (!member.getRsoLinked()) {
 			throw new BaseException(NOT_LINKED_RSO);
 		}
-		ChampionComments championComments = championCommentsReadService.findById(commentsId);
+		ChampionComments championComments = championCommentsReadService.findByIdOptimistic(commentsId);
 		checkValidation(championId, championComments);
 
 		if (!request.getCancel()) {
