@@ -11,6 +11,7 @@ import static com.gnimty.communityapiserver.global.exception.ErrorCode.URL_NOT_F
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
 import com.gnimty.communityapiserver.global.response.CommonResponse;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.Arrays;
 import javax.validation.Path;
 import lombok.Builder;
@@ -122,6 +123,17 @@ public class GlobalExceptionHandler {
 		CommonResponse<Void> response = CommonResponse.fail(errorCode, message);
 
 		return ResponseEntity.status(errorCode.getStatus()).body(response);
+	}
+
+	@ExceptionHandler(SQLIntegrityConstraintViolationException.class)
+	public ResponseEntity<CommonResponse<Void>> sqlIntegrityConstraintViolationException(
+		SQLIntegrityConstraintViolationException e) {
+		if (e.getMessage().contains("Duplicate entry")) {
+			String message = "서비스에 중복으로 요청된 정보입니다. (" + e.getMessage().split("'")[1] + "이(가) 이미 존재합니다)";
+			CommonResponse<Void> response = CommonResponse.fail(ErrorCode.DB_INTEGRITY_CONSTRAINT_VIOLATION, message);
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+		}
+		throw new BaseException(ErrorCode.INTERNAL_SERVER_ERROR);
 	}
 
 	@Data
