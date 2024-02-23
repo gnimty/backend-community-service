@@ -30,10 +30,7 @@ public class MemberLikeControllerTest extends ControllerTestSupport {
 
 	@BeforeEach
 	void setUp() {
-		given(tokenAuthInterceptor.preHandle(
-			any(HttpServletRequest.class),
-			any(HttpServletResponse.class),
-			any(Object.class)))
+		given(tokenAuthInterceptor.preHandle(any(HttpServletRequest.class), any(HttpServletResponse.class), any()))
 			.willReturn(true);
 	}
 

@@ -6,12 +6,16 @@ import static com.gnimty.communityapiserver.global.constant.Bound.MAX_HOUR;
 import static com.gnimty.communityapiserver.global.constant.Bound.MAX_INTRODUCTION_COUNT;
 import static com.gnimty.communityapiserver.global.constant.Bound.MIN_HOUR;
 import static com.gnimty.communityapiserver.global.constant.Bound.RANDOM_CODE_LENGTH;
+import static com.gnimty.communityapiserver.global.constant.CacheType.REFRESH_TOKEN;
+import static com.gnimty.communityapiserver.global.constant.CacheType.RESET_PASSWORD_EMAIL_CODE;
+import static com.gnimty.communityapiserver.global.constant.CacheType.UPDATE_PASSWORD_CODE;
 import static com.gnimty.communityapiserver.global.constant.CommonStringType.PASSWORD_EMAIL_BANNER;
 import static com.gnimty.communityapiserver.global.constant.CommonStringType.PASSWORD_EMAIL_TEMPLATE;
 import static com.gnimty.communityapiserver.global.constant.CommonStringType.TAG_SPLITTER;
 import static com.gnimty.communityapiserver.global.constant.KeyPrefix.PASSWORD;
 import static com.gnimty.communityapiserver.global.constant.KeyPrefix.REFRESH;
 import static com.gnimty.communityapiserver.global.constant.KeyPrefix.UPDATE_PASSWORD;
+import static com.gnimty.communityapiserver.global.utils.CacheService.getCacheKey;
 
 import com.gnimty.communityapiserver.domain.block.repository.BlockRepository;
 import com.gnimty.communityapiserver.domain.introduction.entity.Introduction;
@@ -58,21 +62,18 @@ import com.gnimty.communityapiserver.global.config.async.AfterRiotAccountCommitE
 import com.gnimty.communityapiserver.global.constant.Auth;
 import com.gnimty.communityapiserver.global.constant.DayOfWeek;
 import com.gnimty.communityapiserver.global.constant.GameMode;
-import com.gnimty.communityapiserver.global.constant.KeyPrefix;
 import com.gnimty.communityapiserver.global.constant.Provider;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.dto.webclient.RiotAccountInfo;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
+import com.gnimty.communityapiserver.global.utils.CacheService;
 import com.gnimty.communityapiserver.global.utils.RandomCodeGenerator;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -94,7 +95,6 @@ public class MemberService {
 	private final PreferGameModeReadService preferGameModeReadService;
 	private final IntroductionRepository introductionRepository;
 	private final MemberRepository memberRepository;
-	private final StringRedisTemplate redisTemplate;
 	private final PasswordEncoder passwordEncoder;
 	private final PreferGameModeRepository preferGameModeRepository;
 	private final MemberReadService memberReadService;
@@ -104,6 +104,7 @@ public class MemberService {
 	private final ScheduleRepository scheduleRepository;
 	private final MailSenderUtil mailSenderUtil;
 	private final ApplicationEventPublisher eventPublisher;
+	private final CacheService cacheService;
 
 	@Transactional
 	public RiotAccount summonerAccountLink(OauthLoginServiceRequest request) {
@@ -181,30 +182,28 @@ public class MemberService {
 		String code = RandomCodeGenerator.generateCodeByLength(RANDOM_CODE_LENGTH.getValue());
 		mailSenderUtil.sendEmail(Auth.EMAIL_SUBJECT.getContent(), member.getEmail(), code,
 			PASSWORD_EMAIL_TEMPLATE.getValue(), PASSWORD_EMAIL_BANNER.getValue());
-		String key = getRedisKey(PASSWORD, member.getEmail());
-		saveInRedis(key, code, Auth.EMAIL_CODE_EXPIRATION.getExpiration());
+		String key = getCacheKey(PASSWORD, member.getEmail());
+		cacheService.put(RESET_PASSWORD_EMAIL_CODE, key, code);
 	}
 
 	public PasswordEmailVerifyServiceResponse verifyEmailAuthCode(PasswordEmailVerifyServiceRequest request) {
-		ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
-		String emailAuthKey = getRedisKey(PASSWORD, request.getEmail());
-		String savedCode = valueOperations.get(emailAuthKey);
+		String emailAuthKey = getCacheKey(PASSWORD, request.getEmail());
+		String savedCode = cacheService.get(RESET_PASSWORD_EMAIL_CODE, emailAuthKey);
 		if (!request.getCode().equals(savedCode)) {
 			throw new BaseException(ErrorCode.INVALID_EMAIL_AUTH_CODE);
 		}
 		UUID uuid = UUID.randomUUID();
-		String passwordKey = getRedisKey(UPDATE_PASSWORD, request.getEmail());
-		saveInRedis(passwordKey, uuid.toString(), Auth.PASSWORD_EXPIRATION.getExpiration());
-		redisTemplate.delete(emailAuthKey);
+		String passwordKey = getCacheKey(UPDATE_PASSWORD, request.getEmail());
+		cacheService.put(UPDATE_PASSWORD_CODE, passwordKey, uuid.toString());
+		cacheService.evict(RESET_PASSWORD_EMAIL_CODE, emailAuthKey);
 		return PasswordEmailVerifyServiceResponse.builder()
 			.uuid(uuid.toString())
 			.build();
 	}
 
 	public void resetPassword(PasswordResetServiceRequest request) {
-		ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
 
-		String uuid = valueOperations.get(getRedisKey(UPDATE_PASSWORD, request.getEmail()));
+		String uuid = cacheService.get(UPDATE_PASSWORD_CODE, getCacheKey(UPDATE_PASSWORD, request.getEmail()));
 		if (!request.getUuid().equals(uuid)) {
 			throw new BaseException(ErrorCode.INVALID_UUID);
 		}
@@ -212,7 +211,7 @@ public class MemberService {
 			new BaseException(ErrorCode.NOT_LOGIN_BY_FORM));
 		member.updatePassword(passwordEncoder.encode(request.getPassword()));
 
-		redisTemplate.delete(getRedisKey(UPDATE_PASSWORD, request.getEmail()));
+		cacheService.evict(UPDATE_PASSWORD_CODE, request.getEmail());
 	}
 
 	public void updatePassword(PasswordUpdateServiceRequest request) {
@@ -271,7 +270,7 @@ public class MemberService {
 
 	public void logout() {
 		Member member = MemberThreadLocal.get();
-		redisTemplate.delete(getRedisKey(REFRESH, String.valueOf(member.getId())));
+		cacheService.evict(REFRESH_TOKEN, getCacheKey(REFRESH, member.getId().toString()));
 	}
 
 	public void withdrawal() {
@@ -447,17 +446,6 @@ public class MemberService {
 			.riotDependentInfo(riotDependentInfo)
 			.oauthInfos(oauthInfoEntries)
 			.build();
-	}
-
-	private String getRedisKey(KeyPrefix prefix, String key) {
-		return prefix.getPrefix() + key;
-	}
-
-	private void saveInRedis(String key, String value, long timeout) {
-		ValueOperations<String, String> stringValueOperations = redisTemplate.opsForValue();
-
-		stringValueOperations.set(key, value);
-		redisTemplate.expire(key, timeout, TimeUnit.MILLISECONDS);
 	}
 
 	private void throwIfAlreadyLinkedProvider(Member member, Provider provider) {

@@ -6,7 +6,7 @@ services:
     depends_on:
       - community-mongo-dev
       - community-mysql-dev
-      - community-redis-dev
+#      - community-redis-dev
     ports:
       - "18080:8080"
     environment:
@@ -45,16 +45,16 @@ services:
       - db.env
     restart: always
 
-  community-redis-dev:
-    image: redis:7.2
-    container_name: gnimty-community-redis-main
-    ports:
-      - "16379:6379"
-    volumes:
-      - ./dev-redis:/data
-      - ./dev-redis-conf:/usr/local/conf/redis.conf
-    labels:
-      - "name=redis"
-      - "mode=standalone"
-    restart: on-failure
-    command: redis-server /usr/local/conf/redis.conf
+#  community-redis-dev:
+#    image: redis:7.2
+#    container_name: gnimty-community-redis-main
+#    ports:
+#      - "16379:6379"
+#    volumes:
+#      - ./dev-redis:/data
+#      - ./dev-redis-conf:/usr/local/conf/redis.conf
+#    labels:
+#      - "name=redis"
+#      - "mode=standalone"
+#    restart: on-failure
+#    command: redis-server /usr/local/conf/redis.conf

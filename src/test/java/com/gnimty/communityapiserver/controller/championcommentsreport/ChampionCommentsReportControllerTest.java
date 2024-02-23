@@ -2,6 +2,7 @@ package com.gnimty.communityapiserver.controller.championcommentsreport;
 
 import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_COMMENTS_REPORT;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -29,10 +30,7 @@ public class ChampionCommentsReportControllerTest extends ControllerTestSupport 
 
 	@BeforeEach
 	void setUp() {
-		given(tokenAuthInterceptor.preHandle(
-			any(HttpServletRequest.class),
-			any(HttpServletResponse.class),
-			any()))
+		given(tokenAuthInterceptor.preHandle(any(HttpServletRequest.class), any(HttpServletResponse.class), any()))
 			.willReturn(true);
 		willDoNothing()
 			.given(blockService)
@@ -52,7 +50,7 @@ public class ChampionCommentsReportControllerTest extends ControllerTestSupport 
 		void setUp() {
 			willDoNothing()
 				.given(championCommentsReportService)
-				.doReport(any(Long.TYPE), any(Long.TYPE), any(ChampionCommentsReportServiceRequest.class));
+				.doReport(anyLong(), anyLong(), any(ChampionCommentsReportServiceRequest.class));
 		}
 
 		@DisplayName("올바른 요청 시, 성공한다.")

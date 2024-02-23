@@ -44,6 +44,7 @@ import com.gnimty.communityapiserver.domain.schedule.controller.dto.request.Sche
 import com.gnimty.communityapiserver.domain.schedule.entity.Schedule;
 import com.gnimty.communityapiserver.domain.schedule.service.ScheduleReadService;
 import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
+import com.gnimty.communityapiserver.global.constant.CacheType;
 import com.gnimty.communityapiserver.global.constant.DayOfWeek;
 import com.gnimty.communityapiserver.global.constant.GameMode;
 import com.gnimty.communityapiserver.global.constant.Lane;
@@ -52,11 +53,11 @@ import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.constant.Tier;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
+import com.gnimty.communityapiserver.global.utils.CacheService;
 import com.gnimty.communityapiserver.service.ServiceTestSupport;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -66,8 +67,6 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -90,13 +89,13 @@ public class MemberServiceTest extends ServiceTestSupport {
 	@MockBean
 	private PreferGameModeReadService preferGameModeReadService;
 	@MockBean
-	private StringRedisTemplate redisTemplate;
-	@MockBean
 	private PasswordEncoder passwordEncoder;
 	@MockBean
 	private MemberReadService memberReadService;
 	@MockBean
 	private MailSenderUtil mailSenderUtil;
+	@MockBean
+	private CacheService cacheService;
 
 	@DisplayName("rso 연동 시")
 	@Nested
@@ -129,15 +128,15 @@ public class MemberServiceTest extends ServiceTestSupport {
 
 			// stub
 			if (provider.equals(Provider.KAKAO)) {
-				given(kakaoOauthUtil.getKakaoUserEmail(any(String.class), anyString()))
+				given(kakaoOauthUtil.getKakaoUserEmail(anyString(), anyString()))
 					.willReturn(email);
 			} else {
-				given(googleOauthUtil.getGoogleUserEmail(any(String.class), anyString()))
+				given(googleOauthUtil.getGoogleUserEmail(anyString(), anyString()))
 					.willReturn(email);
 			}
 			willDoNothing()
 				.given(oauthInfoReadService)
-				.throwIfExistsByEmailAndProvider(any(String.class), any(Provider.class));
+				.throwIfExistsByEmailAndProvider(anyString(), any(Provider.class));
 
 			// when
 			memberService.oauthAdditionalLink(provider, request);
@@ -159,8 +158,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 			OauthLoginServiceRequest request = createServiceRequest();
 
 			// stub
-			given(oauthInfoReadService.existsByMemberAndProvider(
-				any(Member.class), any(Provider.class)))
+			given(oauthInfoReadService.existsByMemberAndProvider(any(Member.class), any(Provider.class)))
 				.willReturn(true);
 
 			// when & then
@@ -180,17 +178,16 @@ public class MemberServiceTest extends ServiceTestSupport {
 			OauthLoginServiceRequest request = createServiceRequest();
 
 			// stub
-			given(oauthInfoReadService.existsByMemberAndProvider(any(Member.class),
-				any(Provider.class)))
+			given(oauthInfoReadService.existsByMemberAndProvider(any(Member.class), any(Provider.class)))
 				.willReturn(false);
 			willThrow(exception)
 				.given(oauthInfoReadService)
-				.throwIfExistsByEmailAndProvider(any(String.class), any(Provider.class));
+				.throwIfExistsByEmailAndProvider(anyString(), any(Provider.class));
 			if (provider.equals(Provider.KAKAO)) {
-				given(kakaoOauthUtil.getKakaoUserEmail(any(String.class), anyString()))
+				given(kakaoOauthUtil.getKakaoUserEmail(anyString(), anyString()))
 					.willReturn(email);
 			} else {
-				given(googleOauthUtil.getGoogleUserEmail(any(String.class), anyString()))
+				given(googleOauthUtil.getGoogleUserEmail(anyString(), anyString()))
 					.willReturn(email);
 			}
 
@@ -357,7 +354,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 		void setUp() {
 			member = memberRepository.save(
 				createMemberByEmailAndNickname("email@email.com", "nickname"));
-			given(memberReadService.findById(any(Long.class)))
+			given(memberReadService.findById(anyLong()))
 				.willReturn(member);
 			MemberThreadLocal.set(member);
 		}
@@ -377,7 +374,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 			// stub
 			given(riotAccountReadService.findMainAccountByMember(any(Member.class)))
 				.willReturn(riotAccounts.get(0));
-			given(riotAccountReadService.findById(any(Long.class)))
+			given(riotAccountReadService.findById(anyLong()))
 				.willReturn(riotAccounts.get(1));
 
 			// when
@@ -491,7 +488,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 			// stub
 			given(riotAccountReadService.findMainAccountByMember(any(Member.class)))
 				.willReturn(riotAccount);
-			given(riotAccountReadService.findById(any(Long.class)))
+			given(riotAccountReadService.findById(anyLong()))
 				.willReturn(newRiotAccount);
 
 			// when & then
@@ -517,7 +514,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 			Member mockMember = mock(Member.class);
 			when(introduction.getMember()).thenReturn(mockMember);
 			when(mockMember.getId()).thenReturn(10000000L);
-			given(introductionReadService.findById(any(Long.class)))
+			given(introductionReadService.findById(anyLong()))
 				.willReturn(introduction);
 
 			// when & then
@@ -541,7 +538,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 			// stub
 			willThrow(exception)
 				.given(introductionReadService)
-				.findById(any(Long.class));
+				.findById(anyLong());
 
 			// when & then
 			assertThatThrownBy(() -> memberService.updateMyProfileMain(request))
@@ -567,7 +564,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 			// stub
 			Introduction introduction = mock(Introduction.class);
 			when(introduction.getMember()).thenReturn(member);
-			given(introductionReadService.findById(any(Long.class)))
+			given(introductionReadService.findById(anyLong()))
 				.willReturn(introduction);
 
 			// when & then
@@ -593,7 +590,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 
 			// stub
 			Introduction introduction = mock(Introduction.class);
-			given(introductionReadService.findById(any(Long.class)))
+			given(introductionReadService.findById(anyLong()))
 				.willReturn(introduction);
 
 			// when & then
@@ -617,7 +614,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 			BaseException exception = new BaseException(ErrorCode.EXCEED_INTRODUCTION_COUNT);
 
 			// stub
-			given(introductionReadService.findById(any(Long.class)))
+			given(introductionReadService.findById(anyLong()))
 				.willReturn(introduction);
 			List<Introduction> mockIntroductions = mock(List.class);
 			when(mockIntroductions.size()).thenReturn(3);
@@ -648,7 +645,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 			BaseException exception = new BaseException(ErrorCode.MAIN_CONTENT_MUST_BE_ONLY);
 
 			// stub
-			given(introductionReadService.findById(any(Long.class)))
+			given(introductionReadService.findById(anyLong()))
 				.willReturn(introductions.get(0));
 			willThrow(exception)
 				.given(introductionReadService)
@@ -676,28 +673,20 @@ public class MemberServiceTest extends ServiceTestSupport {
 
 		@DisplayName("form 로그인 회원인 경우, 이메일이 전송된다.")
 		@Test
-		void should_sendEmail_when_formLoginMember() throws Exception {
+		void should_sendEmail_when_formLoginMember() {
 			// given
 			SendEmailServiceRequest request = SendEmailServiceRequest.builder()
 				.email(member.getEmail())
 				.build();
 
 			// stub
-			ValueOperations<String, String> valueOperations = mock(ValueOperations.class);
-			given(redisTemplate.opsForValue())
-				.willReturn(valueOperations);
 			willDoNothing()
-				.given(valueOperations)
-				.set(any(String.class), any(String.class));
-			given(valueOperations.getAndExpire(any(String.class), any(Long.class),
-				any(TimeUnit.class)))
-				.willReturn("value");
+				.given(cacheService)
+				.put(any(CacheType.class), anyString(), anyString());
 			willDoNothing()
 				.given(mailSenderUtil)
-				.sendEmail(any(String.class), any(String.class), any(String.class),
-					any(String.class), any(String.class));
-			given(memberReadService.findByEmailOrElseThrow(any(String.class),
-				any(BaseException.class)))
+				.sendEmail(anyString(), anyString(), anyString(), anyString(), anyString());
+			given(memberReadService.findByEmailOrElseThrow(any(String.class), any(BaseException.class)))
 				.willReturn(member);
 
 			// when
@@ -706,11 +695,10 @@ public class MemberServiceTest extends ServiceTestSupport {
 			// then
 			then(mailSenderUtil)
 				.should(times(1))
-				.sendEmail(any(String.class), any(String.class), any(String.class),
-					any(String.class), any(String.class));
-			then(redisTemplate)
+				.sendEmail(anyString(), anyString(), anyString(), anyString(), anyString());
+			then(cacheService)
 				.should(times(1))
-				.expire(any(String.class), any(Long.class), any(TimeUnit.class));
+				.put(any(CacheType.class), anyString(), anyString());
 		}
 
 		@DisplayName("form 로그인 회원이 아닐 경우, 실패한다.")
@@ -724,8 +712,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 			BaseException exception = new BaseException(ErrorCode.NOT_LOGIN_BY_FORM);
 
 			// stub
-			given(memberReadService.findByEmailOrElseThrow(any(String.class),
-				any(BaseException.class)))
+			given(memberReadService.findByEmailOrElseThrow(any(String.class), any(BaseException.class)))
 				.willReturn(newMember);
 
 			// when & then
@@ -749,50 +736,39 @@ public class MemberServiceTest extends ServiceTestSupport {
 		@DisplayName("올바른 입력 코드를 요청하면 성공하며, uuid가 반환된다.")
 		@Test
 		void should_returnUUID_when_validRequest() {
-			// given
 			String authCode = "ABC123";
 			PasswordEmailVerifyServiceRequest request = PasswordEmailVerifyServiceRequest.builder()
 				.code(authCode)
 				.build();
 			UUID uuid = UUID.randomUUID();
 
-			// stub
-			ValueOperations<String, String> valueOperations = mock(ValueOperations.class);
-			given(redisTemplate.opsForValue())
-				.willReturn(valueOperations);
-			given(valueOperations.get(any(String.class)))
+			willDoNothing()
+				.given(cacheService)
+				.put(any(CacheType.class), anyString(), anyString());
+			given(cacheService.get(any(CacheType.class), anyString()))
 				.willReturn(authCode);
 			willDoNothing()
-				.given(valueOperations)
-				.set(any(String.class), any(String.class));
-			given(valueOperations.getAndExpire(any(String.class), any(Long.class),
-				any(TimeUnit.class)))
-				.willReturn("verified");
+				.given(cacheService)
+				.evict(any(CacheType.class), anyString());
+
 			try (MockedStatic<UUID> ignored = mockStatic(UUID.class)) {
-				// Stub
 				given(UUID.randomUUID())
 					.willReturn(uuid);
 
-				// when
-				PasswordEmailVerifyServiceResponse response = memberService.verifyEmailAuthCode(
-					request);
+				PasswordEmailVerifyServiceResponse response = memberService.verifyEmailAuthCode(request);
 
 				assertThat(response.getUuid()).isEqualTo(uuid.toString());
 			}
 
-			// then
-			then(redisTemplate)
+			then(cacheService)
 				.should(times(1))
-				.expire(any(String.class), any(Long.class), any(TimeUnit.class));
-			then(valueOperations)
+				.evict(any(CacheType.class), anyString());
+			then(cacheService)
 				.should(times(1))
-				.set(any(String.class), any(String.class));
-			then(valueOperations)
+				.get(any(CacheType.class), anyString());
+			then(cacheService)
 				.should(times(1))
-				.get(any(String.class));
-			then(redisTemplate)
-				.should(times(2))
-				.opsForValue();
+				.put(any(CacheType.class), anyString(), anyString());
 		}
 
 		@DisplayName("올바르지 않은 인증 코드를 입력 시 실패한다.")
@@ -805,10 +781,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 			BaseException exception = new BaseException(ErrorCode.INVALID_EMAIL_AUTH_CODE);
 
 			// stub
-			ValueOperations<String, String> valueOperations = mock(ValueOperations.class);
-			given(redisTemplate.opsForValue())
-				.willReturn(valueOperations);
-			given(valueOperations.get(any(String.class)))
+			given(cacheService.get(any(CacheType.class), anyString()))
 				.willReturn(savedCode);
 
 			assertThatThrownBy(() -> memberService.verifyEmailAuthCode(request))
@@ -843,10 +816,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 			given(memberReadService.findByEmailOrElseThrow(any(String.class),
 				any(BaseException.class)))
 				.willReturn(member);
-			ValueOperations<String, String> valueOperations = mock(ValueOperations.class);
-			given(redisTemplate.opsForValue())
-				.willReturn(valueOperations);
-			given(valueOperations.get(any(String.class)))
+			given(cacheService.get(any(CacheType.class), anyString()))
 				.willReturn(uuid);
 			given(passwordEncoder.matches(any(CharSequence.class), any(String.class)))
 				.willReturn(true);
@@ -873,10 +843,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 			given(memberReadService.findByEmailOrElseThrow(any(String.class),
 				any(BaseException.class)))
 				.willReturn(member);
-			ValueOperations<String, String> valueOperations = mock(ValueOperations.class);
-			given(redisTemplate.opsForValue())
-				.willReturn(valueOperations);
-			given(valueOperations.get(any(String.class)))
+			given(cacheService.get(any(CacheType.class), anyString()))
 				.willReturn("uuid2");
 			given(passwordEncoder.matches(any(CharSequence.class), any(String.class)))
 				.willReturn(false);
@@ -911,12 +878,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 				.build();
 
 			// stub
-			ValueOperations<String, String> valueOperations = mock(ValueOperations.class);
-			given(redisTemplate.opsForValue())
-				.willReturn(valueOperations);
-			given(memberReadService.findById(any(Long.class)))
-				.willReturn(member);
-			given(valueOperations.get(any()))
+			given(cacheService.get(any(CacheType.class), anyString()))
 				.willReturn("verified");
 			given(passwordEncoder.matches(any(CharSequence.class), any(String.class)))
 				.willReturn(true);
@@ -941,13 +903,10 @@ public class MemberServiceTest extends ServiceTestSupport {
 			BaseException exception = new BaseException(ErrorCode.INVALID_PASSWORD);
 
 			// stub
-			ValueOperations<String, String> valueOperations = mock(ValueOperations.class);
-			given(redisTemplate.opsForValue())
-				.willReturn(valueOperations);
+			given(cacheService.get(any(CacheType.class), anyString()))
+				.willReturn(null);
 			given(memberReadService.findById(any(Long.class)))
 				.willReturn(member);
-			given(valueOperations.get(any()))
-				.willReturn(null);
 			given(passwordEncoder.matches(any(CharSequence.class), any(String.class)))
 				.willReturn(false);
 
@@ -1021,25 +980,23 @@ public class MemberServiceTest extends ServiceTestSupport {
 			MemberThreadLocal.set(member);
 		}
 
-		@DisplayName("redis에 저장돼있던 Refresh token이 삭제된다.")
+		@DisplayName("cache에 저장돼있던 Refresh token이 삭제된다.")
 		@Test
-		void should_deleteRefreshTokenInRedis_when_logout() {
+		void should_deleteRefreshTokenInCache_when_logout() {
 			// given
 
 			// stub
-			ValueOperations<String, String> valueOperations = mock(ValueOperations.class);
-			given(redisTemplate.opsForValue())
-				.willReturn(valueOperations);
-			given(redisTemplate.delete(anyString()))
-				.willReturn(true);
+			willDoNothing()
+				.given(cacheService)
+				.evict(any(CacheType.class), anyString());
 
 			// when
 			memberService.logout();
 
 			// then
-			then(redisTemplate)
+			then(cacheService)
 				.should(times(1))
-				.delete(any(String.class));
+				.evict(any(CacheType.class), anyString());
 		}
 	}
 

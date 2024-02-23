@@ -8,6 +8,7 @@ import static com.gnimty.communityapiserver.global.exception.ErrorCode.UNAUTHORI
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -31,22 +32,20 @@ import com.gnimty.communityapiserver.domain.member.service.utils.MailSenderUtil;
 import com.gnimty.communityapiserver.domain.oauthinfo.entity.OauthInfo;
 import com.gnimty.communityapiserver.global.auth.JwtProvider;
 import com.gnimty.communityapiserver.global.constant.Auth;
+import com.gnimty.communityapiserver.global.constant.CacheType;
 import com.gnimty.communityapiserver.global.constant.KeyPrefix;
 import com.gnimty.communityapiserver.global.constant.Provider;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.exception.BaseException;
+import com.gnimty.communityapiserver.global.utils.CacheService;
 import com.gnimty.communityapiserver.service.ServiceTestSupport;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,29 +60,13 @@ public class AuthServiceTest extends ServiceTestSupport {
 	@MockBean
 	private JwtProvider jwtProvider;
 	@MockBean
-	private StringRedisTemplate redisTemplate;
-	@MockBean
 	private KakaoOauthUtil kakaoOauthUtil;
 	@MockBean
 	private GoogleOauthUtil googleOauthUtil;
 	@MockBean
 	private MailSenderUtil mailSenderUtil;
-
-	@Mock
-	private ValueOperations<String, String> valueOperations;
-
-	@BeforeEach
-	void setUp() {
-		given(redisTemplate.opsForValue())
-			.willReturn(valueOperations);
-		given(redisTemplate.delete(any(String.class)))
-			.willReturn(true);
-		willDoNothing()
-			.given(valueOperations)
-			.set(any(String.class), any(String.class));
-		given(redisTemplate.expire(any(String.class), any(Long.class), any(TimeUnit.class)))
-			.willReturn(true);
-	}
+	@MockBean
+	private CacheService cacheService;
 
 	@DisplayName("회원 가입 시")
 	@Nested
@@ -93,17 +76,17 @@ public class AuthServiceTest extends ServiceTestSupport {
 		void setUp() {
 			willDoNothing()
 				.given(memberReadService)
-				.throwIfExistByEmail(any(String.class));
-			given(valueOperations.get(any()))
+				.throwIfExistByEmail(anyString());
+			given(cacheService.get(any(CacheType.class), anyString()))
 				.willReturn("verify");
 		}
 
-		@DisplayName("이메일 인증을 완료하고, form 회원가입 이력이 없는 이메일일 경우, 회원가입 되고, redis의 key가 삭제되며, id로 임시 닉네임이 만들어진다.")
+		@DisplayName("이메일 인증을 완료하고, form 회원가입 이력이 없는 이메일일 경우, 회원가입 되고, cache의 key가 삭제되며, id로 임시 닉네임이 만들어진다.")
 		@Test
-		void should_signupAndDeleteRedisKeyAndTemporaryNickname_when_verifyEmailAndNotFormLogin() {
+		void should_signupAndDeleteCacheKeyAndTemporaryNickname_when_verifyEmailAndNotFormLogin() {
 			SignupServiceRequest request = createRequest();
 
-			given(passwordEncoder.encode(any(CharSequence.class)))
+			given(passwordEncoder.encode(anyString()))
 				.willReturn(request.getPassword());
 
 			authService.signup(request);
@@ -119,12 +102,12 @@ public class AuthServiceTest extends ServiceTestSupport {
 			assertThat(member.getStatus()).isEqualTo(Status.OFFLINE);
 			assertThat(member.getUpCount()).isEqualTo(0);
 
-			then(redisTemplate)
+			then(cacheService)
 				.should(times(1))
-				.delete(any(String.class));
+				.evict(any(CacheType.class), anyString());
 			then(passwordEncoder)
 				.should(times(1))
-				.encode(any(CharSequence.class));
+				.encode(anyString());
 		}
 
 		@DisplayName("이메일 인증을 완료하지 않았을 경우, 예외를 반환한다.")
@@ -133,7 +116,7 @@ public class AuthServiceTest extends ServiceTestSupport {
 			SignupServiceRequest request = createRequest();
 			BaseException exception = new BaseException(UNAUTHORIZED_EMAIL);
 
-			given(valueOperations.get(any()))
+			given(cacheService.get(any(CacheType.class), anyString()))
 				.willReturn(null);
 
 			assertThatThrownBy(() -> authService.signup(request))
@@ -149,7 +132,7 @@ public class AuthServiceTest extends ServiceTestSupport {
 
 			willThrow(exception)
 				.given(memberReadService)
-				.throwIfExistByEmail(any(String.class));
+				.throwIfExistByEmail(anyString());
 
 			assertThatThrownBy(() -> authService.signup(request))
 				.isInstanceOf(exception.getClass())
@@ -174,10 +157,9 @@ public class AuthServiceTest extends ServiceTestSupport {
 		@BeforeEach
 		void setUp() {
 			member = memberRepository.save(createMember());
-			given(memberReadService.findByEmailOrElseThrow(any(String.class),
-				any(BaseException.class)))
+			given(memberReadService.findByEmailOrElseThrow(anyString(), any(BaseException.class)))
 				.willReturn(member);
-			given(passwordEncoder.matches(any(CharSequence.class), any(String.class)))
+			given(passwordEncoder.matches(anyString(), anyString()))
 				.willReturn(true);
 		}
 
@@ -187,11 +169,10 @@ public class AuthServiceTest extends ServiceTestSupport {
 			LoginServiceRequest request = createRequest();
 			AuthToken authToken = createAuthToken();
 
-			given(jwtProvider.generateToken(any(Long.class),
-				eq(Auth.ACCESS_TOKEN_EXPIRATION.getExpiration()), any(String.class)))
+			given(jwtProvider.generateToken(anyLong(),
+				eq(Auth.ACCESS_TOKEN_EXPIRATION.getExpiration()), anyString()))
 				.willReturn(authToken.getAccessToken());
-			given(jwtProvider.generateToken(any(Long.class),
-				eq(Auth.REFRESH_TOKEN_EXPIRATION.getExpiration()), any(String.class)))
+			given(jwtProvider.generateToken(anyLong(), eq(Auth.REFRESH_TOKEN_EXPIRATION.getExpiration()), anyString()))
 				.willReturn(authToken.getRefreshToken());
 
 			AuthToken login = authService.login(request);
@@ -206,8 +187,7 @@ public class AuthServiceTest extends ServiceTestSupport {
 			LoginServiceRequest request = createRequest();
 			BaseException exception = new BaseException(INVALID_LOGIN);
 
-			given(memberReadService.findByEmailOrElseThrow(any(String.class),
-				any(BaseException.class)))
+			given(memberReadService.findByEmailOrElseThrow(anyString(), any(BaseException.class)))
 				.willThrow(exception);
 
 			assertThatThrownBy(() -> authService.login(request))
@@ -221,7 +201,7 @@ public class AuthServiceTest extends ServiceTestSupport {
 			LoginServiceRequest request = createRequest();
 			BaseException exception = new BaseException(INVALID_LOGIN);
 
-			given(passwordEncoder.matches(any(CharSequence.class), any(String.class)))
+			given(passwordEncoder.matches(anyString(), anyString()))
 				.willReturn(false);
 
 			assertThatThrownBy(() -> authService.login(request))
@@ -262,9 +242,9 @@ public class AuthServiceTest extends ServiceTestSupport {
 
 		@BeforeEach
 		void setUp() {
-			given(jwtProvider.generateToken(any(Long.class), any(Long.class), any(String.class)))
+			given(jwtProvider.generateToken(anyLong(), anyLong(), anyString()))
 				.willReturn("token");
-			given(kakaoOauthUtil.getKakaoUserEmail(any(String.class), anyString()))
+			given(kakaoOauthUtil.getKakaoUserEmail(anyString(), anyString()))
 				.willReturn("email@email.com");
 		}
 
@@ -330,9 +310,9 @@ public class AuthServiceTest extends ServiceTestSupport {
 
 		@BeforeEach
 		void setUp() {
-			given(jwtProvider.generateToken(any(Long.class), any(Long.class), any(String.class)))
+			given(jwtProvider.generateToken(anyLong(), anyLong(), anyString()))
 				.willReturn("token");
-			given(googleOauthUtil.getGoogleUserEmail(any(String.class), anyString()))
+			given(googleOauthUtil.getGoogleUserEmail(anyString(), anyString()))
 				.willReturn("email@email.com");
 		}
 
@@ -405,21 +385,16 @@ public class AuthServiceTest extends ServiceTestSupport {
 
 			willDoNothing()
 				.given(mailSenderUtil)
-				.sendEmail(any(String.class), any(String.class), any(String.class),
-					any(String.class), any(String.class));
+				.sendEmail(anyString(), anyString(), anyString(), anyString(), anyString());
 
 			authService.sendEmailAuthCode(request);
 
 			then(mailSenderUtil)
 				.should(times(1))
-				.sendEmail(any(String.class), any(String.class), any(String.class),
-					any(String.class), any(String.class));
-			then(valueOperations)
+				.sendEmail(anyString(), anyString(), anyString(), anyString(), anyString());
+			then(cacheService)
 				.should(times(1))
-				.set(any(String.class), any(String.class));
-			then(redisTemplate)
-				.should(times(1))
-				.expire(any(String.class), any(Long.class), any(TimeUnit.class));
+				.put(any(CacheType.class), anyString(), anyString());
 		}
 	}
 
@@ -435,20 +410,17 @@ public class AuthServiceTest extends ServiceTestSupport {
 				.code("code")
 				.build();
 
-			given(valueOperations.get(any(String.class)))
+			given(cacheService.get(any(CacheType.class), anyString()))
 				.willReturn(request.getCode());
 
 			authService.verifyEmailAuthCode(request);
 
-			then(redisTemplate)
+			then(cacheService)
 				.should(times(1))
-				.expire(any(String.class), any(Long.class), any(TimeUnit.class));
-			then(valueOperations)
+				.evict(any(CacheType.class), anyString());
+			then(cacheService)
 				.should(times(1))
-				.set(any(String.class), any(String.class));
-			then(redisTemplate)
-				.should(times(1))
-				.delete(any(String.class));
+				.put(any(CacheType.class), anyString(), anyString());
 		}
 
 		@DisplayName("올바르지 않은 인증 코드를 입력하면 실패한다.")
@@ -460,16 +432,16 @@ public class AuthServiceTest extends ServiceTestSupport {
 				.build();
 			BaseException exception = new BaseException(INVALID_EMAIL_AUTH_CODE);
 
-			given(valueOperations.get(any(String.class)))
+			given(cacheService.get(any(CacheType.class), anyString()))
 				.willReturn("code123");
 
 			assertThatThrownBy(() -> authService.verifyEmailAuthCode(request))
 				.isInstanceOf(exception.getClass())
 				.hasMessage(exception.getMessage());
 
-			then(valueOperations)
+			then(cacheService)
 				.should(times(1))
-				.get(any(String.class));
+				.get(any(CacheType.class), any(String.class));
 		}
 	}
 
@@ -482,7 +454,7 @@ public class AuthServiceTest extends ServiceTestSupport {
 		void should_success_when_requestValidRefreshToken() {
 			String refreshToken = "refreshToken";
 
-			given(valueOperations.get(any(String.class)))
+			given(cacheService.get(any(CacheType.class), anyString()))
 				.willReturn(refreshToken);
 			given(jwtProvider.getIdByToken(any(String.class)))
 				.willReturn(1L);
@@ -501,7 +473,7 @@ public class AuthServiceTest extends ServiceTestSupport {
 			String refreshToken = "invalidRefreshToken";
 			BaseException exception = new BaseException(TOKEN_INVALID);
 
-			given(valueOperations.get(any(String.class)))
+			given(cacheService.get(any(CacheType.class), anyString()))
 				.willReturn("token");
 			given(jwtProvider.getIdByToken(any(String.class)))
 				.willReturn(1L);

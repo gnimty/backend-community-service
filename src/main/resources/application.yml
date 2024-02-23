@@ -126,7 +126,3 @@ spring:
       timeZone: Asia/Seoul
       authentication-database: ${MONGO_ADMIN_DB}
       auto-index-creation: true
-
-  redis:
-    host: ${REDIS_HOST}
-    port: ${REDIS_PORT}

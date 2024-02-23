@@ -3,6 +3,7 @@ package com.gnimty.communityapiserver.controller.championcommentslike;
 import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_CHAMPION_COMMENTS_LIKE;
 import static com.gnimty.communityapiserver.global.exception.ErrorCode.ErrorMessage.INVALID_INPUT_VALUE;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -30,10 +31,7 @@ public class ChampionCommentsLikeControllerTest extends ControllerTestSupport {
 
 	@BeforeEach
 	void setUp() {
-		given(tokenAuthInterceptor.preHandle(
-			any(HttpServletRequest.class),
-			any(HttpServletResponse.class),
-			any()))
+		given(tokenAuthInterceptor.preHandle(any(HttpServletRequest.class), any(HttpServletResponse.class), any()))
 			.willReturn(true);
 		willDoNothing()
 			.given(blockService)
@@ -53,7 +51,7 @@ public class ChampionCommentsLikeControllerTest extends ControllerTestSupport {
 		void setUp() {
 			willDoNothing()
 				.given(championCommentsLikeService)
-				.doChampionCommentsLike(any(Long.TYPE), any(Long.TYPE), any(ChampionCommentsLikeServiceRequest.class));
+				.doChampionCommentsLike(anyLong(), anyLong(), any(ChampionCommentsLikeServiceRequest.class));
 		}
 
 		@DisplayName("올바른 요청을 하면 성공한다.")
