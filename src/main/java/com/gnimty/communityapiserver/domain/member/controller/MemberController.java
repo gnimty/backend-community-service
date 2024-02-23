@@ -15,6 +15,8 @@ import static com.gnimty.communityapiserver.global.constant.ApiSummary.UPDATE_MY
 import static com.gnimty.communityapiserver.global.constant.ApiSummary.UPDATE_PASSWORD;
 import static com.gnimty.communityapiserver.global.constant.ApiSummary.VERIFY_PASSWORD_EMAIL_AUTH_CODE;
 import static com.gnimty.communityapiserver.global.constant.ApiSummary.WITHDRAWAL;
+import static com.gnimty.communityapiserver.global.constant.Auth.SUBJECT_ACCESS_TOKEN;
+import static com.gnimty.communityapiserver.global.constant.Auth.SUBJECT_REFRESH_TOKEN;
 import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_DISCONNECT_OAUTH;
 import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_GOOGLE_LINK;
 import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_KAKAO_LINK;
@@ -26,6 +28,7 @@ import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCC
 import static com.gnimty.communityapiserver.global.constant.ResponseMessage.SUCCESS_WITHDRAWAL;
 import static org.springframework.http.HttpStatus.ACCEPTED;
 import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.ResponseCookie.from;
 
 import com.gnimty.communityapiserver.domain.chat.service.StompService;
 import com.gnimty.communityapiserver.domain.chat.service.UserService;
@@ -56,9 +59,11 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseCookie;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -183,8 +188,9 @@ public class MemberController {
 	@Operation(summary = LOGOUT, description = ApiDescription.LOGOUT)
 	@Parameter(in = ParameterIn.COOKIE, name = "accessToken", description = "인증을 위한 Access Token", required = true)
 	@DeleteMapping("/me/logout")
-	public CommonResponse<Void> logout() {
+	public CommonResponse<Void> logout(HttpServletResponse response) {
 		memberService.logout();
+		expireCookie(response);
 		return CommonResponse.success(SUCCESS_LOGOUT, OK);
 	}
 
@@ -216,5 +222,26 @@ public class MemberController {
 			.upCount(memberReadService.findUpCountByPuuid(puuid))
 			.build()
 		);
+	}
+
+	private void expireCookie(HttpServletResponse response) {
+		ResponseCookie accessTokenCookie = from(SUBJECT_ACCESS_TOKEN.getContent(), null)
+			.path("/")
+			.sameSite("Strict")
+			.httpOnly(true)
+			.secure(true)
+			.maxAge(0)
+			.build();
+
+		ResponseCookie refreshTokenCookie = from(SUBJECT_REFRESH_TOKEN.getContent(), null)
+			.path("/")
+			.sameSite("Strict")
+			.httpOnly(true)
+			.secure(true)
+			.maxAge(0)
+			.build();
+
+		response.addHeader("Set-Cookie", accessTokenCookie.toString());
+		response.addHeader("Set-Cookie", refreshTokenCookie.toString());
 	}
 }
