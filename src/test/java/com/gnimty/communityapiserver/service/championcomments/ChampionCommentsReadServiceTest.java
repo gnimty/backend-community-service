@@ -12,11 +12,13 @@ import com.gnimty.communityapiserver.domain.championcomments.service.dto.respons
 import com.gnimty.communityapiserver.domain.championcommentslike.entity.ChampionCommentsLike;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
+import com.gnimty.communityapiserver.domain.riotaccount.service.utils.ChampionInfoUtil;
 import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
 import com.gnimty.communityapiserver.global.constant.CommentsType;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.service.ServiceTestSupport;
+import java.util.HashSet;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,6 +30,13 @@ public class ChampionCommentsReadServiceTest extends ServiceTestSupport {
 
 	@Autowired
 	private ChampionCommentsReadService championCommentsReadService;
+	private final long championId1 = 1;
+	private final long championId2 = 2;
+
+	@BeforeEach
+	void setUp() {
+		ChampionInfoUtil.CHAMPION_IDS = new HashSet<>(List.of(1L, 2L));
+	}
 
 	@DisplayName("id로 단건 조회 시")
 	@Nested
@@ -94,10 +103,10 @@ public class ChampionCommentsReadServiceTest extends ServiceTestSupport {
 		@Test
 		void should_readSelectedChampionId_when_read() {
 			ChampionComments championComments = championCommentsRepository.save(
-				createChampionCommentsByChampionId(1L, member1));
-			championCommentsRepository.save(createChampionCommentsByChampionId(2L, member1));
+				createChampionCommentsByChampionId(championId1, member1));
+			championCommentsRepository.save(createChampionCommentsByChampionId(championId2, member1));
 
-			ChampionCommentsServiceResponse response = championCommentsReadService.findByChampionId(1L);
+			ChampionCommentsServiceResponse response = championCommentsReadService.findByChampionId(championId1);
 
 			assertThat(response.getChampionComments()).hasSize(1);
 			assertThat(response.getChampionComments().get(0).getId()).isEqualTo(championComments.getId());
@@ -111,10 +120,10 @@ public class ChampionCommentsReadServiceTest extends ServiceTestSupport {
 				.blocked(member2)
 				.memo("memo")
 				.build());
-			championCommentsRepository.save(createChampionCommentsByChampionId(1L, member1));
-			championCommentsRepository.save(createChampionCommentsByChampionId(1L, member2));
+			championCommentsRepository.save(createChampionCommentsByChampionId(championId1, member1));
+			championCommentsRepository.save(createChampionCommentsByChampionId(championId1, member2));
 
-			ChampionCommentsServiceResponse response = championCommentsReadService.findByChampionId(1L);
+			ChampionCommentsServiceResponse response = championCommentsReadService.findByChampionId(championId1);
 
 			assertThat(response.getChampionComments()).hasSize(2);
 			ChampionCommentsEntry blocked = response.getChampionComments().stream()
@@ -135,7 +144,7 @@ public class ChampionCommentsReadServiceTest extends ServiceTestSupport {
 				createChampionCommentsByUpAndDownCount(1L, 0L)
 			));
 
-			ChampionCommentsServiceResponse response = championCommentsReadService.findByChampionId(1L);
+			ChampionCommentsServiceResponse response = championCommentsReadService.findByChampionId(championId1);
 			assertThat(response.getChampionComments().get(0).getId()).isEqualTo(championCommentsList.get(0).getId());
 			assertThat(response.getChampionComments().get(1).getId()).isEqualTo(championCommentsList.get(1).getId());
 			assertThat(response.getChampionComments().get(2).getId()).isEqualTo(championCommentsList.get(2).getId());
@@ -147,8 +156,8 @@ public class ChampionCommentsReadServiceTest extends ServiceTestSupport {
 		@Test
 		void should_likeOrNotIsTrue_when_commentsLiked() {
 			ChampionComments championComments = championCommentsRepository.save(
-				createChampionCommentsByChampionId(1L, member2));
-			championCommentsRepository.save(createChampionCommentsByChampionId(1L, member2));
+				createChampionCommentsByChampionId(championId1, member2));
+			championCommentsRepository.save(createChampionCommentsByChampionId(championId1, member2));
 			championCommentsLikeRepository.save(ChampionCommentsLike.builder()
 				.member(member1)
 				.likeOrNot(true)

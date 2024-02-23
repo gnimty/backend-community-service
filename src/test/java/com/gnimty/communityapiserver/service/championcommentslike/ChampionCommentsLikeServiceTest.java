@@ -12,10 +12,12 @@ import com.gnimty.communityapiserver.domain.championcommentslike.service.Champio
 import com.gnimty.communityapiserver.domain.championcommentslike.service.dto.request.ChampionCommentsLikeServiceRequest;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
+import com.gnimty.communityapiserver.domain.riotaccount.service.utils.ChampionInfoUtil;
 import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
 import com.gnimty.communityapiserver.global.constant.Status;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.service.ServiceTestSupport;
+import java.util.HashSet;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,6 +31,12 @@ public class ChampionCommentsLikeServiceTest extends ServiceTestSupport {
 
 	@Autowired
 	private ChampionCommentsLikeService championCommentsLikeService;
+	private final long championId1 = 1;
+
+	@BeforeEach
+	void setUp() {
+		ChampionInfoUtil.CHAMPION_IDS = new HashSet<>(List.of(1L));
+	}
 
 	@DisplayName("챔피언 운용법 좋아요/싫어요 또는 취소 시")
 	@Nested
@@ -70,7 +78,7 @@ public class ChampionCommentsLikeServiceTest extends ServiceTestSupport {
 		@Test
 		void should_success_when_like() {
 			ChampionCommentsLikeServiceRequest request = createRequest(true, false);
-			championCommentsLikeService.doChampionCommentsLike(1L, championComments.getId(), request);
+			championCommentsLikeService.doChampionCommentsLike(championId1, championComments.getId(), request);
 
 			List<ChampionCommentsLike> championCommentsLikes = championCommentsLikeRepository.findAll();
 
@@ -85,7 +93,7 @@ public class ChampionCommentsLikeServiceTest extends ServiceTestSupport {
 		@Test
 		void should_success_when_dislike() {
 			ChampionCommentsLikeServiceRequest request = createRequest(false, false);
-			championCommentsLikeService.doChampionCommentsLike(1L, championComments.getId(), request);
+			championCommentsLikeService.doChampionCommentsLike(championId1, championComments.getId(), request);
 
 			List<ChampionCommentsLike> championCommentsLikes = championCommentsLikeRepository.findAll();
 
@@ -100,11 +108,12 @@ public class ChampionCommentsLikeServiceTest extends ServiceTestSupport {
 		@Test
 		void should_fail_when_duplicateLike() {
 			ChampionCommentsLikeServiceRequest request = createRequest(true, false);
-			championCommentsLikeService.doChampionCommentsLike(1L, championComments.getId(), request);
+			championCommentsLikeService.doChampionCommentsLike(championId1, championComments.getId(), request);
 
 			BaseException exception = new BaseException(ALREADY_CHAMPION_COMMENTS_LIKE);
 			assertThatThrownBy(
-				() -> championCommentsLikeService.doChampionCommentsLike(1L, championComments.getId(), request))
+				() -> championCommentsLikeService.doChampionCommentsLike(championId1, championComments.getId(),
+					request))
 				.isInstanceOf(exception.getClass())
 				.hasMessage(exception.getMessage());
 		}
@@ -113,11 +122,12 @@ public class ChampionCommentsLikeServiceTest extends ServiceTestSupport {
 		@Test
 		void should_fail_when_duplicateDislike() {
 			ChampionCommentsLikeServiceRequest request = createRequest(false, false);
-			championCommentsLikeService.doChampionCommentsLike(1L, championComments.getId(), request);
+			championCommentsLikeService.doChampionCommentsLike(championId1, championComments.getId(), request);
 
 			BaseException exception = new BaseException(ALREADY_CHAMPION_COMMENTS_LIKE);
 			assertThatThrownBy(
-				() -> championCommentsLikeService.doChampionCommentsLike(1L, championComments.getId(), request))
+				() -> championCommentsLikeService.doChampionCommentsLike(championId1, championComments.getId(),
+					request))
 				.isInstanceOf(exception.getClass())
 				.hasMessage(exception.getMessage());
 		}
@@ -126,10 +136,10 @@ public class ChampionCommentsLikeServiceTest extends ServiceTestSupport {
 		@Test
 		void should_success_when_cancelLike() {
 			ChampionCommentsLikeServiceRequest request = createRequest(true, false);
-			championCommentsLikeService.doChampionCommentsLike(1L, championComments.getId(), request);
+			championCommentsLikeService.doChampionCommentsLike(championId1, championComments.getId(), request);
 
 			ChampionCommentsLikeServiceRequest request2 = createRequest(true, true);
-			championCommentsLikeService.doChampionCommentsLike(1L, championComments.getId(), request2);
+			championCommentsLikeService.doChampionCommentsLike(championId1, championComments.getId(), request2);
 
 			assertThat(championCommentsLikeRepository.findAll()).isEmpty();
 		}
@@ -138,10 +148,10 @@ public class ChampionCommentsLikeServiceTest extends ServiceTestSupport {
 		@Test
 		void should_success_when_cancelDislike() {
 			ChampionCommentsLikeServiceRequest request = createRequest(false, false);
-			championCommentsLikeService.doChampionCommentsLike(1L, championComments.getId(), request);
+			championCommentsLikeService.doChampionCommentsLike(championId1, championComments.getId(), request);
 
 			ChampionCommentsLikeServiceRequest request2 = createRequest(false, true);
-			championCommentsLikeService.doChampionCommentsLike(1L, championComments.getId(), request2);
+			championCommentsLikeService.doChampionCommentsLike(championId1, championComments.getId(), request2);
 
 			assertThat(championCommentsLikeRepository.findAll()).isEmpty();
 		}
@@ -153,7 +163,8 @@ public class ChampionCommentsLikeServiceTest extends ServiceTestSupport {
 
 			BaseException exception = new BaseException(CHAMPION_COMMENTS_LIKE_NOT_FOUND);
 			assertThatThrownBy(
-				() -> championCommentsLikeService.doChampionCommentsLike(1L, championComments.getId(), request))
+				() -> championCommentsLikeService.doChampionCommentsLike(championId1, championComments.getId(),
+					request))
 				.isInstanceOf(exception.getClass())
 				.hasMessage(exception.getMessage());
 
@@ -166,7 +177,8 @@ public class ChampionCommentsLikeServiceTest extends ServiceTestSupport {
 
 			BaseException exception = new BaseException(CHAMPION_COMMENTS_LIKE_NOT_FOUND);
 			assertThatThrownBy(
-				() -> championCommentsLikeService.doChampionCommentsLike(1L, championComments.getId(), request))
+				() -> championCommentsLikeService.doChampionCommentsLike(championId1, championComments.getId(),
+					request))
 				.isInstanceOf(exception.getClass())
 				.hasMessage(exception.getMessage());
 		}
@@ -176,12 +188,13 @@ public class ChampionCommentsLikeServiceTest extends ServiceTestSupport {
 		@CsvSource({"true,false", "false,true"})
 		void should_fail_when_crossLikeOrNot(Boolean likeOrNot1, Boolean likeOrNot2) {
 			ChampionCommentsLikeServiceRequest request = createRequest(likeOrNot1, false);
-			championCommentsLikeService.doChampionCommentsLike(1L, championComments.getId(), request);
+			championCommentsLikeService.doChampionCommentsLike(championId1, championComments.getId(), request);
 
 			ChampionCommentsLikeServiceRequest request2 = createRequest(likeOrNot2, false);
 			BaseException exception = new BaseException(ALREADY_CHAMPION_COMMENTS_LIKE);
 			assertThatThrownBy(
-				() -> championCommentsLikeService.doChampionCommentsLike(1L, championComments.getId(), request2))
+				() -> championCommentsLikeService.doChampionCommentsLike(championId1, championComments.getId(),
+					request2))
 				.isInstanceOf(exception.getClass())
 				.hasMessage(exception.getMessage());
 
@@ -195,7 +208,8 @@ public class ChampionCommentsLikeServiceTest extends ServiceTestSupport {
 
 			BaseException exception = new BaseException(NOT_LINKED_RSO);
 			assertThatThrownBy(
-				() -> championCommentsLikeService.doChampionCommentsLike(1L, championComments.getId(), request))
+				() -> championCommentsLikeService.doChampionCommentsLike(championId1, championComments.getId(),
+					request))
 				.isInstanceOf(exception.getClass())
 				.hasMessage(exception.getMessage());
 		}

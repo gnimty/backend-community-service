@@ -13,6 +13,7 @@ import com.gnimty.communityapiserver.domain.championcomments.service.ChampionCom
 import com.gnimty.communityapiserver.domain.championcomments.service.dto.request.ChampionCommentsServiceRequest;
 import com.gnimty.communityapiserver.domain.championcomments.service.dto.request.ChampionCommentsUpdateServiceRequest;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
+import com.gnimty.communityapiserver.domain.riotaccount.service.utils.ChampionInfoUtil;
 import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
 import com.gnimty.communityapiserver.global.constant.CommentsType;
 import com.gnimty.communityapiserver.global.constant.Lane;
@@ -22,6 +23,7 @@ import com.gnimty.communityapiserver.global.dto.webclient.VersionInfo;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.utils.WebClientUtil;
 import com.gnimty.communityapiserver.service.ServiceTestSupport;
+import java.util.HashSet;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -34,6 +36,12 @@ public class ChampionCommentsServiceTest extends ServiceTestSupport {
 
 	@Autowired
 	private ChampionCommentsService championCommentsService;
+	private final long championId1 = 1;
+
+	@BeforeEach
+	void setUp() {
+		ChampionInfoUtil.CHAMPION_IDS = new HashSet<>(List.of(1L));
+	}
 
 	@Nested
 	@DisplayName("챔피언 운용법 추가 시")
@@ -64,7 +72,7 @@ public class ChampionCommentsServiceTest extends ServiceTestSupport {
 		void should_willBeParentComments_when_firstComments() {
 			ChampionCommentsServiceRequest request = createRequest(Lane.BOTTOM, 0, null, null);
 
-			championCommentsService.addComments(1L, request);
+			championCommentsService.addComments(championId1, request);
 
 			List<ChampionComments> championCommentsList = championCommentsRepository.findAll();
 			ChampionComments championComments = championCommentsList.get(0);
@@ -87,7 +95,7 @@ public class ChampionCommentsServiceTest extends ServiceTestSupport {
 
 			ChampionCommentsServiceRequest request = createRequest(null, 1, parent.getId(), null);
 
-			championCommentsService.addComments(1L, request);
+			championCommentsService.addComments(championId1, request);
 
 			List<ChampionComments> championCommentsList = championCommentsRepository.findAll();
 			assertThat(championCommentsList).hasSize(2); // 부모 댓글과 자식 댓글 포함
@@ -122,7 +130,7 @@ public class ChampionCommentsServiceTest extends ServiceTestSupport {
 
 			BaseException exception = new BaseException(MEMBER_NOT_FOUND);
 
-			assertThatThrownBy(() -> championCommentsService.addComments(1L, request))
+			assertThatThrownBy(() -> championCommentsService.addComments(championId1, request))
 				.isInstanceOf(exception.getClass())
 				.hasMessage(exception.getMessage());
 		}
@@ -136,7 +144,7 @@ public class ChampionCommentsServiceTest extends ServiceTestSupport {
 
 			BaseException exception = new BaseException(INVALID_CHILD_COMMENTS);
 
-			assertThatThrownBy(() -> championCommentsService.addComments(1L, request))
+			assertThatThrownBy(() -> championCommentsService.addComments(championId1, request))
 				.isInstanceOf(exception.getClass())
 				.hasMessage(exception.getMessage());
 		}
@@ -149,7 +157,7 @@ public class ChampionCommentsServiceTest extends ServiceTestSupport {
 			ChampionCommentsServiceRequest request = createRequest(null, 1, parent.getId(), null);
 			BaseException exception = new BaseException(INVALID_VERSION);
 
-			assertThatThrownBy(() -> championCommentsService.addComments(1L, request))
+			assertThatThrownBy(() -> championCommentsService.addComments(championId1, request))
 				.isInstanceOf(exception.getClass())
 				.hasMessage(exception.getMessage());
 		}
@@ -205,7 +213,7 @@ public class ChampionCommentsServiceTest extends ServiceTestSupport {
 			ChampionCommentsUpdateServiceRequest request = ChampionCommentsUpdateServiceRequest.builder()
 				.contents("newContents")
 				.build();
-			championCommentsService.updateComments(1L, championComments.getId(), request);
+			championCommentsService.updateComments(championId1, championComments.getId(), request);
 
 			assertThat(championComments.getContents()).isEqualTo(request.getContents());
 		}
@@ -225,7 +233,7 @@ public class ChampionCommentsServiceTest extends ServiceTestSupport {
 				.build();
 
 			BaseException exception = new BaseException(NO_PERMISSION);
-			assertThatThrownBy(() -> championCommentsService.updateComments(1L, championComments.getId(), request))
+			assertThatThrownBy(() -> championCommentsService.updateComments(championId1, championComments.getId(), request))
 				.isInstanceOf(exception.getClass())
 				.hasMessage(exception.getMessage());
 		}
@@ -267,7 +275,7 @@ public class ChampionCommentsServiceTest extends ServiceTestSupport {
 		@Test
 		void should_update_when_validRequest() {
 			ChampionComments championComments = championCommentsRepository.save(createChampionComments(member));
-			championCommentsService.deleteComments(1L, championComments.getId());
+			championCommentsService.deleteComments(championId1, championComments.getId());
 
 			assertThat(championComments.getDeleted()).isTrue();
 		}
@@ -284,7 +292,7 @@ public class ChampionCommentsServiceTest extends ServiceTestSupport {
 			ChampionComments championComments = championCommentsRepository.save(createChampionComments(newMember));
 
 			BaseException exception = new BaseException(NO_PERMISSION);
-			assertThatThrownBy(() -> championCommentsService.deleteComments(1L, championComments.getId()))
+			assertThatThrownBy(() -> championCommentsService.deleteComments(championId1, championComments.getId()))
 				.isInstanceOf(exception.getClass())
 				.hasMessage(exception.getMessage());
 		}
