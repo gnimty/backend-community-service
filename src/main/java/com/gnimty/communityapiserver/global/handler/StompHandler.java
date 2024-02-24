@@ -15,19 +15,19 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
 
 @Component
 @RequiredArgsConstructor
 @Order(Ordered.HIGHEST_PRECEDENCE + 99)
 @Slf4j
-public class StompHandler extends HttpSessionHandshakeInterceptor implements ChannelInterceptor {
+public class StompHandler implements ChannelInterceptor {
 
 	private final JwtProvider jwtProvider;
 	private final WebSocketSessionManager webSocketSessionManager;
 
 	@Override
 	public Message<?> preSend(Message<?> message, MessageChannel channel) {
+
 		final StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
 
 		// websocket 연결시 헤더의 jwt token 유효성 검증
@@ -37,6 +37,14 @@ public class StompHandler extends HttpSessionHandshakeInterceptor implements Cha
 
 			Member member = jwtProvider.findMemberByToken(token);
 			webSocketSessionManager.addSession(accessor.getSessionId(), member.getId());
+		}
+
+		else {
+			log.info(StompLog.builder()
+				.command(accessor.getCommand().toString())
+				.destination(accessor.getDestination())
+				.sessionId(accessor.getSessionId())
+				.build().toString());
 		}
 		return message;
 	}
@@ -51,5 +59,4 @@ public class StompHandler extends HttpSessionHandshakeInterceptor implements Cha
 		token = token.substring(0, semicolonIndex);
 		return token;
 	}
-
 }

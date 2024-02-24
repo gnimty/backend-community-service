@@ -70,7 +70,7 @@ spring:
     properties:
       hibernate:
         hbm2ddl:
-          auto: create-drop
+          auto: update
         format_sql: true
     show-sql: true
 
@@ -94,6 +94,11 @@ logging:
           mongodb:
             core:
               MongoTemplate: DEBUG
+        web:
+          socket:
+            config:
+              WebSocketMessageBrokerStats: ERROR
+
 ---
 spring:
   config:

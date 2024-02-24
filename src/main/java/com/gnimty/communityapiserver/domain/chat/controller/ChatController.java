@@ -138,7 +138,6 @@ public class ChatController {
 
 	private boolean isMultipleUser(Long memberId) {
 		int cnt = webSocketSessionManager.getSessionCountByMemberId(memberId);
-		log.info("isMultipleUser.cnt: {}", cnt);
 		return webSocketSessionManager.getSessionCountByMemberId(memberId) > 1;
 	}
 

@@ -14,7 +14,6 @@ public class WebSocketSessionManager {
 	private static Map<String, Long> sessionStore = new ConcurrentHashMap<>();
 
 	public void addSession(String sessionId, Long memberId) {
-		log.info("sessionId: {}  memberId: {}", sessionId, memberId);
 		sessionStore.put(sessionId, memberId);
 	}
 
