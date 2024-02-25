@@ -54,7 +54,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.webjars:stomp-websocket:2.3.3-1'
-    implementation group: 'joda-time', name: 'joda-time', version: '2.3'
 
     //cache
     implementation 'org.springframework.boot:spring-boot-starter-cache'
