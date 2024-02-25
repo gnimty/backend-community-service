@@ -1,5 +1,6 @@
 package com.gnimty.communityapiserver.global.connect;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,8 +21,7 @@ public class WebSocketSessionManager {
 	private static final long ZOMBIE_CHECK_TIME = 24 * 60 * 60 * 1000;
 
 	public void addSession(String sessionId, Long memberId) {
-		long sessionExpireTime = System.currentTimeMillis() + SESSION_TIMEOUT;
-		sessionStore.put(sessionId, new SessionInfo(memberId, sessionExpireTime));
+		sessionStore.put(sessionId, new SessionInfo(memberId, LocalDateTime.now().plusHours(1)));
 	}
 
 	public void deleteSession(String sessionId) {
@@ -40,28 +40,28 @@ public class WebSocketSessionManager {
 
 	@Scheduled(fixedRate = SESSION_TIMEOUT)
 	private void cleanExpiredSessions() {
-		long currentTime = System.currentTimeMillis();
-		sessionStore.entrySet().removeIf(session -> session.getValue().getExpirationTime() < currentTime);
+		sessionStore.values().removeIf(session -> isBeforeNow(session.getExpirationTime()));
 	}
 
-	@Scheduled(fixedRate = ZOMBIE_CHECK_TIME)
+	@Scheduled(fixedRate = 5000)
 	private void log() {
-		long currentTime = System.currentTimeMillis();
-
 		List<SessionInfo> zombieSessions = sessionStore.values().stream()
-			.filter(sessionInfo -> sessionInfo.getExpirationTime() < currentTime)
+			.filter(sessionInfo -> isBeforeNow(sessionInfo.getExpirationTime()))
 			.toList();
 
 		log.info("""
-          
-        [ZombieSession]
-            count: {}
-            Sessions:
-            				{}
-        """
+				  
+				[ZombieSessions]
+				    count: {}
+				    Sessions:
+				    				{}
+				"""
 			, zombieSessions.size(), zombieSessions.stream()
 				.map(Object::toString)
 				.collect(Collectors.joining("\n\t\t\t\t\t\t")));
+	}
 
+	public boolean isBeforeNow(LocalDateTime time) {
+		return time.isAfter(LocalDateTime.now());
 	}
 }
