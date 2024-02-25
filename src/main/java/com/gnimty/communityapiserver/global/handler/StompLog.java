@@ -17,10 +17,11 @@ public class StompLog {
 	@Override
 	public String toString() {
 		return String.format("""
+    
 				chat client:
-				    Command         = %s
-				    Destination     = %s
-				    SessionId       = %s
+				    Command      = %s
+				    Destination  = %s
+				    SessionId    = %s
 				    """,
 			this.command,
 			this.destination,

@@ -111,7 +111,7 @@ public class ChatController {
 	public void onClientConnect(SessionConnectedEvent event) {
 		String sessionId = String.valueOf(event.getMessage().getHeaders().get("simpSessionId"));
 		User user = getUserBySessionId(sessionId);
-		log.info("[Connect] userId: {}", user.getActualUserId());
+		log.info("[Connect] userId: {} ", user.getActualUserId());
 		if (!isMultipleUser(user.getActualUserId())) {
 			stompService.updateConnStatus(user, user.getSelectedStatus(), false);
 			memberService.updateStatus(user.getSelectedStatus(), user.getActualUserId());

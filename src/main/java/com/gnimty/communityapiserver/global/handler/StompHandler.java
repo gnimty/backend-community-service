@@ -49,6 +49,8 @@ public class StompHandler implements ChannelInterceptor {
 		return message;
 	}
 
+
+
 	private String parseTokenByHeader(StompHeaderAccessor accessor) {
 		String token = jwtProvider.extractJwt(accessor);
 		if (token == null) {
