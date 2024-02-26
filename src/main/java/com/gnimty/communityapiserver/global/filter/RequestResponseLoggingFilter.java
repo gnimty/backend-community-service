@@ -2,6 +2,7 @@ package com.gnimty.communityapiserver.global.filter;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -18,11 +19,23 @@ import org.springframework.web.util.ContentCachingResponseWrapper;
 @Component
 public class RequestResponseLoggingFilter extends OncePerRequestFilter {
 
+	public static final String[] BLACK_LIST = {
+		"/community/v3/api-docs",
+		"/community/swagger-ui/index.html",
+		"/community/swagger-ui/swagger-initializer.js",
+		"/community/v3/api-docs/swagger-config",
+	};
+
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 		throws ServletException, IOException {
 		ContentCachingRequestWrapper requestWrapper = new ContentCachingRequestWrapper(request);
 		ContentCachingResponseWrapper responseWrapper = new ContentCachingResponseWrapper(response);
+
+		if (Arrays.stream(BLACK_LIST).anyMatch(uri -> request.getRequestURI().equals(uri))) {
+			filterChain.doFilter(request, response);
+			return;
+		}
 
 		long start = System.currentTimeMillis();
 		filterChain.doFilter(requestWrapper, responseWrapper);
