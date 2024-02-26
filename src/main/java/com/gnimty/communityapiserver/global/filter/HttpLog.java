@@ -32,7 +32,9 @@ public class HttpLog {
 		this.method = requestWrapper.getMethod();
 		this.host = requestWrapper.getRemoteHost();
 		this.requestUri = requestWrapper.getRequestURI();
-		this.requestParam = requestWrapper.getParameterMap().values().toString();
+		this.requestParam = requestWrapper.getParameterMap().entrySet().stream()
+			.map(entry -> entry.getKey() + "=[" + String.join(",", entry.getValue()) + "]")
+			.collect(Collectors.joining(", "));
 		this.requestHeaders = Collections.list(requestWrapper.getHeaderNames()).stream()
 			.map(headerName -> headerName + ": " + requestWrapper.getHeader(headerName))
 			.collect(Collectors.joining(", "));
