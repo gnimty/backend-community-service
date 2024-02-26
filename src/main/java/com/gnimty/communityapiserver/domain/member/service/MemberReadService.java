@@ -6,7 +6,9 @@ import com.gnimty.communityapiserver.domain.member.repository.MemberRepository;
 import com.gnimty.communityapiserver.domain.member.service.dto.response.OtherProfileServiceResponse;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
+import javax.persistence.LockModeType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +32,12 @@ public class MemberReadService {
 	}
 
 	public Member findById(Long id) {
+		return memberRepository.findById(id)
+			.orElseThrow(() -> new BaseException(ErrorCode.MEMBER_NOT_FOUND));
+	}
+
+	@Lock(LockModeType.OPTIMISTIC)
+	public Member findByIdOptimistic(Long id) {
 		return memberRepository.findById(id)
 			.orElseThrow(() -> new BaseException(ErrorCode.MEMBER_NOT_FOUND));
 	}

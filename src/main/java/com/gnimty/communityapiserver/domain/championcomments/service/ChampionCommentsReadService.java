@@ -10,7 +10,9 @@ import com.gnimty.communityapiserver.domain.championcomments.service.dto.respons
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
 import java.util.List;
+import javax.persistence.LockModeType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +25,12 @@ public class ChampionCommentsReadService {
 	private final ChampionCommentsQueryRepository championCommentsQueryRepository;
 
 	public ChampionComments findById(Long id) {
+		return championCommentsRepository.findById(id)
+			.orElseThrow(() -> new BaseException(ErrorCode.CHAMPION_COMMENTS_NOT_FOUND));
+	}
+
+	@Lock(LockModeType.OPTIMISTIC)
+	public ChampionComments findByIdOptimistic(Long id) {
 		return championCommentsRepository.findById(id)
 			.orElseThrow(() -> new BaseException(ErrorCode.CHAMPION_COMMENTS_NOT_FOUND));
 	}

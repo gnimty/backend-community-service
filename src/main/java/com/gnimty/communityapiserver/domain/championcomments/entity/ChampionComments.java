@@ -16,6 +16,7 @@ import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -83,6 +84,9 @@ public class ChampionComments extends BaseEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "parent_champion_comments_id")
 	private ChampionComments parentChampionComments;
+
+	@Version
+	private Long lockVersion;
 
 	@Builder
 	public ChampionComments(

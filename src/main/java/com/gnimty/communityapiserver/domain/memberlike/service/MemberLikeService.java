@@ -5,6 +5,7 @@ import com.gnimty.communityapiserver.domain.member.service.MemberReadService;
 import com.gnimty.communityapiserver.domain.memberlike.entity.MemberLike;
 import com.gnimty.communityapiserver.domain.memberlike.repository.MemberLikeRepository;
 import com.gnimty.communityapiserver.domain.memberlike.service.dto.request.MemberLikeServiceRequest;
+import com.gnimty.communityapiserver.global.aop.Retry;
 import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
 import com.gnimty.communityapiserver.global.exception.BaseException;
 import com.gnimty.communityapiserver.global.exception.ErrorCode;
@@ -22,9 +23,10 @@ public class MemberLikeService {
 	private final MemberLikeReadService memberLikeReadService;
 	private final MemberReadService memberReadService;
 
+	@Retry
 	public void doMemberLike(MemberLikeServiceRequest request) {
 		Member source = MemberThreadLocal.get();
-		Member target = memberReadService.findById(request.getTargetMemberId());
+		Member target = memberReadService.findByIdOptimistic(request.getTargetMemberId());
 
 		if (request.getCancel()) {
 			cancelMemberLike(source, target);

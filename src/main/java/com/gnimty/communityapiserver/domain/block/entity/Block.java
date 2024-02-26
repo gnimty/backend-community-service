@@ -12,6 +12,7 @@ import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,6 +23,9 @@ import lombok.NoArgsConstructor;
 	name = "block",
 	indexes = {
 		@Index(name = "blocker_id_blocked_id_idx", columnList = "blocker_id, blocked_id")
+	},
+	uniqueConstraints = {
+		@UniqueConstraint(name = "blocker_id_blocked_id_unique_constraints", columnNames = {"blocker_id", "blocked_id"})
 	}
 )
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
