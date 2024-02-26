@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class WebSocketSessionManager {
 
-	private static Map<String, SessionInfo> sessionStore = new ConcurrentHashMap<>();
+	private static final Map<String, SessionInfo> sessionStore = new ConcurrentHashMap<>();
 
 	private static final long SESSION_TIMEOUT = 60 * 60 * 1000;
 	private static final long ZOMBIE_CHECK_TIME = 24 * 60 * 60 * 1000;
@@ -34,7 +34,7 @@ public class WebSocketSessionManager {
 
 	public int getSessionCountByMemberId(Long memberId) {
 		return (int) sessionStore.values().stream()
-			.filter(memberId::equals)
+			.filter(value -> value.getMemberId().equals(memberId))
 			.count();
 	}
 
@@ -43,7 +43,7 @@ public class WebSocketSessionManager {
 		sessionStore.values().removeIf(session -> isBeforeNow(session.getExpirationTime()));
 	}
 
-	@Scheduled(fixedRate = 5000)
+	@Scheduled(fixedRate = ZOMBIE_CHECK_TIME)
 	private void log() {
 		List<SessionInfo> zombieSessions = sessionStore.values().stream()
 			.filter(sessionInfo -> isBeforeNow(sessionInfo.getExpirationTime()))
