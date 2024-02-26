@@ -38,7 +38,7 @@ spring:
           timeout: 10000
           starttls:
             enable: true
-        debug: true
+        debug: false
         transport:
           protocol: smtp
 
@@ -94,6 +94,11 @@ logging:
           mongodb:
             core:
               MongoTemplate: DEBUG
+        web:
+          socket:
+            config:
+              WebSocketMessageBrokerStats: ERROR
+
 ---
 spring:
   config:
