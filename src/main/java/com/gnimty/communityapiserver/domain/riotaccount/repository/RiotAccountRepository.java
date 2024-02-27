@@ -16,7 +16,7 @@ public interface RiotAccountRepository extends JpaRepository<RiotAccount, Long> 
 	Optional<RiotAccount> findByMemberAndIsMain(Member member, Boolean isMain);
 
 	@Query("SELECT ra FROM RiotAccount ra WHERE ra.puuid IN :puuids")
-	List<RiotAccount> findByPuuids(List<String> puuids);
+	List<RiotAccount> findByPuuids(@Param("puuids") List<String> puuids);
 
 	Optional<RiotAccount> findByPuuid(String puuid);
 

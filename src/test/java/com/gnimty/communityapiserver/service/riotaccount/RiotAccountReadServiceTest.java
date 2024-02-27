@@ -460,10 +460,10 @@ public class RiotAccountReadServiceTest extends ServiceTestSupport {
 				.duoable(true)
 				.timeMatch(true)
 				.sortBy(sortBy)
-				.lastSummonerId(0L)
+				.lastSummonerId(null)
 				.lastName(lastName)
 				.lastSummonerMmr(lastSummonerMmr)
-				.lastSummonerUpCount(0L)
+				.lastSummonerUpCount(null)
 				.pageSize(100)
 				.build();
 		}

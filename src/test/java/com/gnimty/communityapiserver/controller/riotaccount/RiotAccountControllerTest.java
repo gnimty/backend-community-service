@@ -174,6 +174,7 @@ public class RiotAccountControllerTest extends ControllerTestSupport {
 					.param("gameMode", String.valueOf(GameMode.RANK_SOLO))
 					.param("status", String.valueOf(Status.ONLINE))
 					.param("sortBy", sortBy.name())
+					.param("lastSummonerId", "1")
 					.param("pageSize", "10"))
 				.andExpectAll(
 					status().isBadRequest(),
