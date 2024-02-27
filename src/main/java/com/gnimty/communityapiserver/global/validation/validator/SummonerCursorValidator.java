@@ -14,6 +14,7 @@ public class SummonerCursorValidator implements ConstraintValidator<ValidateCurs
 	private String lastName;
 	private String lastSummonerMmr;
 	private String lastSummonerUpCount;
+	private String lastSummonerId;
 
 	@Override
 	public void initialize(ValidateCursor constraintAnnotation) {
@@ -21,6 +22,7 @@ public class SummonerCursorValidator implements ConstraintValidator<ValidateCurs
 		lastName = constraintAnnotation.lastName();
 		lastSummonerMmr = constraintAnnotation.lastSummonerMmr();
 		lastSummonerUpCount = constraintAnnotation.lastSummonerUpCount();
+		lastSummonerId = constraintAnnotation.lastSummonerId();
 	}
 
 	@Override
@@ -29,17 +31,18 @@ public class SummonerCursorValidator implements ConstraintValidator<ValidateCurs
 		String lastNameField = getObjectValue(value, lastName, String.class);
 		Long lastSummonerMmrField = getObjectValue(value, lastSummonerMmr, Long.class);
 		Long lastSummonerUpCountField = getObjectValue(value, lastSummonerUpCount, Long.class);
+		Long lastSummonerIdField = getObjectValue(value, lastSummonerId, Long.class);
 
 		if (sortByField == null) {
 			throw new BaseException(ErrorCode.CONSTRAINT_VIOLATION);
 		}
 		if (sortByField.equals(SortBy.ATOZ)) {
-			return lastNameField != null;
+			return isAllNullOrNotAllNull(lastNameField, lastSummonerIdField);
 		}
 		if (sortByField.equals(SortBy.TIER)) {
-			return lastSummonerMmrField != null;
+			return isAllNullOrNotAllNull(lastSummonerMmrField, lastSummonerIdField);
 		}
-		return lastSummonerUpCountField != null;
+		return isAllNullOrNotAllNull(lastSummonerUpCountField, lastSummonerIdField);
 	}
 
 	private <T> T getObjectValue(Object object, String fieldName, Class<T> type) {
@@ -59,5 +62,9 @@ public class SummonerCursorValidator implements ConstraintValidator<ValidateCurs
 		} catch (NoSuchFieldException | IllegalAccessException e) {
 			throw new BaseException(ErrorCode.CONSTRAINT_VIOLATION);
 		}
+	}
+
+	private boolean isAllNullOrNotAllNull(Object first, Object second) {
+		return (first == null) == (second == null);
 	}
 }
