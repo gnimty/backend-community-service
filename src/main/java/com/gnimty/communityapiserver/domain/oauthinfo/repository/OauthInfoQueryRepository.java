@@ -18,8 +18,7 @@ public class OauthInfoQueryRepository {
 		return queryFactory
 			.selectOne()
 			.from(oauthInfo)
-			.where(oauthInfo.email.eq(email)
-				.and(oauthInfo.provider.eq(provider)))
+			.where(oauthInfo.email.eq(email), oauthInfo.provider.eq(provider))
 			.fetchFirst() != null;
 	}
 
@@ -27,8 +26,7 @@ public class OauthInfoQueryRepository {
 		return queryFactory
 			.selectOne()
 			.from(oauthInfo)
-			.where(oauthInfo.member.id.eq(member.getId())
-				.and(oauthInfo.provider.eq(provider)))
+			.where(oauthInfo.member.id.eq(member.getId()), oauthInfo.provider.eq(provider))
 			.fetchFirst() != null;
 	}
 }

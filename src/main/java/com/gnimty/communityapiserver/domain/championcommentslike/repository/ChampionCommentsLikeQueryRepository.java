@@ -18,8 +18,8 @@ public class ChampionCommentsLikeQueryRepository {
 		return queryFactory
 			.selectOne()
 			.from(championCommentsLike)
-			.where(championCommentsLike.member.id.eq(member.getId())
-				.and(championCommentsLike.championComments.id.eq(championComments.getId())))
+			.where(championCommentsLike.member.id.eq(member.getId()),
+				championCommentsLike.championComments.id.eq(championComments.getId()))
 			.fetchFirst() != null;
 	}
 }

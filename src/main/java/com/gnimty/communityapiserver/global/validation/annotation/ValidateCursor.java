@@ -27,4 +27,5 @@ public @interface ValidateCursor {
 	String lastSummonerMmr();
 
 	String lastSummonerUpCount();
+	String lastSummonerId();
 }

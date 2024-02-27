@@ -273,14 +273,22 @@ public class ApiDescription {
 		해당 API는 cursor base paging이 적용되어 있으므로, 아래와 같은 검증 과정을 거치게 됩니다.
 		   
 		- sortBy는 정렬 조건으로, null일 수 없습니다.
+
+		- lastSummonerId와, sortBy에 해당하는 정렬 조건 필드는 모두 null이거나, 모두 null이 아니어야 합니다.
+				
+		- lastSummonerId와, sortBy에 해당하는 정렬 조건 필드 모두 null인 경우: 최초 페이지 요청 시(0번 페이지)
+		
+		- 이외의 경우: n번 페이지
+				
+		예를들어,
+
+		- sortBy가 ATOZ(이름순)일 경우, (lastSummonerId == null && lastName == null) 또는, (lastSummonerId != null && lastName != null)
 					
-		- lastSummonerId는 기본 커서 정렬 조건으로, null일 수 없습니다. 만약 최초 조회 시 0으로 요청해야 합니다.
-		   
-		- sortBy가 ATOZ(이름순)일 경우, lastName은 null일 수 없습니다.
+		- sortBy가 RECOMMEND(추천순)일 경우, (lastSummonerId == null && lastSummonerUpCount == null) 또는, (lastSummonerId != null && lastSummonerUpCount != null)
 					
-		- sortBy가 RECOMMENDED(추천순)일 경우, lastSummonerUpCount는 null일 수 없습니다.
-					
-		- sortBy가 TIER(티어순)일 경우, lastSummonerMmr은 null일 수 없습니다.
+		- sortBy가 TIER(티어순)일 경우, (lastSummonerId == null && lastSummonerMmr == null) 또는, (lastSummonerId != null && lastSummonerMmr != null)
+				
+		이어야 합니다.
 		""";
 	public static final String GET_MAIN_SUMMONERS = """
 		@GameMode 에 해당하는 소환사들의 목록을 조회하는 API 입니다.

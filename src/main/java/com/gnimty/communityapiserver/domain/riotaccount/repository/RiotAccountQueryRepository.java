@@ -76,20 +76,20 @@ public class RiotAccountQueryRepository {
 			.leftJoin(preferGameMode).on(preferGameMode.member.eq(member))
 			.leftJoin(introduction).on(introduction.member.eq(member))
 			.leftJoin(schedule).on(schedule.member.eq(member))
-			.where(
-				cursorGt(request)
-					.and(isMainRiotAccount())
-					.and(excludeMasterGoe())
-					.and(gameModeEq(request.getGameMode()))
-					.and(tierGoe(request.getLastSummonerMmr()))
-					.and(memberStatusEq(request.getStatus()))
-					.and(laneEq(request.getLanes()))
-					.and(frequentChampionIdEq(request.getPreferChampionIds()))
-					.and(duoable(mainRiotAccount.getQueue(), mainRiotAccount.getDivision(),
-						request.getDuoable(), request.getGameMode()))
-					.and(timeMatch(schedules, request.getTimeMatch()))
-					.and(riotAccount.member.id.ne(me.getId())))
+			.where(cursorGt(request),
+				isMainRiotAccount(),
+				excludeMasterGoe(),
+				gameModeEq(request.getGameMode()),
+				tierGoe(getMmrByTier(request.getTier())),
+				memberStatusEq(request.getStatus()),
+				laneEq(request.getLanes()),
+				frequentChampionIdEq(request.getPreferChampionIds()),
+				duoable(mainRiotAccount.getQueue(), mainRiotAccount.getDivision(),
+					request.getDuoable(), request.getGameMode()),
+				timeMatch(schedules, request.getTimeMatch()),
+				riotAccount.member.id.ne(me.getId()))
 			.orderBy(orderSpecifier)
+			.distinct()
 			.limit(pageable.getPageSize());
 
 		List<RecommendedSummonersEntry> fetch = query.fetch();
@@ -109,10 +109,9 @@ public class RiotAccountQueryRepository {
 			.leftJoin(preferGameMode).on(preferGameMode.member.eq(member))
 			.leftJoin(introduction).on(introduction.member.eq(member))
 			.leftJoin(schedule).on(schedule.member.eq(member))
-			.where(
-				memberStatusEq(Status.ONLINE)
-					.and(gameModeEq(gameMode))
-					.and(memberNotEq(me)));
+			.where(memberStatusEq(Status.ONLINE),
+				gameModeEq(gameMode),
+				memberNotEq(me));
 
 		if (me == null || !existsByMember(me)) {
 			return notLinkedSummonersQuery(query);
@@ -314,16 +313,25 @@ public class RiotAccountQueryRepository {
 			return riotAccount.id.gt(request.getLastSummonerId());
 		}
 		if (sortBy.equals(SortBy.ATOZ)) {
+			if (request.getLastName() == null || request.getLastSummonerId() == null) {
+				return null;
+			}
 			return riotAccount.name.toLowerCase().trim().goe(request.getLastName().toLowerCase().trim())
 				.and(riotAccount.name.toLowerCase().trim().gt(request.getLastName().toLowerCase().trim())
 					.or(riotAccount.id.gt(request.getLastSummonerId())));
 		} else if (sortBy.equals(SortBy.TIER)) {
-			return riotAccount.mmr.goe(request.getLastSummonerMmr())
-				.and(riotAccount.mmr.gt(request.getLastSummonerMmr())
+			if (request.getLastSummonerMmr() == null || request.getLastSummonerId() == null) {
+				return null;
+			}
+			return riotAccount.mmr.loe(request.getLastSummonerMmr())
+				.and(riotAccount.mmr.lt(request.getLastSummonerMmr())
 					.or(riotAccount.id.gt(request.getLastSummonerId())));
 		}
-		return member.upCount.goe(request.getLastSummonerUpCount())
-			.and(member.upCount.gt(request.getLastSummonerUpCount())
+		if (request.getLastSummonerUpCount() == null || request.getLastSummonerId() == null) {
+			return null;
+		}
+		return member.upCount.loe(request.getLastSummonerUpCount())
+			.and(member.upCount.lt(request.getLastSummonerUpCount())
 				.or(riotAccount.id.gt(request.getLastSummonerId())));
 	}
 
@@ -365,6 +373,9 @@ public class RiotAccountQueryRepository {
 	}
 
 	private Long getMmrByTier(Tier tier) {
+		if (tier == null) {
+			return null;
+		}
 		if (tier.getWeight() >= Tier.master.getWeight()) {
 			return MASTER_WEIGHT;
 		}

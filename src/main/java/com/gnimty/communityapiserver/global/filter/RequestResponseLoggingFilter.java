@@ -20,10 +20,8 @@ import org.springframework.web.util.ContentCachingResponseWrapper;
 public class RequestResponseLoggingFilter extends OncePerRequestFilter {
 
 	public static final String[] BLACK_LIST = {
-		"/community/v3/api-docs",
-		"/community/swagger-ui/index.html",
-		"/community/swagger-ui/swagger-initializer.js",
-		"/community/v3/api-docs/swagger-config",
+		"swagger",
+		"api-docs"
 	};
 
 	@Override
@@ -32,7 +30,7 @@ public class RequestResponseLoggingFilter extends OncePerRequestFilter {
 		ContentCachingRequestWrapper requestWrapper = new ContentCachingRequestWrapper(request);
 		ContentCachingResponseWrapper responseWrapper = new ContentCachingResponseWrapper(response);
 
-		if (Arrays.stream(BLACK_LIST).anyMatch(uri -> request.getRequestURI().equals(uri))) {
+		if (Arrays.stream(BLACK_LIST).anyMatch(blackList -> request.getRequestURI().contains(blackList))) {
 			filterChain.doFilter(request, response);
 			return;
 		}

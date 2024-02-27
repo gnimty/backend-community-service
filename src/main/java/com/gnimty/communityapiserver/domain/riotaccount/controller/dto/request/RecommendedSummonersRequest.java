@@ -19,7 +19,7 @@ import lombok.Getter;
 @Getter
 @Builder
 @ValidateCursor(sortBy = "sortBy", lastName = "lastName",
-	lastSummonerMmr = "lastSummonerMmr", lastSummonerUpCount = "lastSummonerUpCount")
+	lastSummonerMmr = "lastSummonerMmr", lastSummonerUpCount = "lastSummonerUpCount", lastSummonerId = "lastSummonerId")
 @AllArgsConstructor
 public class RecommendedSummonersRequest {
 
@@ -45,7 +45,7 @@ public class RecommendedSummonersRequest {
 	@Schema(example = "true", description = "선호 플레이 시간 겹치는 소환사만 조회 여부")
 	private Boolean timeMatch;
 	@Schema(example = "1", description = "최근 조회한 소환사 중, 마지막 소환사의 id. 최초 조회라면 0. not null")
-	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
+//	@NotNull(message = ErrorMessage.INVALID_INPUT_VALUE)
 	private Long lastSummonerId;
 	@Schema(example = "name", description = "최근 조회한 소환사 중, 마지막 소환사의 name")
 	private String lastName;
@@ -68,9 +68,9 @@ public class RecommendedSummonersRequest {
 			.sortBy(sortBy)
 			.timeMatch(timeMatch)
 			.lastSummonerId(lastSummonerId)
-			.lastName(lastName == null ? "A" : lastName)
-			.lastSummonerMmr(lastSummonerMmr == null ? 0L : lastSummonerMmr)
-			.lastSummonerUpCount(lastSummonerUpCount == null ? 0L : lastSummonerUpCount)
+			.lastName(lastName)
+			.lastSummonerMmr(lastSummonerMmr)
+			.lastSummonerUpCount(lastSummonerUpCount)
 			.pageSize(pageSize)
 			.build();
 	}
