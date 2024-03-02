@@ -269,7 +269,7 @@ public class MemberService {
 
 	public void withdrawal() {
 		Member member = MemberThreadLocal.get();
-		withdrawalService.withDrawal(member.getId());
+		withdrawalService.withdrawal(member.getId());
 		cacheService.evict(REFRESH_TOKEN, getCacheKey(REFRESH, member.getId().toString()));
 	}
 
