@@ -197,10 +197,11 @@ public class MemberController {
 	@Operation(summary = WITHDRAWAL, description = ApiDescription.WITHDRAWAL)
 	@Parameter(in = ParameterIn.COOKIE, name = "accessToken", description = "인증을 위한 Access Token", required = true)
 	@DeleteMapping("/me")
-	public CommonResponse<Void> withdrawal() {
+	public CommonResponse<Void> withdrawal(HttpServletResponse response) {
 		Member member = MemberThreadLocal.get();
 		memberService.withdrawal();
 		stompService.withdrawal(member.getId());
+		expireCookie(response);
 		return CommonResponse.success(SUCCESS_WITHDRAWAL, OK);
 	}
 
