@@ -48,7 +48,7 @@ public class RiotAccountQueryRepository {
 		return queryFactory
 			.selectOne()
 			.from(riotAccount)
-			.where(riotAccount.puuid.eq(puuid))
+			.where(riotAccount.puuid.eq(puuid), riotAccount.deleted.isFalse())
 			.fetchFirst() != null;
 	}
 
@@ -56,7 +56,7 @@ public class RiotAccountQueryRepository {
 		return queryFactory
 			.selectOne()
 			.from(riotAccount)
-			.where(riotAccount.member.id.eq(member.getId()))
+			.where(riotAccount.member.id.eq(member.getId()), riotAccount.deleted.isFalse())
 			.fetchFirst() != null;
 	}
 
@@ -73,9 +73,9 @@ public class RiotAccountQueryRepository {
 				getProjectionBean(request.getGameMode()))
 			.from(riotAccount)
 			.join(riotAccount.member, member)
-			.leftJoin(preferGameMode).on(preferGameMode.member.eq(member))
-			.leftJoin(introduction).on(introduction.member.eq(member))
-			.leftJoin(schedule).on(schedule.member.eq(member))
+			.leftJoin(preferGameMode).on(preferGameMode.member.eq(member), preferGameMode.deleted.isFalse())
+			.leftJoin(introduction).on(introduction.member.eq(member), introduction.deleted.isFalse())
+			.leftJoin(schedule).on(schedule.member.eq(member), schedule.deleted.isFalse())
 			.where(cursorGt(request),
 				isMainRiotAccount(),
 				excludeMasterGoe(),
@@ -106,9 +106,9 @@ public class RiotAccountQueryRepository {
 				getProjectionBean(gameMode))
 			.from(riotAccount)
 			.join(riotAccount.member, member)
-			.leftJoin(preferGameMode).on(preferGameMode.member.eq(member))
-			.leftJoin(introduction).on(introduction.member.eq(member))
-			.leftJoin(schedule).on(schedule.member.eq(member))
+			.leftJoin(preferGameMode).on(preferGameMode.member.eq(member), preferGameMode.deleted.isFalse())
+			.leftJoin(introduction).on(introduction.member.eq(member), introduction.deleted.isFalse())
+			.leftJoin(schedule).on(schedule.member.eq(member), schedule.deleted.isFalse())
 			.where(memberStatusEq(Status.ONLINE),
 				gameModeEq(gameMode),
 				memberNotEq(me));

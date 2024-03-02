@@ -17,7 +17,7 @@ public class BlockQueryRepository {
 		return queryFactory
 			.selectOne()
 			.from(block)
-			.where(block.blocker.id.eq(blocker.getId()), block.blocked.id.eq(blocked.getId()))
+			.where(block.blocker.id.eq(blocker.getId()), block.blocked.id.eq(blocked.getId()), block.deleted.isFalse())
 			.fetchFirst() != null;
 	}
 
@@ -25,7 +25,7 @@ public class BlockQueryRepository {
 		return queryFactory
 			.selectOne()
 			.from(block)
-			.where(block.blocker.id.eq(blockerId), block.blocked.id.eq(blockedId))
+			.where(block.blocker.id.eq(blockerId), block.blocked.id.eq(blockedId), block.deleted.isFalse())
 			.fetchFirst() != null;
 	}
 }

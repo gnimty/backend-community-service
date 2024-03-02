@@ -29,7 +29,7 @@ public class MemberQueryRepository {
 		return queryFactory
 			.selectOne()
 			.from(member)
-			.where(member.email.eq(email))
+			.where(member.email.eq(email), member.deleted.isFalse())
 			.fetchFirst() != null;
 	}
 
@@ -37,25 +37,24 @@ public class MemberQueryRepository {
 		return queryFactory
 			.selectOne()
 			.from(member)
-			.where(member.id.eq(id))
+			.where(member.id.eq(id), member.deleted.isFalse())
 			.fetchFirst() != null;
 	}
 
 	public OtherProfileServiceResponse findOtherById(Long id) {
 		List<Schedule> schedules = queryFactory
 			.selectFrom(schedule)
-			.join(schedule.member, member).on(schedule.member.id.eq(member.id))
+			.join(schedule.member, member).on(schedule.member.id.eq(member.id), schedule.deleted.isFalse())
 			.where(schedule.member.id.eq(id))
 			.fetch();
 		Optional<Introduction> mainIntroduction = Optional.ofNullable(queryFactory
 			.selectFrom(introduction)
-			.join(introduction.member)
-			.where(introduction.member.id.eq(id), isMainIntroduction())
+			.join(introduction.member).on(introduction.member.id.eq(member.id), introduction.deleted.isFalse())
+			.where(isMainIntroduction())
 			.fetchFirst());
 		List<PreferGameMode> preferGameModes = queryFactory
 			.selectFrom(preferGameMode)
-			.join(preferGameMode.member)
-			.where(preferGameMode.member.id.eq(id))
+			.join(preferGameMode.member).on(preferGameMode.member.id.eq(member.id), preferGameMode.deleted.isFalse())
 			.fetch();
 
 		return OtherProfileServiceResponse.builder()
@@ -72,7 +71,7 @@ public class MemberQueryRepository {
 	public Long findUpCountByPuuid(String puuid) {
 		return queryFactory.select(member.upCount)
 			.from(member)
-			.join(riotAccount).on(memberEq())
+			.join(riotAccount).on(memberEq(), riotAccount.deleted.isFalse())
 			.where(puuidEq(puuid))
 			.fetchFirst();
 	}
