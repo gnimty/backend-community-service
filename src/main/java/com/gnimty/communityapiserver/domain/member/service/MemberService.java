@@ -17,7 +17,6 @@ import static com.gnimty.communityapiserver.global.constant.KeyPrefix.REFRESH;
 import static com.gnimty.communityapiserver.global.constant.KeyPrefix.UPDATE_PASSWORD;
 import static com.gnimty.communityapiserver.global.utils.CacheService.getCacheKey;
 
-import com.gnimty.communityapiserver.domain.block.repository.BlockRepository;
 import com.gnimty.communityapiserver.domain.introduction.entity.Introduction;
 import com.gnimty.communityapiserver.domain.introduction.repository.IntroductionRepository;
 import com.gnimty.communityapiserver.domain.introduction.service.IntroductionReadService;
@@ -41,9 +40,6 @@ import com.gnimty.communityapiserver.domain.member.service.utils.GoogleOauthUtil
 import com.gnimty.communityapiserver.domain.member.service.utils.KakaoOauthUtil;
 import com.gnimty.communityapiserver.domain.member.service.utils.MailSenderUtil;
 import com.gnimty.communityapiserver.domain.member.service.utils.RiotOauthUtil;
-import com.gnimty.communityapiserver.domain.memberlike.entity.MemberLike;
-import com.gnimty.communityapiserver.domain.memberlike.repository.MemberLikeRepository;
-import com.gnimty.communityapiserver.domain.memberlike.service.MemberLikeReadService;
 import com.gnimty.communityapiserver.domain.oauthinfo.entity.OauthInfo;
 import com.gnimty.communityapiserver.domain.oauthinfo.repository.OauthInfoRepository;
 import com.gnimty.communityapiserver.domain.oauthinfo.service.OauthInfoReadService;
@@ -98,13 +94,11 @@ public class MemberService {
 	private final PasswordEncoder passwordEncoder;
 	private final PreferGameModeRepository preferGameModeRepository;
 	private final MemberReadService memberReadService;
-	private final MemberLikeRepository memberLikeRepository;
-	private final MemberLikeReadService memberLikeReadService;
-	private final BlockRepository blockRepository;
 	private final ScheduleRepository scheduleRepository;
 	private final MailSenderUtil mailSenderUtil;
 	private final ApplicationEventPublisher eventPublisher;
 	private final CacheService cacheService;
+	private final WithdrawalService withdrawalService;
 
 	@Transactional
 	public RiotAccount summonerAccountLink(OauthLoginServiceRequest request) {
@@ -275,18 +269,8 @@ public class MemberService {
 
 	public void withdrawal() {
 		Member member = MemberThreadLocal.get();
-		List<MemberLike> targets = memberLikeReadService.findBySourceMember(member);
-		targets.forEach(
-			memberLike -> memberReadService.findById(memberLike.getTargetMember().getId()).decreaseUpCount());
-		memberLikeRepository.deleteAllFromMember(member.getId());
-		riotAccountRepository.deleteAllFromMember(member.getId());
-		// 챔피언 운용법, 댓글 좋아요
-		oauthInfoRepository.deleteAllFromMember(member.getId());
-		blockRepository.deleteAllFromMember(member.getId());
-		scheduleRepository.deleteAllFromMember(member.getId());
-		preferGameModeRepository.deleteAllFromMember(member.getId());
-		introductionRepository.deleteAllFromMember(member.getId());
-		memberRepository.delete(member);
+		withdrawalService.withDrawal(member.getId());
+		cacheService.evict(REFRESH_TOKEN, getCacheKey(REFRESH, member.getId().toString()));
 	}
 
 	private void insertDefaultQueries(Member member) {
