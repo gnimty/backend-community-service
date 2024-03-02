@@ -94,7 +94,6 @@ public class WithdrawalService {
 	}
 
 	private void memberLikeDelete(Long id, LocalDateTime now) {
-		memberLikeRepository.deleteAllFromMember(id);
 		List<Long> targetIds = memberLikeRepository.findTargetIdsBySourceMemberId(id);
 		targetIds.forEach(targetId -> {
 			int rowsUpdated = 0;
@@ -115,15 +114,16 @@ public class WithdrawalService {
 			entityManager.flush();
 			entityManager.clear();
 		});
+		memberLikeRepository.deleteAllFromMember(id);
 	}
 
 	private void championCommentsLikeDelete(Long id, LocalDateTime now) {
-		championCommentsLikeRepository.deleteAllFromMember(id);
 		List<Long> championCommentsLikeIds = championCommentsLikeRepository.findByMemberIdAndLikeOrNot(id, true);
 		List<Long> championCommentsDislikeIds = championCommentsLikeRepository.findByMemberIdAndLikeOrNot(id, false);
 
 		updateChampionCommentsReaction(now, championCommentsLikeIds, UPDATE_CHAMPION_COMMENTS_LIKE_SQL);
 		updateChampionCommentsReaction(now, championCommentsDislikeIds, UPDATE_CHAMPION_COMMENTS_DISLIKE_SQL);
+		championCommentsLikeRepository.deleteAllFromMember(id);
 	}
 
 	private void updateChampionCommentsReaction(LocalDateTime now, List<Long> championCommentsLikeIds,
