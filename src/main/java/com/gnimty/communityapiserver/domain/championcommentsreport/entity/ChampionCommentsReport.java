@@ -22,6 +22,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Table(
@@ -30,11 +31,12 @@ import lombok.NoArgsConstructor;
 		@Index(name = "member_id_champion_comments_id_idx", columnList = "member_id, champion_comments_id")
 	},
 	uniqueConstraints = {
-		@UniqueConstraint(name = "member_champion_comments_id_unique_constraints", columnNames = {"member_id", "champion_comments_id"})
+		@UniqueConstraint(name = "member_champion_comments_id_unique_constraints", columnNames = {"member_id", "champion_comments_id", "deleted"})
 	}
 )
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Where(clause = "deleted = 0")
 public class ChampionCommentsReport extends BaseEntity {
 
 	@Id

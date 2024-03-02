@@ -22,6 +22,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Table(
@@ -33,6 +34,7 @@ import lombok.NoArgsConstructor;
 )
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Where(clause = "deleted = 0")
 public class RiotAccount extends BaseEntity {
 
 	@Id
@@ -45,7 +47,7 @@ public class RiotAccount extends BaseEntity {
 	private String name;
 
 	@NotNull
-	@Column(name = "internal_tag_name", columnDefinition = "VARCHAR(100)", unique = true)
+	@Column(name = "internal_tag_name", columnDefinition = "VARCHAR(100)")
 	private String internalTagName;
 
 	@NotNull
