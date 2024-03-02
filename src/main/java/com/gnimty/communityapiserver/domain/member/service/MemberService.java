@@ -259,7 +259,7 @@ public class MemberService {
 			throw new BaseException(ErrorCode.NOT_LOGIN_BY_FORM);
 		}
 		OauthInfo oauthInfo = oauthInfoReadService.findByMemberAndProvider(member, provider);
-		oauthInfoRepository.delete(oauthInfo);
+		oauthInfo.delete();
 	}
 
 	public void logout() {

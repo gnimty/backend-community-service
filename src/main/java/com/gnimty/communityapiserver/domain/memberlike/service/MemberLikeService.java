@@ -52,6 +52,6 @@ public class MemberLikeService {
 
 	private void cancelMemberLike(Member source, Member target) {
 		MemberLike memberLike = memberLikeReadService.findBySourceAndTarget(source, target);
-		memberLikeRepository.delete(memberLike);
+		memberLike.delete();
 	}
 }

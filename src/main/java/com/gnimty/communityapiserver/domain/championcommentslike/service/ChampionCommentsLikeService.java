@@ -49,7 +49,7 @@ public class ChampionCommentsLikeService {
 	private void cancelChampionCommentsLike(Member member, ChampionComments championComments) {
 		ChampionCommentsLike championCommentsLike = championCommentsLikeReadService
 			.findByMemberAndChampionComments(member, championComments);
-		championCommentsLikeRepository.delete(championCommentsLike);
+		championCommentsLike.delete();
 	}
 
 	private void championCommentsLike(
