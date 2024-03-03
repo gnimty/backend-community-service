@@ -33,12 +33,9 @@ public class StompHandler implements ChannelInterceptor {
 
 		// websocket 연결시 헤더의 jwt token 유효성 검증
 		if (StompCommand.CONNECT == accessor.getCommand()) {
-			Object memberId1 = accessor.getHeader("memberId");
-			log.info("memberId1: {}", memberId1);
 			Map<String, Object> sessionAttributes = accessor.getSessionAttributes();
-			assert sessionAttributes != null;
-			Long memberId = Long.valueOf((String) sessionAttributes.get("sessionId"));
-			log.info("memberId: {}", memberId);
+			Long memberId = (Long) sessionAttributes.get("memberId");
+			log.info("stomp handler memberId: {}", memberId);
 			webSocketSessionManager.addSession(accessor.getSessionId(), memberId);
 		}
 
@@ -50,16 +47,5 @@ public class StompHandler implements ChannelInterceptor {
 				.build().toString());
 		}
 		return message;
-	}
-
-	private String parseTokenByHeader(StompHeaderAccessor accessor) {
-		String token = jwtProvider.extractJwt(accessor);
-		if (token == null) {
-			throw new BaseException(ErrorCode.COOKIE_NOT_FOUND);
-		}
-		token = token.substring(token.indexOf("accessToken=") + "accessToken=".length());
-		int semicolonIndex = token.indexOf(';') == -1 ? token.length() : token.indexOf(';');
-		token = token.substring(0, semicolonIndex);
-		return token;
 	}
 }
