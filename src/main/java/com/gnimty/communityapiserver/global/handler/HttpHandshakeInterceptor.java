@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
@@ -26,18 +27,19 @@ public class HttpHandshakeInterceptor implements HandshakeInterceptor {
 	@Override
 	public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler,
 		Map<String, Object> attributes) throws Exception {
-		HttpServletRequest httpRequest = (HttpServletRequest) request;
-		Arrays.stream(((HttpServletRequest) request).getCookies())
-			.forEach(cookie -> log.info("cookie: {}, {}", cookie.getName(), cookie.getValue()));
-		Optional<String> tokenByCookie = jwtProvider.resolveToken(httpRequest);
-		if (tokenByCookie.isEmpty()) {
-			return false;
+		if (request instanceof ServletServerHttpRequest httpRequest) {
+			HttpServletRequest servletRequest = httpRequest.getServletRequest();
+			Optional<String> tokenByCookie = jwtProvider.resolveToken(servletRequest);
+			if (tokenByCookie.isEmpty()) {
+				return false;
+			}
+			String token = tokenByCookie.get();
+			jwtProvider.checkValidation(token);
+			Member member = jwtProvider.findMemberByToken(token);
+			webSocketSessionManager.addSession(servletRequest.getSession().getId(), member.getId());
+			Arrays.stream(servletRequest.getCookies())
+				.forEach(cookie -> log.info("cookie: {}, {}", cookie.getName(), cookie.getValue()));
 		}
-
-		String token = tokenByCookie.get();
-		jwtProvider.checkValidation(token);
-		Member member = jwtProvider.findMemberByToken(token);
-		webSocketSessionManager.addSession(httpRequest.getSession().getId(), member.getId());
 		return true;
 	}
 
