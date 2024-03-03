@@ -57,7 +57,7 @@ public class StompHandler implements ChannelInterceptor {
 			throw new BaseException(ErrorCode.COOKIE_NOT_FOUND);
 		}
 		token = token.substring(token.indexOf("accessToken=") + "accessToken=".length());
-		int semicolonIndex = token.indexOf(';');
+		int semicolonIndex = token.indexOf(';') == -1 ? token.length() : token.indexOf(';');
 		token = token.substring(0, semicolonIndex);
 		return token;
 	}
