@@ -29,18 +29,14 @@ public class StompHandler implements ChannelInterceptor {
 	public Message<?> preSend(Message<?> message, MessageChannel channel) {
 
 		final StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
-		message.getHeaders().forEach((key, value) -> log.info("key: {}, value: {}", key, value));
 
 		// websocket 연결시 헤더의 jwt token 유효성 검증
 		if (StompCommand.CONNECT == accessor.getCommand()) {
-			accessor.getMessageHeaders().forEach((key, value) -> log.info("key: {}, value: {}", key, value));
-			log.info("Cookie header: {}", accessor.getHeader("Cookie"));
-			log.info("access token header: {}", accessor.getHeader("accessToken"));
-			String token = parseTokenByHeader(accessor);
-			jwtProvider.checkValidation(token);
-
-			Member member = jwtProvider.findMemberByToken(token);
-			webSocketSessionManager.addSession(accessor.getSessionId(), member.getId());
+//			String token = parseTokenByHeader(accessor);
+//			jwtProvider.checkValidation(token);
+//
+//			Member member = jwtProvider.findMemberByToken(token);
+//			webSocketSessionManager.addSession(accessor.getSessionId(), member.getId());
 		}
 
 		else {
@@ -52,8 +48,6 @@ public class StompHandler implements ChannelInterceptor {
 		}
 		return message;
 	}
-
-
 
 	private String parseTokenByHeader(StompHeaderAccessor accessor) {
 		String token = jwtProvider.extractJwt(accessor);
