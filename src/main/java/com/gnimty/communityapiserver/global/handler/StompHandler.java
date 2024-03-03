@@ -33,6 +33,8 @@ public class StompHandler implements ChannelInterceptor {
 
 		// websocket 연결시 헤더의 jwt token 유효성 검증
 		if (StompCommand.CONNECT == accessor.getCommand()) {
+			Object memberId1 = accessor.getHeader("memberId");
+			log.info("memberId1: {}", memberId1);
 			Map<String, Object> sessionAttributes = accessor.getSessionAttributes();
 			assert sessionAttributes != null;
 			Long memberId = Long.valueOf((String) sessionAttributes.get("sessionId"));

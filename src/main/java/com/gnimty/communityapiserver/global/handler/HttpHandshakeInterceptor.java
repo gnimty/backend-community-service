@@ -36,6 +36,7 @@ public class HttpHandshakeInterceptor implements HandshakeInterceptor {
 			String token = tokenByCookie.get();
 			jwtProvider.checkValidation(token);
 			Member member = jwtProvider.findMemberByToken(token);
+			request.getHeaders().set("memberId", String.valueOf(member.getId()));
 			attributes.put("memberId", member.getId());
 			log.info("log sessionId: {}", servletRequest.getSession().getId());
 			Arrays.stream(servletRequest.getCookies())
