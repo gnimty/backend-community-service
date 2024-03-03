@@ -36,12 +36,8 @@ public class StompHandler implements ChannelInterceptor {
 			Map<String, Object> sessionAttributes = accessor.getSessionAttributes();
 			assert sessionAttributes != null;
 			Long memberId = Long.valueOf((String) sessionAttributes.get("sessionId"));
+			log.info("memberId: {}", memberId);
 			webSocketSessionManager.addSession(accessor.getSessionId(), memberId);
-//			String token = parseTokenByHeader(accessor);
-//			jwtProvider.checkValidation(token);
-//
-//			Member member = jwtProvider.findMemberByToken(token);
-//			webSocketSessionManager.addSession(accessor.getSessionId(), member.getId());
 		}
 
 		else {
