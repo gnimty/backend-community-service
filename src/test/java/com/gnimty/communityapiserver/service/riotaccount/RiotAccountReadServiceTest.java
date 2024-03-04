@@ -301,8 +301,8 @@ public class RiotAccountReadServiceTest extends ServiceTestSupport {
 			List<RecommendedSummonersEntry> response = riotAccountReadService.getRecommendedSummoners(
 				request, main, Collections.emptyList()).getRecommendedSummoners();
 			assertThat(response).hasSize(2);
-			assertThat(response.get(0).getId()).isEqualTo(riotAccount2.getId());
-			assertThat(response.get(1).getId()).isEqualTo(riotAccount3.getId());
+			assertThat(response.get(0).getId()).isEqualTo(member2.getId());
+			assertThat(response.get(1).getId()).isEqualTo(member3.getId());
 		}
 
 		@DisplayName("introduction, schedule이 null이라도 조회된다.")
@@ -320,8 +320,8 @@ public class RiotAccountReadServiceTest extends ServiceTestSupport {
 			List<RecommendedSummonersEntry> response = riotAccountReadService.getRecommendedSummoners(
 				request, main, Collections.emptyList()).getRecommendedSummoners();
 			assertThat(response).hasSize(2);
-			assertThat(response.get(0).getId()).isEqualTo(riotAccount3.getId());
-			assertThat(response.get(1).getId()).isEqualTo(riotAccount2.getId());
+			assertThat(response.get(0).getId()).isEqualTo(member3.getId());
+			assertThat(response.get(1).getId()).isEqualTo(member2.getId());
 		}
 
 		@DisplayName("메인 소환사만 조회된다.")
@@ -339,7 +339,7 @@ public class RiotAccountReadServiceTest extends ServiceTestSupport {
 			List<RecommendedSummonersEntry> response = riotAccountReadService.getRecommendedSummoners(
 				request, main, Collections.emptyList()).getRecommendedSummoners();
 			assertThat(response).hasSize(1);
-			assertThat(response.get(0).getId()).isEqualTo(riotAccount2.getId());
+			assertThat(response.get(0).getId()).isEqualTo(member2.getId());
 		}
 
 		@DisplayName("마스터 이상은 조회되지 않는다.")
@@ -374,7 +374,7 @@ public class RiotAccountReadServiceTest extends ServiceTestSupport {
 			List<RecommendedSummonersEntry> response = riotAccountReadService.getRecommendedSummoners(
 				request, main, Collections.emptyList()).getRecommendedSummoners();
 			assertThat(response).hasSize(1);
-			assertThat(response.get(0).getId()).isEqualTo(riotAccount2.getId());
+			assertThat(response.get(0).getId()).isEqualTo(member2.getId());
 		}
 
 		@DisplayName("lane이 하나라도겹치면 조회된다.")
@@ -392,7 +392,7 @@ public class RiotAccountReadServiceTest extends ServiceTestSupport {
 			List<RecommendedSummonersEntry> response = riotAccountReadService.getRecommendedSummoners(
 				request, main, Collections.emptyList()).getRecommendedSummoners();
 			assertThat(response).hasSize(1);
-			assertThat(response.get(0).getId()).isEqualTo(riotAccount2.getId());
+			assertThat(response.get(0).getId()).isEqualTo(member2.getId());
 		}
 
 		@DisplayName("duoable일 경우, 듀오 가능한 소환사만 조회된다.")
@@ -410,7 +410,7 @@ public class RiotAccountReadServiceTest extends ServiceTestSupport {
 			List<RecommendedSummonersEntry> response = riotAccountReadService.getRecommendedSummoners(
 				request, main, Collections.emptyList()).getRecommendedSummoners();
 			assertThat(response).hasSize(1);
-			assertThat(response.get(0).getId()).isEqualTo(riotAccount2.getId());
+			assertThat(response.get(0).getId()).isEqualTo(member2.getId());
 		}
 
 		@DisplayName("시간이 조금이라도 겹치는 소환사만 조회된다.")
@@ -432,7 +432,7 @@ public class RiotAccountReadServiceTest extends ServiceTestSupport {
 			List<RecommendedSummonersEntry> response = riotAccountReadService.getRecommendedSummoners(
 				request, main, List.of(schedule)).getRecommendedSummoners();
 			assertThat(response).hasSize(1);
-			assertThat(response.get(0).getId()).isEqualTo(riotAccount2.getId());
+			assertThat(response.get(0).getId()).isEqualTo(member2.getId());
 		}
 
 		private Schedule createAndSaveSchedule(Member member, int startTime, int endTime) {
