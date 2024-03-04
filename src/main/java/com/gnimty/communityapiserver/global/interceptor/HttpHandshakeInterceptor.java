@@ -1,9 +1,9 @@
-package com.gnimty.communityapiserver.global.handler;
+package com.gnimty.communityapiserver.global.interceptor;
 
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.global.auth.JwtProvider;
-import com.gnimty.communityapiserver.global.connect.WebSocketSessionManager;
-import java.util.Arrays;
+import com.gnimty.communityapiserver.global.exception.BaseException;
+import com.gnimty.communityapiserver.global.exception.ErrorCode;
 import java.util.Map;
 import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +22,6 @@ import org.springframework.web.socket.server.HandshakeInterceptor;
 public class HttpHandshakeInterceptor implements HandshakeInterceptor {
 
 	private final JwtProvider jwtProvider;
-	private final WebSocketSessionManager webSocketSessionManager;
 
 	@Override
 	public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler,
@@ -31,12 +30,11 @@ public class HttpHandshakeInterceptor implements HandshakeInterceptor {
 			HttpServletRequest servletRequest = httpRequest.getServletRequest();
 			Optional<String> tokenByCookie = jwtProvider.resolveToken(servletRequest);
 			if (tokenByCookie.isEmpty()) {
-				return false;
+				throw new BaseException(ErrorCode.COOKIE_NOT_FOUND);
 			}
 			String token = tokenByCookie.get();
 			jwtProvider.checkValidation(token);
 			Member member = jwtProvider.findMemberByToken(token);
-			log.info("handshake member id : {}", member.getId());
 			attributes.put("memberId", member.getId());
 		}
 		return true;

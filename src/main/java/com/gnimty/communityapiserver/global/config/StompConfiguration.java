@@ -1,6 +1,6 @@
 package com.gnimty.communityapiserver.global.config;
 
-import com.gnimty.communityapiserver.global.handler.HttpHandshakeInterceptor;
+import com.gnimty.communityapiserver.global.interceptor.HttpHandshakeInterceptor;
 import com.gnimty.communityapiserver.global.handler.StompExceptionHandler;
 import com.gnimty.communityapiserver.global.handler.StompHandler;
 import lombok.RequiredArgsConstructor;

@@ -1,10 +1,6 @@
 package com.gnimty.communityapiserver.global.handler;
 
-import com.gnimty.communityapiserver.domain.member.entity.Member;
-import com.gnimty.communityapiserver.global.auth.JwtProvider;
 import com.gnimty.communityapiserver.global.connect.WebSocketSessionManager;
-import com.gnimty.communityapiserver.global.exception.BaseException;
-import com.gnimty.communityapiserver.global.exception.ErrorCode;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +19,6 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class StompHandler implements ChannelInterceptor {
 
-	private final JwtProvider jwtProvider;
 	private final WebSocketSessionManager webSocketSessionManager;
 
 	@Override
@@ -34,12 +29,10 @@ public class StompHandler implements ChannelInterceptor {
 		// websocket 연결시 헤더의 jwt token 유효성 검증
 		if (StompCommand.CONNECT == accessor.getCommand()) {
 			Map<String, Object> sessionAttributes = accessor.getSessionAttributes();
+			assert sessionAttributes != null;
 			Long memberId = (Long) sessionAttributes.get("memberId");
-			log.info("stomp handler memberId: {}", memberId);
 			webSocketSessionManager.addSession(accessor.getSessionId(), memberId);
-		}
-
-		else {
+		} else {
 			log.info(StompLog.builder()
 				.command(accessor.getCommand().toString())
 				.destination(accessor.getDestination())

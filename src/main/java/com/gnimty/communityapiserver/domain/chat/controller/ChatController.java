@@ -50,7 +50,6 @@ public class ChatController {
 	@SubscribeMapping("/init_chat")
 	public List<ChatRoomDto> getTotalChatRoomsAndChatsAndOtherUserInfo(
 		@Header("simpSessionId") String sessionId) {
-		log.info("getTotalChatRoomsAndChatsAndOtherUserInfo simp session id: {}", sessionId);
 		User user = getUserBySessionId(sessionId);
 		return stompService.getChatRoomsJoined(user);
 	}
@@ -61,7 +60,6 @@ public class ChatController {
 	@MessageMapping("/user/{otherUserId}")
 	public void createChatRoomAndDerive(@DestinationVariable("otherUserId") Long otherUserId,
 		@Header("simpSessionId") String sessionId) {
-		log.info("createChatRoomAndDerive simp session id: {}", sessionId);
 		User me = getUserBySessionId(sessionId);
 		User other = userService.getUser(otherUserId);
 
@@ -91,7 +89,6 @@ public class ChatController {
 	public void sendMessage(@DestinationVariable("chatRoomNo") Long chatRoomNo,
 		@Header("simpSessionId") String sessionId,
 		final @Valid MessageRequest request) {
-		log.info("sendMessage simp session id: {}", sessionId);
 		User user = getUserBySessionId(sessionId);
 		ChatRoom chatRoom = chatRoomService.getChatRoom(chatRoomNo);
 
