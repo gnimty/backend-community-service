@@ -153,7 +153,7 @@ public class RiotAccountQueryRepository {
 	private QBean<RecommendedSummonersEntry> getRankSoloProjectionBean() {
 		return Projections.bean(
 			RecommendedSummonersEntry.class,
-			riotAccount.id.as("id"),
+			member.id.as("id"),
 			riotAccount.name.as("name"),
 			riotAccount.tagLine.as("tagLine"),
 			member.status.as("status"),
@@ -177,7 +177,7 @@ public class RiotAccountQueryRepository {
 	private QBean<RecommendedSummonersEntry> getRankFlexProjectionBean() {
 		return Projections.bean(
 			RecommendedSummonersEntry.class,
-			riotAccount.id.as("id"),
+			member.id.as("id"),
 			riotAccount.name.as("name"),
 			riotAccount.tagLine.as("tagLine"),
 			member.status.as("status"),

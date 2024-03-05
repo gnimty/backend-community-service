@@ -60,7 +60,6 @@ public class ChatController {
 	@MessageMapping("/user/{otherUserId}")
 	public void createChatRoomAndDerive(@DestinationVariable("otherUserId") Long otherUserId,
 		@Header("simpSessionId") String sessionId) {
-
 		User me = getUserBySessionId(sessionId);
 		User other = userService.getUser(otherUserId);
 
@@ -137,7 +136,6 @@ public class ChatController {
 
 
 	private boolean isMultipleUser(Long memberId) {
-		int cnt = webSocketSessionManager.getSessionCountByMemberId(memberId);
 		return webSocketSessionManager.getSessionCountByMemberId(memberId) > 1;
 	}
 

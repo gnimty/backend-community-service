@@ -29,7 +29,11 @@ public class WebSocketSessionManager {
 	}
 
 	public Long getMemberId(String sessionId) {
-		return sessionStore.get(sessionId).getMemberId();
+		SessionInfo sessionInfo = sessionStore.get(sessionId);
+		if (sessionInfo == null) {
+			return -1L;
+		}
+		return sessionInfo.getMemberId();
 	}
 
 	public int getSessionCountByMemberId(Long memberId) {

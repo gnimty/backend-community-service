@@ -1,10 +1,7 @@
 package com.gnimty.communityapiserver.global.handler;
 
-import com.gnimty.communityapiserver.domain.member.entity.Member;
-import com.gnimty.communityapiserver.global.auth.JwtProvider;
 import com.gnimty.communityapiserver.global.connect.WebSocketSessionManager;
-import com.gnimty.communityapiserver.global.exception.BaseException;
-import com.gnimty.communityapiserver.global.exception.ErrorCode;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
@@ -22,7 +19,6 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class StompHandler implements ChannelInterceptor {
 
-	private final JwtProvider jwtProvider;
 	private final WebSocketSessionManager webSocketSessionManager;
 
 	@Override
@@ -32,14 +28,11 @@ public class StompHandler implements ChannelInterceptor {
 
 		// websocket 연결시 헤더의 jwt token 유효성 검증
 		if (StompCommand.CONNECT == accessor.getCommand()) {
-			String token = parseTokenByHeader(accessor);
-			jwtProvider.checkValidation(token);
-
-			Member member = jwtProvider.findMemberByToken(token);
-			webSocketSessionManager.addSession(accessor.getSessionId(), member.getId());
-		}
-
-		else {
+			Map<String, Object> sessionAttributes = accessor.getSessionAttributes();
+			assert sessionAttributes != null;
+			Long memberId = (Long) sessionAttributes.get("memberId");
+			webSocketSessionManager.addSession(accessor.getSessionId(), memberId);
+		} else {
 			log.info(StompLog.builder()
 				.command(accessor.getCommand().toString())
 				.destination(accessor.getDestination())
@@ -47,18 +40,5 @@ public class StompHandler implements ChannelInterceptor {
 				.build().toString());
 		}
 		return message;
-	}
-
-
-
-	private String parseTokenByHeader(StompHeaderAccessor accessor) {
-		String token = jwtProvider.extractJwt(accessor);
-		if (token == null) {
-			throw new BaseException(ErrorCode.COOKIE_NOT_FOUND);
-		}
-		token = token.substring(token.indexOf("accessToken=") + "accessToken=".length());
-		int semicolonIndex = token.indexOf(';');
-		token = token.substring(0, semicolonIndex);
-		return token;
 	}
 }
