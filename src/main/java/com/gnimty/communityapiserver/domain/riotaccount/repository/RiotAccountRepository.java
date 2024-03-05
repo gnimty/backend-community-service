@@ -2,6 +2,7 @@ package com.gnimty.communityapiserver.domain.riotaccount.repository;
 
 import com.gnimty.communityapiserver.domain.member.entity.Member;
 import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,11 +19,9 @@ public interface RiotAccountRepository extends JpaRepository<RiotAccount, Long> 
 	@Query("SELECT ra FROM RiotAccount ra WHERE ra.puuid IN :puuids")
 	List<RiotAccount> findByPuuids(@Param("puuids") List<String> puuids);
 
-	Optional<RiotAccount> findByPuuid(String puuid);
-
-	@Query("delete from RiotAccount r where r.member.id = :id")
+	@Query("update RiotAccount r set r.deleted = 1, r.updatedAt = :updatedAt where r.member.id = :id")
 	@Modifying
-	void deleteAllFromMember(@Param("id") Long id);
+	void deleteAllFromMember(@Param("id") Long id, @Param("updatedAt") LocalDateTime updatedAt);
 
 	Optional<RiotAccount> findByMemberIdAndIsMain(Long memberId, Boolean isMain);
 }

@@ -77,14 +77,15 @@ public class ChampionComments extends BaseEntity {
 	@Column(name = "version", columnDefinition = "VARCHAR(20)")
 	private String version;
 
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(name = "member_id", nullable = false)
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "member_id")
 	private Member member;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "parent_champion_comments_id")
 	private ChampionComments parentChampionComments;
 
+	@Column(name = "lock_version")
 	@Version
 	private Long lockVersion;
 
@@ -117,20 +118,6 @@ public class ChampionComments extends BaseEntity {
 		this.parentChampionComments = parentChampionComments;
 	}
 
-	public void updateLane(Lane lane) {
-		if (lane == null) {
-			return;
-		}
-		this.lane = lane;
-	}
-
-	public void updateOpponentChampionId(Long opponentChampionId) {
-		if (opponentChampionId == null) {
-			return;
-		}
-		this.opponentChampionId = opponentChampionId;
-	}
-
 	public void updateMentionedMemberId(Long mentionedMemberId) {
 		if (mentionedMemberId == null) {
 			return;
@@ -148,5 +135,11 @@ public class ChampionComments extends BaseEntity {
 
 	public void increaseDownCount() {
 		this.downCount++;
+	}
+
+	@Override
+	public void delete() {
+		super.delete();
+		member = null;
 	}
 }

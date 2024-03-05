@@ -18,7 +18,7 @@ public class ChampionCommentsReportQueryRepository {
 	public boolean existsByMemberAndChampionComments(Member member, ChampionComments championComments) {
 		return queryFactory.selectOne()
 			.from(championCommentsReport)
-			.where(memberIdEq(member), championCommentsIdEq(championComments))
+			.where(memberIdEq(member), championCommentsIdEq(championComments), championCommentsReport.deleted.isFalse())
 			.fetchFirst() != null;
 	}
 

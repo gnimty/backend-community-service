@@ -17,7 +17,8 @@ public class MemberLikeQueryRepository {
 		return queryFactory
 			.selectOne()
 			.from(memberLike)
-			.where(memberLike.sourceMember.id.eq(source.getId()), memberLike.targetMember.id.eq(target.getId()))
+			.where(memberLike.sourceMember.id.eq(source.getId()), memberLike.targetMember.id.eq(target.getId()),
+				memberLike.deleted.isFalse())
 			.fetchFirst() != null;
 	}
 }

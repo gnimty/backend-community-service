@@ -15,7 +15,10 @@ public interface MemberLikeRepository extends JpaRepository<MemberLike, Long> {
 
 	List<MemberLike> findBySourceMember(Member sourceMember);
 
-	@Query("delete from MemberLike ml where ml.sourceMember.id = :id or ml.targetMember.id = :id")
+	@Query("update MemberLike ml set ml.deleted = 1 where ml.sourceMember.id = :id or ml.targetMember.id = :id")
 	@Modifying
 	void deleteAllFromMember(@Param("id") Long id);
+
+	@Query("select ml.targetMember.id from MemberLike ml where ml.sourceMember.id = :id")
+	List<Long> findTargetIdsBySourceMemberId(@Param("id") Long id);
 }

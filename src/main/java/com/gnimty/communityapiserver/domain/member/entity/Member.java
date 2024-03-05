@@ -17,6 +17,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Table(
@@ -27,6 +28,7 @@ import lombok.NoArgsConstructor;
 )
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Where(clause = "deleted = 0")
 public class Member extends BaseEntity {
 
 	@Id
@@ -38,7 +40,7 @@ public class Member extends BaseEntity {
 	@NotNull
 	private Boolean rsoLinked;
 
-	@Column(name = "email", columnDefinition = "VARCHAR(100)", unique = true)
+	@Column(name = "email", columnDefinition = "VARCHAR(100)")
 	private String email;
 
 	@Column(name = "password", columnDefinition = "VARCHAR(100)")
@@ -47,7 +49,7 @@ public class Member extends BaseEntity {
 	@Column(name = "favorite_champion_id", columnDefinition = "BIGINT")
 	private Long favoriteChampionID;
 
-	@Column(name = "nickname", columnDefinition = "VARCHAR(16)", unique = true)
+	@Column(name = "nickname", columnDefinition = "VARCHAR(16)")
 	private String nickname;
 
 	@Enumerated(EnumType.STRING)
@@ -58,6 +60,7 @@ public class Member extends BaseEntity {
 	@NotNull
 	private Long upCount;
 
+	@Column(name = "lock_version")
 	@Version
 	private Long lockVersion;
 

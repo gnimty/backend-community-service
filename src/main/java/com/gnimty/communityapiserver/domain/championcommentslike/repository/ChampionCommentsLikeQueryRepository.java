@@ -19,7 +19,8 @@ public class ChampionCommentsLikeQueryRepository {
 			.selectOne()
 			.from(championCommentsLike)
 			.where(championCommentsLike.member.id.eq(member.getId()),
-				championCommentsLike.championComments.id.eq(championComments.getId()))
+				championCommentsLike.championComments.id.eq(championComments.getId()),
+				championCommentsLike.deleted.isFalse())
 			.fetchFirst() != null;
 	}
 }

@@ -38,7 +38,7 @@ public class BlockService {
 		if (!Objects.equals(block.getBlocker().getId(), member.getId())) {
 			throw new BaseException(ErrorCode.NO_PERMISSION);
 		}
-		blockRepository.delete(block);
+		block.delete();
 	}
 
 	private Block createBlockEntity(BlockServiceRequest request, Member member, Member blocked) {
