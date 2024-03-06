@@ -139,7 +139,7 @@ public class BlockServiceTest extends ServiceTestSupport {
 
 			blockService.clearBlock(blocker, request);
 
-			assertThat(blockRepository.findAll()).isEmpty();
+			assertThat(block.getDeleted()).isTrue();
 		}
 
 		@DisplayName("차단 id로 차단 정보를 찾을 수 없을 시, 실패한다.")
