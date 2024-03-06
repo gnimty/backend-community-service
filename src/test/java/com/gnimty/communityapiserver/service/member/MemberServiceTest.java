@@ -948,7 +948,7 @@ public class MemberServiceTest extends ServiceTestSupport {
 			memberService.deleteOauthInfo(provider);
 
 			// then
-			assertThat(oauthInfoRepository.findByMemberAndProvider(member, provider)).isEmpty();
+			assertThat(oauthInfo.getDeleted()).isTrue();
 		}
 
 		@DisplayName("form 로그인이 아닐 경우 oauth 정보는 삭제될 수 없다.")
