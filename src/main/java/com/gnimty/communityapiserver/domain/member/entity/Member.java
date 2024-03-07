@@ -60,7 +60,6 @@ public class Member extends BaseEntity {
 	@NotNull
 	private Long upCount;
 
-	@Column(name = "lock_version")
 	@Version
 	private Long lockVersion;
 
