@@ -85,7 +85,6 @@ public class ChampionComments extends BaseEntity {
 	@JoinColumn(name = "parent_champion_comments_id")
 	private ChampionComments parentChampionComments;
 
-	@Column(name = "lock_version")
 	@Version
 	private Long lockVersion;
 

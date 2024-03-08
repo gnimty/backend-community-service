@@ -47,21 +47,21 @@ public class WithdrawalService {
 	};
 	private static final String UPDATE_MEMBER_SQL = """
 			update member m
-			set m.up_count = m.up_count - 1, m.lock_version = m.lock_version + 1, m.updated_at = ?
+			set m.up_count = m.up_count - 1, m.lockVersion = m.lockVersion + 1, m.updated_at = ?
 			where m.member_id = ?
-			and m.lock_version = ?
+			and m.lockVersion = ?
 		""";
 	private static final String UPDATE_CHAMPION_COMMENTS_LIKE_SQL = """
 			update champion_comments c
-			set c.up_count = c.up_count - 1, c.lock_version = c.lock_version + 1, c.updated_at = ?
+			set c.up_count = c.up_count - 1, c.lockVersion = c.lockVersion + 1, c.updated_at = ?
 			where c.champion_comments_id = ?
-			and c.lock_version = ?
+			and c.lockVersion = ?
 		""";
 	private static final String UPDATE_CHAMPION_COMMENTS_DISLIKE_SQL = """
 			update champion_comments c
-			set c.down_count = c.down_count - 1, c.lock_version = c.lock_version + 1, c.updated_at = ?
+			set c.down_count = c.down_count - 1, c.lockVersion = c.lockVersion + 1, c.updated_at = ?
 			where c.champion_comments_id = ?
-			and c.lock_version = ?
+			and c.lockVersion = ?
 		""";
 
 	private final IntroductionRepository introductionRepository;

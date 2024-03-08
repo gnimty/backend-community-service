@@ -310,7 +310,7 @@ public class RiotAccountQueryRepository {
 	private BooleanExpression cursorGt(RecommendedSummonersServiceRequest request) {
 		SortBy sortBy = request.getSortBy();
 		if (sortBy == null) {
-			return riotAccount.id.gt(request.getLastSummonerId());
+			return member.id.gt(request.getLastSummonerId());
 		}
 		if (sortBy.equals(SortBy.ATOZ)) {
 			if (request.getLastName() == null || request.getLastSummonerId() == null) {
@@ -318,28 +318,28 @@ public class RiotAccountQueryRepository {
 			}
 			return riotAccount.name.toLowerCase().trim().goe(request.getLastName().toLowerCase().trim())
 				.and(riotAccount.name.toLowerCase().trim().gt(request.getLastName().toLowerCase().trim())
-					.or(riotAccount.id.gt(request.getLastSummonerId())));
+					.or(member.id.gt(request.getLastSummonerId())));
 		} else if (sortBy.equals(SortBy.TIER)) {
 			if (request.getLastSummonerMmr() == null || request.getLastSummonerId() == null) {
 				return null;
 			}
 			return riotAccount.mmr.loe(request.getLastSummonerMmr())
 				.and(riotAccount.mmr.lt(request.getLastSummonerMmr())
-					.or(riotAccount.id.gt(request.getLastSummonerId())));
+					.or(member.id.gt(request.getLastSummonerId())));
 		}
 		if (request.getLastSummonerUpCount() == null || request.getLastSummonerId() == null) {
 			return null;
 		}
 		return member.upCount.loe(request.getLastSummonerUpCount())
 			.and(member.upCount.lt(request.getLastSummonerUpCount())
-				.or(riotAccount.id.gt(request.getLastSummonerId())));
+				.or(member.id.gt(request.getLastSummonerId())));
 	}
 
 	private OrderSpecifier<?>[] createOrderSpecifier(SortBy sortBy) {
 		OrderSpecifier<String> nameAsc = riotAccount.name.toLowerCase().asc();
 		OrderSpecifier<Long> mmrDesc = riotAccount.mmr.desc();
 		OrderSpecifier<Long> upCountDesc = member.upCount.desc();
-		OrderSpecifier<Long> idAsc = riotAccount.id.asc();
+		OrderSpecifier<Long> idAsc = member.id.asc();
 
 		if (sortBy == null) {
 			return new OrderSpecifier[]{idAsc};
