@@ -30,7 +30,7 @@ public class HttpLog {
 		double elapsedTime
 	) throws UnsupportedEncodingException {
 		this.method = requestWrapper.getMethod();
-		this.host = requestWrapper.getRemoteHost();
+		this.host = requestWrapper.getHeader("x-real-ip");
 		this.requestUri = requestWrapper.getRequestURI();
 		this.requestParam = requestWrapper.getParameterMap().entrySet().stream()
 			.map(entry -> entry.getKey() + "=[" + String.join(",", entry.getValue()) + "]")
