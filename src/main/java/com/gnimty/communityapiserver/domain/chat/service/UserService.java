@@ -40,12 +40,6 @@ public class UserService {
 	}
 
 	public User save(RiotAccount riotAccount) {
-		Optional<User> byActualUserId = userRepository.findByActualUserId(riotAccount.getMember().getId());
-		if (byActualUserId.isPresent()) {
-			log.info("id: {}", byActualUserId.get().getId());
-			log.info("actualUserId: {}", byActualUserId.get().getActualUserId());
-			log.info("internalTagName: {}", byActualUserId.get().getInternalTagName());
-		}
 		return userRepository.findByActualUserId(riotAccount.getMember().getId())
 			.map(user -> {
 				user.updateByRiotAccount(riotAccount);

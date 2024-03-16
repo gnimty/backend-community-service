@@ -50,7 +50,6 @@ public class ChatController {
 	@SubscribeMapping("/init_chat")
 	public List<ChatRoomDto> getTotalChatRoomsAndChatsAndOtherUserInfo(
 		@Header("simpSessionId") String sessionId) {
-		log.info("simpSessionId: {}", sessionId);
 		User user = getUserBySessionId(sessionId);
 		return stompService.getChatRoomsJoined(user);
 	}
@@ -132,7 +131,6 @@ public class ChatController {
 
 	private User getUserBySessionId(String sessionId) {
 		Long actualUserId = webSocketSessionManager.getMemberId(sessionId);
-		log.info("sessionId: {}, actualUserId: {}", sessionId, actualUserId);
 		return userService.getUser(actualUserId);
 	}
 
