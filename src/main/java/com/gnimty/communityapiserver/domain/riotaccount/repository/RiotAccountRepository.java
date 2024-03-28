@@ -24,4 +24,7 @@ public interface RiotAccountRepository extends JpaRepository<RiotAccount, Long> 
 	void deleteAllFromMember(@Param("id") Long id, @Param("updatedAt") LocalDateTime updatedAt);
 
 	Optional<RiotAccount> findByMemberIdAndIsMain(Long memberId, Boolean isMain);
+
+	@Query("SELECT ra.puuid FROM RiotAccount ra WHERE ra.puuid IN :puuids")
+	List<String> findByExistsPuuids(@Param("puuids") List<String> puuids);
 }

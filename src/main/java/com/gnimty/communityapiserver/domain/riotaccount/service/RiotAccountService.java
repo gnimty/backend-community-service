@@ -10,7 +10,9 @@ import com.gnimty.communityapiserver.domain.memberlike.service.MemberLikeReadSer
 import com.gnimty.communityapiserver.domain.riotaccount.controller.dto.response.RecentlySummonersEntry;
 import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
 import com.gnimty.communityapiserver.domain.riotaccount.repository.RiotAccountJdbcRepository;
+import com.gnimty.communityapiserver.domain.riotaccount.service.dto.request.FilterPuuidServiceRequest;
 import com.gnimty.communityapiserver.domain.riotaccount.service.dto.request.RecommendedSummonersServiceRequest;
+import com.gnimty.communityapiserver.domain.riotaccount.service.dto.response.FilteredPuuidServiceResponse;
 import com.gnimty.communityapiserver.domain.riotaccount.service.dto.response.RecentlySummonersServiceResponse;
 import com.gnimty.communityapiserver.domain.riotaccount.service.dto.response.RecommendedSummonersServiceResponse;
 import com.gnimty.communityapiserver.domain.schedule.entity.Schedule;
@@ -106,5 +108,11 @@ public class RiotAccountService {
 			.filter(riotAccount -> !memberLikeReadService
 				.existsBySourceAndTarget(member, riotAccount.getMember()))
 			.collect(Collectors.toMap(RiotAccount::getPuuid, ra -> ra));
+	}
+
+	public FilteredPuuidServiceResponse filterPuuids(FilterPuuidServiceRequest request) {
+		return FilteredPuuidServiceResponse.builder()
+			.puuids(riotAccountReadService.filterPuuids(request.getPuuids()))
+			.build();
 	}
 }
