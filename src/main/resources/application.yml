@@ -1,6 +1,7 @@
 jwt:
   secret: ${JWT_SECRET}
-
+gnimty:
+  base-url: ${GNIMTY_BASE_URL}
 oauth:
   kakao:
     client_id: ${OAUTH_KAKAO_CLIENT_ID}

@@ -22,11 +22,11 @@ public enum WebClientType {
 	GOOGLE_USER_INFO_REQUEST_URI("https://www.googleapis.com/userinfo/v2/me?access_token="),
 
 	// GNIMTY
-	GNIMTY_VERSION_URI("https://gnimty.kro.kr/asset/version"),
-	GNIMTY_TOGETHER_URI("https://gnimty.kro.kr/statistics/summoners/together/%s?queue_type=%s"),
-	GNIMTY_POST_SUMMONER_URI("https://gnimty.kro.kr/statistics/summoners/%s"),
-	GNIMTY_GET_SUMMONER_URI("https://gnimty.kro.kr/statistics/summoners/%s-%s"),
-	GNIMTY_GET_CHAMPION_INFO("https://gnimty.kro.kr/asset/champion"),
+	GNIMTY_VERSION_URI("/asset/version"),
+	GNIMTY_TOGETHER_URI("/statistics/summoners/together/%s?queue_type=%s"),
+	GNIMTY_POST_SUMMONER_URI("/statistics/summoners/%s"),
+	GNIMTY_GET_SUMMONER_URI("/statistics/summoners/%s-%s"),
+	GNIMTY_GET_CHAMPION_INFO("/asset/champion"),
 
 	// COMMON
 	GRANT_TYPE("grant_type"),

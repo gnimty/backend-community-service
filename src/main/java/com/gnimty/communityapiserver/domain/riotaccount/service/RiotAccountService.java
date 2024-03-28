@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +36,8 @@ public class RiotAccountService {
 	private final RiotAccountJdbcRepository riotAccountJdbcRepository;
 	private final ScheduleReadService scheduleReadService;
 	private final MemberLikeReadService memberLikeReadService;
+	@Value("${gnimty.base-url}")
+	private String baseUrl;
 
 	public List<RiotAccount> updateSummoners(SummonerUpdateServiceRequest request) {
 		List<SummonerUpdateEntry> summonerUpdateEntries = request.getSummonerUpdates()
@@ -94,8 +97,8 @@ public class RiotAccountService {
 	}
 
 	private RecentMemberInfo getRecentMemberInfo(String internalTagName, GameMode gameMode) {
-		return WebClientUtil.get(RecentMemberInfo.class, GNIMTY_TOGETHER_URI.getValue(internalTagName, gameMode.name()),
-			null);
+		return WebClientUtil.get(RecentMemberInfo.class,
+			baseUrl + GNIMTY_TOGETHER_URI.getValue(internalTagName, gameMode.name()), null);
 	}
 
 	private Map<String, RiotAccount> createRiotAccountMap(Member member, List<RiotAccount> chattedRiotAccounts) {
