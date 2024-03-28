@@ -38,7 +38,13 @@ public class HttpLog {
 		this.requestHeaders = Collections.list(requestWrapper.getHeaderNames()).stream()
 			.map(headerName -> headerName + ": " + requestWrapper.getHeader(headerName))
 			.collect(Collectors.joining(", "));
-		this.requestBody = new String(requestWrapper.getContentAsByteArray(), requestWrapper.getCharacterEncoding());
+		if (requestWrapper.getRequestURI().contains("/community/summoners")
+			&& requestWrapper.getMethod().equals("PATCH")) {
+			this.requestBody = null;
+		} else {
+			this.requestBody = new String(requestWrapper.getContentAsByteArray(),
+				requestWrapper.getCharacterEncoding());
+		}
 		this.httpStatus = HttpStatus.valueOf(responseWrapper.getStatus());
 		this.responseHeaders = responseWrapper.getHeaderNames().stream()
 			.distinct()
