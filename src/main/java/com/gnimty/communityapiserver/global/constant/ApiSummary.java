@@ -44,4 +44,5 @@ public class ApiSummary {
 	public static final String GET_MAIN_SUMMONERS = "메인 화면 추천 소환사 조회";
 	public static final String GET_RECENTLY_SUMMONERS = "최근 같이 게임한 소환사 상위 9명 조회";
 	public static final String GET_UP_COUNT = "puuid로 upCount 조회";
+	public static final String FILTER_PUUID = "puuid 필터링";
 }

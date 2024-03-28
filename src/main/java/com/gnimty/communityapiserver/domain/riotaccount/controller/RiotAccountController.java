@@ -1,5 +1,6 @@
 package com.gnimty.communityapiserver.domain.riotaccount.controller;
 
+import static com.gnimty.communityapiserver.global.constant.ApiSummary.FILTER_PUUID;
 import static com.gnimty.communityapiserver.global.constant.ApiSummary.GET_MAIN_SUMMONERS;
 import static com.gnimty.communityapiserver.global.constant.ApiSummary.GET_RECENTLY_SUMMONERS;
 import static com.gnimty.communityapiserver.global.constant.ApiSummary.GET_RECOMMENDED_SUMMONERS;
@@ -11,11 +12,14 @@ import com.gnimty.communityapiserver.domain.chat.service.StompService;
 import com.gnimty.communityapiserver.domain.chat.service.UserService;
 import com.gnimty.communityapiserver.domain.member.controller.dto.request.SummonerUpdateRequest;
 import com.gnimty.communityapiserver.domain.member.entity.Member;
+import com.gnimty.communityapiserver.domain.riotaccount.controller.dto.request.FilterPuuidRequest;
 import com.gnimty.communityapiserver.domain.riotaccount.controller.dto.request.RecommendedSummonersRequest;
+import com.gnimty.communityapiserver.domain.riotaccount.controller.dto.response.FilteredPuuidResponse;
 import com.gnimty.communityapiserver.domain.riotaccount.controller.dto.response.RecentlySummonersResponse;
 import com.gnimty.communityapiserver.domain.riotaccount.controller.dto.response.RecommendedSummonersResponse;
 import com.gnimty.communityapiserver.domain.riotaccount.entity.RiotAccount;
 import com.gnimty.communityapiserver.domain.riotaccount.service.RiotAccountService;
+import com.gnimty.communityapiserver.domain.riotaccount.service.dto.response.FilteredPuuidServiceResponse;
 import com.gnimty.communityapiserver.domain.riotaccount.service.dto.response.RecentlySummonersServiceResponse;
 import com.gnimty.communityapiserver.domain.riotaccount.service.dto.response.RecommendedSummonersServiceResponse;
 import com.gnimty.communityapiserver.global.auth.MemberThreadLocal;
@@ -33,6 +37,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -87,5 +92,12 @@ public class RiotAccountController {
 		List<Long> chattedMemberIds = stompService.getChattedMemberIds(userService.getUser(member.getId()));
 		RecentlySummonersServiceResponse response = riotAccountService.getRecentlySummoners(member, chattedMemberIds);
 		return CommonResponse.success(RecentlySummonersResponse.from(response));
+	}
+
+	@Operation(summary = FILTER_PUUID, description = ApiDescription.FILTER_PUUID)
+	@PostMapping("/filter")
+	public CommonResponse<FilteredPuuidResponse> filterPuuids(@RequestBody @Valid FilterPuuidRequest request) {
+		FilteredPuuidServiceResponse response = riotAccountService.filterPuuids(request.toServiceRequest());
+		return CommonResponse.success(FilteredPuuidResponse.from(response));
 	}
 }
