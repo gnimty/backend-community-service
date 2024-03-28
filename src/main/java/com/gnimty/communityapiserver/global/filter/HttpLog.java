@@ -30,7 +30,7 @@ public class HttpLog {
 		double elapsedTime
 	) throws UnsupportedEncodingException {
 		this.method = requestWrapper.getMethod();
-		this.host = requestWrapper.getRemoteHost();
+		this.host = requestWrapper.getHeader("x-real-ip");
 		this.requestUri = requestWrapper.getRequestURI();
 		this.requestParam = requestWrapper.getParameterMap().entrySet().stream()
 			.map(entry -> entry.getKey() + "=[" + String.join(",", entry.getValue()) + "]")
@@ -38,7 +38,13 @@ public class HttpLog {
 		this.requestHeaders = Collections.list(requestWrapper.getHeaderNames()).stream()
 			.map(headerName -> headerName + ": " + requestWrapper.getHeader(headerName))
 			.collect(Collectors.joining(", "));
-		this.requestBody = new String(requestWrapper.getContentAsByteArray(), requestWrapper.getCharacterEncoding());
+		if (requestWrapper.getRequestURI().contains("/community/summoners")
+			&& requestWrapper.getMethod().equals("PATCH")) {
+			this.requestBody = null;
+		} else {
+			this.requestBody = new String(requestWrapper.getContentAsByteArray(),
+				requestWrapper.getCharacterEncoding());
+		}
 		this.httpStatus = HttpStatus.valueOf(responseWrapper.getStatus());
 		this.responseHeaders = responseWrapper.getHeaderNames().stream()
 			.distinct()

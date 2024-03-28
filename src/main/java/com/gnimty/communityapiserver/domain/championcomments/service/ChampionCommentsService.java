@@ -21,6 +21,7 @@ import com.gnimty.communityapiserver.global.exception.ErrorCode;
 import com.gnimty.communityapiserver.global.utils.WebClientUtil;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +33,8 @@ public class ChampionCommentsService {
 	private final ChampionCommentsReadService championCommentsReadService;
 	private final MemberReadService memberReadService;
 	private final ChampionCommentsRepository championCommentsRepository;
+	@Value("${gnimty.base-url}")
+	private String baseUrl;
 
 	public void addComments(Long championId, ChampionCommentsServiceRequest request) {
 		Member member = MemberThreadLocal.get();
@@ -150,6 +153,6 @@ public class ChampionCommentsService {
 	}
 
 	private VersionInfo getVersionInfo() {
-		return WebClientUtil.get(VersionInfo.class, GNIMTY_VERSION_URI.getValue(), null);
+		return WebClientUtil.get(VersionInfo.class, baseUrl + GNIMTY_VERSION_URI.getValue(), null);
 	}
 }

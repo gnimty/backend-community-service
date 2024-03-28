@@ -108,6 +108,7 @@ public class StompService {
 
 	// TODO solomon : 유저정보 생성하기
 	public void createOrUpdateUser(RiotAccount riotAccount) {
+		log.info("riot account id: {}, member id: {}", riotAccount.getId(), riotAccount.getMember().getId());
 		User user = userService.save(riotAccount);
 
 		List<ChatRoom> chatRooms = chatRoomService.findChatRoom(user);

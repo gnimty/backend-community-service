@@ -81,4 +81,8 @@ public class RiotAccountReadService {
 		return riotAccountRepository.findByMemberIdAndIsMain(memberId, true)
 			.orElseThrow(() -> new BaseException(ErrorCode.NOT_LINKED_RSO));
 	}
+
+	public List<String> filterPuuids(List<String> puuids) {
+		return riotAccountRepository.findByExistsPuuids(puuids);
+	}
 }

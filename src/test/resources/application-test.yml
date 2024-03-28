@@ -1,6 +1,7 @@
 jwt:
   secret: test
-
+gnimty:
+  base-url: https://gnimty.kro.kr
 oauth:
   kakao:
     client_id: test

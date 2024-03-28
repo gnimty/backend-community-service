@@ -320,4 +320,8 @@ public class ApiDescription {
 	public static final String GET_UP_COUNT = """
 		해당 전적 검색 아이디가 community 서비스에 회원가입 돼 있지 않은 경우, null을 응답합니다.
 		""";
+
+	public static final String FILTER_PUUID = """
+		list 요청으로 온 puuids를 gnimty 내에 가입된 소환사 기준으로 필터링합니다.
+		""";
 }

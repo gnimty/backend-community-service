@@ -58,7 +58,7 @@ public class TokenAuthInterceptor implements HandlerInterceptor {
 		if (path.contains("/members") && Character.isDigit(lastPathSegment(path)) && HttpMethod.GET.matches(method)) {
 			return true;
 		}
-		return path.equals("/summoners") && HttpMethod.PATCH.matches(method);
+		return (path.equals("/summoners") && HttpMethod.PATCH.matches(method)) || path.equals("/summoners/filter");
 	}
 
 	private boolean skipTokenCheckAfterCookie(String path, String method) {

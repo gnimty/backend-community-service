@@ -12,6 +12,7 @@ import com.gnimty.communityapiserver.global.dto.webclient.SummonerResponse;
 import com.gnimty.communityapiserver.global.utils.WebClientUtil;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,17 +24,20 @@ import org.springframework.util.LinkedMultiValueMap;
 public class RiotAccountUpdateUtil {
 
 	private final RiotAccountReadService riotAccountReadService;
+	@Value("${gnimty.base-url}")
+	private String baseUrl;
 
 	@Async(value = "riotAccountExecutor")
 	@Transactional
 	@TransactionalEventListener
 	public void updateSummonerInfo(AfterRiotAccountCommitEvent event) {
 		RiotAccount riotAccount = riotAccountReadService.findById(event.getId());
-		WebClientUtil.post(Object.class, GNIMTY_POST_SUMMONER_URI.getValue(event.getInfo().getPuuid()),
+		WebClientUtil.post(Object.class, baseUrl + GNIMTY_POST_SUMMONER_URI.getValue(event.getInfo().getPuuid()),
 			APPLICATION_JSON, new LinkedMultiValueMap<>(), null);
 
 		Optional<SummonerResponse> response = Optional.ofNullable(WebClientUtil.get(SummonerResponse.class,
-			GNIMTY_GET_SUMMONER_URI.getValue(event.getInfo().getGameName(), event.getInfo().getTagLine()), null));
+			baseUrl + GNIMTY_GET_SUMMONER_URI.getValue(event.getInfo().getGameName(), event.getInfo().getTagLine()),
+			null));
 
 		updateEntity(riotAccount, response);
 	}
